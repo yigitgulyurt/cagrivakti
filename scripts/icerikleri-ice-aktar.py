@@ -8,7 +8,60 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.factory import create_app
 from app.extensions import db
-from app.models import DailyContent
+from app.models import DailyContent, Guide
+
+def bulk_add_guides(file_path):
+    if not os.path.exists(file_path):
+        print(f"Dosya bulunamadı: {file_path}")
+        return
+
+    app = create_app()
+    with app.app_context():
+        with open(file_path, 'r', encoding='utf-8') as f:
+            try:
+                data = json.load(f)
+                items = data.get('guides', [])
+                
+                count = 0
+                for item in items:
+                    slug = item.get('slug')
+                    title = item.get('title')
+                    description = item.get('description')
+                    category = item.get('category')
+                    content = item.get('content')
+                    
+                    if not slug or not title:
+                        continue
+
+                    # Mükerrer kontrolü (slug üzerinden)
+                    exists = Guide.query.filter_by(slug=slug).first()
+
+                    if not exists:
+                        new_item = Guide(
+                            slug=slug,
+                            title=title,
+                            description=description,
+                            category=category,
+                            content=content,
+                            is_active=True
+                        )
+                        db.session.add(new_item)
+                        count += 1
+                    else:
+                        # Varsa güncelle
+                        exists.title = title
+                        exists.description = description
+                        exists.category = category
+                        exists.content = content
+                        print(f"Güncellendi: {slug}")
+                
+                db.session.commit()
+                if count > 0:
+                    print(f"{count} adet yeni rehber başarıyla eklendi.")
+                else:
+                    print("Yeni rehber eklenmedi (tümü zaten mevcut veya güncellendi).")
+            except Exception as e:
+                print(f"Hata oluştu: {e}")
 
 def add_content(category, content_type, text, source=None, day_index=None):
     app = create_app()
@@ -151,12 +204,16 @@ if __name__ == "__main__":
     del_parser = subparsers.add_parser('delete', help='İçerik sil')
     del_parser.add_argument('id', type=int, help='Silinecek içeriğin ID\'si')
 
-    # Bulk komutu
-    bulk_parser = subparsers.add_parser('bulk', help='Dosyadan toplu ekle (JSON)')
-    bulk_parser.add_argument('file', help='JSON dosya yolu')
+    # Daily komutu (eski bulk)
+    daily_parser = subparsers.add_parser('daily', help='Dosyadan günlük içerikleri toplu ekle (JSON)')
+    daily_parser.add_argument('file', nargs='?', help='JSON dosya yolu (opsiyonel)')
 
     # Sync komutu
-    sync_parser = subparsers.add_parser('sync', help='Varsayılan daily_content.json dosyasını veritabanına aktar')
+    sync_parser = subparsers.add_parser('sync', help='Varsayılan dosyaları veritabanına aktar')
+
+    # Guide komutu
+    guide_parser = subparsers.add_parser('guides', help='Dosyadan rehberleri toplu ekle (JSON)')
+    guide_parser.add_argument('file', nargs='?', help='JSON dosya yolu (opsiyonel)')
 
     # Export komutu
     export_parser = subparsers.add_parser('export', help='İçerikleri dosyaya aktar (JSON)')
@@ -171,11 +228,22 @@ if __name__ == "__main__":
         list_content(args.category)
     elif args.command == 'delete':
         delete_content(args.id)
-    elif args.command == 'bulk':
-        bulk_add(args.file)
+    elif args.command == 'daily':
+        file_path = args.file or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'app', 'static', 'data', 'daily_content.json')
+        bulk_add(file_path)
+    elif args.command == 'guides':
+        file_path = args.file or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'app', 'static', 'data', 'guides.json')
+        bulk_add_guides(file_path)
     elif args.command == 'sync':
-        default_path = os.path.join(os.path.dirname(__file__), 'daily_content.json')
-        bulk_add(default_path)
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        daily_path = os.path.join(base_dir, 'app', 'static', 'data', 'daily_content.json')
+        guides_path = os.path.join(base_dir, 'app', 'static', 'data', 'guides.json')
+        
+        print("Günlük içerikler senkronize ediliyor...")
+        bulk_add(daily_path)
+        
+        print("\nRehberler senkronize ediliyor...")
+        bulk_add_guides(guides_path)
     elif args.command == 'export':
         export_content(args.file, args.category)
     else:

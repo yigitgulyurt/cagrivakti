@@ -32,10 +32,11 @@ def index():
     vakitler = PrayerService.get_vakitler(sehir, country_code)
     
     # Dinamik SEO
-    title = f"{sehir} Namaz Vakitleri {datetime.now().year} - İftar ve Sahur Saatleri"
+    current_year = datetime.now().year
+    title = f"Namaz Vakitleri {current_year} - Ezan Saatleri, İftar ve Sahur Vakitleri"
     description = f"{sehir} için bugün imsak: {vakitler['imsak']}, akşam: {vakitler['aksam']}. En doğru ve güncel {sehir} namaz vakitleri, ezan saatleri ve imsakiye."
     
-    return render_template('index.html', 
+    return render_template('main/index.html', 
                          sehir=sehir, 
                          country_code=country_code,
                          vakitler=vakitler,
@@ -65,7 +66,7 @@ def sehir_sayfasi(sehir):
     title = f"{sehir} Namaz Vakitleri {datetime.now().strftime('%d.%m.%Y')} - Ezan Saatleri"
     description = f"{sehir} ezan vakitleri: İmsak {vakitler['imsak']}, Öğle {vakitler['ogle']}, Akşam {vakitler['aksam']}. {sehir} günlük namaz vakitleri ve aylık imsakiye."
     
-    return render_template('city_page.html', 
+    return render_template('city/city_page.html', 
                          sehir=sehir, 
                          country_code=country_code,
                          vakitler=vakitler,
@@ -77,7 +78,7 @@ def sehir_sayfasi(sehir):
 @views_bp.route('/sehir')
 @cache.cached(timeout=3600)
 def sehir_secimi():
-    return render_template('city_selection.html')
+    return render_template('city/city_selection.html')
 
 @views_bp.route('/kible-pusulasi')
 @cache.cached(timeout=86400)
@@ -85,14 +86,14 @@ def kible_pusulasi():
     """Kıble pusulası sayfasını gösterir."""
     title = "Kıble Pusulası - Online Kıble Yönü Bulma"
     description = "Pusula ve harita yardımıyla online kıble yönünü bulun. Telefonunuzun sensörlerini kullanarak en doğru kıble açısını hesaplayın."
-    return render_template('qibla_compass.html',
+    return render_template('utils/qibla_compass.html',
                          seo_title=title,
                          seo_description=description)
 
 @views_bp.route('/offline')
 @cache.cached(timeout=86400)
 def offline():
-    return render_template('offline.html')
+    return render_template('utils/offline.html')
 
 @views_bp.route('/sitemap.xml')
 @cache.cached(timeout=86400)
@@ -145,7 +146,7 @@ def serve_sitemap():
             "priority": "0.6"
         })
 
-    sitemap_xml = render_template('sitemap_template.xml', pages=pages)
+    sitemap_xml = render_template('utils/sitemap_template.xml', pages=pages)
     response = make_response(sitemap_xml)
     response.headers["Content-Type"] = "application/xml"
     return response
@@ -181,37 +182,42 @@ def serve_manifest():
 @views_bp.route('/ilkelerimiz')
 @cache.cached(timeout=86400)
 def ilkelerimiz():
-    return render_template('policies.html')
+    return render_template('info/policies.html')
+
+@views_bp.route('/MUSTAFA-KEMAL-ATATÜRK')
+@cache.cached(timeout=86400)
+def ataturk():
+    return render_template('main/ataturk.html')
 
 @views_bp.route('/api-dokuman')
 @cache.cached(timeout=86400)
 def api_dokuman():
-    return render_template('api_docs.html')
+    return render_template('info/api_docs.html')
 
 @views_bp.route('/ramazan')
 @cache.cached(timeout=3600)
 def ramazan_nedir():
-    return render_template('what_is_ramadan.html')
+    return render_template('ramadan/what_is_ramadan.html')
 
 @views_bp.route('/orucu-bozan-durumlar')
 @cache.cached(timeout=3600)
 def orucu_bozan_durumlar():
-    return render_template('things_that_break_fast.html')
+    return render_template('ramadan/things_that_break_fast.html')
 
 @views_bp.route('/neden-biz')
 @cache.cached(timeout=86400)
 def neden_biz():
-    return render_template('why_us.html')
+    return render_template('info/why_us.html')
 
 @views_bp.route('/indir')
 @cache.cached(timeout=86400)
 def indir():
-    return render_template('download.html')
+    return render_template('utils/download.html')
 
 @views_bp.route('/imsakiye')
 @cache.cached(timeout=3600)
 def imsakiye_secimi():
-    return render_template('ramadan_schedule_selection.html')
+    return render_template('ramadan/ramadan_schedule_selection.html')
 
 @views_bp.route('/imsakiye/<sehir>')
 def imsakiye_detay(sehir):
@@ -222,7 +228,7 @@ def imsakiye_detay(sehir):
     if not is_latin_only(country_code):
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
         
-    return render_template('ramadan_schedule_detail.html', 
+    return render_template('ramadan/ramadan_schedule_detail.html', 
                          sehir=sehir, 
                          country_code=country_code,
                          ramadan_info=RamadanService.get_ramadan_info())
@@ -231,7 +237,7 @@ def imsakiye_detay(sehir):
 @cache.cached(timeout=3600)
 def bilgi_kosesi_liste():
     guides = get_guides()
-    return render_template('guide_list.html', guides=guides)
+    return render_template('guide/guide_list.html', guides=guides)
 
 @views_bp.route('/bilgi-kosesi/<slug>')
 @cache.cached(timeout=3600)
@@ -243,11 +249,11 @@ def bilgi_kosesi_detay(slug):
     if not guide:
         abort(404)
     guides = get_guides()
-    return render_template('guide_detail.html', guide=guide, guides=guides)
+    return render_template('guide/guide_detail.html', guide=guide, guides=guides)
 
 @views_bp.route('/konum-bul')
 def konum_bul():
-    return render_template('detect_location.html')
+    return render_template('city/detect_location.html')
 
 def send_async_notification(app, name, email, subject, message):
     with app.app_context():
@@ -320,7 +326,7 @@ def iletisim():
             flash('Bir hata oluştu, lütfen daha sonra tekrar deneyin.', 'error')
             return redirect(url_for('views.iletisim'))
 
-    return render_template('contact.html')
+    return render_template('main/contact.html')
 
 def admin_required(f):
     """Admin yetkisi kontrolü için decorator."""
@@ -369,12 +375,9 @@ def admin_guide_edit(guide_id=None):
         image_url = request.form.get('image_url')
         is_active = 'is_active' in request.form
         
-        # Latin karakter kontrolü (URL uyumluluğu için)
-        if not is_latin_only(title):
-            flash('Baslik yalnizca Latin karakterler icerebilir.', 'danger')
-            return render_template('admin/guide_form.html', guide=guide)
+        # Sadece slug için Latin karakter kontrolü (URL uyumluluğu için kritik)
         if not is_latin_only(slug):
-            flash('Slug yalnizca Latin karakterler icerebilir.', 'danger')
+            flash('Slug yalnızca Latin karakterler içerebilir (URL uyumu için).', 'danger')
             return render_template('admin/guide_form.html', guide=guide)
             
         if not guide:

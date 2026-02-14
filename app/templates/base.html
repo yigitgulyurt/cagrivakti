@@ -64,6 +64,22 @@
     <!-- CSS Dosyaları -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 
+    <!-- In-App Browser Redirect Library -->
+    <script src="{{ url_for('static', filename='js/InAppRedirect.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new InAppRedirect({
+                appName: 'Çağrı Vakti',
+                primaryColor: '#FFC107',
+                onDetect: (data) => console.log('In-App Browser Detected:', data.ua),
+                onAction: () => {
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'in_app_browser_action', { 'event_category': 'Engagement' });
+                    }
+                }
+            });
+        });
+    </script>
 
     {% block extra_css %}{% endblock %}
 
@@ -101,7 +117,7 @@
         <div class="nav-links" id="navLinks">
             <a href="{{ url_for('views.sehir_secimi') }}" class="nav-link" title="Şehir Seçimi Sayfası">İl Seçimi</a>
             <a href="{{ url_for('views.kible_pusulasi') }}" class="nav-link" title="Online Kıble Pusulası">Kıble Pusulası</a>
-            <a href="{{ url_for('views.imsakiye_secimi') }}" class="nav-link" title="2026 İmsakiye Çizelgesi">Vakit Çizelgesi</a>
+            <a href="{{ url_for('views.imsakiye_secimi') }}" class="nav-link" title="{{ current_year }} İmsakiye Çizelgesi">Vakit Çizelgesi</a>
             <a href="{{ url_for('views.ramazan_nedir') }}" class="nav-link" title="Ramazan Hakkında Bilgiler">Ramazan Kılavuzu</a>
             <a href="{{ url_for('views.orucu_bozan_durumlar') }}" class="nav-link" title="Oruç Bozan Durumları">Oruç Bozan Durumları</a>
             <a href="{{ url_for('views.bilgi_kosesi_liste') }}" class="nav-link" title="Dini Bilgiler Bilgi Köşesi">Bilgi Köşesi</a>
@@ -109,6 +125,7 @@
             <a href="{{ url_for('views.indir') }}" class="nav-link" title="Mobil Uygulamayı İndir">Uygulamayı İndir</a>
             <a href="{{ url_for('views.ilkelerimiz') }}" class="nav-link" title="Çağrı Vakti İlkeleri">İlkelerimiz</a>
             <a href="{{ url_for('views.iletisim') }}" class="nav-link" title="Bize Ulaşın">İletişim</a>
+            <a href="{{ url_for('views.ataturk') }}" class="nav-link" title="Mustafa Kemal Atatürk" style="color: #e30a17 !important; font-weight: 600;">Atatürk</a>
             <!-- <a href="{{ url_for('views.api_dokuman') }}" class="nav-link">API Ulaşımı</a> -->
         </div>
     </nav>
@@ -124,9 +141,10 @@
             <div class="footer-links">
                 <a href="{{ url_for('views.sehir_secimi') }}">Vakitler</a>
                 <a href="{{ url_for('views.kible_pusulasi') }}">Kıble Pusulası</a>
-                <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye 2026</a>
+                <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye {{ current_year }}</a>
                 <a href="{{ url_for('views.neden_biz') }}">Neden Biz?</a>
                 <a href="{{ url_for('views.api_dokuman') }}">API</a>
+                <a href="{{ url_for('views.ataturk') }}">Atatürk</a>
                 <a href="{{ url_for('views.ilkelerimiz') }}">İlkelerimiz</a>
                 <a href="{{ url_for('views.indir') }}">Uygulamayı İndir</a>
                 <a href="{{ url_for('views.iletisim') }}">İletişim</a>
@@ -135,7 +153,7 @@
                 <a href="https://www.instagram.com/yigitgulyurt/" target="_blank" rel="noopener noreferrer">BİR YİĞİT GÜLYURT PROJESİ</a>
             </div>
             <div class="footer-copy">
-                &copy; 2026 Çağrı Vakti. Bütün hakları saklıdır.
+                &copy; {{ current_year }} Çağrı Vakti. Bütün hakları saklıdır.
             </div>
         </div>
     </footer>

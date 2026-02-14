@@ -1,49 +1,29 @@
 {% extends "base.html" %}
 
-{% block title %}İl Seçimi | Çağrı Vakti{% endblock %}
+{% block title %}İmsakiye {{ current_year }} - İl Seçimi | Çağrı Vakti{% endblock %}
 
-{% block brand_text %}İL SEÇİMİ{% endblock %}
+{% block brand_text %}İMSAKİYE {{ current_year }}{% endblock %}
 
 {% block content %}
 <div class="container fade-in">
     <header class="header">
         <a href="{{ url_for('views.index') }}" class="home-link">
             <h1>
-                <!-- SVG İkonu: Cami -->
-                <svg class="icon"><use xlink:href="#fa-mosque"></use></svg> Çağrı Vakti
+                <svg class="icon"><use xlink:href="#fa-calendar-days"></use></svg> {{ current_year }} Ramazan İmsakiyesi
             </h1>
         </a>
         <div class="search-container">
-            <!-- SVG İkonu: Arama -->
             <svg class="icon search-icon"><use xlink:href="#fa-search"></use></svg>
             <input type="text" class="search-box" placeholder="İl ya da ülke ara...">
         </div>
     </header>
 
     <nav class="category-tabs">
-        <button class="category-tab active" data-category="biggest">Büyük İller</button>
-        <button class="category-tab" data-category="turkey">Türkiye</button>
+        <button class="category-tab active" data-category="turkey">Türkiye</button>
         <button class="category-tab" data-category="countries">Ülkeler</button>
     </nav>
 
-    <section class="category-content active" id="biggest">
-        <div class="city-grid" id="buyuk-sehirler-grid">
-            <!-- Initial Skeletons -->
-            {% for i in range(30) %}
-            <div class="city-card skeleton-card">
-                <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto;"></div>
-                </div>
-                <div class="vakit-bilgisi">
-                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto 5px;"></div>
-                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto;"></div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-
-    <section class="category-content" id="turkey">
+    <section class="category-content active" id="turkey">
         <h2 class="region-title" data-region="marmara">Marmara Bölgesi</h2>
         <div class="city-grid" id="Marmara">
             {% for i in range(12) %}
@@ -326,8 +306,11 @@
 <script src="{{ url_for('static', filename='js/city-data.js') }}" defer></script>
 <script>
     $(document).ready(function() {
-        // Öncelikli olarak büyük şehirleri yükle
-        renderCityGrid('#buyuk-sehirler-grid', buyukSehirler, 'TR', false);
+        const CITY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else '{}' }};
+
+        function getDisplayName(city) {
+            return CITY_MAPPING[city] || city;
+        }
 
         // Diğer kategorileri arka planda, kullanıcıyı engellemeden yükle
         setTimeout(() => {
@@ -394,9 +377,8 @@
                     .addClass('city-card')
                     .click(function() {
                         if ($(this).hasClass('skeleton-card')) return;
-                        // Çevrimdışı uyumluluk için doğrudan yönlendir
-                        // Sunucu tarafındaki tercih kaydı sehir_sayfasi route'unda zaten yapılıyor
-                        window.location.href = `/sehir/${sehir}?country=${itemCountryCode}`;
+                        // İmsakiye detay sayfasına yönlendir
+                        window.location.href = `/imsakiye/${sehir}?country=${itemCountryCode}`;
                     });
 
                 const cityName = $('<div>').addClass('city-name');
@@ -407,7 +389,7 @@
 
                 if (cachedData) {
                     card.addClass('content-loaded');
-                    cityName.text(sehir);
+                    cityName.text(getDisplayName(sehir));
                     if (cachedData.imsak !== "--:--") {
                         vakitBilgisi.html(`İmsak: ${cachedData.imsak}<br>${aksamLabel}: ${cachedData.aksam}`);
                     } else {
@@ -425,7 +407,7 @@
                 
                 function updateUI(vakitler) {
                     card.removeClass('skeleton-card').addClass('content-loaded');
-                    cityName.empty().text(sehir);
+                    cityName.empty().text(getDisplayName(sehir));
                     if (vakitler && vakitler.imsak !== "--:--") {
                         vakitBilgisi.html(`İmsak: ${vakitler.imsak}<br>${aksamLabel}: ${vakitler.aksam}`);
                     } else {
@@ -446,7 +428,7 @@
                         updateUI(data.vakitler);
                     } else if (!card.hasClass('content-loaded')) {
                         card.removeClass('skeleton-card').addClass('content-loaded');
-                        cityName.empty().text(sehir);
+                        cityName.empty().text(getDisplayName(sehir));
                         vakitBilgisi.text('Hata oluştu');
                     }
                 };

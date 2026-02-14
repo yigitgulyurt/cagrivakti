@@ -191,10 +191,10 @@
         <a href="{{ url_for('views.bilgi_kosesi_detay', slug=guide.slug) }}" class="guide-card">
             <div class="guide-category">
                 <svg class="icon" style="width:14px;height:14px;"><use xlink:href="#fa-tag-solid"></use></svg>
-                {{ guide.category }}
+                {{ get_display_name(guide.category) }}
             </div>
-            <h2>{{ guide.title }}</h2>
-            <p>{{ guide.description }}</p>
+            <h2>{{ get_display_name(guide.title) }}</h2>
+            <p>{{ get_display_name(guide.description) }}</p>
             <div class="guide-footer">
                 <span class="read-more">Okumaya Başla <svg class="icon" style="width:16px;height:16px;"><use xlink:href="#fa-chevron-right-solid"></use></svg></span>
                 <span class="update-date">{{ guide.last_updated }}</span>

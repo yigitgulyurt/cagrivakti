@@ -411,7 +411,7 @@
                     <svg><use xlink:href="#fa-info-circle"></use></svg>
                     Genel Bakış
                 </h2>
-                <p>Çağrı Vakti API, 2026 yılına ait tüm dünya namaz vakitlerini JSON formatında sunar. Verilerimiz Diyanet İşleri Başkanlığı ve uluslararası astronomik hesaplamalarla %100 uyumludur.</p>
+                <p>Çağrı Vakti API, {{ current_year }} yılına ait tüm dünya namaz vakitlerini JSON formatında sunar. Verilerimiz Diyanet İşleri Başkanlığı ve uluslararası astronomik hesaplamalarla %100 uyumludur.</p>
                 
                 <div class="endpoint-box">
                     <span class="method-badge">GET</span>
@@ -490,7 +490,7 @@
   <span class="json-key">"data"</span>: {
     <span class="json-key">"sehir"</span>: <span class="json-string">"Istanbul"</span>,
     <span class="json-key">"ulke"</span>: <span class="json-string">"TR"</span>,
-    <span class="json-key">"tarih"</span>: <span class="json-string">"2026-02-10"</span>,
+    <span class="json-key">"tarih"</span>: <span class="json-string">"{{ current_year }}-02-10"</span>,
     <span class="json-key">"vakitler"</span>: {
       <span class="json-key">"imsak"</span>: <span class="json-string">"06:32"</span>,
       <span class="json-key">"gunes"</span>: <span class="json-string">"07:58"</span>,
@@ -635,8 +635,8 @@ $data = <span class="code-function">json_decode</span>($response, <span class="c
                     <div class="form-group" id="group-yil" style="display: none;">
                         <label>Yıl</label>
                         <select id="pg-yil" class="form-control">
-                            <option value="2026">2026</option>
-                            <option value="2027">2027</option>
+                            <option value="{{ current_year }}">{{ current_year }}</option>
+                            <option value="{{ current_year + 1 }}">{{ current_year + 1 }}</option>
                         </select>
                     </div>
 
@@ -684,7 +684,7 @@ $data = <span class="code-function">json_decode</span>($response, <span class="c
     </div>
 
     <footer style="text-align: center; margin-top: 60px; color: var(--api-text-muted);">
-        <p>&copy; 2026 Çağrı Vakti API. <a href="{{ url_for('views.index') }}" style="color: var(--api-primary);">Geri Dön</a></p>
+        <p>&copy; {{ current_year }} Çağrı Vakti API. <a href="{{ url_for('views.index') }}" style="color: var(--api-primary);">Geri Dön</a></p>
     </footer>
 </main>
 {% endblock %}

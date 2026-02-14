@@ -1,34 +1,30 @@
 {% extends "base.html" %}
 
-{% block title %}İmsakiye 2026 - İl Seçimi | Çağrı Vakti{% endblock %}
+{% block title %}İl Seçimi | Çağrı Vakti{% endblock %}
 
-{% block brand_text %}İMSAKİYE 2026{% endblock %}
+{% block brand_text %}İL SEÇİMİ{% endblock %}
 
 {% block content %}
-<main class="selection-wrapper fade-in">
-    <header class="selection-header">
-        <h1>
-            <svg><use xlink:href="#fa-calendar-days"></use></svg>
-            2026 Ramazan İmsakiyesi
-        </h1>
-        <p class="subtitle">İl ve ilçenize ait imsakiye bilgilerine ulaşmak için aşağıdaki listeden seçiminizi yapın veya arama özelliğini kullanın.</p>
-        
+<div class="container fade-in">
+    <header class="header">
+        <a href="{{ url_for('views.index') }}" class="home-link">
+            <h1>
+                <!-- SVG İkonu: Cami -->
+                <svg class="icon"><use xlink:href="#fa-mosque"></use></svg> Çağrı Vakti
+            </h1>
+        </a>
         <div class="search-container">
-            <svg class="search-icon"><use xlink:href="#fa-magnifying-glass"></use></svg>
-            <input type="text" id="citySearch" class="search-box" placeholder="İl veya ilçe ara...">
+            <!-- SVG İkonu: Arama -->
+            <svg class="icon search-icon"><use xlink:href="#fa-search"></use></svg>
+            <input type="text" class="search-box" placeholder="İl ya da ülke ara...">
         </div>
     </header>
 
-    <div class="category-tabs">
-        <button class="category-tab active" data-category="turkey">
-            <svg><use xlink:href="#fa-location-dot"></use></svg>
-            Türkiye
-        </button>
-        <button class="category-tab" data-category="world">
-            <svg><use xlink:href="#fa-globe"></use></svg>
-            Dünya
-        </button>
-    </div>
+    <nav class="category-tabs">
+        <button class="category-tab active" data-category="biggest">Büyük İller</button>
+        <button class="category-tab" data-category="turkey">Türkiye</button>
+        <button class="category-tab" data-category="countries">Ülkeler</button>
+    </nav>
 
     <section class="category-content active" id="biggest">
         <div class="city-grid" id="buyuk-sehirler-grid">
@@ -49,76 +45,135 @@
 
     <section class="category-content" id="turkey">
         <h2 class="region-title" data-region="marmara">Marmara Bölgesi</h2>
-        <div class="city-grid" id="Marmara"></div>
+        <div class="city-grid" id="Marmara">
+            {% for i in range(12) %}
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto;"></div>
+                </div>
+                <div class="vakit-bilgisi">
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto 5px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
 
         <h2 class="region-title" data-region="ege">Ege Bölgesi</h2>
-        <div class="city-grid" id="Ege"></div>
+        <div class="city-grid" id="Ege">
+            {% for i in range(8) %}
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto;"></div>
+                </div>
+                <div class="vakit-bilgisi">
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto 5px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
 
         <h2 class="region-title" data-region="akdeniz">Akdeniz Bölgesi</h2>
-        <div class="city-grid" id="Akdeniz"></div>
+        <div class="city-grid" id="Akdeniz">
+            {% for i in range(8) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
 
         <h2 class="region-title" data-region="icanadolu">İç Anadolu Bölgesi</h2>
-        <div class="city-grid" id="IcAnadolu"></div>
+        <div class="city-grid" id="IcAnadolu">
+            {% for i in range(13) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
 
         <h2 class="region-title" data-region="karadeniz">Karadeniz Bölgesi</h2>
-        <div class="city-grid" id="Karadeniz"></div>
+        <div class="city-grid" id="Karadeniz">
+            {% for i in range(17) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
 
         <h2 class="region-title" data-region="doguanadolu">Doğu Anadolu Bölgesi</h2>
-        <div class="city-grid" id="DoguAnadolu"></div>
+        <div class="city-grid" id="DoguAnadolu">
+            {% for i in range(14) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
 
         <h2 class="region-title" data-region="guneydoguanadolu">Güneydoğu Anadolu Bölgesi</h2>
-        <div class="city-grid" id="GuneydoguAnadolu"></div>
+        <div class="city-grid" id="GuneydoguAnadolu">
+            {% for i in range(7) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="category-content" id="countries">
+        <div class="city-grid" id="countries-grid">
+            {% for i in range(61) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
     </section>
 </div>
 {% endblock %}
 
 {% block extra_css %}
 <style>
-:root {
-    --selection-primary: #FFC107;
-    --selection-bg: #0f0f0f;
-    --selection-card: #1a1a1a;
-    --selection-border: rgba(255, 255, 255, 0.08);
-}
-
-.selection-wrapper {
-    padding: 60px 20px;
+.container {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 20px;
 }
 
-.selection-header {
+.header {
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 40px;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
 }
 
-.selection-header h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 15px;
+.home-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    color: var(--primary);
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 15px;
-}
-
-.selection-header h1 svg {
-    width: 40px;
-    height: 40px;
-    fill: var(--selection-primary);
-}
-
-.subtitle {
-    color: #a0a0a0;
-    font-size: 1.1rem;
-    max-width: 600px;
-    margin: 0 auto 30px;
+    justify-content: center;
 }
 
 .search-container {
     position: relative;
-    max-width: 500px;
+    max-width: 600px;
     margin: 0 auto;
 }
 
@@ -127,172 +182,142 @@
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    color: #666;
-    width: 20px;
-    height: 20px;
+    color: var(--gray);
 }
 
 .search-box {
     width: 100%;
-    background: var(--selection-card);
-    border: 1px solid var(--selection-border);
-    border-radius: 100px;
-    padding: 16px 25px 16px 55px;
-    color: #fff;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
+    padding: 15px 20px 15px 50px;
+    font-size: 1.1em;
+    border: 2px solid transparent;
+    border-radius: 15px;
+    background-color: var(--dark);
+    color: var(--text);
+    transition: var(--transition);
 }
 
 .search-box:focus {
-    border-color: var(--selection-primary);
-    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
     outline: none;
+    border-color: var(--primary);
+    background-color: var(--hover-color);
 }
 
 .category-tabs {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    margin-bottom: 40px;
+    gap: 10px;
+    margin-bottom: 30px;
     flex-wrap: wrap;
 }
 
 .category-tab {
-    background: var(--selection-card);
-    border: 1px solid var(--selection-border);
-    color: #a0a0a0;
     padding: 12px 24px;
-    border-radius: 100px;
-    font-weight: 600;
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: 12px;
+    color: var(--text);
     cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.category-tab svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-}
-
-.category-tab:hover {
-    border-color: var(--selection-primary);
-    color: #fff;
+    transition: var(--transition);
+    font-weight: 600;
 }
 
 .category-tab.active {
-    background: var(--selection-primary);
-    color: #000;
-    border-color: var(--selection-primary);
+    background-color: var(--primary);
+    color: var(--dark);
+}
+
+.category-tab:hover:not(.active) {
+    background-color: var(--hover-color);
+    transform: translateY(-2px);
 }
 
 .category-content {
     display: none;
-    animation: fadeIn 0.4s ease;
+    padding: 20px;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
 }
 
 .category-content.active {
     display: block;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.region-title {
-    color: #fff;
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 40px 0 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.region-title::before {
-    content: '';
-    width: 4px;
-    height: 24px;
-    background: var(--selection-primary);
-    border-radius: 2px;
-}
-
 .city-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 15px;
+    gap: 20px;
+    padding: 10px;
 }
 
 .city-card {
-    background: var(--selection-card);
-    border: 1px solid var(--selection-border);
-    border-radius: 20px;
+    background: var(--dark);
     padding: 20px;
+    border-radius: 15px;
     text-align: center;
-    text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    min-height: 114px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 100px;
+}
+
+.skeleton-card {
+    cursor: default;
+    pointer-events: none;
 }
 
 .city-card:hover {
     transform: translateY(-5px);
-    border-color: var(--selection-primary);
-    background: rgba(255, 193, 7, 0.03);
+    background: var(--hover-color);
+    border-color: var(--primary);
 }
 
 .city-name {
-    color: #fff;
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.region-title {
+    color: var(--primary);
+    font-size: 1.5em;
+    margin: 30px 0 15px;
+    padding-left: 10px;
+    border-left: 4px solid var(--primary);
 }
 
 .vakit-bilgisi {
-    color: #666;
-    font-size: 0.85rem;
-}
-
-.city-card:hover .vakit-bilgisi {
-    color: var(--selection-primary);
+    font-size: 0.9em;
+    color: var(--gray);
+    line-height: 1.4;
 }
 
 @media (max-width: 768px) {
-    .selection-wrapper {\ padding: 40px 15px; }
-    .category-tabs { display: grid; grid-template-columns: 1fr 1fr; }
-    .category-tab { justify-content: center; }
-    .city-grid { grid-template-columns: repeat(2, 1fr); }
+    .container { padding: 10px; }
+    .header { padding: 20px; margin-bottom: 20px; }
+    .header h1 { font-size: 1.6em; gap: 10px; }
+    .search-box { padding: 12px 15px 12px 45px; font-size: 1rem; }
+    .search-icon { left: 15px; }
+    
+    .category-tabs { gap: 8px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; }
+    .category-tab { width: 100%; padding: 10px; font-size: 0.9rem; white-space: nowrap; }
+    .category-tab:first-child { grid-column: span 2; }
+    
+    .category-content { padding: 15px 10px; }
+    .city-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 5px; }
+    .city-card { padding: 15px 10px; min-height: 100px; }
+    .city-name { font-size: 0.95rem; }
+    .vakit-bilgisi { font-size: 0.85rem; }
+    
+    .region-title { font-size: 1.2rem; margin: 20px 0 10px; }
 }
 
 @media (max-width: 480px) {
-    .selection-header h1 { font-size: 1.8rem; }
-    .region-title { font-size: 1.2rem; }
-}
-
-/* Skeleton Styles */
-.skeleton-card {
-    background: var(--selection-card);
-    border: 1px solid var(--selection-border);
-    border-radius: 20px;
-    padding: 20px;
-    height: 100px;
-}
-
-.skeleton {
-    background: linear-gradient(90deg, #222 25%, #2a2a2a 50%, #222 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-    border-radius: 4px;
-}
-
-@keyframes loading {
-    from { background-position: 200% 0; }
-    to { background-position: -200% 0; }
+    .city-grid { grid-template-columns: 1fr 1fr; }
+    .header h1 { font-size: 1.4rem; }
 }
 </style>
 {% endblock %}
@@ -301,12 +326,21 @@
 <script src="{{ url_for('static', filename='js/city-data.js') }}" defer></script>
 <script>
     $(document).ready(function() {
+        const CITY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else '{}' }};
+
+        function getDisplayName(city) {
+            return CITY_MAPPING[city] || city;
+        }
+
+        // Öncelikli olarak büyük şehirleri yükle
         renderCityGrid('#buyuk-sehirler-grid', buyukSehirler, 'TR', false);
 
+        // Diğer kategorileri arka planda, kullanıcıyı engellemeden yükle
         setTimeout(() => {
             Object.entries(turkiyeSehirleri).forEach(([bolge, sehirler]) => {
                 renderCityGrid(`#${bolge}`, sehirler, 'TR', true);
             });
+            renderCityGrid('#countries-grid', uluslararasiSehirler, 'AUTO', true);
         }, 500);
 
         $('.category-tab').click(function() {
@@ -337,12 +371,14 @@
                 .done(callback)
                 .always(() => {
                     isProcessing = false;
-                    setTimeout(processQueue, 50);
+                    setTimeout(processQueue, 50); // Her istek arası 50ms bekle
                 });
         }
 
         function renderCityGrid(containerId, sehirler, countryCode, isLazy) {
             const grid = $(containerId);
+            
+            // Mevcut kartları temizle ama iskeletleri sadece veri geldikçe değiştir
             grid.empty();
 
             sehirler.forEach((item, index) => {
@@ -364,7 +400,9 @@
                     .addClass('city-card')
                     .click(function() {
                         if ($(this).hasClass('skeleton-card')) return;
-                        window.location.href = `/imsakiye/${sehir}?country=${itemCountryCode}`;
+                        // Çevrimdışı uyumluluk için doğrudan yönlendir
+                        // Sunucu tarafındaki tercih kaydı sehir_sayfasi route'unda zaten yapılıyor
+                        window.location.href = `/sehir/${sehir}?country=${itemCountryCode}`;
                     });
 
                 const cityName = $('<div>').addClass('city-name');
@@ -375,7 +413,7 @@
 
                 if (cachedData) {
                     card.addClass('content-loaded');
-                    cityName.text(sehir);
+                    cityName.text(getDisplayName(sehir));
                     if (cachedData.imsak !== "--:--") {
                         vakitBilgisi.html(`İmsak: ${cachedData.imsak}<br>${aksamLabel}: ${cachedData.aksam}`);
                     } else {
@@ -393,7 +431,7 @@
                 
                 function updateUI(vakitler) {
                     card.removeClass('skeleton-card').addClass('content-loaded');
-                    cityName.empty().text(sehir);
+                    cityName.empty().text(getDisplayName(sehir));
                     if (vakitler && vakitler.imsak !== "--:--") {
                         vakitBilgisi.html(`İmsak: ${vakitler.imsak}<br>${aksamLabel}: ${vakitler.aksam}`);
                     } else {
@@ -402,7 +440,8 @@
                 }
 
                 if (cachedData) return;
-                
+
+                // API isteğini sıraya ekle
                 const url = `/api/namaz_vakitleri?sehir=${sehir}&country=${itemCountryCode}`;
                 const callback = function(data) {
                     if (data.vakitler) {
@@ -413,8 +452,8 @@
                         updateUI(data.vakitler);
                     } else if (!card.hasClass('content-loaded')) {
                         card.removeClass('skeleton-card').addClass('content-loaded');
-                        cityName.empty().text(sehir);
-                        vakitBilgisi.text('Hata oluştu');
+                        cityName.empty().text(getDisplayName(sehir));
+                        vakitBilgisi.text('Vakit bulunamadı');
                     }
                 };
 

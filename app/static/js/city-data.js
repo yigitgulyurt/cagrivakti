@@ -56,7 +56,7 @@ const uluslararasiSehirler = [
     { sehir: "Baku", code: "AZ", timezone: "Asia/Baku" }, { sehir: "Nakhchivan", code: "AZ", timezone: "Asia/Baku" }, { sehir: "Tbilisi", code: "GE", timezone: "Asia/Tbilisi" },
     { sehir: "Yerevan", code: "AM", timezone: "Asia/Yerevan" }, { sehir: "Baghdad", code: "IQ", timezone: "Asia/Baghdad" }, { sehir: "Tehran", code: "IR", timezone: "Asia/Tehran" },
     { sehir: "Damascus", code: "SY", timezone: "Asia/Damascus" }, { sehir: "Beirut", code: "LB", timezone: "Asia/Beirut" }, { sehir: "Amman", code: "JO", timezone: "Asia/Amman" },
-    { sehir: "Jerusalem", code: "IL", timezone: "Asia/Jerusalem" }, { sehir: "Palestine", code: "PS", timezone: "Asia/Gaza" }, { sehir: "Dubai", code: "AE", timezone: "Asia/Dubai" }, { sehir: "Kuwait", code: "KW", timezone: "Asia/Kuwait" },
+    { sehir: "Jerusalem", code: "IL", timezone: "Asia/Jerusalem" }, { sehir: "Dubai", code: "AE", timezone: "Asia/Dubai" }, { sehir: "Kuwait", code: "KW", timezone: "Asia/Kuwait" },
     { sehir: "Doha", code: "QA", timezone: "Asia/Qatar" }, { sehir: "Muscat", code: "OM", timezone: "Asia/Muscat" }, { sehir: "Manama", code: "BH", timezone: "Asia/Bahrain" },
     { sehir: "Sanaa", code: "YE", timezone: "Asia/Aden" }, { sehir: "Nicosia", code: "CY", timezone: "Asia/Nicosia" },
 

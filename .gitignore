@@ -41,7 +41,7 @@ migrations/*.sqlite3
 .idea/
 *.swp
 *.swo
-
+app/static/data/daily_content.json
 # OS files
 .DS_Store
 Thumbs.db

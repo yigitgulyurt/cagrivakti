@@ -83,7 +83,39 @@
 
 {% block extra_js %}
 <script>
-function getLocation() {
+const CITY_DISPLAY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else '{}' }};
+// Reverse mapping for normalization
+const REVERSE_CITY_MAPPING = Object.fromEntries(
+    Object.entries(CITY_DISPLAY_MAPPING).map(([latin, turkish]) => [turkish, latin])
+);
+
+function getLatinName(turkishName) {
+     // 1. Direct reverse mapping check
+     if (REVERSE_CITY_MAPPING[turkishName]) {
+         return REVERSE_CITY_MAPPING[turkishName];
+     }
+
+     // 2. Generic normalization for other Turkish characters
+     const charMap = {
+         'ç': 'c', 'Ç': 'C',
+         'ğ': 'g', 'Ğ': 'G',
+         'ı': 'i', 'İ': 'I',
+         'ö': 'o', 'Ö': 'O',
+         'ş': 's', 'Ş': 'S',
+         'ü': 'u', 'Ü': 'U'
+     };
+     
+     let normalized = turkishName.split('').map(char => charMap[char] || char).join('');
+     
+     // URL safe format: space to dash, remove non-latin
+     return normalized.replace(/\s+/g, '-').replace(/[^A-Za-z0-9\-]/g, '');
+ }
+
+ function getDisplayName(latinName) {
+     return CITY_DISPLAY_MAPPING[latinName] || latinName;
+ }
+
+ function getLocation() {
     const statusIcon = document.getElementById('status-icon');
     const statusTitle = document.getElementById('status-title');
     const statusText = document.getElementById('status-text');
@@ -95,7 +127,7 @@ function getLocation() {
     if (savedCity) {
         statusIcon.innerHTML = '<svg class="icon"><use xlink:href="#fa-check-circle"></use></svg>';
         statusTitle.textContent = "Kayıtlı Şehir Yükleniyor";
-        statusText.textContent = `${savedCity} için yönlendiriliyorsunuz...`;
+        statusText.textContent = `${getDisplayName(savedCity)} için yönlendiriliyorsunuz...`;
         
         setTimeout(() => {
             window.location.href = cityUrlPattern.replace('PLACEHOLDER', savedCity);
@@ -128,20 +160,21 @@ function getLocation() {
                 
                 if (data && data.address) {
                     // Şehir ismini ayıkla (province, city, town, state)
-                    let cityName = data.address.province || data.address.city || data.address.town || data.address.state;
+                    let originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
                     
-                    if (cityName) {
-                        cityName = cityName.replace(" İli", "").replace(" Province", "").trim();
+                    if (originalCityName) {
+                        originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
+                        const latinCityName = getLatinName(originalCityName);
                         
-                        // LocalStorage'a kaydet
-                        localStorage.setItem('user_city', cityName);
+                        // LocalStorage'a Latin halini kaydet
+                        localStorage.setItem('user_city', latinCityName);
                         
                         statusIcon.innerHTML = '<svg class="icon"><use xlink:href="#fa-check-circle"></use></svg>';
                         statusTitle.textContent = "Şehir Bulundu!";
-                        statusText.textContent = `${cityName} olarak kaydedildi ve yönlendiriliyorsunuz...`;
+                        statusText.textContent = `${originalCityName} olarak kaydedildi ve yönlendiriliyorsunuz...`;
                         
                         setTimeout(() => {
-                            window.location.href = cityUrlPattern.replace('PLACEHOLDER', cityName);
+                            window.location.href = cityUrlPattern.replace('PLACEHOLDER', latinCityName);
                         }, 1000);
                     } else {
                         showError("Konumunuzdan şehir bilgisi alınamadı.");

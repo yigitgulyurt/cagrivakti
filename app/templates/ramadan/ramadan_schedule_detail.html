@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}{{ sehir }} İmsakiye 2026 | Haftalık, Aylık, Yıllık Çağrı Vakitleri{% endblock %}
+{% block title %}{{ get_display_name(sehir) }} İmsakiye {{ current_year }} | Haftalık, Aylık, Yıllık Çağrı Vakitleri{% endblock %}
 
-{% block brand_text %}{{ sehir }}{% endblock %}
+{% block brand_text %}{{ get_display_name(sehir) }}{% endblock %}
 
 {% block content %}
 <div class="imsakiye-wrapper fade-in">
     <div class="container">
         <header class="imsakiye-header">
             <div class="header-main">
-                <h1>{{ sehir }} <span class="year-badge">2026</span></h1>
+                <h1>{{ get_display_name(sehir) }} <span class="year-badge">{{ current_year }}</span></h1>
             </div>
             <p class="subtitle">Haftalık, aylık ve yıllık çağrı vakitleri çizelgesi.</p>
         </header>

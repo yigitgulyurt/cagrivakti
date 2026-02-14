@@ -250,10 +250,10 @@
         <header class="article-header">
             <div class="category-badge">
                 <svg class="icon" style="width:14px;height:14px;"><use xlink:href="#fa-tag-solid"></use></svg>
-                {{ guide.category }}
+                {{ get_display_name(guide.category) }}
             </div>
-            <h1>{{ guide.title }}</h1>
-            <p class="article-desc">{{ guide.description }}</p>
+            <h1>{{ get_display_name(guide.title) }}</h1>
+            <p class="article-desc">{{ get_display_name(guide.description) }}</p>
         </header>
 
         <div class="article-body">
@@ -271,7 +271,7 @@
         <div class="suggested-grid">
             {% for other in guides if other.slug != guide.slug %}
             <a href="{{ url_for('views.bilgi_kosesi_detay', slug=other.slug) }}" class="suggested-card">
-                <h3>{{ other.title }}</h3>
+                <h3>{{ get_display_name(other.title) }}</h3>
                 <span>Göz At <svg class="icon" style="width:14px;height:14px;"><use xlink:href="#fa-chevron-right-solid"></use></svg></span>
             </a>
             {% endfor %}

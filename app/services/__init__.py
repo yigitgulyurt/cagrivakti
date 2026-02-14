@@ -92,7 +92,6 @@ def get_timezone_for_city(sehir, country_code='TR'):
             ('beirut', 'lb'): 'Asia/Beirut',
             ('amman', 'jo'): 'Asia/Amman',
             ('jerusalem', 'il'): 'Asia/Jerusalem',
-            ('palestine', 'ps'): 'Asia/Gaza',
             ('dubai', 'ae'): 'Asia/Dubai',
             ('kuwait', 'kw'): 'Asia/Kuwait',
             ('doha', 'qa'): 'Asia/Qatar',
@@ -169,7 +168,7 @@ def get_country_for_city(sehir):
         'Mecca': 'SA', 'Medina': 'SA', 'Riyadh': 'SA', 'Baku': 'AZ',
         'Tbilisi': 'GE', 'Yerevan': 'AM', 'Baghdad': 'IQ', 'Tehran': 'IR',
         'Damascus': 'SY', 'Beirut': 'LB', 'Amman': 'JO', 'Jerusalem': 'IL',
-        'Palestine': 'PS', 'Dubai': 'AE', 'Kuwait': 'KW', 'Doha': 'QA',
+        'Dubai': 'AE', 'Kuwait': 'KW', 'Doha': 'QA',
         'Muscat': 'OM', 'Manama': 'BH', 'Sanaa': 'YE', 'Nicosia': 'CY',
         # Asia
         'Nur-Sultan': 'KZ', 'Almaty': 'KZ', 'Tashkent': 'UZ', 'Ashgabat': 'TM',
@@ -239,7 +238,7 @@ class UserService:
                 "Athens", "Dublin", "Stockholm", "Oslo", "Copenhagen", "Helsinki", "Reykjavik", "Moscow", "Kiev",
                 "Warsaw", "Prague", "Budapest", "Bucharest", "Sofia", "Belgrade", "Sarajevo", "Skopje", "Tirana",
                 "Pristina", "Zagreb", "Mecca", "Medina", "Riyadh", "Baku", "Tbilisi", "Yerevan", "Baghdad", "Tehran",
-                "Damascus", "Beirut", "Amman", "Jerusalem", "Palestine", "Dubai", "Kuwait", "Doha", "Muscat", "Manama",
+                "Damascus", "Beirut", "Amman", "Jerusalem", "Dubai", "Kuwait", "Doha", "Muscat", "Manama",
                 "Sanaa", "Nicosia", "Nur-Sultan", "Almaty", "Tashkent", "Ashgabat", "Bishkek", "Dushanbe", "Kabul",
                 "Islamabad", "New-Delhi", "Tokyo", "Seoul", "Beijing", "Jakarta", "Singapore", "Kuala-Lumpur",
                 "Bangkok", "Manila", "Hanoi", "Sydney", "Melbourne", "Perth", "Auckland", "Cairo", "Tripoli",
@@ -541,7 +540,7 @@ def get_daily_content():
 def get_guides():
     """Tüm bilgi köşesi yazılarını veritabanından döndürür."""
     try:
-        guides = Guide.query.filter_by(is_active=True).order_by(Guide.last_updated.desc()).all()
+        guides = Guide.query.filter_by(is_active=True).order_by(Guide.updated_at.desc()).all()
         return [guide.to_dict() for guide in guides]
     except Exception as e:
         from flask import current_app

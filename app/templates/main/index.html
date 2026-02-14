@@ -27,9 +27,9 @@
     <section class="hero">
         <div class="hero-content fade-in">
             <div class="hero-badges">
-                <a href="{{ url_for('views.imsakiye_secimi') }}" class="status-badge update" title="2026 Güncel İmsakiye Verileri">
+                <a href="{{ url_for('views.imsakiye_secimi') }}" class="status-badge update" title="{{ current_year }} Güncel İmsakiye Verileri">
                     <svg class="icon" aria-hidden="true"><use xlink:href="#fa-check-circle"></use></svg>
-                    <span>2026 Güncel Veriler</span>
+                    <span>{{ current_year }} Güncel Veriler</span>
                     <svg class="icon-sm" aria-hidden="true"><use xlink:href="#fa-chevron-right"></use></svg>
                 </a>
                 
@@ -198,10 +198,10 @@
                 <div class="guide-card-content">
                     <div class="guide-category">
                         <svg class="icon"><use xlink:href="#fa-tag-solid"></use></svg>
-                        {{ guide.category }}
+                        {{ get_display_name(guide.category) }}
                     </div>
-                    <h3>{{ guide.title }}</h3>
-                    <p>{{ guide.description[:100] }}...</p>
+                    <h3>{{ get_display_name(guide.title) }}</h3>
+                    <p>{{ get_display_name(guide.description[:100]) }}...</p>
                 </div>
                 <div class="guide-card-footer">
                     <span class="read-btn">İncele <svg class="icon"><use xlink:href="#fa-chevron-right-solid"></use></svg></span>
@@ -240,8 +240,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedCity = localStorage.getItem('user_city');
     const savedCountry = localStorage.getItem('user_country') || 'TR';
     
+    const CITY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else '{}' }};
+
+    function getDisplayName(city) {
+        return CITY_MAPPING[city] || city;
+    }
+
     if (savedCity) {
-        locationDesc.textContent = "Kayıtlı Şehir: " + savedCity;
+        locationDesc.textContent = "Kayıtlı Şehir: " + getDisplayName(savedCity);
         initHomeCountdown(savedCity, savedCountry);
     } else {
         locationDesc.textContent = "Şehrini Otomatik Belirle";
@@ -337,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             wrapper.style.opacity = '1';
                         }, 50);
                     }
-                cityEl.textContent = city;
+                cityEl.textContent = getDisplayName(city);
                 
                 const vakitler = data.vakitler;
                 const tz = data.timezone || 'Europe/Istanbul';
