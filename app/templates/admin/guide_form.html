@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Düzenle' if guide else 'Yeni Ekle' }} | Rehber Yönetimi{% endblock %}
+
+{% block brand_text %}REHBER {{ 'DÜZENLE' if guide else 'EKLE' }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        padding: 40px 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    .form-card {
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 40px;
+        border: 1px solid rgba(255, 193, 7, 0.1);
+    }
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: var(--primary);
+    }
+    .form-control {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 12px 15px;
+        color: var(--text);
+        font-family: inherit;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: rgba(255, 255, 255, 0.05);
+    }
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .checkbox-group input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    .btn {
+        padding: 12px 25px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-save {
+        background: var(--primary);
+        color: var(--dark);
+    }
+    .btn-cancel {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container fade-in">
+    <div class="form-card">
+        <form method="POST">
+            <div class="form-group">
+                <label for="title">Başlık</label>
+                <input type="text" id="title" name="title" class="form-control" value="{{ guide.title if guide else '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="slug">URL Slug (Benzersiz olmalı)</label>
+                <input type="text" id="slug" name="slug" class="form-control" value="{{ guide.slug if guide else '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Kategori</label>
+                <input type="text" id="category" name="category" class="form-control" value="{{ guide.category if guide else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Kısa Açıklama (SEO için)</label>
+                <textarea id="description" name="description" class="form-control">{{ guide.description if guide else '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="image_url">Görsel URL</label>
+                <input type="text" id="image_url" name="image_url" class="form-control" value="{{ guide.image_url if guide else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="content">İçerik (HTML destekler)</label>
+                <textarea id="content" name="content" class="form-control" style="min-height: 400px;">{{ guide.content if guide else '' }}</textarea>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="is_active" name="is_active" {{ 'checked' if not guide or guide.is_active else '' }}>
+                <label for="is_active" style="margin-bottom: 0;">Aktif mi?</label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-save">Kaydet</button>
+                <a href="{{ url_for('views.admin_guides') }}" class="btn btn-cancel">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Başlıktan otomatik slug oluşturma
+    const titleInput = document.getElementById('title');
+    const slugInput = document.getElementById('slug');
+
+    if (!{{ 'true' if guide else 'false' }}) {
+        titleInput.addEventListener('input', function() {
+            let slug = titleInput.value.toLowerCase()
+                .replace(/[çÇ]/g, 'c')
+                .replace(/[ğĞ]/g, 'g')
+                .replace(/[ıİ]/g, 'i')
+                .replace(/[öÖ]/g, 'o')
+                .replace(/[şŞ]/g, 's')
+                .replace(/[üÜ]/g, 'u')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+            slugInput.value = slug;
+        });
+    }
+
+    // Slug ve diğer alanlar için Latin karakter doğrulaması
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const latinRegex = /^[A-Za-z0-9\-\_\s\.]+$/;
+        const slug = slugInput.value;
+        const category = document.getElementById('category').value;
+
+        if (slug && !latinRegex.test(slug)) {
+            alert('URL Slug yalnızca Latin karakterler (A-Z, a-z), sayılar, tire ve alt çizgi içerebilir.');
+            e.preventDefault();
+            return;
+        }
+
+        if (category && !latinRegex.test(category)) {
+            alert('Kategori yalnızca Latin karakterler içerebilir.');
+            e.preventDefault();
+            return;
+        }
+    });
+</script>
+{% endblock %}

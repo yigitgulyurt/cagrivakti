@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}İçerik Yönetimi | Admin{% endblock %}
+
+{% block brand_text %}İÇERİK YÖNETİMİ{% endblock %}
+
+{% block content %}
+<div class="admin-container fade-in" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1>Ayet, Hadis ve Sözler</h1>
+        <a href="{{ url_for('views.admin_content_edit') }}" class="btn-primary" style="background: var(--primary); color: var(--dark); padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 700;">
+            <i class="fas fa-plus"></i> Yeni İçerik Ekle
+        </a>
+    </div>
+
+    <table style="width: 100%; background: var(--card-bg); border-radius: 24px; overflow: hidden; border-collapse: collapse; border: 1px solid rgba(255, 193, 7, 0.1);">
+        <thead>
+            <tr style="background: rgba(255, 193, 7, 0.05); color: var(--primary); text-align: left;">
+                <th style="padding: 15px 20px;">Tür</th>
+                <th style="padding: 15px 20px;">İçerik</th>
+                <th style="padding: 15px 20px;">Kaynak</th>
+                <th style="padding: 15px 20px;">Kategori</th>
+                <th style="padding: 15px 20px;">Durum</th>
+                <th style="padding: 15px 20px;">İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in contents %}
+            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                <td style="padding: 15px 20px;"><span style="text-transform: uppercase; font-size: 0.8rem; font-weight: bold;">{{ item.content_type }}</span></td>
+                <td style="padding: 15px 20px;">{{ item.text[:100] }}{{ '...' if item.text|length > 100 }}</td>
+                <td style="padding: 15px 20px;">{{ item.source or '-' }}</td>
+                <td style="padding: 15px 20px;">{{ item.category }}</td>
+                <td style="padding: 15px 20px;">
+                    {% if item.is_active %}
+                    <span style="color: #28a745;">Aktif</span>
+                    {% else %}
+                    <span style="color: #dc3545;">Pasif</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 15px 20px;">
+                    <a href="{{ url_for('views.admin_content_edit', content_id=item.id) }}" style="color: var(--primary); text-decoration: none; margin-right: 10px;">Düzenle</a>
+                    <form action="{{ url_for('views.admin_content_delete', content_id=item.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Bu içeriği silmek istediğinize emin misiniz?');">
+                        <button type="submit" style="color: #dc3545; background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; font-size: inherit;">Sil</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" style="padding: 30px; text-align: center;">Henüz içerik eklenmemiş.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

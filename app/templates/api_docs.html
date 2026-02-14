@@ -1,0 +1,813 @@
+{% extends "base.html" %}
+
+{% block title %}API Belgelendirmesi | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}API DOKÜMANTASYONU{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --api-primary: #FFC107;
+        --api-secondary: #2196F3;
+        --api-success: #4CAF50;
+        --api-bg: #0f0f0f;
+        --api-card: #1a1a1a;
+        --api-border: rgba(255, 255, 255, 0.08);
+        --api-text-muted: #a0a0a0;
+        --code-bg: #121212;
+        color-scheme: dark;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 60px 20px;
+    }
+
+    .api-hero {
+        text-align: center;
+        margin-bottom: 80px;
+        position: relative;
+    }
+
+    .api-hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        background: linear-gradient(135deg, #fff 0%, var(--api-primary) 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+        letter-spacing: -1px;
+    }
+
+    .api-hero p {
+        font-size: 1.25rem;
+        color: var(--api-text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .api-grid {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 30px;
+    }
+
+    @media (max-width: 992px) {
+        .api-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .api-section {
+        background: var(--api-card);
+        border-radius: 24px;
+        padding: 40px;
+        border: 1px solid var(--api-border);
+        margin-bottom: 30px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .api-main .api-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .api-section:hover {
+        border-color: rgba(255, 193, 7, 0.2);
+    }
+
+    .api-section h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff;
+    }
+
+    .api-section h2 svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor !important;
+        transition: transform 0.3s ease;
+    }
+
+    .api-section:hover h2 svg {
+        transform: scale(1.1);
+    }
+
+    /* İkon Renkleri - Daha Canlı */
+    .section-info h2 svg { color: #00f2ff !important; filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.6)); }
+    .section-params h2 svg { color: #ffe100 !important; filter: drop-shadow(0 0 15px rgba(255, 225, 0, 0.6)); }
+    .section-code h2 svg { color: #00ff6a !important; filter: drop-shadow(0 0 15px rgba(0, 255, 106, 0.6)); }
+    .section-endpoints h2 svg { color: #00f2ff !important; filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.6)); }
+    .section-errors h2 svg { color: #ff3d3d !important; filter: drop-shadow(0 0 15px rgba(255, 61, 61, 0.6)); }
+
+    .method-badge {
+        background: #00ff6a;
+        color: #000; /* Daha okunaklı olması için siyah */
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 800;
+        margin-right: 12px;
+    }
+
+    .endpoint-box {
+        background: var(--code-bg);
+        padding: 18px 24px;
+        border-radius: 16px;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 1rem;
+        color: var(--api-primary);
+        border: 1px solid var(--api-border);
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        overflow-x: auto;
+    }
+
+    .param-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        margin: 20px 0;
+    }
+
+    .param-table th {
+        text-align: left;
+        padding: 12px 20px;
+        color: var(--api-text-muted);
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    .param-table td {
+        padding: 16px 20px;
+        background: rgba(255,255,255,0.02);
+        border-top: 1px solid var(--api-border);
+        border-bottom: 1px solid var(--api-border);
+    }
+
+    .param-table td:first-child {
+        border-left: 1px solid var(--api-border);
+        border-radius: 12px 0 0 12px;
+        font-weight: 700;
+        color: var(--api-primary);
+    }
+
+    .param-table td:last-child {
+        border-right: 1px solid var(--api-border);
+        border-radius: 0 12px 12px 0;
+        color: var(--api-text-muted);
+    }
+
+    .badge-status {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-req { background: rgba(244, 67, 54, 0.1); color: #f44336; }
+    .badge-opt { background: rgba(33, 150, 243, 0.1); color: #2196f3; }
+
+    /* Playground Styles */
+    .playground-card {
+        background: linear-gradient(145deg, #1a1a1a 0%, #121212 100%);
+        padding: 30px;
+        border-radius: 24px;
+        border: 1px solid var(--api-primary);
+        position: sticky;
+        top: 100px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .playground-form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 480px) {
+        .playground-form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--api-text-muted);
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        background: #1a1a1a !important;
+        border: 1px solid var(--api-border);
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: #fff !important;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        color-scheme: dark;
+    }
+
+    /* Select ve Datalist seçeneklerini düzelt */
+    .form-control option,
+    select.form-control option,
+    datalist option {
+        background-color: #1a1a1a !important;
+        color: #fff !important;
+    }
+
+    /* Firefox için özel stil */
+    @-moz-document url-prefix() {
+        .form-control {
+            background-color: #1a1a1a !important;
+            color: #fff !important;
+        }
+        .form-control option {
+            background-color: #1a1a1a !important;
+            color: #fff !important;
+        }
+    }
+
+    /* Datalist ve input picker renklerini zorla */
+    ::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
+
+    /* Tarayıcı varsayılanlarını daha güçlü ezmek için */
+    select.form-control {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23FFC107'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 16px;
+        padding-right: 40px;
+        color-scheme: dark;
+    }
+
+    .form-control:focus {
+        border-color: var(--api-primary);
+        background: rgba(255,255,255,0.08);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
+    }
+
+    .url-output {
+        background: #000;
+        padding: 15px;
+        border-radius: 12px;
+        font-family: monospace;
+        font-size: 0.85rem;
+        color: var(--api-primary);
+        word-break: break-all;
+        margin: 20px 0;
+        border: 1px dashed var(--api-primary);
+    }
+
+    /* Code Blocks */
+    .code-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        color: var(--api-text-muted);
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 8px 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+        background: var(--api-primary);
+        color: #000;
+    }
+
+    pre {
+        background: var(--code-bg);
+        padding: 24px;
+        border-radius: 16px;
+        overflow-x: auto;
+        border: 1px solid var(--api-border);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .json-key { color: #ce9178; }
+    .json-value { color: #9cdcfe; }
+    .json-string { color: #b5cea8; }
+    .code-comment { color: #6a9955; }
+    .code-keyword { color: #569cd6; }
+    .code-function { color: #dcdcaa; }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .response-preview {
+        margin-top: 20px;
+        max-height: 300px;
+        overflow-y: auto;
+        display: none;
+    }
+
+    .error-card {
+        border-left: 4px solid #f44336 !important;
+    }
+
+    .vip-banner {
+        background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(33,150,243,0.1) 100%);
+        border: 1px solid var(--api-primary);
+        padding: 30px;
+        border-radius: 24px;
+        margin-top: 50px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .vip-banner {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+
+    .vip-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--api-primary);
+        color: #fff;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .copy-btn {
+        background: rgba(255,255,255,0.05);
+        border: none;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+    }
+
+    .copy-btn:hover {
+        background: var(--api-primary);
+        color: #000;
+    }
+
+    .btn-test {
+        width: 100%;
+        margin-top: 10px;
+        padding: 14px;
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container fade-in">
+    <header class="api-hero">
+        <h1>Geleceğin Çağrı API'si</h1>
+        <p>Geliştiriciler için yüksek performanslı, ücretsiz ve Diyanet uyumlu vakit servisleri.</p>
+    </header>
+
+    <div class="api-grid">
+        <div class="api-main">
+            <!-- Temel Bilgiler -->
+            <section class="api-section section-info">
+                <h2>
+                    <svg><use xlink:href="#fa-info-circle"></use></svg>
+                    Genel Bakış
+                </h2>
+                <p>Çağrı Vakti API, 2026 yılına ait tüm dünya namaz vakitlerini JSON formatında sunar. Verilerimiz Diyanet İşleri Başkanlığı ve uluslararası astronomik hesaplamalarla %100 uyumludur.</p>
+                
+                <div class="endpoint-box">
+                    <span class="method-badge">GET</span>
+                    https://cagrivakti.com.tr/api/vakitler
+                </div>
+
+                <div style="background: rgba(33, 150, 243, 0.1); border-left: 4px solid var(--api-secondary); padding: 20px; border-radius: 12px;">
+                    <h4 style="margin: 0 0 10px 0; color: var(--api-secondary);">Rate Limit (Hız Sınırı)</h4>
+                    <p style="margin: 0; font-size: 0.95rem;">Standart kullanımda saatlik <strong>100 istek</strong> hakkınız bulunmaktadır. Daha fazlası için VIP anahtar talep edebilirsiniz.</p>
+                </div>
+            </section>
+
+            <!-- Parametreler -->
+            <section class="api-section section-params">
+                <h2>
+                    <svg><use xlink:href="#fa-sliders"></use></svg>
+                    Parametreler
+                </h2>
+                <div class="table-responsive">
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parametre</th>
+                                <th>Tür</th>
+                                <th>Durum</th>
+                                <th>Açıklama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>sehir</td>
+                                <td>String</td>
+                                <td><span class="badge-status badge-req">Zorunlu</span></td>
+                                <td>Sorgulanacak il adı (Örn: Istanbul)</td>
+                            </tr>
+                            <tr>
+                                <td>ulke</td>
+                                <td>String</td>
+                                <td><span class="badge-status badge-opt">Opsiyonel</span></td>
+                                <td>Ülke kodu (Varsayılan: TR)</td>
+                            </tr>
+                            <tr>
+                                <td>tip</td>
+                                <td>String</td>
+                                <td><span class="badge-status badge-opt">Opsiyonel</span></td>
+                                <td>gunluk, aylik, yillik, ramazan</td>
+                            </tr>
+                            <tr>
+                                <td>tarih</td>
+                                <td>Date</td>
+                                <td><span class="badge-status badge-opt">Opsiyonel</span></td>
+                                <td>YYYY-MM-DD formatında</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Örnek Yanıt ve Kodlar -->
+            <section class="api-section section-code">
+                <h2>
+                    <svg><use xlink:href="#fa-code"></use></svg>
+                    Kod Örnekleri
+                </h2>
+                <div class="code-tabs">
+                    <button class="tab-btn active" onclick="switchTab(event, 'code-json')">JSON Yanıt</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'code-js')">JavaScript</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'code-python')">Python</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'code-php')">PHP</button>
+                </div>
+
+                <div id="code-json" class="tab-content active">
+                    <pre><code>{
+  <span class="json-key">"durum"</span>: <span class="json-string">"basarili"</span>,
+  <span class="json-key">"tip"</span>: <span class="json-string">"gunluk"</span>,
+  <span class="json-key">"data"</span>: {
+    <span class="json-key">"sehir"</span>: <span class="json-string">"Istanbul"</span>,
+    <span class="json-key">"ulke"</span>: <span class="json-string">"TR"</span>,
+    <span class="json-key">"tarih"</span>: <span class="json-string">"2026-02-10"</span>,
+    <span class="json-key">"vakitler"</span>: {
+      <span class="json-key">"imsak"</span>: <span class="json-string">"06:32"</span>,
+      <span class="json-key">"gunes"</span>: <span class="json-string">"07:58"</span>,
+      <span class="json-key">"ogle"</span>: <span class="json-string">"13:23"</span>,
+      <span class="json-key">"ikindi"</span>: <span class="json-string">"16:11"</span>,
+      <span class="json-key">"aksam"</span>: <span class="json-string">"18:38"</span>,
+      <span class="json-key">"yatsi"</span>: <span class="json-string">"19:59"</span>
+    },
+    <span class="json-key">"timezone"</span>: <span class="json-string">"Europe/Istanbul"</span>
+  }
+}</code></pre>
+                </div>
+
+                <div id="code-js" class="tab-content">
+                    <pre><code><span class="code-keyword">const</span> <span class="code-function">fetchVakitler</span> = <span class="code-keyword">async</span> () => {
+  <span class="code-keyword">const</span> url = <span class="json-string">'https://cagrivakti.com.tr/api/vakitler?sehir=Istanbul'</span>;
+  <span class="code-keyword">try</span> {
+    <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(url);
+    <span class="code-keyword">const</span> data = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();
+    console.<span class="code-function">log</span>(data);
+  } <span class="code-keyword">catch</span> (error) {
+    console.<span class="code-function">error</span>(<span class="json-string">'Hata:'</span>, error);
+  }
+};</code></pre>
+                </div>
+
+                <div id="code-python" class="tab-content">
+                    <pre><code><span class="code-keyword">import</span> requests
+
+url = <span class="json-string">"https://cagrivakti.com.tr/api/vakitler"</span>
+params = {
+    <span class="json-string">"sehir"</span>: <span class="json-string">"Istanbul"</span>,
+    <span class="json-string">"ulke"</span>: <span class="json-string">"TR"</span>
+}
+
+response = requests.<span class="code-function">get</span>(url, params=params)
+data = response.<span class="code-function">json</span>()
+<span class="code-function">print</span>(data)</code></pre>
+                </div>
+
+                <div id="code-php" class="tab-content">
+                    <pre><code><span class="code-keyword">&lt;?php</span>
+$url = <span class="json-string">"https://cagrivakti.com.tr/api/vakitler?sehir=Istanbul"</span>;
+$response = <span class="code-function">file_get_contents</span>($url);
+$data = <span class="code-function">json_decode</span>($response, <span class="code-keyword">true</span>);
+<span class="code-function">print_r</span>($data);
+<span class="code-keyword">?&gt;</span></code></pre>
+                </div>
+            </section>
+
+            <!-- Ek Uç Noktalar -->
+            <section class="api-section section-endpoints">
+                <h2>
+                    <svg><use xlink:href="#fa-list-ul"></use></svg>
+                    Diğer Uç Noktalar
+                </h2>
+                
+                <div class="endpoint-item" style="margin-bottom: 30px;">
+                    <h4 style="color: #fff; margin-bottom: 10px;">Şehir Listesi</h4>
+                    <div class="endpoint-box" style="margin-bottom: 10px;">
+                        <span class="method-badge">GET</span>
+                        /api/sehirler?country=TR
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--api-text-muted);">Belirtilen ülkeye ait desteklenen şehir listesini döner.</p>
+                </div>
+
+                <div class="endpoint-item">
+                    <h4 style="color: #fff; margin-bottom: 10px;">Sonraki Vakit</h4>
+                    <div class="endpoint-box" style="margin-bottom: 10px;">
+                        <span class="method-badge">GET</span>
+                        /api/sonraki_vakit?sehir=Istanbul
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--api-text-muted);">Belirtilen şehir için yaklaşan ilk vakti ve kalan süreyi döner.</p>
+                </div>
+            </section>
+
+            <!-- Hata Kodları -->
+            <section class="api-section error-card section-errors">
+                <h2>
+                    <svg><use xlink:href="#fa-exclamation-triangle"></use></svg>
+                    Hata Kodları
+                </h2>
+                <div class="table-responsive">
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Kod</th>
+                                <th>Anlamı</th>
+                                <th>Çözüm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>400</td>
+                                <td>Hatalı İstek</td>
+                                <td>Eksik parametre (Örn: sehir belirtilmemiş).</td>
+                            </tr>
+                            <tr>
+                                <td>404</td>
+                                <td>Bulunamadı</td>
+                                <td>Belirtilen şehir veya tarih için veri yok.</td>
+                            </tr>
+                            <tr>
+                                <td>429</td>
+                                <td>Limit Aşımı</td>
+                                <td>Saatlik istek sınırına ulaştınız.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Sidebar Playground -->
+        <aside class="api-sidebar">
+            <div class="playground-card">
+                <h3 style="margin-top: 0; color: #fff; margin-bottom: 20px;">API Playground</h3>
+                
+                <div class="playground-form-row">
+                    <div class="form-group">
+                        <label>Şehir Seçin</label>
+                        <input type="text" id="pg-sehir" class="form-control" list="city-list" value="Istanbul">
+                        <datalist id="city-list"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Sorgu Türü</label>
+                        <select id="pg-tip" class="form-control">
+                            <option value="gunluk">Günlük Vakitler</option>
+                            <option value="aylik">Aylık Liste</option>
+                            <option value="yillik">Yıllık Veri</option>
+                            <option value="ramazan">Ramazan (İmsakiye)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="playground-form-row" id="extra-fields-row">
+                    <div class="form-group" id="group-tarih">
+                        <label>Tarih</label>
+                        <input type="date" id="pg-tarih" class="form-control">
+                    </div>
+
+                    <div class="form-group" id="group-yil" style="display: none;">
+                        <label>Yıl</label>
+                        <select id="pg-yil" class="form-control">
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="group-ay" style="display: none;">
+                        <label>Ay</label>
+                        <select id="pg-ay" class="form-control">
+                            <option value="1">Ocak</option>
+                            <option value="2">Şubat</option>
+                            <option value="3">Mart</option>
+                            <option value="4">Nisan</option>
+                            <option value="5">Mayıs</option>
+                            <option value="6">Haziran</option>
+                            <option value="7">Temmuz</option>
+                            <option value="8">Ağustos</option>
+                            <option value="9">Eylül</option>
+                            <option value="10">Ekim</option>
+                            <option value="11">Kasım</option>
+                            <option value="12">Aralık</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="url-output" id="generated-url">...</div>
+                
+                <button class="btn btn-primary btn-test" onclick="copyUrl()">URL'yi Kopyala</button>
+                <button class="btn btn-secondary btn-test" id="btn-test-live">Canlı Test Et</button>
+
+                <div id="response-preview" class="response-preview">
+                    <pre style="padding: 15px; font-size: 0.8rem;"><code id="response-code"></code></pre>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- VIP Banner -->
+    <div class="vip-banner">
+        <div class="vip-icon">
+            <svg style="width: 32px; height: 32px;"><use xlink:href="#fa-bolt"></use></svg>
+        </div>
+        <div class="vip-content">
+            <h3 style="margin: 0 0 5px 0; color: #fff;">Sınırsız Erişime mi İhtiyacınız Var?</h3>
+            <p style="margin: 0; color: var(--api-text-muted);">Ticari projeleriniz veya yüksek trafikli uygulamalarınız için <strong>ücretsiz VIP API Anahtarı</strong> talep edin.</p>
+        </div>
+        <a href="{{ url_for('views.iletisim') }}" class="btn btn-primary" style="margin-left: auto;">Anahtar Al</a>
+    </div>
+
+    <footer style="text-align: center; margin-top: 60px; color: var(--api-text-muted);">
+        <p>&copy; 2026 Çağrı Vakti API. <a href="{{ url_for('views.index') }}" style="color: var(--api-primary);">Geri Dön</a></p>
+    </footer>
+</main>
+{% endblock %}
+
+{% block footer_js %}
+<script>
+    // Şehir listesi ve playground mantığı
+    const turkiyeSehirleri = [
+        "İstanbul", "Ankara", "İzmir", "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Antalya", "Ardahan", "Artvin", "Aydın", "Balıkesir", "Bartın", "Batman", "Bayburt", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Düzce", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Iğdır", "Isparta", "Kahramanmaraş", "Karabük", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kilis", "Kırıkkale", "Kırklareli", "Kırşehir", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin", "Mersin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Şanlıurfa", "Siirt", "Sinop", "Sivas", "Şırnak", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
+    ];
+
+    function initPlayground() {
+        const cityList = document.getElementById('city-list');
+        turkiyeSehirleri.forEach(sehir => {
+            const opt = document.createElement('option');
+            opt.value = sehir;
+            cityList.appendChild(opt);
+        });
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('pg-tarih').value = today;
+
+        // Listeners
+        ['pg-sehir', 'pg-tip', 'pg-tarih', 'pg-yil', 'pg-ay'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateUrl);
+        });
+        
+        document.getElementById('btn-test-live').addEventListener('click', testUrlLive);
+        
+        updateUrl();
+    }
+
+    function switchTab(event, tabId) {
+        // Remove active from all buttons in the same container
+        const container = event.target.closest('.api-section');
+        container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        // Add active to current
+        event.target.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function updateUrl() {
+        const sehir = document.getElementById('pg-sehir').value || 'Istanbul';
+        const tip = document.getElementById('pg-tip').value;
+        const tarih = document.getElementById('pg-tarih').value;
+        const yil = document.getElementById('pg-yil').value;
+        const ay = document.getElementById('pg-ay').value;
+        const baseUrl = window.location.origin + '/api/vakitler';
+        
+        let url = `${baseUrl}?sehir=${sehir}`;
+        
+        // Form alanlarını gizle/göster
+        document.getElementById('group-tarih').style.display = 'none';
+        document.getElementById('group-yil').style.display = 'none';
+        document.getElementById('group-ay').style.display = 'none';
+        document.getElementById('extra-fields-row').style.display = 'none';
+
+        if (tip === 'gunluk') {
+            document.getElementById('extra-fields-row').style.display = 'grid';
+            document.getElementById('group-tarih').style.display = 'block';
+            if (tarih) url += `&tarih=${tarih}`;
+        } else if (tip === 'aylik') {
+            document.getElementById('extra-fields-row').style.display = 'grid';
+            document.getElementById('group-yil').style.display = 'block';
+            document.getElementById('group-ay').style.display = 'block';
+            url += `&tip=aylik&yil=${yil}&ay=${ay}`;
+        } else if (tip === 'yillik') {
+            document.getElementById('extra-fields-row').style.display = 'grid';
+            document.getElementById('group-yil').style.display = 'block';
+            url += `&tip=yillik&yil=${yil}`;
+        } else if (tip === 'ramazan') {
+            document.getElementById('extra-fields-row').style.display = 'grid';
+            document.getElementById('group-yil').style.display = 'block';
+            url += `&ramazan=true&yil=${yil}`;
+        }
+        
+        document.getElementById('generated-url').textContent = url;
+    }
+
+    async function testUrlLive() {
+        const url = document.getElementById('generated-url').textContent;
+        const btn = document.getElementById('btn-test-live');
+        const preview = document.getElementById('response-preview');
+        const code = document.getElementById('response-code');
+
+        btn.disabled = true;
+        btn.textContent = 'Yükleniyor...';
+        preview.style.display = 'block';
+        code.textContent = '// İstek gönderiliyor...';
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            code.textContent = JSON.stringify(data, null, 2);
+        } catch (error) {
+            code.textContent = '// Hata: ' + error.message;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Canlı Test Et';
+        }
+    }
+
+    function copyUrl() {
+        const url = document.getElementById('generated-url').textContent;
+        navigator.clipboard.writeText(url).then(() => {
+            const btn = document.querySelector('.btn-test');
+            const originalText = btn.textContent;
+            btn.textContent = 'Kopyalandı!';
+            btn.style.background = 'var(--api-success)';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 2000);
+        });
+    }
+
+    function testUrl() {
+        const url = document.getElementById('generated-url').textContent;
+        window.open(url, '_blank');
+    }
+
+    document.addEventListener('DOMContentLoaded', initPlayground);
+</script>
+{% endblock %}

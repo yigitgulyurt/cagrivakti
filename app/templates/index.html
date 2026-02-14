@@ -1,0 +1,1342 @@
+{% extends "base.html" %}
+
+{% block title %}{{ seo_title }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
+{% block og_title %}{{ seo_title }}{% endblock %}
+{% block og_description %}{{ seo_description }}{% endblock %}
+
+{% block json_ld %}
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Çağrı Vakti",
+  "url": "https://cagrivakti.com.tr",
+  "description": "{{ seo_description }}",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://cagrivakti.com.tr/sehir/{search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+{% endblock %}
+
+{% block brand_text %}ANA SAYFA{% endblock %}
+
+{% block content %}
+<div class="landing-wrapper">
+    <section class="hero">
+        <div class="hero-content fade-in">
+            <div class="hero-badges">
+                <a href="{{ url_for('views.imsakiye_secimi') }}" class="status-badge update" title="2026 Güncel İmsakiye Verileri">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-check-circle"></use></svg>
+                    <span>2026 Güncel Veriler</span>
+                    <svg class="icon-sm" aria-hidden="true"><use xlink:href="#fa-chevron-right"></use></svg>
+                </a>
+                
+                {% if ramadan_info.status != 'none' and ramadan_info.status != 'finished' %}
+                <a href="{{ url_for('views.ramazan_nedir') }}" class="status-badge ramadan" title="Ramazan Bilgileri">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-moon"></use></svg>
+                    <span>{% if ramadan_info.status == 'upcoming' %}    Ramazan'a {{ ramadan_info.days_to_start }} Gün{% elif ramadan_info.status == 'active' %}    Ramazan {{ ramadan_info.current_day }}. Gün{% endif %}
+                    </span>
+                    <svg class="icon-sm"><use xlink:href="#fa-chevron-right"></use></svg>
+                </a>
+                {% endif %}
+            </div>
+            <h1 class="btn-label">ÇAĞRI VAKTİ</h1>
+            <p>Dünya genelinde çağrı vakitleri, imsakiye ve dini içerikler. Çağdaş arayüz ve doğru verilerle her an yanınızdayız.</p>
+            
+            <!-- Geri Sayım Kapsayıcı (Layout Shift'i önlemek için sabit alan) -->
+            <div class="home-countdown-fixed-height">
+                <!-- Geri Sayım Skeleton (Yüklenirken görünür) -->
+                <div id="countdown-skeleton" class="home-countdown-container fade-in">
+                    <div class="countdown-card skeleton-card">
+                        <div class="skeleton-line label"></div>
+                        <div class="skeleton-line time"></div>
+                        <div class="skeleton-line location"></div>
+                    </div>
+                </div>
+                
+                <!-- Canlı Geri Sayım Bölümü (Yüklendikten sonra görünür) -->
+                <div id="home-countdown-wrapper" class="home-countdown-container fade-in" style="display: none; opacity: 0;">
+                    <div class="countdown-card">
+                        <div class="countdown-label" id="next-vakit-name">...</div>
+                        <div class="countdown-time" id="home-countdown-timer">00:00:00</div>
+                        <div class="countdown-location" id="active-city-name">...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-buttons">
+                <a href="{{ url_for('views.sehir_secimi') }}" class="btn-ultra-hero" title="Şehir Seçimi Yap">
+                    <div class="btn-inner">
+                        <div class="btn-icon-box">
+                            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-sun"></use></svg>
+                        </div>
+                        <div class="btn-text-content">
+                            <span class="btn-label">VAKTİ KEŞFET</span>
+                            <span class="btn-desc">İlini Seç ve Başla</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-chevron-right"></use></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('views.konum_bul') }}" class="btn-ultra-hero" id="location-button" title="Otomatik Konum Bul">
+                    <div class="btn-inner">
+                        <div class="btn-icon-box">
+                             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-map-marker-alt"></use></svg>
+                         </div>
+                        <div class="btn-text-content">
+                            <span class="btn-label">KONUMUMU BUL</span>
+                            <span id="location-desc" class="btn-desc">Şehrini Otomatik Belirle</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-chevron-right"></use></svg>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <button class="hero-scroll" id="scroll-to-features" aria-label="Aşağı Kaydır">
+            <svg class="icon"><use xlink:href="#fa-chevron-down"></use></svg>
+        </button>
+    </section>
+
+    <section class="features" id="features-section">
+        <div class="section-header">
+            <h2>Neden Çağrı Vakti?</h2>
+            <p>En doğru veriye en hızlı şekilde ulaşmanız için tasarlandı.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <div class="feature-icon">
+                        <svg class="icon"><use xlink:href="#fa-shield-alt"></use></svg>
+                    </div>
+                </div>
+                <h3>Doğru Veri</h3>
+                <p>T.C. Diyanet İşleri Başkanlığı'ndan alınan resmi ve güncel vakitler.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <div class="feature-icon">
+                        <svg class="icon"><use xlink:href="#fa-bolt"></use></svg>
+                    </div>
+                </div>
+                <h3>Hızlı Ulaşım</h3>
+                <p>Tek tıkla konumunuzu bulun ve vakitlere anında erişin.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <div class="feature-icon">
+                        <svg class="icon"><use xlink:href="#fa-mobile-screen-button"></use></svg>
+                    </div>
+                </div>
+                <h3>PWA Desteği</h3>
+                <p>Uygulamayı ana ekranınıza ekleyerek uygulama gibi kullanın.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <div class="feature-icon">
+                        <svg class="icon"><use xlink:href="#fa-clock"></use></svg>
+                    </div>
+                </div>
+                <h3>Geri Sayım</h3>
+                <p>Bir sonraki vakte ne kadar kaldığını saniyelik takip edin.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works" id="how-it-works-section">
+        <div class="section-header">
+            <h2>Nasıl Çalışır?</h2>
+            <p>Sadece 3 adımda huzura odaklanın.</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number-badge">01</div>
+                <div class="step-icon">
+                    <svg class="icon"><use xlink:href="#fa-search"></use></svg>
+                </div>
+                <h4>İlini Seç</h4>
+                <p>Dünya genelindeki binlerce il arasından konumunu bul.</p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number-badge">02</div>
+                <div class="step-icon">
+                    <svg class="icon"><use xlink:href="#fa-check-circle"></use></svg>
+                </div>
+                <h4>Onayla</h4>
+                <p>Seçtiğin konumu doğrula ve vakitleri yükle.</p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number-badge">03</div>
+                <div class="step-icon">
+                    <svg class="icon"><use xlink:href="#fa-mosque"></use></svg>
+                </div>
+                <h4>Takip Et</h4>
+                <p>Vakitleri, geri sayımı ve günlük içerikleri görüntüle.</p>
+            </div>
+        </div>
+    </section>
+{% if guides %}
+    <section class="home-guides" id="guides-section">
+        <div class="section-header">
+            <h2>Bilgi Köşesi</h2>
+            <p>Dini konular ve namaz kılavuzları hakkında derinlemesine bilgiler.</p>
+        </div>
+        <div class="guides-preview-grid">
+            {% for guide in guides %}
+            <a href="{{ url_for('views.bilgi_kosesi_detay', slug=guide.slug) }}" class="guide-preview-card">
+                <div class="guide-card-content">
+                    <div class="guide-category">
+                        <svg class="icon"><use xlink:href="#fa-tag-solid"></use></svg>
+                        {{ guide.category }}
+                    </div>
+                    <h3>{{ guide.title }}</h3>
+                    <p>{{ guide.description[:100] }}...</p>
+                </div>
+                <div class="guide-card-footer">
+                    <span class="read-btn">İncele <svg class="icon"><use xlink:href="#fa-chevron-right-solid"></use></svg></span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="section-footer">
+            <a href="{{ url_for('views.bilgi_kosesi_liste') }}" class="btn-secondary">Tüm Yazıları Gör</a>
+        </div>
+    </section>
+{% endif %}
+    <section class="stats-overview" id="stats-section">
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-val">81</span>
+                <span class="stat-lbl">İl Desteği</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">200+</span>
+                <span class="stat-lbl">Ülke</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">%100</span>
+                <span class="stat-lbl">Ücretsiz</span>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const locationDesc = document.getElementById('location-desc');
+    const savedCity = localStorage.getItem('user_city');
+    const savedCountry = localStorage.getItem('user_country') || 'TR';
+    
+    if (savedCity) {
+        locationDesc.textContent = "Kayıtlı Şehir: " + savedCity;
+        initHomeCountdown(savedCity, savedCountry);
+    } else {
+        locationDesc.textContent = "Şehrini Otomatik Belirle";
+    }
+
+    // Quad Staged Scroll: Features -> How it Works (500ms) -> Guides (500ms) -> Stats (500ms)
+        document.getElementById('scroll-to-features').addEventListener('click', function() {
+            // 1. Scroll to Features
+            document.getElementById('features-section').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+            // 2. After 500ms, scroll to How it Works
+            setTimeout(() => {
+                document.getElementById('how-it-works-section').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // 3. After another 500ms, scroll to Guides
+                setTimeout(() => {
+                    const guidesSection = document.getElementById('guides-section');
+                    if (guidesSection) {
+                        guidesSection.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+
+                    // 4. After another 500ms, scroll to Stats Overview
+                    setTimeout(() => {
+                        document.getElementById('stats-section').scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+
+                        // 5. Finally, after 800ms, scroll back to Top (Hero)
+                        setTimeout(() => {
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
+                        }, 1000);
+                    }, 750);
+                }, 750);
+            }, 750);
+        });
+
+    async function initHomeCountdown(city, country) {
+        try {
+            const CACHE_KEY = `vakitler_${city}_${country}`;
+            const TODAY = new Date().toISOString().split('T')[0];
+            const cached = localStorage.getItem(CACHE_KEY);
+            let data = null;
+
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed.tarih === TODAY) {
+                    data = { vakitler: parsed.data };
+                }
+            }
+
+            if (!data) {
+                const response = await fetch(`/api/namaz_vakitleri?sehir=${city}&country=${country}`);
+                data = await response.json();
+                
+                if (data.vakitler) {
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({
+                        tarih: TODAY,
+                        data: data.vakitler
+                    }));
+                }
+            }
+            
+            if (!data || !data.vakitler) {
+                const skeleton = document.getElementById('countdown-skeleton');
+                if (skeleton) skeleton.style.display = 'none';
+                return;
+            }
+            
+            if (data && data.vakitler) {
+                const skeleton = document.getElementById('countdown-skeleton');
+                const wrapper = document.getElementById('home-countdown-wrapper');
+                const timerEl = document.getElementById('home-countdown-timer');
+                const labelEl = document.getElementById('next-vakit-name');
+                const cityEl = document.getElementById('active-city-name');
+                
+                if (skeleton) skeleton.style.display = 'none';
+                    if (wrapper) {
+                        wrapper.style.display = 'block';
+                        setTimeout(() => {
+                            wrapper.style.opacity = '1';
+                        }, 50);
+                    }
+                cityEl.textContent = city;
+                
+                const vakitler = data.vakitler;
+                const tz = data.timezone || 'Europe/Istanbul';
+                const vakitSirasi = [
+                    {id: 'imsak', label: 'İmsak'},
+                    {id: 'gunes', label: 'Güneş'},
+                    {id: 'ogle', label: 'Öğle'},
+                    {id: 'ikindi', label: 'İkindi'},
+                    {id: 'aksam', label: 'Akşam'},
+                    {id: 'yatsi', label: 'Yatsı'}
+                ];
+
+                function update() {
+                    const now = new Date();
+                    const cityNow = new Date(now.toLocaleString("en-US", {timeZone: tz}));
+                    
+                    let nextVakit = null;
+                    
+                    for (let v of vakitSirasi) {
+                        const [h, m] = vakitler[v.id].split(':').map(Number);
+                        const vDate = new Date(cityNow);
+                        vDate.setHours(h, m, 0, 0);
+                        
+                        if (vDate > cityNow) {
+                            nextVakit = { ...v, date: vDate };
+                            break;
+                        }
+                    }
+                    
+                    // Eğer bugün vakit kalmadıysa yarın imsak
+                    if (!nextVakit) {
+                        const [h, m] = vakitler['imsak'].split(':').map(Number);
+                        const vDate = new Date(cityNow);
+                        vDate.setDate(vDate.getDate() + 1);
+                        vDate.setHours(h, m, 0, 0);
+                        nextVakit = { id: 'imsak', label: 'İmsak', date: vDate };
+                    }
+                    
+                    const diff = nextVakit.date - cityNow;
+                    const hours = Math.floor(diff / 3600000);
+                    const mins = Math.floor((diff % 3600000) / 60000);
+                    const secs = Math.floor((diff % 60000) / 1000);
+                    
+                    labelEl.textContent = nextVakit.label + " Vaktine Kalan";
+                    timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                }
+                
+                update();
+                setInterval(update, 1000);
+            }
+        } catch (e) {
+            console.error("Home countdown error:", e);
+        }
+    }
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Layout Stability */
+.home-countdown-fixed-height {
+    min-height: 180px; /* Mobil için tahmini yükseklik */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 992px) {
+    .home-countdown-fixed-height {
+        min-height: 280px; /* Masaüstü için tahmini yükseklik */
+    }
+}
+
+/* Skeleton Loader Styles */
+.skeleton-card {
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.skeleton-line {
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.03) 25%, 
+        rgba(255, 255, 255, 0.08) 50%, 
+        rgba(255, 255, 255, 0.03) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 8px;
+    margin: 0 auto;
+}
+
+.skeleton-line.label {
+    width: 60%;
+    height: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.skeleton-line.time {
+    width: 80%;
+    height: 4rem;
+    margin-bottom: 15px;
+    border-radius: 12px;
+}
+
+.skeleton-line.location {
+    width: 40%;
+    height: 1rem;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@media (min-width: 992px) {
+    .skeleton-line.time {
+        height: 6rem;
+    }
+}
+
+.home-countdown-container {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 400px;
+    transition: opacity 0.4s ease;
+}
+
+@media (min-width: 992px) {
+    .home-countdown-container {
+        width: 50%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .countdown-card {
+        padding: 45px;
+        border-width: 2px;
+        background: rgba(255, 255, 255, 0.07);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+    
+    .countdown-time {
+        font-size: 5.5rem;
+        letter-spacing: -2px;
+    }
+    
+    .countdown-label {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+}
+
+.countdown-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 25px;
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+
+.countdown-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+}
+
+.countdown-label {
+    color: var(--primary);
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.countdown-time {
+    font-size: clamp(2.5rem, 10vw, 3.5rem);
+    font-weight: 800;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace; /* Eğer yüklüyse daha iyi durur, değilse monospace */
+    line-height: 1.2;
+    margin-bottom: 10px;
+    white-space: nowrap;
+}
+
+.countdown-location {
+    color: var(--gray);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.countdown-location::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #10b981;
+}
+
+.landing-wrapper {
+    overflow-x: hidden;
+}
+
+.hero {
+    min-height: 96vh;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 20px 160px; /* Alt boşluk 120px'den 160px'e çıkarıldı */
+    background: radial-gradient(circle at center, #333438 0%, #121212 100%);
+    position: relative;
+}
+
+/* Hero responsive styles moved to consolidated media query at bottom */
+
+@media (max-width: 480px) {
+    .hero {
+        padding-top: 80px;
+        padding-bottom: 240px;
+    }
+}
+
+@media (min-width: 992px) {
+    .hero {
+        height: 96vh;
+        padding: 20px;
+    }
+}
+
+.hero-badges {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+    text-decoration: none;
+    height: 44px;
+    width: 220px;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.status-badge.update {
+    border-color: rgba(34, 197, 94, 0.3);
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.status-badge.update:hover {
+    background: rgba(34, 197, 94, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(34, 197, 94, 0.5);
+}
+
+.status-badge.ramadan {
+    border-color: rgba(255, 193, 7, 0.3);
+    background: rgba(255, 193, 7, 0.05);
+}
+
+.status-badge.ramadan:hover {
+    background: rgba(255, 193, 7, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(255, 193, 7, 0.5);
+}
+
+.hero h1 {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 800;
+    margin-bottom: 20px;
+    background: linear-gradient(to right, var(--primary), #fbbf24);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.4;
+    padding: 0.1em 0;
+    margin-top: -0.1em;
+}
+
+.hero p {
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+    color: var(--gray);
+    max-width: 700px;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn-ultra-hero {
+    position: relative;
+    padding: 3px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, var(--primary), #fbbf24, var(--primary));
+    background-size: 200% auto;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: shine 3s linear infinite;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.15);
+    width: 360px; /* Genişliği biraz daha artırdım */
+}
+
+.btn-ultra-hero:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(255, 193, 7, 0.3);
+}
+
+.btn-inner {
+    background: #1a1b1e;
+    padding: 18px 28px; /* Padding artırılarak boyu uzatıldı */
+    border-radius: 21px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    color: white;
+    position: relative;
+    z-index: 1;
+    transition: background 0.4s ease;
+    height: 90px; /* Sabit yükseklik ile ikisi de aynı boyda */
+}
+
+.btn-ultra-hero:hover .btn-inner {
+    background: #232429;
+}
+
+.btn-icon-box {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 193, 7, 0.08);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.btn-icon-box .icon {
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0 0 5px rgba(255, 193, 7, 0.2));
+    animation: sunRotate 15s linear infinite;
+    transition: all 0.4s ease;
+}
+
+.btn-ultra-hero:hover .btn-icon-box {
+    background: var(--primary);
+    color: #1a1b1e;
+    transform: scale(1.1) rotate(8deg);
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+}
+
+.btn-ultra-hero:hover .btn-icon-box .icon {
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.15));
+    animation: sunRotate 4s linear infinite;
+}
+
+@keyframes sunRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.btn-text-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.btn-label {
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    background: linear-gradient(to right, #fff, var(--primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 768px) {
+    .btn-ultra-hero {
+        width: 100%;
+        max-width: 350px;
+    }
+}
+
+.btn-desc {
+    font-size: 0.8rem;
+    color: var(--gray);
+    font-weight: 500;
+}
+
+.btn-arrow {
+    margin-left: 10px;
+    color: var(--primary);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-ultra-hero:hover .btn-arrow {
+    transform: translateX(8px) scale(1.2);
+}
+
+.btn-ultra-hero.secondary-hero {
+    background: linear-gradient(135deg, #4b5563, #1f2937, #4b5563);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-ultra-hero.secondary-hero .btn-icon-box {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--gray);
+}
+
+.btn-ultra-hero.secondary-hero:hover .btn-icon-box {
+    background: var(--gray);
+    color: var(--dark);
+}
+
+.btn-ultra-hero.secondary-hero .btn-label {
+    background: linear-gradient(to right, #fff, var(--gray));
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+@keyframes shine {
+    to { background-position: 200% center; }
+}
+
+/* How It Works Section */
+.how-it-works {
+    padding: 120px 20px;
+    background: rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+@media (min-width: 992px) {
+    .steps-grid::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: linear-gradient(to right, transparent, rgba(255, 193, 7, 0.3), transparent);
+        z-index: 0;
+    }
+}
+
+.step-card {
+    position: relative;
+    padding: 50px 40px;
+    background: var(--card-bg);
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    text-align: center;
+}
+
+.step-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+.step-number-badge {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: var(--dark);
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-weight: 900;
+    font-size: 1rem;
+    box-shadow: 0 10px 20px rgba(255, 193, 7, 0.3);
+}
+
+.step-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    color: var(--primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s ease;
+}
+
+.step-card:hover .step-icon {
+    transform: scale(1.1);
+    background: rgba(255, 193, 7, 0.1);
+    border-color: var(--primary);
+}
+
+.step-icon .icon {
+    width: 28px;
+    height: 28px;
+}
+
+.step-card h4 {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+    color: var(--text);
+    font-weight: 800;
+}
+
+.step-card p {
+    color: var(--gray);
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+.hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    opacity: 0.8;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: bounce 2s infinite;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 10;
+}
+
+.hero-scroll::before {
+    content: 'Keşfet';
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.3s;
+}
+
+.hero-scroll:hover {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-5px);
+}
+
+.hero-scroll:hover::before {
+    color: var(--primary);
+}
+
+.hero-scroll svg {
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+    transition: fill 0.3s;
+}
+
+.hero-scroll:hover svg {
+    fill: var(--primary);
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+    40% { transform: translateX(-50%) translateY(-10px); }
+    60% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* Features Section */
+.features {
+    padding: 120px 20px;
+    max-width: 1500px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 70px;
+    position: relative;
+}
+
+.section-header h2 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+}
+
+.section-header h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: var(--primary);
+    margin: 15px auto 0;
+    border-radius: 2px;
+}
+
+.section-header p {
+    color: var(--gray);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+@media (max-width: 1100px) {
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .features {
+        max-width: 1240px;
+    }
+}
+
+.feature-card {
+    background: linear-gradient(145deg, rgba(30, 30, 30, 0.6), rgba(20, 20, 20, 0.8));
+    padding: 50px 30px;
+    border-radius: 40px;
+    text-align: center;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(255, 193, 7, 0.05), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-15px);
+    border-color: rgba(255, 193, 7, 0.4);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 193, 7, 0.05);
+}
+
+.feature-card:hover::before {
+    opacity: 1;
+}
+
+.feature-icon-wrapper {
+    position: relative;
+    margin-bottom: 35px;
+    z-index: 2;
+}
+
+.feature-icon {
+    width: 90px;
+    height: 90px;
+    background: rgba(255, 193, 7, 0.07);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba(255, 193, 7, 0.15);
+    position: relative;
+}
+
+.feature-card:hover .feature-icon {
+    background: var(--primary);
+    color: var(--dark);
+    transform: rotate(12deg) scale(1.1);
+    box-shadow: 0 15px 30px rgba(255, 193, 7, 0.3);
+}
+
+.feature-icon .icon {
+    width: 36px;
+    height: 36px;
+}
+
+.feature-card h3 {
+    font-size: 1.7rem;
+    margin-bottom: 18px;
+    color: var(--text);
+    font-weight: 800;
+    z-index: 2;
+}
+
+.feature-card p {
+    color: var(--gray);
+    line-height: 1.8;
+    font-size: 1.05rem;
+    z-index: 2;
+}
+
+/* Stats Section */
+.stats-overview {
+    padding: 100px 20px;
+    background: radial-gradient(circle at center, rgba(255, 193, 7, 0.03) 0%, transparent 70%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Home Guides Section */
+.home-guides {
+    padding: 120px 20px;
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.guides-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.guide-preview-card {
+    background: var(--card-bg);
+    border-radius: 32px;
+    padding: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    text-decoration: none;
+    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.guide-preview-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.guide-preview-card h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.guide-preview-card p {
+    color: var(--gray);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.guide-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(255, 193, 7, 0.1);
+    color: var(--primary);
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 193, 7, 0.1);
+}
+
+.read-btn {
+    color: var(--primary);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+.section-footer {
+    text-align: center;
+}
+
+.stats-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 40px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-5px);
+    border-color: rgba(255, 193, 7, 0.2);
+}
+
+.stat-val {
+    display: block;
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 10px;
+    line-height: 1;
+    font-family: 'Inter', sans-serif;
+}
+
+.stat-lbl {
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.hero-badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: default;
+}
+
+.status-badge.update {
+    background: rgba(16, 185, 129, 0.08);
+    color: #10b981;
+}
+
+.status-badge.ramadan {
+    background: rgba(245, 158, 11, 0.08);
+    color: #f59e0b;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.status-badge.ramadan:hover {
+    background: rgba(245, 158, 11, 0.15);
+    transform: translateY(-2px);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.status-badge .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    animation: badgePulse 2s infinite;
+}
+
+.status-badge .icon {
+    width: 16px;
+    height: 16px;
+}
+
+.status-badge .icon-sm {
+    width: 12px;
+    height: 12px;
+    opacity: 0.6;
+    transition: transform 0.3s ease;
+}
+
+.status-badge.ramadan:hover .icon-sm {
+    transform: translateX(3px);
+    opacity: 1;
+}
+
+@keyframes badgePulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 992px) {
+    .steps-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        max-width: 500px;
+    }
+    
+    .stats-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero { 
+        height: auto; 
+        min-height: 90vh; 
+        padding: 100px 20px 120px; 
+        justify-content: flex-start;
+    }
+    .hero h1 { font-size: clamp(2.2rem, 10vw, 3rem); }
+    .hero p { font-size: 1rem; margin-bottom: 30px; }
+    
+    .btn-ultra-hero { width: 100%; max-width: 350px; }
+    .btn-inner { padding: 12px 20px; gap: 12px; }
+    .btn-icon-box { width: 40px; height: 40px; border-radius: 12px; }
+    .btn-icon-box .icon { width: 20px; height: 20px; }
+    .btn-label { font-size: 1rem; letter-spacing: 1px; }
+    .btn-desc { font-size: 0.75rem; }
+    
+    .features { padding: 80px 15px; }
+    .section-header { margin-bottom: 50px; }
+    .section-header h2 { font-size: 2rem; }
+    .section-header p { font-size: 1rem; }
+    .features-grid { grid-template-columns: 1fr; gap: 20px; }
+    .feature-card { padding: 40px 25px; border-radius: 24px; }
+
+    .how-it-works { padding: 80px 15px; }
+    .step-card { padding: 50px 30px 30px; border-radius: 24px; }
+    .step-number-badge { font-size: 0.85rem; padding: 6px 16px; top: -15px; }
+    .step-icon { width: 60px; height: 60px; margin-bottom: 20px; }
+    .step-icon .icon { width: 24px; height: 24px; }
+
+    .stats-overview { padding: 60px 15px; }
+    .stat-item { padding: 30px; border-radius: 20px; }
+    .stat-val { font-size: 2.8rem; }
+
+    .home-guides { padding: 80px 15px; }
+    .guide-preview-card { padding: 30px 20px; border-radius: 24px; }
+    .guides-preview-grid { grid-template-columns: 1fr; gap: 20px; }
+}
+
+@media (max-width: 480px) {
+    .hero h1 { font-size: 2rem; }
+    .status-badge { font-size: 0.8rem; padding: 6px 12px; }
+}
+</style>
+{% endblock %}

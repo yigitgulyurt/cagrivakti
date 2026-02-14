@@ -1,0 +1,12 @@
+{
+  "guides": [
+    {
+      "slug": "rehber-basligi-url-uyumlu",
+      "title": "Rehber Başlığı",
+      "description": "Rehberin kısa açıklaması (meta description için uygun).",
+      "category": "Kategori Adı",
+      "content": "<h3>Alt Başlık</h3><p>İçerik metni buraya gelecek. HTML etiketleri kullanılabilir.</p><ul><li>Liste öğesi 1</li><li>Liste öğesi 2</li></ul>",
+      "last_updated": "YYYY-MM-DD"
+    }
+  ]
+}

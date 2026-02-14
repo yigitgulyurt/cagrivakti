@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Mesaj Detayı | Admin{% endblock %}
+
+{% block content %}
+<div class="admin-container fade-in" style="max-width: 800px; margin: 40px auto; padding: 20px;">
+    <div style="background: var(--card-bg); border-radius: 24px; padding: 40px; border: 1px solid rgba(255, 193, 7, 0.1);">
+        <h1 style="color: var(--primary); margin-bottom: 20px;">Mesaj Detayı</h1>
+        <div style="margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
+            <p><strong>Gönderen:</strong> {{ message.name }} ({{ message.email }})</p>
+            <p><strong>Tarih:</strong> {{ message.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+            <p><strong>Konu:</strong> {{ message.subject }}</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; line-height: 1.6;">
+            {{ message.message }}
+        </div>
+        <div style="margin-top: 30px;">
+            <a href="{{ url_for('views.admin_messages') }}" class="btn-primary" style="display: inline-block; padding: 10px 20px; text-decoration: none; border-radius: 8px; background: var(--primary); color: var(--dark); font-weight: bold;">Mesajlara Dön</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

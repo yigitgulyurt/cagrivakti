@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Neden Biz? | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}NEDEN BİZ?{% endblock %}
+
+{% block extra_css %}
+<style>
+    .comparison-container {
+        max-width: 1000px;
+        margin: 60px auto;
+        padding: 0 20px;
+    }
+    .hero-section {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+    .hero-section h1 {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 20px;
+        font-weight: 800;
+    }
+    .hero-section p {
+        font-size: 1.2rem;
+        color: var(--gray);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 40px;
+    }
+    .comp-card {
+        background: var(--card-bg);
+        padding: 40px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: var(--transition);
+    }
+    .comp-card.our-site {
+        border-color: var(--primary);
+        position: relative;
+        overflow: hidden;
+    }
+    .comp-card.our-site::before {
+        content: 'BİZİM SİTEMİZ';
+        position: absolute;
+        top: 20px;
+        right: -50px;
+        background: var(--primary);
+        color: var(--dark);
+        padding: 5px 40px;
+        transform: rotate(45deg);
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+    .comp-card h3 {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .comp-list {
+        list-style: none;
+        padding: 0;
+    }
+    .comp-list li {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 15px;
+        line-height: 1.5;
+    }
+    .comp-list li svg {
+        flex-shrink: 0;
+        margin-top: 4px;
+    }
+    .check-icon { color: #10b981; }
+    .cross-icon { color: #ef4444; }
+
+    .why-content {
+        margin-top: 80px;
+    }
+    .why-item {
+        margin-bottom: 40px;
+    }
+    .why-item h4 {
+        color: var(--primary);
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    .why-item p {
+        color: var(--gray);
+        line-height: 1.8;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .comparison-grid {
+            grid-template-columns: 1fr;
+        }
+        .hero-section h1 {
+            font-size: 2.2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="comparison-container">
+    <div class="hero-section fade-in">
+        <h1>Yalın, Hızlı ve Odaklı</h1>
+        <p>İbadetinizi planlarken reklamlar arasında kaybolmanızı istemiyoruz.</p>
+    </div>
+
+    <div class="comparison-grid">
+        <!-- Bizim Sitemiz -->
+        <div class="comp-card our-site">
+            <h3 style="color: var(--primary);">
+                <svg class="icon"><use xlink:href="#fa-check-circle"></use></svg>
+                Çağrı Vakti
+            </h3>
+            <ul class="comp-list">
+                <li>
+                    <svg class="icon check-icon"><use xlink:href="#fa-check"></use></svg>
+                    <span>Sıfır reklam, sıfır dikkat dağınıklığı. Sadece ihtiyacınız olan bilgi.</span>
+                </li>
+                <li>
+                    <svg class="icon check-icon"><use xlink:href="#fa-check"></use></svg>
+                    <span>Çağdaş ve yalın arayüz ile vakitlere anında ulaşım.</span>
+                </li>
+                <li>
+                    <svg class="icon check-icon"><use xlink:href="#fa-check"></use></svg>
+                    <span>PWA desteği ile telefonunuza uygulama olarak yükleyebilme.</span>
+                </li>
+                <li>
+                    <svg class="icon check-icon"><use xlink:href="#fa-check"></use></svg>
+                    <span>Düşük veri kullanımı ve saniyeler içinde açılan hızlı yapı.</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Haber Siteleri / Diğerleri -->
+        <div class="comp-card">
+            <h3 style="color: #ef4444;">
+                <svg class="icon"><use xlink:href="#fa-times-circle"></use></svg>
+                Haber Siteleri
+            </h3>
+            <ul class="comp-list">
+                <li>
+                    <svg class="icon cross-icon"><use xlink:href="#fa-times"></use></svg>
+                    <span>Her yerden fırlayan, dikkatinizi dağıtan saldırgan reklamlar.</span>
+                </li>
+                <li>
+                    <svg class="icon cross-icon"><use xlink:href="#fa-times"></use></svg>
+                    <span>Çağrı vaktini görmek için onlarca gereksiz haber başlığını geçmek zorunda kalırsınız.</span>
+                </li>
+                <li>
+                    <svg class="icon cross-icon"><use xlink:href="#fa-times"></use></svg>
+                    <span>Sayfalarca kaydırma gerektiren, karışık ve yavaş yüklenen tasarım.</span>
+                </li>
+                <li>
+                    <svg class="icon cross-icon"><use xlink:href="#fa-times"></use></svg>
+                    <span>Taşınabilir aygıtlarda pil ve veri tüketen ağır kod yapıları.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="why-content">
+        <div class="why-item">
+            <h4>Diğer Çağrı Vakti Sitelerinden Farkımız Nedir?</h4>
+            <p>
+                Genel ağda birçok çağrı vakti sitesi bulabilirsiniz, ancak çoğu 2000'li yıllardan kalma tasarımlar, karmaşık menüler ve yavaş altyapılarla hizmet vermektedir. 
+                Bizim yaklaşımımız ise tamamen farklı:
+            </p>
+            <ul style="color: var(--gray); margin-top: 15px; list-style: none; padding-left: 0;">
+                <li style="margin-bottom: 15px; display: flex; gap: 10px;">
+                    <svg class="icon check-icon" style="flex-shrink:0; margin-top:5px;"><use xlink:href="#fa-check"></use></svg>
+                    <span><strong>Çağdaş Teknoloji:</strong> Diğer siteler her sayfa geçişinde tüm sayfayı yenilerken, biz en güncel web teknolojilerini kullanarak saniyeler içinde geçiş yapmanızı sağlıyoruz.</span>
+                </li>
+                <li style="margin-bottom: 15px; display: flex; gap: 10px;">
+                    <svg class="icon check-icon" style="flex-shrink:0; margin-top:5px;"><use xlink:href="#fa-check"></use></svg>
+                    <span><strong>Gizlilik Odaklı:</strong> Çoğu site arka planda onlarca izleyici (tracker) çalıştırarak verilerinizi adsız da olsa toplar. Bizde ise tek bir izleyici bile yoktur.</span>
+                </li>
+                <li style="margin-bottom: 15px; display: flex; gap: 10px;">
+                    <svg class="icon check-icon" style="flex-shrink:0; margin-top:5px;"><use xlink:href="#fa-check"></use></svg>
+                    <span><strong>Çevrimdışı Ulaşım:</strong> PWA desteğimiz sayesinde, internetiniz kesilse bile daha önce baktığınız vakitlere ulaşmaya devam edebilirsiniz.</span>
+                </li>
+                <li style="margin-bottom: 15px; display: flex; gap: 10px;">
+                    <svg class="icon check-icon" style="flex-shrink:0; margin-top:5px;"><use xlink:href="#fa-check"></use></svg>
+                    <span><strong>Gereksiz Karmaşadan Uzak:</strong> Diğer siteler onlarca gereksiz eklenti ve bağlantıyla doluyken, biz sadece ihtiyacınız olan vakitlere ve dini içeriklere odaklanıyoruz.</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="why-item">
+            <h4>Neden Haber Sitelerinden Uzak Durmalısınız?</h4>
+            <p>
+                Haber siteleri çağrı vakitlerini bir "hizmet" olarak değil, daha fazla reklam gösterimi ve trafik elde etmek için bir "araç" olarak kullanır. 
+                Vakitlere bakmak istediğinizde karşınıza çıkan magazin haberleri, siyasi tartışmalar ve kendi kendine oynayan videolar, 
+                ibadet öncesi dinginliğinizi bozabilir.
+            </p>
+        </div>
+
+        <div class="why-item">
+            <h4>Bizim Farkımız Ne?</h4>
+            <p>
+                Biz sadece çağrı vakitlerine ve dini içeriklere odaklanıyoruz. Sitemizi tasarlarken en büyük önceliğimiz "hız" ve "yalınlık" oldu. 
+                Gereksiz hiçbir JavaScript kütüphanesi ya da izleyici (tracker) kullanmıyoruz. Bu sayede hem özel yaşamınızı koruyor hem de 
+                en eski aygıtlarda bile akıcı bir deneyim sunuyoruz.
+            </p>
+        </div>
+
+        <div class="why-item">
+            <h4>Amacımız</h4>
+            <p>
+                Tek amacımız, Müslümanların çağrı vakitlerine en doğru ve en temiz şekilde ulaşmasını sağlamaktır. 
+                Resmi Diyanet verilerini kullanarak, teknolojiyle maneviyatı en yalın noktada buluşturuyoruz.
+            </p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{{ url_for('views.sehir_secimi') }}" class="btn btn-primary">
+            <svg class="icon"><use xlink:href="#fa-map-marker-alt"></use></svg>
+            <span>İlini Seç ve Başla</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

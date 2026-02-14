@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}ADMİN PANELİ{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .admin-header {
+        margin-bottom: 30px;
+    }
+    .admin-header h1 {
+        font-size: 2rem;
+        color: var(--primary);
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 30px;
+        border: 1px solid rgba(255, 193, 7, 0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+    }
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary);
+        display: block;
+        margin-bottom: 5px;
+    }
+    .stat-label {
+        font-size: 1rem;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .admin-menu {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    .menu-item {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 20px;
+        text-decoration: none;
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid rgba(255, 193, 7, 0.05);
+        transition: all 0.3s ease;
+    }
+    .menu-item:hover {
+        background: rgba(255, 193, 7, 0.05);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    .menu-item i {
+        font-size: 2rem;
+    }
+    .menu-item span {
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container fade-in">
+    <div class="admin-header">
+        <h1>Hoş Geldiniz, Admin</h1>
+        <p>Sistem durumunu ve içerikleri buradan yönetebilirsiniz.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.guides_count }}</span>
+            <span class="stat-label">Rehber Yazısı</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.messages_count }}</span>
+            <span class="stat-label">Yeni Mesaj</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.daily_content_count }}</span>
+            <span class="stat-label">Günlük İçerik</span>
+        </div>
+    </div>
+
+    <div class="admin-menu">
+        <a href="{{ url_for('views.admin_guides') }}" class="menu-item">
+            <i class="fas fa-book"></i>
+            <span>Rehberleri Yönet</span>
+        </a>
+        <a href="{{ url_for('views.admin_contents') }}" class="menu-item">
+            <i class="fas fa-quote-left"></i>
+            <span>Ayet/Hadis Yönet</span>
+        </a>
+        <a href="{{ url_for('views.admin_messages') }}" class="menu-item">
+            <i class="fas fa-envelope"></i>
+            <span>Mesajları Oku</span>
+        </a>
+        <a href="{{ url_for('views.admin_logs') }}" class="menu-item">
+            <i class="fas fa-terminal"></i>
+            <span>Sistem Logları</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

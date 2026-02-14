@@ -1,0 +1,28 @@
+{
+    "content": [
+        {
+            "type": "ayet",
+            "text": "Örnek ayet metni buraya gelecek.",
+            "category": "daily",
+            "source": "Sure Adı ve Ayet Numarası"
+        },
+        {
+            "type": "hadis",
+            "text": "Örnek hadis metni buraya gelecek.",
+            "category": "daily",
+            "source": "Hadis Kaynağı"
+        },
+        {
+            "type": "soz",
+            "text": "Örnek güzel söz metni buraya gelecek.",
+            "category": "daily",
+            "source": "Sözün Sahibi"
+        },
+        {
+            "type": "xxxx",
+            "text": "Ramazan ayı için örnek ayet metni.",
+            "category": "ramadan",
+            "source": "xxxx"
+        }
+    ]
+}

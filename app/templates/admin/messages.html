@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}İletişim Mesajları | Admin{% endblock %}
+
+{% block brand_text %}MESAJLAR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .data-table {
+        width: 100%;
+        background: var(--card-bg);
+        border-radius: 24px;
+        overflow: hidden;
+        border-collapse: collapse;
+        border: 1px solid rgba(255, 193, 7, 0.1);
+    }
+    .data-table th, .data-table td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .data-table th {
+        background: rgba(255, 193, 7, 0.05);
+        color: var(--primary);
+        font-weight: 700;
+    }
+    .unread {
+        background: rgba(255, 193, 7, 0.03);
+        font-weight: 600;
+    }
+    .badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+    }
+    .badge-new { background: var(--primary); color: var(--dark); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container fade-in">
+    <h1>Gelen Mesajlar</h1>
+    
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Tarih</th>
+                <th>Gönderen</th>
+                <th>Konu</th>
+                <th>Durum</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for msg in messages %}
+            <tr class="{{ 'unread' if not msg.is_read else '' }}">
+                <td>{{ msg.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                <td>{{ msg.name }} ({{ msg.email }})</td>
+                <td>{{ msg.subject }}</td>
+                <td>
+                    {% if not msg.is_read %}
+                    <span class="badge badge-new">YENİ</span>
+                    {% else %}
+                    Okundu
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('views.admin_message_read', message_id=msg.id) }}" class="btn-sm" style="margin-right: 5px;">Oku</a>
+                    <form action="{{ url_for('views.admin_message_delete', message_id=msg.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Bu mesajı silmek istediğinize emin misiniz?');">
+                        <button type="submit" class="btn-sm" style="color: #dc3545; background: none; border: 1px solid rgba(220, 53, 69, 0.2); cursor: pointer;">Sil</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" style="text-align: center;">Mesaj bulunamadı.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

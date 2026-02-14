@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.python-version
+
+# Database
+*.db
+*.sqlite3
+instance/cagrivakti.db
+instance/discord_users.db
+instance/telegram_bot.db
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+app/logs/app_info.log
+app/logs/cagrivakti-api.log
+app/logs/cagrivakti-web.log
+app/logs/cagrivakti-bot.log
+app/logs/error_details.log
+
+# Database Migrations
+# Standard practice is to keep migrations but ignore local db state
+migrations/*.db
+migrations/*.sqlite3
+
+# Static Files & SEO (Generated)
+# robots.txt
+# sitemap.xml
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project Specific Data
+scripts/2026/*.xlsx
+scripts/**/*.xlsx
+scripts/**/*.json
+!scripts/daily_content.json
+!app/static/data/guides.json
+scripts/daily_content.json
+app/static/data/guides.json
+
+stress_test.py
+test.py

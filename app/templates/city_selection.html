@@ -1,0 +1,485 @@
+{% extends "base.html" %}
+
+{% block title %}İl Seçimi | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}İL SEÇİMİ{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <header class="header">
+        <a href="{{ url_for('views.index') }}" class="home-link">
+            <h1>
+                <!-- SVG İkonu: Cami -->
+                <svg class="icon"><use xlink:href="#fa-mosque"></use></svg> Çağrı Vakti
+            </h1>
+        </a>
+        <div class="search-container">
+            <!-- SVG İkonu: Arama -->
+            <svg class="icon search-icon"><use xlink:href="#fa-search"></use></svg>
+            <input type="text" class="search-box" placeholder="İl ya da ülke ara...">
+        </div>
+    </header>
+
+    <nav class="category-tabs">
+        <button class="category-tab active" data-category="biggest">Büyük İller</button>
+        <button class="category-tab" data-category="turkey">Türkiye</button>
+        <button class="category-tab" data-category="countries">Ülkeler</button>
+    </nav>
+
+    <section class="category-content active" id="biggest">
+        <div class="city-grid" id="buyuk-sehirler-grid">
+            <!-- Initial Skeletons -->
+            {% for i in range(30) %}
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto;"></div>
+                </div>
+                <div class="vakit-bilgisi">
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto 5px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="category-content" id="turkey">
+        <h2 class="region-title" data-region="marmara">Marmara Bölgesi</h2>
+        <div class="city-grid" id="Marmara">
+            {% for i in range(12) %}
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto;"></div>
+                </div>
+                <div class="vakit-bilgisi">
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto 5px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="region-title" data-region="ege">Ege Bölgesi</h2>
+        <div class="city-grid" id="Ege">
+            {% for i in range(8) %}
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto;"></div>
+                </div>
+                <div class="vakit-bilgisi">
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto 5px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="region-title" data-region="akdeniz">Akdeniz Bölgesi</h2>
+        <div class="city-grid" id="Akdeniz">
+            {% for i in range(8) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="region-title" data-region="icanadolu">İç Anadolu Bölgesi</h2>
+        <div class="city-grid" id="IcAnadolu">
+            {% for i in range(13) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="region-title" data-region="karadeniz">Karadeniz Bölgesi</h2>
+        <div class="city-grid" id="Karadeniz">
+            {% for i in range(17) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="region-title" data-region="doguanadolu">Doğu Anadolu Bölgesi</h2>
+        <div class="city-grid" id="DoguAnadolu">
+            {% for i in range(14) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="region-title" data-region="guneydoguanadolu">Güneydoğu Anadolu Bölgesi</h2>
+        <div class="city-grid" id="GuneydoguAnadolu">
+            {% for i in range(7) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="category-content" id="countries">
+        <div class="city-grid" id="countries-grid">
+            {% for i in range(61) %}
+            <div class="city-card skeleton-card">
+                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+.home-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: center;
+}
+
+.search-container {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+}
+
+.search-box {
+    width: 100%;
+    padding: 15px 20px 15px 50px;
+    font-size: 1.1em;
+    border: 2px solid transparent;
+    border-radius: 15px;
+    background-color: var(--dark);
+    color: var(--text);
+    transition: var(--transition);
+}
+
+.search-box:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: var(--hover-color);
+}
+
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.category-tab {
+    padding: 12px 24px;
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: 12px;
+    color: var(--text);
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+}
+
+.category-tab.active {
+    background-color: var(--primary);
+    color: var(--dark);
+}
+
+.category-tab:hover:not(.active) {
+    background-color: var(--hover-color);
+    transform: translateY(-2px);
+}
+
+.category-content {
+    display: none;
+    padding: 20px;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+.category-content.active {
+    display: block;
+}
+
+.city-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 10px;
+}
+
+.city-card {
+    background: var(--dark);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    min-height: 114px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.skeleton-card {
+    cursor: default;
+    pointer-events: none;
+}
+
+.city-card:hover {
+    transform: translateY(-5px);
+    background: var(--hover-color);
+    border-color: var(--primary);
+}
+
+.city-name {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.region-title {
+    color: var(--primary);
+    font-size: 1.5em;
+    margin: 30px 0 15px;
+    padding-left: 10px;
+    border-left: 4px solid var(--primary);
+}
+
+.vakit-bilgisi {
+    font-size: 0.9em;
+    color: var(--gray);
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .container { padding: 10px; }
+    .header { padding: 20px; margin-bottom: 20px; }
+    .header h1 { font-size: 1.6em; gap: 10px; }
+    .search-box { padding: 12px 15px 12px 45px; font-size: 1rem; }
+    .search-icon { left: 15px; }
+    
+    .category-tabs { gap: 8px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; }
+    .category-tab { width: 100%; padding: 10px; font-size: 0.9rem; white-space: nowrap; }
+    .category-tab:first-child { grid-column: span 2; }
+    
+    .category-content { padding: 15px 10px; }
+    .city-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 5px; }
+    .city-card { padding: 15px 10px; min-height: 100px; }
+    .city-name { font-size: 0.95rem; }
+    .vakit-bilgisi { font-size: 0.85rem; }
+    
+    .region-title { font-size: 1.2rem; margin: 20px 0 10px; }
+}
+
+@media (max-width: 480px) {
+    .city-grid { grid-template-columns: 1fr 1fr; }
+    .header h1 { font-size: 1.4rem; }
+}
+</style>
+{% endblock %}
+
+{% block footer_js %}
+<script src="{{ url_for('static', filename='js/city-data.js') }}" defer></script>
+<script>
+    $(document).ready(function() {
+        // Öncelikli olarak büyük şehirleri yükle
+        renderCityGrid('#buyuk-sehirler-grid', buyukSehirler, 'TR', false);
+
+        // Diğer kategorileri arka planda, kullanıcıyı engellemeden yükle
+        setTimeout(() => {
+            Object.entries(turkiyeSehirleri).forEach(([bolge, sehirler]) => {
+                renderCityGrid(`#${bolge}`, sehirler, 'TR', true);
+            });
+            renderCityGrid('#countries-grid', uluslararasiSehirler, 'AUTO', true);
+        }, 500);
+
+        $('.category-tab').click(function() {
+            const category = $(this).data('category');
+            window.location.hash = category;
+            
+            $('.category-tab').removeClass('active');
+            $(this).addClass('active');
+            $('.category-content').removeClass('active');
+            $(`#${category}`).addClass('active');
+        });
+
+        if (window.location.hash) {
+            const hash = window.location.hash.substring(1);
+            const targetTab = $(`.category-tab[data-category="${hash}"]`);
+            if (targetTab.length) targetTab.click();
+        }
+
+        const requestQueue = [];
+        let isProcessing = false;
+
+        function processQueue() {
+            if (isProcessing || requestQueue.length === 0) return;
+            isProcessing = true;
+            const { url, callback } = requestQueue.shift();
+            
+            $.get(url)
+                .done(callback)
+                .always(() => {
+                    isProcessing = false;
+                    setTimeout(processQueue, 50); // Her istek arası 50ms bekle
+                });
+        }
+
+        function renderCityGrid(containerId, sehirler, countryCode, isLazy) {
+            const grid = $(containerId);
+            
+            // Mevcut kartları temizle ama iskeletleri sadece veri geldikçe değiştir
+            grid.empty();
+
+            sehirler.forEach((item, index) => {
+                const sehir = typeof item === 'object' ? item.sehir : item;
+                const itemCountryCode = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
+                
+                const CACHE_KEY = `vakitler_${sehir}_${itemCountryCode}`;
+                const TODAY = new Date().toISOString().split('T')[0];
+                const cached = localStorage.getItem(CACHE_KEY);
+                let cachedData = null;
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed.tarih === TODAY) {
+                        cachedData = parsed.data;
+                    }
+                }
+
+                const card = $('<div>')
+                    .addClass('city-card')
+                    .click(function() {
+                        if ($(this).hasClass('skeleton-card')) return;
+                        // Çevrimdışı uyumluluk için doğrudan yönlendir
+                        // Sunucu tarafındaki tercih kaydı sehir_sayfasi route'unda zaten yapılıyor
+                        window.location.href = `/sehir/${sehir}?country=${itemCountryCode}`;
+                    });
+
+                const cityName = $('<div>').addClass('city-name');
+                const vakitBilgisi = $('<div>').addClass('vakit-bilgisi');
+                
+                const IS_RAMADAN = {{ 'true' if ramadan_info.is_ramadan else 'false' }};
+                const aksamLabel = IS_RAMADAN ? 'İftar' : 'Akşam';
+
+                if (cachedData) {
+                    card.addClass('content-loaded');
+                    cityName.text(sehir);
+                    if (cachedData.imsak !== "--:--") {
+                        vakitBilgisi.html(`İmsak: ${cachedData.imsak}<br>${aksamLabel}: ${cachedData.aksam}`);
+                    } else {
+                        vakitBilgisi.text('Vakit bulunamadı');
+                    }
+                } else {
+                    card.addClass('skeleton-card');
+                    cityName.append($('<div>').addClass('skeleton skeleton-text').css({width: '70%', margin: '0 auto'}));
+                    vakitBilgisi.append($('<div>').addClass('skeleton skeleton-text').css({width: '40%', margin: '0 auto 5px'}));
+                    vakitBilgisi.append($('<div>').addClass('skeleton skeleton-text').css({width: '40%', margin: '0 auto'}));
+                }
+
+                card.append(cityName).append(vakitBilgisi);
+                grid.append(card);
+                
+                function updateUI(vakitler) {
+                    card.removeClass('skeleton-card').addClass('content-loaded');
+                    cityName.empty().text(sehir);
+                    if (vakitler && vakitler.imsak !== "--:--") {
+                        vakitBilgisi.html(`İmsak: ${vakitler.imsak}<br>${aksamLabel}: ${vakitler.aksam}`);
+                    } else {
+                        vakitBilgisi.text('Vakit bulunamadı');
+                    }
+                }
+
+                if (cachedData) return;
+
+                // API isteğini sıraya ekle
+                const url = `/api/namaz_vakitleri?sehir=${sehir}&country=${itemCountryCode}`;
+                const callback = function(data) {
+                    if (data.vakitler) {
+                        localStorage.setItem(CACHE_KEY, JSON.stringify({
+                            tarih: TODAY,
+                            data: data.vakitler
+                        }));
+                        updateUI(data.vakitler);
+                    } else if (!card.hasClass('content-loaded')) {
+                        card.removeClass('skeleton-card').addClass('content-loaded');
+                        cityName.empty().text(sehir);
+                        vakitBilgisi.text('Hata oluştu');
+                    }
+                };
+
+                if (!isLazy) {
+                    $.get(url).done(callback);
+                } else {
+                    requestQueue.push({ url, callback });
+                    processQueue();
+                }
+            });
+        }
+
+        $('.search-box').on('input', function() {
+            const searchText = $(this).val().toLowerCase();
+            $('.city-card').each(function() {
+                const text = $(this).text().toLowerCase();
+                $(this).toggle(text.includes(searchText));
+            });
+
+            $('.category-content').each(function() {
+                const content = $(this);
+                if (searchText.length > 0) {
+                    content.find('.region-title').each(function() {
+                        const title = $(this);
+                        const nextGrid = title.next('.city-grid');
+                        title.toggle(nextGrid.find('.city-card:visible').length > 0);
+                    });
+                } else {
+                    $('.region-title').show();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

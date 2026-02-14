@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}Çağrı Vakti | Çağdaş, Hızlı ve Doğru{% endblock %}</title>
+
+    <!-- SEO Meta Etiketleri -->
+    <meta name="description" content="{% block description %}Dünya genelinde çağrı vakitleri, imsakiye ve dini içerikler. Çağdaş arayüz ve doğru verilerle yanınızdayız.{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}ramazan, imsakiye, çağrı vakitleri, iftar, sahur, ezan vakitleri, namaz saatleri{% endblock %}">
+    <meta name="author" content="Çağrı Vakti">
+    <link rel="canonical" href="{% block canonical %}https://cagrivakti.com.tr{{ request.path }}{% endblock %}">
+
+    <!-- Open Graph Meta Etiketleri -->
+    <meta property="og:title" content="{% block og_title %}Çağrı Vakti{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Günlük çağrı vakitleri ve Ramazan'a özel içerikler{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cagrivakti.com.tr{{ request.path }}">
+    <meta property="og:image" content="https://cagrivakti.com.tr/static/icons/og-image.webp">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {% block json_ld %}
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Çağrı Vakti",
+      "url": "https://cagrivakti.com.tr",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://cagrivakti.com.tr/sehir/{search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    {% endblock %}
+    
+    {% block breadcrumb_json_ld %}{% endblock %}
+    </script>
+
+    <!-- Favicon ve App Icons -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/icon-192-192.webp') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename='icons/icon-512-512.webp') }}" color="#FFC107">
+
+    <!-- PWA Meta Etiketleri -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#121212">
+    <meta name="msapplication-TileColor" content="#121212">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='icons/icon-144-144.webp') }}">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Çağrı">
+    
+    <!-- iOS Splash Screens -->
+    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='icons/icon-512-512.webp') }}">
+
+    <!-- Fontlar
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"> -->
+
+    <!-- CSS Dosyaları -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+
+    {% block extra_css %}{% endblock %}
+
+    <script>
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => {
+                        console.log('SW Registered');
+                        
+                        // Periyodik Arka Plan Senkronizasyonu (Destekleyen tarayıcılar için)
+                        if ('periodicSync' in reg) {
+                            reg.periodicSync.register('refresh-vakitler', {
+                                minInterval: 24 * 60 * 60 * 1000 // 24 saatte bir
+                            }).catch(err => console.log('Periodic Sync failed', err));
+                        }
+                    })
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- SVG Sprite -->
+    <div style="display: none;">
+        {% include 'img/icons.svg' %}
+    </div>
+
+    <nav class="navbar">
+        <a href="{{ url_for('views.index') }}" class="nav-brand" title="Ana Sayfa">{% block brand_text %}ÇAĞRI{% endblock %}</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Menüyü Aç/Kapat">
+            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-bars"></use></svg>
+        </button>
+        <div class="nav-links" id="navLinks">
+            <a href="{{ url_for('views.sehir_secimi') }}" class="nav-link" title="Şehir Seçimi Sayfası">İl Seçimi</a>
+            <a href="{{ url_for('views.kible_pusulasi') }}" class="nav-link" title="Online Kıble Pusulası">Kıble Pusulası</a>
+            <a href="{{ url_for('views.imsakiye_secimi') }}" class="nav-link" title="2026 İmsakiye Çizelgesi">Vakit Çizelgesi</a>
+            <a href="{{ url_for('views.ramazan_nedir') }}" class="nav-link" title="Ramazan Hakkında Bilgiler">Ramazan Kılavuzu</a>
+            <a href="{{ url_for('views.orucu_bozan_durumlar') }}" class="nav-link" title="Oruç Bozan Durumları">Oruç Bozan Durumları</a>
+            <a href="{{ url_for('views.bilgi_kosesi_liste') }}" class="nav-link" title="Dini Bilgiler Bilgi Köşesi">Bilgi Köşesi</a>
+            <a href="{{ url_for('views.neden_biz') }}" class="nav-link" title="Çağrı Vakti İlkeleri">Neden Biz?</a>
+            <a href="{{ url_for('views.indir') }}" class="nav-link" title="Mobil Uygulamayı İndir">Uygulamayı İndir</a>
+            <a href="{{ url_for('views.ilkelerimiz') }}" class="nav-link" title="Çağrı Vakti İlkeleri">İlkelerimiz</a>
+            <a href="{{ url_for('views.iletisim') }}" class="nav-link" title="Bize Ulaşın">İletişim</a>
+            <!-- <a href="{{ url_for('views.api_dokuman') }}" class="nav-link">API Ulaşımı</a> -->
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <footer class="landing-footer" style="padding: 60px 20px; background: var(--dark); text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <svg class="icon"><use xlink:href="#fa-mosque"></use></svg>
+                <span>Çağrı Vakti</span>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('views.sehir_secimi') }}">Vakitler</a>
+                <a href="{{ url_for('views.kible_pusulasi') }}">Kıble Pusulası</a>
+                <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye 2026</a>
+                <a href="{{ url_for('views.neden_biz') }}">Neden Biz?</a>
+                <a href="{{ url_for('views.api_dokuman') }}">API</a>
+                <a href="{{ url_for('views.ilkelerimiz') }}">İlkelerimiz</a>
+                <a href="{{ url_for('views.indir') }}">Uygulamayı İndir</a>
+                <a href="{{ url_for('views.iletisim') }}">İletişim</a>
+            </div>
+            <div class="footer-creator">
+                <a href="https://www.instagram.com/yigitgulyurt/" target="_blank" rel="noopener noreferrer">BİR YİĞİT GÜLYURT PROJESİ</a>
+            </div>
+            <div class="footer-copy">
+                &copy; 2026 Çağrı Vakti. Bütün hakları saklıdır.
+            </div>
+        </div>
+    </footer>
+
+    {% block modals %}
+    {% endblock %}
+
+    <!-- PWA Kurulum Banner'ı -->
+    <div id="pwaInstallBanner" class="pwa-install-banner" title="Uygulamayı Yükle">
+        <div class="pwa-content">
+            <div class="pwa-icon">
+                <img src="{{ url_for('static', filename='icons/icon-96-96.webp') }}" alt="Çağrı Vakti Uygulama İkonu" loading="lazy">
+            </div>
+            <div class="pwa-text">
+                <h3>Uygulamayı Yükleyin</h3>
+                <p>Çağrı vakitlerine hızlı erişim için ana ekranınıza ekleyin.</p>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button id="pwaInstallBtn" class="btn btn-primary btn-sm" title="Uygulamayı Cihaza Yükle">Yükle</button>
+            <button id="pwaCloseBtn" class="btn-close-pwa" title="Kapat">
+                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-xmark"></use></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Hoş Geldin Modalı -->
+    <div id="welcomeModal" class="welcome-modal-overlay">
+        <div class="welcome-modal">
+            <div class="welcome-icon">
+                <svg class="icon" style="width: 80px; height: 80px;" aria-hidden="true"><use xlink:href="#fa-mosque"></use></svg>
+            </div>
+            <h2>Hoş Geldiniz!</h2>
+            <p>Çağrı vakitlerini en yalın, en hızlı ve reklamsız şekilde izleyebileceğiniz çağdaş platformumuza hoş geldiniz.</p>
+            <div class="welcome-buttons">
+                <a href="{{ url_for('views.neden_biz') }}" class="btn btn-primary" onclick="closeWelcomeModal()" title="Neden Bizi Seçmelisiniz?">
+                    <span>Neden Biz?</span>
+                </a>
+                <a href="{{ url_for('views.index') }}" class="btn btn-secondary" onclick="closeWelcomeModal()" title="Uygulamayı Kullanmaya Başla">
+                    <span>Kullanmaya Başla</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    
+    <!-- Global Scripts -->
+    <script>
+        // Bağlantı Durumu Kontrolü
+        function updateOnlineStatus() {
+            // Sadece bağlantı koptuğunda offline sayfasına yönlendirilebilir 
+            // ya da uygulama genelinde sessizce yönetilebilir.
+            // Kullanıcının bahsettiği "kırmızı kutu" uyarısı burada tetiklenmiyor.
+            console.log(navigator.onLine ? "Çevrimiçi" : "Çevrimdışı");
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        // Hoş Geldin Modalı Kontrolü
+        function checkWelcomeModal() {
+            const hasVisited = localStorage.getItem('hasVisitedCagriVakti');
+            if (!hasVisited) {
+                const modal = document.getElementById('welcomeModal');
+                if (modal) {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+        }
+
+        function closeWelcomeModal() {
+            const modal = document.getElementById('welcomeModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                localStorage.setItem('hasVisitedCagriVakti', 'true');
+            }
+        }
+
+        // Sayfa yüklendiğinde modalı kontrol et
+        window.addEventListener('DOMContentLoaded', checkWelcomeModal);
+
+        // PWA Kurulum Mantığı
+        let deferredPrompt;
+        const pwaBanner = document.getElementById('pwaInstallBanner');
+        const installBtn = document.getElementById('pwaInstallBtn');
+        const closeBtn = document.getElementById('pwaCloseBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Chrome 67 ve öncesinde otomatik gösterimi engelle
+            e.preventDefault();
+            // Olayı sakla ki daha sonra tetikleyebilelim
+            deferredPrompt = e;
+            
+            // Eğer kullanıcı daha önce bu oturumda kapatmadıysa banner'ı göster
+            if (!sessionStorage.getItem('pwaBannerDismissed')) {
+                setTimeout(() => {
+                    pwaBanner.classList.add('active');
+                }, 3000); // 3 saniye sonra göster
+            }
+        });
+
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    // Kurulum istemini göster
+                    deferredPrompt.prompt();
+                    // Kullanıcının cevabını bekle
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`PWA kurulum sonucu: ${outcome}`);
+                    // İstem kullanıldı, temizle
+                    deferredPrompt = null;
+                    // Banner'ı gizle
+                    pwaBanner.classList.remove('active');
+                }
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                pwaBanner.classList.remove('active');
+                // Bu oturumda tekrar gösterme
+                sessionStorage.setItem('pwaBannerDismissed', 'true');
+            });
+        }
+
+        // Uygulama yüklendiğinde
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA başarıyla yüklendi');
+            pwaBanner.classList.remove('active');
+        });
+
+        // Navbar Toggle
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                const icon = navToggle.querySelector('use');
+                if (navLinks.classList.contains('active')) {
+                    icon.setAttribute('xlink:href', '#fa-xmark');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    icon.setAttribute('xlink:href', '#fa-bars');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Menü linklerine tıklandığında menüyü kapat
+            navLinks.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    navToggle.querySelector('use').setAttribute('xlink:href', '#fa-bars');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+        }
+    </script>
+
+    {% block footer_js %}{% endblock %}
+</body>
+</html>

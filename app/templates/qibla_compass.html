@@ -1,0 +1,941 @@
+{% extends "base.html" %}
+
+{% block title %}{{ seo_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Sadece Mobil Uyarı Ekranı */
+    #mobile-only-warning {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #0f172a;
+        z-index: 9999;
+        display: none; /* JS ile açılacak */
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px;
+        color: white;
+    }
+
+    .warning-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+    }
+
+    .warning-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 15px;
+    }
+
+    .warning-text {
+        font-size: 16px;
+        line-height: 1.6;
+        color: rgba(255,255,255,0.7);
+        max-width: 400px;
+    }
+
+    .qr-code {
+        margin-top: 30px;
+        padding: 15px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* Masaüstünde ana içeriği gizle */
+    @media (min-width: 1025px) {
+        .qibla-page { display: none !important; }
+        #mobile-only-warning { display: flex; }
+    }
+
+    :root {
+        --primary-color: var(--primary);
+        --compass-size: 285px;
+        --compass-size-mobile: 268.5px;
+    }
+
+    .qibla-page {
+        background: var(--dark); /* Project dark background */
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-x: hidden;
+        position: relative;
+        color: var(--text);
+    }
+
+    #camera-feed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        opacity: 0.6;
+        display: none;
+    }
+
+    .qibla-content-overlay {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .qibla-header {
+        text-align: center;
+        margin-bottom: 30px;
+        max-width: 700px;
+        animation: fadeInDown 0.8s ease-out;
+        padding: 0 10px;
+    }
+
+    .qibla-header h1 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        background: linear-gradient(to right, #fff, var(--primary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .qibla-header p {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    /* Compass Container */
+    .compass-wrapper {
+        position: relative;
+        width: var(--compass-size);
+        height: var(--compass-size);
+        margin: 20px auto;
+        perspective: 1000px;
+        animation: zoomIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .compass-outer {
+        position: relative;
+        width: var(--compass-size);
+        height: var(--compass-size);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 50px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 0 auto;
+        box-sizing: border-box; /* Önemli: Border genişliği hesaplamayı bozmasın */
+    }
+
+    .compass-dial {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        transition: none !important;
+        will-change: transform;
+        background: transparent;
+        box-sizing: border-box;
+    }
+
+    .mark {
+        position: absolute;
+        width: 1px;
+        height: 8px;
+        background: rgba(255,255,255,0.3);
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        /* transform-origin JS tarafından createMarks içinde atanıyor */
+    }
+
+    .mark.cardinal {
+        height: 12px;
+        width: 2px;
+        background: #fff;
+    }
+
+    .cardinal-label {
+        position: absolute;
+        font-weight: 800; /* Daha belirgin */
+        font-size: 16px; /* Biraz büyütüldü */
+        color: #fff;
+        left: 50%;
+        /* top JS ile dinamik ayarlanacak */
+        transform: translateX(-50%);
+        text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px; /* Harf için sabit genişlik alanı */
+        height: 20px;
+    }
+
+    /* Fixed North Needle (Optional, helps orientation) */
+    .needle-fixed {
+        position: absolute;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary) 50%, transparent 50%);
+        z-index: 5;
+        opacity: 0.5;
+    }
+
+    /* Qibla Pointer (The main one) */
+    .qibla-pointer {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 30px; /* Ok genişliği */
+        height: 100%; /* Dairenin çapı kadar */
+        z-index: 10;
+        display: none;
+        pointer-events: none;
+        transform: translate(-50%, -50%); /* Tam merkeze oturt */
+        transform-origin: center center;
+    }
+
+    .qibla-pointer .pointer-line {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 6px; /* Daha dolgun */
+        height: 50%;
+        /* Hub'dan çıkıyormuş gibi görünmesi için gradient yönünü değiştirdim */
+        background: linear-gradient(to top, transparent 0%, rgba(255, 193, 7, 0.2) 15%, var(--primary) 40%);
+        transform: translateX(-50%);
+        border-radius: 3px;
+        transition: all 0.3s ease;
+    }
+
+    /* Hizalanınca Ok Hub ile Bütünleşsin */
+    .is-aligned .qibla-pointer .pointer-line {
+        background: linear-gradient(to top, var(--primary) 0%, #fff 100%);
+        width: 8px;
+        box-shadow: 0 0 15px var(--primary);
+    }
+
+    /* Hizalanınca Okun Rengi ve Parlaması */
+    .is-aligned .qibla-pointer svg {
+        fill: #fff !important;
+        filter: drop-shadow(0 0 15px var(--primary));
+        transform: scale(1.2);
+    }
+
+    /* Center Hub - Puzzle Dock Tasarımı */
+    .compass-center {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background: radial-gradient(circle, #fff 30%, #f0f0f0 100%);
+        border: 3px solid var(--hover-color); /* Daha koyu, mekanik bir çerçeve */
+        border-radius: 50%;
+        z-index: 20;
+        box-shadow: 0 0 15px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Sabit İleri Göstergesi (Target Dock) */
+    .compass-center::after {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 12px;
+        height: 12px;
+        background: var(--primary);
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Üçgen oyuk hissi */
+        transition: all 0.3s ease;
+    }
+
+    /* İç Nokta (Core) */
+    .compass-center::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: var(--hover-color);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    /* Hizalanınca Parçalar Birleşsin */
+    .is-aligned .compass-center {
+        border-color: var(--primary);
+        box-shadow: 0 0 30px var(--primary);
+        transform: scale(1.1);
+    }
+
+    .is-aligned .compass-center::after {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-50%) scale(0.5);
+    }
+
+    .is-aligned .compass-center::before {
+        background: var(--primary);
+        transform: scale(1.2);
+    }
+
+    /* Stats Grid */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        width: 100%;
+        max-width: 400px;
+        margin-top: 10px;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .stat-card {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 15px;
+        text-align: center;
+        border: 1px solid rgba(255, 193, 7, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        border-color: rgba(255, 193, 7, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .stat-card .label {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+
+    .stat-card .value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .stat-card.full {
+        grid-column: span 2;
+    }
+
+    /* Warning Footer Style */
+    .qibla-warning {
+        margin-top: 20px;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.7);
+        display: flex;
+        flex-direction: column; /* Alt alta sıralamak için */
+        gap: 8px; /* Metinler arası boşluk */
+        align-items: flex-start;
+        max-width: 400px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+
+    .qibla-warning .warning-item {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .qibla-warning svg {
+        flex-shrink: 0;
+        width: 14px;
+        height: 14px;
+        fill: var(--primary);
+        margin-top: 2px;
+    }
+
+    .qibla-warning strong {
+        color: var(--primary);
+    }
+
+    /* Action Buttons */
+    .action-group {
+        margin-top: 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        gap: 15px;
+        animation: fadeInUp 0.8s ease-out 0.8s both;
+    }
+
+    .btn-qibla {
+        padding: 14px 30px;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: var(--primary);
+        color: var(--dark);
+        width: 100%;
+        max-width: 280px;
+        box-shadow: 0 10px 20px rgba(255, 193, 7, 0.1);
+    }
+
+    .btn-secondary {
+        display: flex;
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn-secondary:active {
+        transform: scale(0.95);
+        background: rgba(255,255,255,0.15);
+    }
+
+    /* Status Bar kaldırıldı veya gizlendi */
+    .status-indicator {
+        display: none !important;
+    }
+
+    /* Map Integration */
+    .map-preview {
+        width: 100%;
+        max-width: 400px;
+        height: 120px;
+        margin-top: 20px;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        display: none;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Debug Panel */
+    .debug-panel {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.85);
+        color: #00ff00;
+        padding: 12px;
+        border-radius: 10px;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        z-index: 9999;
+        max-height: 150px;
+        overflow-y: auto;
+        width: 200px;
+        pointer-events: none;
+        display: none; /* Varsayılan gizli , none*/
+        border: 1px solid rgba(0,255,0,0.3);
+    }
+
+    /* Smoothing & Transitions */
+    .compass-dial, .qibla-pointer {
+        /* Transition'ları kaldırıyoruz, JS ile yöneteceğiz */
+        transition: none !important;
+        will-change: transform;
+    }
+
+    .is-aligned .qibla-pointer {
+        filter: drop-shadow(0 0 15px var(--primary));
+        transform: scale(1.1);
+    }
+
+    .is-aligned .compass-outer {
+        box-shadow: 0 0 40px rgba(255, 193, 7, 0.4);
+        border-color: var(--primary);
+    }
+
+    /* Success State */
+    .is-aligned .compass-outer {
+        border-color: var(--primary);
+        box-shadow: 0 0 40px rgba(255, 193, 7, 0.4);
+        background: rgba(255, 193, 7, 0.1);
+    }
+
+    .is-aligned .qibla-pointer .pointer-line {
+        background: var(--primary);
+        box-shadow: 0 0 15px var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        :root {
+            --compass-size: var(--compass-size-mobile);
+        }
+        .mark { transform-origin: 50% 132px; }
+        .cardinal-label { transform-origin: 50% 132px; }
+        .qibla-pointer { height: 240px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Masaüstü Uyarı Ekranı -->
+<div id="mobile-only-warning">
+    <div class="warning-icon">📱</div>
+    <div class="warning-title">Sadece Mobil Cihazlar</div>
+    <div class="warning-text">
+        Kıble Pusulası, hassas yön ölçümü için cihazınızdaki manyetik sensörleri kullanır. 
+        Bu özellik sadece akıllı telefon ve tabletlerde çalışmaktadır.
+    </div>
+    <div class="qr-code">
+        <!-- Mevcut URL için basit bir QR Placeholder veya Bilgi -->
+        <div style="color: #0f172a; font-weight: bold; font-size: 14px;">Mobil Cihazdan Taratın</div>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.url }}" alt="QR Code" style="margin-top: 10px;">
+    </div>
+</div>
+
+<div class="qibla-page">
+    <video id="camera-feed" autoplay playsinline muted></video>
+
+    <div class="qibla-content-overlay">
+        <div class="qibla-header">
+            <h1>Kıbleyi Keşfedin</h1>
+            <p>Hassas sensör teknolojisi ve artırılmış gerçeklik (AR) desteği ile kıble yönünüzü saniyeler içinde, en doğru şekilde bulun.</p>
+        </div>
+
+        <div class="compass-wrapper" id="compass-wrapper">
+            <div class="compass-outer">
+                <div class="compass-dial" id="compass-dial">
+                    <div class="compass-marks" id="compass-marks"></div>
+                </div>
+                
+                <div class="compass-center"></div>
+
+                <div class="qibla-pointer" id="qibla-pointer">
+                    <div class="pointer-line"></div>
+                    <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%);">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="var(--primary)">
+                            <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <span class="label">Pusula</span>
+                <span class="value" id="heading-val">0°</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Kıble Açısı</span>
+                <span class="value" id="qibla-val">--</span>
+            </div>
+            <div class="stat-card full">
+                <span class="label">Kabe'ye Mesafe</span>
+                <span class="value" id="distance-val">-- km</span>
+            </div>
+        </div>
+
+        <div class="qibla-warning">
+            <div class="warning-item">
+                <svg class="icon"><use xlink:href="#fa-circle-info"></use></svg>
+                <span><strong>Dikkat:</strong> En doğru sonuç için telefonunuzu dik tutunuz. <br> </span>
+            </div>
+            <div class="warning-item">
+                <svg class="icon"><use xlink:href="#fa-circle-info"></use></svg>
+                <span><strong>Dikkat:</strong> Manyetik sapma ve cihaz hassasiyeti nedeniyle 1-3 derecelik farklar oluşabilir. En doğru sonuç için cihazınızı 8 çizerek kalibre ediniz.</span>
+            </div>
+        </div>
+
+        <div class="action-group">
+            <button id="permission-btn" class="btn-qibla">
+                <svg class="icon" style="width:20px;height:20px;"><use xlink:href="#fa-bolt"></use></svg>
+                Pusulayı Başlat
+            </button>
+            <button id="camera-toggle" class="btn-qibla btn-secondary">
+                <svg class="icon" style="width:20px;height:20px;"><use xlink:href="#fa-camera-solid"></use></svg>
+                Kamera Modu
+            </button>
+        </div>
+
+        <div id="debug-panel" class="debug-panel"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const dial = document.getElementById('compass-dial');
+    const marksContainer = document.getElementById('compass-marks');
+    const permBtn = document.getElementById('permission-btn');
+    const qiblaPointer = document.getElementById('qibla-pointer');
+    const qiblaVal = document.getElementById('qibla-val');
+    const headingVal = document.getElementById('heading-val');
+    const distanceVal = document.getElementById('distance-val');
+    const wrapper = document.getElementById('compass-wrapper');
+    const debugPanel = document.getElementById('debug-panel');
+    const cameraFeed = document.getElementById('camera-feed');
+    const cameraToggle = document.getElementById('camera-toggle');
+
+    let userLat, userLon, qiblaAngle = 0;
+    let magneticDeclination = 0; // Manyetik sapma (varsayılan 0)
+
+    // Basit manyetik sapma tahmini (WMM modelinin çok basitleştirilmiş hali)
+    // Türkiye için genelde +5 ile +6 derece civarındadır.
+    function calculateDeclination(lat, lon) {
+        // Bu çok kaba bir tahmindir, ancak 0'dan iyidir.
+        // Gerçek dünyada WMM modeli kullanılır.
+        // Türkiye koordinatları için yaklaşık bir değer:
+        if (lat > 35 && lat < 45 && lon > 25 && lon < 45) {
+            return 6.0; // Türkiye için ortalama +6 derece (Doğuya sapma)
+        }
+        return 0;
+    }
+    let map = null;
+    let stream = null;
+    const KAABA = [21.4224779, 39.8251832];
+
+    function logDebug(msg) {
+        const now = new Date().toLocaleTimeString();
+        debugPanel.innerHTML = `[${now}] ${msg}<br>` + debugPanel.innerHTML;
+    }
+
+    // Camera Toggle Logic
+    cameraToggle.onclick = async () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            cameraFeed.style.display = 'none';
+            stream = null;
+            logDebug("Kamera kapatıldı.");
+        } else {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                cameraFeed.srcObject = stream;
+                cameraFeed.style.display = 'block';
+                logDebug("Kamera açıldı.");
+            } catch (err) {
+                logDebug("Kamera hatası: " + err.message);
+                alert("Kamera erişimi sağlanamadı.");
+            }
+        }
+    };
+
+    function createMarks() {
+        const dialRect = dial.getBoundingClientRect();
+        let originY = dialRect.height / 2;
+        
+        // Eğer henüz render edilmediyse fallback kullan
+        if (originY === 0) {
+            const isMobile = window.innerWidth <= 768;
+            originY = isMobile ? 134.25 : 162.5; // 268.5/2 ve 325/2
+        }
+        
+        marksContainer.innerHTML = '';
+        
+        for (let i = 0; i < 360; i += 5) {
+            const mark = document.createElement('div');
+            mark.className = i % 30 === 0 ? 'mark cardinal' : 'mark';
+            mark.style.transform = `rotate(${i}deg)`;
+            mark.style.transformOrigin = `50% ${originY}px`;
+            marksContainer.appendChild(mark);
+
+            // Ana yön harflerini ekle (K, D, G, B)
+            if (i % 90 === 0) {
+                const label = document.createElement('div');
+                label.className = 'cardinal-label';
+                const directions = { 0: 'K', 90: 'D', 180: 'G', 270: 'B' };
+                label.textContent = directions[i];
+                
+                // Harf başı yer ayarı (çeperden uzaklık)
+                const labelOffset = originY * 0.12; // %12 içeride dursun
+                label.style.top = labelOffset + 'px';
+                
+                label.style.transform = `translateX(-50%) rotate(${i}deg)`;
+                label.style.transformOrigin = `50% ${originY - labelOffset}px`;
+                marksContainer.appendChild(label);
+            }
+        }
+    }
+    createMarks();
+    window.addEventListener('resize', createMarks);
+
+    // Haversine Distance Calculation
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    function calculateQibla(lat1, lon1) {
+        const phi1 = lat1 * Math.PI / 180;
+        const phi2 = KAABA[0] * Math.PI / 180;
+        const lam1 = lon1 * Math.PI / 180;
+        const lam2 = KAABA[1] * Math.PI / 180;
+        const angle = Math.atan2(
+            Math.sin(lam2 - lam1),
+            Math.cos(phi1) * Math.tan(phi2) - Math.sin(phi1) * Math.cos(lam2 - lam1)
+        ) * 180 / Math.PI;
+        return (angle + 360) % 360;
+    }
+
+    function updateStatus(text, type) {
+        // Durum çubuğu kaldırıldı, sadece log tutuyoruz
+        logDebug(`Status: ${text} (${type})`);
+    }
+
+    function initMap(lat, lon) {
+        // Harita kaldırıldı
+    }
+
+    function initCompass() {
+        // Cihaz tespiti: Masaüstü ise hiç başlatma
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (!isMobile && window.innerWidth > 1024) {
+            logDebug("Masaüstü cihaz tespit edildi, sensörler başlatılmıyor.");
+            return;
+        }
+
+        if (!window.isSecureContext) {
+            updateStatus("HTTPS gerekli.", "error");
+            logDebug("Kritik Hata: HTTPS üzerinden bağlanın.");
+            return;
+        }
+
+        updateStatus("Konum isteniyor...", "");
+        logDebug("Geolocation başlatıldı.");
+        
+        navigator.geolocation.getCurrentPosition(position => {
+            userLat = position.coords.latitude;
+            userLon = position.coords.longitude;
+            
+            qiblaAngle = calculateQibla(userLat, userLon);
+            magneticDeclination = calculateDeclination(userLat, userLon);
+            logDebug(`Manyetik Sapma: ${magneticDeclination}°`);
+            
+            const distance = calculateDistance(userLat, userLon, KAABA[0], KAABA[1]);
+            
+            qiblaVal.textContent = Math.round(qiblaAngle) + '°';
+            distanceVal.textContent = Math.round(distance).toLocaleString() + ' km';
+            
+            qiblaPointer.style.display = 'block';
+            updateStatus("Sensörler başlatılıyor...", "active");
+            logDebug(`Konum tamam: ${userLat.toFixed(2)},${userLon.toFixed(2)}`);
+            
+            // Konum alındıktan sonra otomatik sensörleri başlatmayı dene
+            setupOrientation(true); 
+        }, error => {
+            updateStatus("Konum alınamadı. Manuel başlatın.", "error");
+            logDebug(`Konum Hatası: ${error.message}`);
+            permBtn.style.display = 'flex'; // Hata durumunda butonu göster
+        }, { 
+            enableHighAccuracy: true,
+            timeout: 10000
+        });
+    }
+
+    // Buton tıklama olayını en başta ve her zaman çalışacak şekilde bağla
+    permBtn.addEventListener('click', function() {
+        logDebug("Butona basıldı!");
+        this.style.background = "rgba(255,255,255,0.3)"; // Görsel geri bildirim
+        setupOrientation(false);
+    });
+
+    function setupOrientation(isAuto = false) {
+        logDebug(`setupOrientation(auto=${isAuto}) çağrıldı.`);
+        // iOS 13+ Özel İzin İsteme (Otomatik başlatılamaz, kullanıcı etkileşimi şart)
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            if (isAuto) {
+                updateStatus("Başlatmak için dokunun.", "active");
+                permBtn.style.display = 'flex'; // iOS'ta butonu göster (mecburiyetten)
+                return;
+            }
+            
+            logDebug("iOS İzin İsteği gönderiliyor...");
+            DeviceOrientationEvent.requestPermission()
+                .then(state => {
+                    logDebug(`iOS İzin Durumu: ${state}`);
+                    if (state === 'granted') {
+                        permBtn.style.display = 'none';
+                        activateSensors();
+                    } else {
+                        updateStatus("İzin verilmedi.", "error");
+                    }
+                })
+                .catch(err => {
+                    logDebug(`iOS Sensör Hatası: ${err}`);
+                    updateStatus("Başlatılamadı.", "error");
+                });
+        } else {
+            // Android / Standart (Otomatik başlatılabilir)
+            logDebug("Standart Sensörler aktifleştiriliyor...");
+            activateSensors();
+        }
+    }
+
+    let lastHeading = 0;
+    let sensorActive = false;
+
+    function activateSensors() {
+        sensorActive = false;
+        logDebug("Dinleyiciler bağlanıyor...");
+
+        // Modern AbsoluteOrientationSensor API (Android Chrome için en sağlam yol)
+        if ('AbsoluteOrientationSensor' in window) {
+            try {
+                const sensor = new AbsoluteOrientationSensor({ frequency: 60, referenceFrame: 'device' });
+                sensor.addEventListener('reading', () => {
+                    if (!sensorActive) {
+                        sensorActive = true;
+                        logDebug("Modern Sensör: Veri akışı başladı.");
+                        updateStatus("Pusula aktif (Modern).", "active");
+                    }
+                    // Quaternions to Euler (heading)
+                    const q = sensor.quaternion;
+                    // Standard formula for heading from quaternions
+                    let heading = Math.atan2(2 * (q[0] * q[1] + q[2] * q[3]), 1 - 2 * (q[1] * q[1] + q[2] * q[2])) * (180 / Math.PI);
+                    
+                    // Modern API typically gives values where 0 is North.
+                    // Let's ensure it's in 0-360 and matches standard direction
+                    heading = (360 - heading) % 360; 
+                    processHeading(heading);
+                });
+                sensor.addEventListener('error', e => {
+                    logDebug("Modern Sensör Hatası: " + e.error.name);
+                    fallbackToLegacySensors();
+                });
+                sensor.start();
+                logDebug("Modern Sensör başlatıldı.");
+            } catch (err) {
+                logDebug("Modern Sensör başlatılamadı: " + err.message);
+                fallbackToLegacySensors();
+            }
+        } else {
+            fallbackToLegacySensors();
+        }
+    }
+
+    function fallbackToLegacySensors() {
+        logDebug("Standart dinleyicilere geçiliyor...");
+        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+        window.addEventListener('deviceorientation', handleOrientation, true);
+        
+        // Veri akışı kontrolü
+        setTimeout(() => {
+            if (!sensorActive) {
+                logDebug("KRİTİK: Hiçbir sensörden veri gelmiyor.");
+                updateStatus("Sensör yanıt vermiyor. Lütfen sayfayı Chrome veya Safari ile açın.", "error");
+            }
+        }, 5000);
+    }
+
+    function handleOrientation(event) {
+        if (!sensorActive) {
+            sensorActive = true;
+            updateStatus("Pusula aktif.", "active");
+            logDebug(`Veri geldi! Alpha: ${Math.round(event.alpha)}`);
+        }
+
+        let heading = null;
+        
+        // iOS ve modern cihazlarda manyetik Kuzey
+        if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
+            heading = event.webkitCompassHeading;
+        } else if (event.alpha !== null) {
+            // Android'de alpha değeri saat yönünün tersine artar.
+            // Pusula standartı olan saat yönüne çevirmek için 360'tan çıkarıyoruz.
+            heading = (360 - event.alpha) % 360;
+            
+            // Eğer cihaz 'absolute' değilse manyetik sapmayı düzelt
+            if (!event.absolute) {
+                heading = (heading + magneticDeclination + 360) % 360;
+            }
+        }
+
+        if (heading !== null) {
+            processHeading(heading);
+        }
+    }
+
+    let currentVisualHeading = null;
+
+    function processHeading(targetHeading) {
+        targetHeading = (targetHeading + 360) % 360;
+        
+        if (currentVisualHeading === null) {
+            currentVisualHeading = targetHeading;
+        }
+
+        // Shortest path interpolation (360-0 geçiş sorunu çözümü)
+        let diff = targetHeading - currentVisualHeading;
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+        
+        // Çok küçük hareketleri yok say (titreme engelleme)
+        if (Math.abs(diff) < 0.1) return;
+
+        // Yumuşatma faktörü (0.1 = çok akıcı, 0.3 = daha hızlı)
+        currentVisualHeading += diff * 0.15;
+        currentVisualHeading = (currentVisualHeading + 360) % 360;
+
+        // UI Update
+        requestAnimationFrame(() => {
+            headingVal.textContent = Math.round(currentVisualHeading) + '°';
+            
+            // Pusula kadranını döndür
+            dial.style.transform = `rotate(${-currentVisualHeading}deg)`;
+            
+            // Kıble okunu döndür
+            const relativeQibla = (qiblaAngle - currentVisualHeading + 360) % 360;
+            qiblaPointer.style.transform = `translate(-50%, -50%) rotate(${relativeQibla}deg)`;
+
+            // Hizalanma kontrolü
+            const alignmentDiff = Math.min(Math.abs(relativeQibla), 360 - Math.abs(relativeQibla));
+            if (alignmentDiff < 3) {
+                if (!wrapper.classList.contains('is-aligned')) {
+                    wrapper.classList.add('is-aligned');
+                    if (navigator.vibrate) navigator.vibrate([40, 30, 40]);
+                }
+            } else {
+                wrapper.classList.remove('is-aligned');
+            }
+        });
+    }
+
+    initCompass();
+</script>
+{% endblock %}

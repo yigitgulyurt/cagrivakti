@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Log Yönetimi | Çağrı Vakti Admin{% endblock %}
+
+{% block brand_text %}LOG PANELİ{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    .log-header h1 {
+        font-size: 2rem;
+        color: var(--primary);
+    }
+    .log-section {
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 30px;
+        margin-bottom: 40px;
+        border: 1px solid rgba(255, 193, 7, 0.1);
+    }
+    .log-section h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .log-viewer {
+        background: #0d1117;
+        color: #e6edf3;
+        font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', Courier, monospace;
+        padding: 20px;
+        border-radius: 12px;
+        height: 450px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        border: 1px solid #30363d;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .log-viewer::-webkit-scrollbar {
+        width: 8px;
+    }
+    .log-viewer::-webkit-scrollbar-track {
+        background: #0d1117;
+    }
+    .log-viewer::-webkit-scrollbar-thumb {
+        background: #30363d;
+        border-radius: 4px;
+    }
+    .log-viewer::-webkit-scrollbar-thumb:hover {
+        background: #8b949e;
+    }
+    .refresh-btn {
+        padding: 12px 24px;
+        background: var(--primary);
+        color: var(--dark);
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+    }
+    .refresh-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+        filter: brightness(1.1);
+    }
+    .refresh-btn:active {
+        transform: translateY(0);
+    }
+    .refresh-btn.loading {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+    .refresh-btn.loading svg {
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .log-timestamp {
+        color: #8b949e;
+    }
+    .log-level-error { color: #ff7b72; font-weight: bold; }
+    .log-level-info { color: #79c0ff; }
+    .log-level-warn { color: #d29922; }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: rgba(35, 134, 54, 0.1);
+        color: #3fb950;
+        border: 1px solid rgba(63, 185, 80, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container fade-in">
+    <div class="log-header">
+        <div class="header-info">
+            <h1>Sistem Log Yönetimi</h1>
+            <div class="status-badge">
+                <span style="width: 8px; height: 8px; background: #3fb950; border-radius: 50%; margin-right: 8px; display: inline-block;"></span>
+                Sistem Aktif
+            </div>
+        </div>
+        <button id="refreshLogs" class="refresh-btn">
+            <svg class="icon"><use xlink:href="#fa-sync"></use></svg> 
+            <span>Verileri Yenile</span>
+        </button>
+    </div>
+
+    <div class="log-section">
+        <h2><svg class="icon"><use xlink:href="#fa-globe"></use></svg> Web Uygulama Raporu</h2>
+        <div id="web_logs" class="log-viewer">{{ web_logs if web_logs else 'Log verisi bulunamadı.' }}</div>
+    </div>
+
+    <div class="log-section">
+        <h2><svg class="icon"><use xlink:href="#fa-code"></use></svg> API Kullanım Raporu</h2>
+        <div id="api_logs" class="log-viewer">{{ api_logs if api_logs else 'API log verisi bulunamadı.' }}</div>
+    </div>
+
+    <div class="log-section">
+        <h2><svg class="icon"><use xlink:href="#fa-robot"></use></svg> Bot Aktivite Raporu</h2>
+        <div id="bot_logs" class="log-viewer">{{ bot_logs if bot_logs else 'Bot log verisi bulunamadı.' }}</div>
+    </div>
+</div>
+
+<script>
+document.getElementById('refreshLogs').addEventListener('click', async function() {
+    const btn = this;
+    const btnText = btn.querySelector('span');
+    const viewers = {
+        web: document.getElementById('web_logs'),
+        api: document.getElementById('api_logs'),
+        bot: document.getElementById('bot_logs')
+    };
+
+    try {
+        btn.classList.add('loading');
+        btnText.textContent = 'Yükleniyor...';
+
+        const response = await fetch(window.location.href, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) throw new Error('Sunucu hatası');
+
+        const data = await response.json();
+
+        // Logları güncelle ve renklendir (basit bir regex ile)
+        Object.keys(viewers).forEach(key => {
+            let content = data[key + '_logs'];
+            
+            // Satır bazlı işlem
+            if (content && content !== 'Log verisi bulunamadı.') {
+                const lines = content.split('\n');
+                const processedLines = lines.map(line => {
+                    // Tarihleri soluklaştır
+                    line = line.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})/, '<span class="log-timestamp">$1</span>');
+                    // Hata seviyelerini renklendir
+                    line = line.replace(/(ERROR|CRITICAL)/g, '<span class="log-level-error">$1</span>');
+                    line = line.replace(/(WARNING|WARN)/g, '<span class="log-level-warn">$1</span>');
+                    line = line.replace(/(INFO)/g, '<span class="log-level-info">$1</span>');
+                    return line;
+                });
+                viewers[key].innerHTML = processedLines.join('\n');
+            } else {
+                viewers[key].textContent = content;
+            }
+            
+            // En alta kaydır
+            viewers[key].scrollTop = viewers[key].scrollHeight;
+        });
+
+    } catch (error) {
+        console.error('Log yenileme hatası:', error);
+        alert('Loglar yenilenirken bir hata oluştu.');
+    } finally {
+        btn.classList.remove('loading');
+        btnText.textContent = 'Verileri Yenile';
+    }
+});
+
+// İlk yüklemede en alta kaydır
+window.addEventListener('DOMContentLoaded', () => {
+    ['web_logs', 'api_logs', 'bot_logs'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.scrollTop = el.scrollHeight;
+    });
+});
+</script>
+{% endblock %}

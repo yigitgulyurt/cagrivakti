@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Hizmet Kullanılamıyor - 503 Hata{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .error-container {
+        background: var(--card-bg);
+        padding: 50px 40px;
+        border-radius: 24px;
+        max-width: 600px;
+        width: 100%;
+        box-shadow: var(--card-shadow);
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .error-icon {
+        font-size: 5rem;
+        color: var(--primary);
+        margin-bottom: 24px;
+    }
+    h1 {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 16px;
+        font-weight: 700;
+    }
+    p {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 32px;
+        line-height: 1.6;
+    }
+    .arabic-text {
+        font-family: 'Amiri', serif;
+        font-size: 1.8rem;
+        margin: 32px 0;
+        line-height: 1.8;
+        color: var(--primary);
+    }
+    .error-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="error-wrapper fade-in">
+    <section class="error-container">
+        <div class="error-icon">
+            <svg class="icon"><use xlink:href="#fa-tools"></use></svg>
+        </div>
+        <h1>503</h1>
+        <p>Hizmet şu anda sunulamıyor (bakım çalışması olabilir). Lütfen daha sonra yeniden deneyiniz.</p>
+        
+        <div class="arabic-text">
+            "İnnallâhe me’as-sâbirîn"<br>
+            (Şüphesiz Allah sabredenlerle birliktedir)
+        </div>
+
+        <div class="error-actions">
+            <a href="{{ url_for('views.index') }}" class="btn btn-primary">
+                <svg class="icon"><use xlink:href="#fa-home"></use></svg> Ana Sayfaya Dön
+            </a>
+            <a href="javascript:location.reload()" class="btn btn-secondary">
+                <svg class="icon"><use xlink:href="#fa-sync"></use></svg> Tekrar Dene
+            </a>
+        </div>
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}İletişim | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}İLETİŞİM{% endblock %}
+
+
+{% block content %}
+<div class="contact-wrapper fade-in">
+    <div class="container">
+        <div class="contact-header">
+            <h1>Bizimle İletişime Geçin</h1>
+            <p>Uygulamamız hakkında tavsiye, şikayet veya görüşlerinizi paylaşarak bize destek olabilirsiniz.</p>
+        </div>
+
+        <div class="contact-card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('views.iletisim') }}" method="POST" class="contact-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <!-- Honeypot field - hidden from users -->
+                <div style="display:none !important;">
+                    <label for="website">Leave this field blank</label>
+                    <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Adınız Soyadınız</label>
+                        <input type="text" id="name" name="name" placeholder="Örn: Ahmet Yılmaz" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-posta Adresiniz</label>
+                        <input type="email" id="email" name="email" placeholder="Örn: ahmet@example.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Konu</label>
+                    <select id="subject" name="subject" required>
+                        <option value="" disabled selected>Bir konu seçin</option>
+                        <option value="tavsiye">Tavsiye</option>
+                        <option value="sikayet">Şikayet</option>
+                        <option value="gorus">Görüş/Öneri</option>
+                        <option value="diger">Diğer</option>
+                        <option value="vip">VIP Anahtar Talebi</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Mesajınız</label>
+                    <textarea id="message" name="message" rows="5" placeholder="Mesajınızı buraya yazın..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <svg class="icon"><use xlink:href="#fa-paper-plane"></use></svg>
+                    Mesajı Gönder
+                </button>
+            </form>
+
+            <div class="contact-footer">
+                <div class="divider"><span>veya</span></div>
+                <p>Doğrudan e-posta göndermek isterseniz:</p>
+                <a href="mailto:yigitgulyurt@proton.me" class="email-link">
+                    yigitgulyurt@proton.me
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.contact-footer {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.divider {
+    position: relative;
+    margin-bottom: 30px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.divider span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card-bg);
+    padding: 0 15px;
+    color: var(--gray);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.email-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 15px;
+    padding: 12px 24px;
+    background: rgba(var(--primary-rgb), 0.05);
+    border: 1px solid rgba(var(--primary-rgb), 0.2);
+    border-radius: 50px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: bold;
+    transition: var(--transition);
+}
+
+.email-link:hover {
+    background: rgba(var(--primary-rgb), 0.15);
+    color: var(--primary);
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.contact-wrapper {
+    padding: 60px 20px;
+    min-height: calc(100vh - 200px);
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.contact-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+    color: var(--primary);
+}
+
+.contact-header p {
+    color: var(--gray);
+    font-size: 1.1rem;
+}
+
+.contact-card {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 16px;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.form-group select option {
+    background: #1e1e1e;
+    color: white;
+}
+
+.btn-block {
+    width: 100%;
+    justify-content: center;
+    padding: 16px;
+    font-size: 1.1rem;
+}
+
+.alert {
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-card {
+        padding: 24px;
+    }
+    
+    .contact-header h1 {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}

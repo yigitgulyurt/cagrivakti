@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}İnternet Bağlantısı Yok | Çağrı Vakti{% endblock %}
+
+{% block extra_css %}
+<style>
+    .offline-wrapper {
+        min-height: calc(100vh - 120px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: radial-gradient(circle at top right, rgba(255, 193, 7, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(30, 60, 114, 0.1) 0%, transparent 40%);
+    }
+    .offline-container {
+        background: rgba(30, 30, 30, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 60px 40px;
+        border-radius: 32px;
+        max-width: 550px;
+        width: 100%;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    .offline-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), #ffd700);
+    }
+    .offline-icon-wrapper {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 30px;
+    }
+    .offline-icon {
+        font-size: 5.5rem;
+        color: var(--primary);
+        filter: drop-shadow(0 0 15px rgba(255, 193, 7, 0.3));
+        animation: pulse-soft 3s infinite ease-in-out;
+    }
+    @keyframes pulse-soft {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+    }
+    h1 {
+        font-size: 2.5rem;
+        color: #fff;
+        margin-bottom: 20px;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+    .offline-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 100px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #ff4b2b;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #ff4b2b;
+    }
+    p {
+        font-size: 1.15rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 30px;
+        line-height: 1.7;
+    }
+    .arabic-text {
+        font-family: 'Amiri', serif;
+        font-size: 1.8rem;
+        color: var(--primary);
+        margin: 30px 0;
+        opacity: 0.9;
+        line-height: 1.4;
+    }
+    .offline-tips {
+        text-align: left;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 35px;
+    }
+    .tip-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    .tip-item:last-child { margin-bottom: 0; }
+    .tip-item svg {
+        width: 18px;
+        height: 18px;
+        color: var(--primary);
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    .error-actions {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px !important;
+    }
+    .btn-full { grid-column: span 2; }
+    
+    .btn {
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border-radius: 14px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .btn-clear-cache {
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.85rem;
+        margin-top: 20px;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    .btn-clear-cache:hover { color: #ff4b2b; }
+
+    @media (max-width: 600px) {
+        .offline-container { padding: 40px 25px; border-radius: 0; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+        .offline-wrapper { padding: 0; }
+        h1 { font-size: 2rem; }
+    }
+</style>
+{% endblock %}
+
+{% block brand_text %}ÇAĞRI VAKTİ{% endblock %}
+
+{% block content %}
+<main class="offline-wrapper fade-in">
+    <section class="offline-container">
+        <div class="offline-status-badge">
+            <span class="status-dot"></span>
+            Bağlantı Bekleniyor
+        </div>
+
+        <div class="offline-icon-wrapper">
+            <div class="offline-icon">
+                <svg class="icon"><use xlink:href="#fa-wifi-slash"></use></svg>
+            </div>
+        </div>
+
+        <h1>Çevrimdışı Mod</h1>
+        
+        <p>İnternet bağlantınız kesildi ancak endişelenmeyin; Çağrı Vakti yanınızda.</p>
+
+        <div class="arabic-text">
+            "İnnallâhe me’as-sâbirîn"<br>
+            <span style="font-size: 1rem; font-family: 'Inter', sans-serif;">(Şüphesiz Allah sabredenlerle birliktedir)</span>
+        </div>
+
+        <div class="offline-tips">
+            <div class="tip-item">
+                <svg class="icon"><use xlink:href="#fa-circle-check"></use></svg>
+                <span>Daha önce baktığınız namaz vakitlerine erişebilirsiniz.</span>
+            </div>
+            <div class="tip-item">
+                <svg class="icon"><use xlink:href="#fa-circle-check"></use></svg>
+                <span>Kayıtlı şehirlerinizdeki vakitleri görebilirsiniz.</span>
+            </div>
+            <div class="tip-item">
+                <svg class="icon"><use xlink:href="#fa-circle-check"></use></svg>
+                <span>Bağlantı geldiğinde bilgiler otomatik güncellenir.</span>
+            </div>
+        </div>
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">
+                <svg class="icon"><use xlink:href="#fa-home"></use></svg> Ana Sayfa
+            </a>
+            <a href="/sehir" class="btn btn-secondary">
+                <svg class="icon"><use xlink:href="#fa-map-marker-alt"></use></svg> Şehir Seç
+            </a>
+            <button class="btn btn-secondary btn-full" onclick="window.location.reload()">
+                <svg class="icon"><use xlink:href="#fa-sync"></use></svg> Yeniden Dene
+            </button>
+        </div>
+</main>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Kurumsal İlkeler ve Politikalar | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}İLKELERİMİZ{% endblock %}
+
+{% block extra_css %}
+<style>
+    .policy-container {
+        max-width: 1000px;
+        margin: 60px auto;
+        padding: 0 24px;
+    }
+    .policy-card {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 60px;
+        border-radius: 32px;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+    }
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--gray);
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 32px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+    .back-link:hover {
+        color: var(--primary);
+        transform: translateX(-6px);
+    }
+    .policy-nav {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 48px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 20px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .policy-nav::-webkit-scrollbar { display: none; }
+    
+    .policy-nav a {
+        color: var(--gray);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0.7;
+    }
+    .policy-nav a:hover {
+        color: var(--primary);
+        opacity: 1;
+    }
+    
+    h1 {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        margin-bottom: 40px;
+        background: linear-gradient(to right, #fff, var(--primary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    h2 {
+        font-size: 1.8rem;
+        color: var(--primary);
+        margin-top: 60px;
+        margin-bottom: 24px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    h2 .icon {
+        width: 28px;
+        height: 28px;
+        color: var(--primary);
+    }
+    h3 {
+        font-size: 1.25rem;
+        color: var(--text);
+        margin-top: 40px;
+        margin-bottom: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    p {
+        color: var(--gray);
+        line-height: 1.8;
+        margin-bottom: 20px;
+        font-size: 1.05rem;
+    }
+    ul {
+        margin-bottom: 32px;
+        padding-left: 0;
+        list-style: none;
+    }
+    li {
+        color: var(--gray);
+        line-height: 1.8;
+        margin-bottom: 12px;
+        position: relative;
+        padding-left: 24px;
+    }
+    li::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 12px;
+        width: 6px;
+        height: 6px;
+        background: var(--primary);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--primary);
+    }
+    .source-info {
+        background: rgba(255, 193, 7, 0.03);
+        padding: 32px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 193, 7, 0.1);
+        margin: 40px 0;
+    }
+    .section {
+        margin-bottom: 60px;
+    }
+    .policy-footer {
+        margin-top: 60px;
+        padding-top: 32px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--gray);
+        font-size: 0.9rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    @media (max-width: 768px) {
+        .policy-container { margin: 30px auto; }
+        .policy-card { padding: 32px 24px; border-radius: 24px; }
+        h1 { font-size: 2.2rem; }
+        h2 { font-size: 1.5rem; }
+        .policy-footer { flex-direction: column; text-align: center; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="policy-container fade-in">
+    <a href="{{ url_for('views.index') }}" class="back-link">
+        <svg class="icon"><use xlink:href="#fa-arrow-left"></use></svg> Platforma Dön
+    </a>
+    
+    <article class="policy-card">
+        <h1>İlkeler ve Kullanım Standartları</h1>
+
+        <nav class="policy-nav">
+            <a href="#gizlilik"><svg class="icon"><use xlink:href="#fa-user-shield"></use></svg> Gizlilik</a>
+            <a href="#kullanim"><svg class="icon"><use xlink:href="#fa-file-contract"></use></svg> Kullanım</a>
+            <a href="#sorumluluk"><svg class="icon"><use xlink:href="#fa-info-circle"></use></svg> Sorumluluk</a>
+        </nav>
+        
+        <section id="gizlilik" class="section">
+            <h2><svg class="icon"><use xlink:href="#fa-shield-alt"></use></svg> Veri Gizliliği Politikası</h2>
+            <p>Çağrı Vakti olarak, kullanıcılarımızın dijital mahremiyetini en temel hak olarak kabul ediyoruz. Platformumuzun her katmanı, verilerin şeffaf, güvenli ve yalnızca kullanıcı faydasına odaklı bir şekilde işlenmesi üzerine kurgulanmıştır.</p>
+
+            <h3>1. Veri İşleme Prensipleri</h3>
+            <p>Sistemimiz, "gizlilik odaklı tasarım" (Privacy by Design) yaklaşımıyla, minimum veri ile maksimum hizmet kalitesi sunar:</p>
+            <ul>
+                <li><strong>Konum Verileri:</strong> Tercih ettiğiniz şehre ait vakit verileri, yalnızca hizmet sunumu amacıyla yerel tarayıcı hafızasında işlenir. Bu veriler merkezi sunucularımızda profilleme amacıyla saklanmaz.</li>
+                <li><strong>Sistem Analitiği:</strong> Platform performansını ölçümlemek ve kullanıcı deneyimini iyileştirmek için toplanan teknik veriler tamamen anonimdir.</li>
+                <li><strong>Bot Etkileşimleri:</strong> Telegram ve Discord servislerimiz üzerinden kurulan iletişimler, yalnızca talebinize teknik yanıt oluşturmak amacıyla geçici olarak işlenir.</li>
+            </ul>
+
+            <h3>2. Yerel Depolama ve Çerez Kullanımı</h3>
+            <p>Deneyiminizi özelleştirmek (şehir tercihi, tema ayarları vb.) için modern tarayıcı teknolojilerinden yararlanıyoruz. LocalStorage üzerinde barındırılan bu bilgiler, tamamen sizin kontrolünüzdedir ve dilediğiniz zaman tarayıcı ayarlarınızdan temizlenebilir.</p>
+
+            <h3>3. Veri Güvenliği ve Paylaşım Reddi</h3>
+            <p>Çağrı Vakti, hiçbir koşulda kullanıcı verilerini ticari bir meta olarak değerlendirmez. Verileriniz üçüncü taraflarla paylaşılmaz, satılmaz veya reklam hedefleme amacıyla kullanılmaz. Altyapımız SSL/TLS protokolleri ile uçtan uca şifrelenmektedir.</p>
+        </section>
+
+        <section id="kullanim" class="section">
+            <h2><svg class="icon"><use xlink:href="#fa-gavel"></use></svg> Hizmet Kullanım Şartları</h2>
+            <p>Çağrı Vakti platformuna erişim sağlayarak, modern dijital etik ve hukuki kullanım standartlarını kabul etmiş sayılmaktasınız.</p>
+
+            <h3>1. Hizmetin Niteliği ve Misyon</h3>
+            <p>Çağrı Vakti; reklam barındırmayan, kâr amacı gütmeyen ve toplumsal faydayı odağına alan profesyonel bir dijital ibadet rehberidir.</p>
+
+            <h3>2. Fikri Mülkiyet ve Teknik Sınırlar</h3>
+            <ul>
+                <li>Sunucu kaynaklarını suistimal eden, sistem bütünlüğünü bozan otomatik veri çekme (scraping) ve bot faaliyetleri kesinlikle yasaktır.</li>
+                <li>API servislerimiz, bireysel ve eğitim odaklı projeler için tanımlanan limitler dahilinde ücretsizdir. Yüksek trafikli entegrasyonlar özel protokol gerektirir.</li>
+                <li>Marka itibarını zedeleyecek veya içeriği manipüle edecek her türlü kullanım durumunda yasal haklar saklı tutulmaktadır.</li>
+            </ul>
+        </section>
+
+        <section id="sorumluluk" class="section">
+            <h2><svg class="icon"><use xlink:href="#fa-info-circle"></use></svg> Sorumluluk Beyanı</h2>
+            <div class="source-info">
+                <p>Platformumuzda sunulan vakit verileri, küresel ve yerel otoritelerle tam senkronize çalışmaktadır:</p>
+                <ul>
+                    <li><strong>Türkiye Verileri:</strong> T.C. Diyanet İşleri Başkanlığı resmi veri tabanı.</li>
+                    <li><strong>Uluslararası Veriler:</strong> Aladhan Global API altyapısı ve standart hesaplama metodolojileri.</li>
+                </ul>
+                <p>Teknik kusursuzluk için en üst düzey mühendislik çabası gösterilse de; veri kaynaklı gecikmeler, sistemsel güncellemeler veya bölgesel hesaplama farkları nedeniyle oluşabilecek milimetrik sapmalarda Çağrı Vakti hukuki sorumluluk kabul etmez. Kullanıcıların kritik durumlarda yerel takvim kontrollerini yapmaları önerilir.</p>
+            </div>
+        </section>
+
+        <div class="policy-footer">
+            <span>Son Güncelleme: 10 Şubat 2026</span>
+            <span>&copy; 2026 Çağrı Vakti | Güven ve Şeffaflık Esaslı Bilgi Köşesi</span>
+        </div>
+    </article>
+</main>
+{% endblock %}
+

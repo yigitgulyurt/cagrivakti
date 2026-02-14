@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Sunucu Hatası - 500{% endblock %}
+
+{% block brand_text %}SUNUCU HATASI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-wrapper {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+    .error-container {
+        background: var(--card-bg);
+        padding: 60px 40px;
+        border-radius: 32px;
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        text-align: center;
+        border: 1px solid rgba(255, 193, 7, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    .error-container::before {
+        content: '500';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        font-size: 150px;
+        font-weight: 900;
+        color: rgba(255, 193, 7, 0.03);
+        z-index: 0;
+    }
+    .error-icon {
+        font-size: 5rem;
+        color: #ef4444;
+        margin-bottom: 24px;
+        position: relative;
+        z-index: 1;
+        animation: glitch 1s linear infinite;
+    }
+    @keyframes glitch {
+        0% { transform: translate(0); }
+        20% { transform: translate(-2px, 2px); }
+        40% { transform: translate(-2px, -2px); }
+        60% { transform: translate(2px, 2px); }
+        80% { transform: translate(2px, -2px); }
+        100% { transform: translate(0); }
+    }
+    h1 {
+        font-size: 2.5rem;
+        color: var(--text);
+        margin-bottom: 16px;
+        font-weight: 800;
+        position: relative;
+        z-index: 1;
+    }
+    p {
+        font-size: 1.1rem;
+        color: var(--gray);
+        margin-bottom: 32px;
+        line-height: 1.6;
+        position: relative;
+        z-index: 1;
+    }
+    .arabic-quote {
+        background: rgba(255, 193, 7, 0.05);
+        padding: 24px;
+        border-radius: 20px;
+        margin-bottom: 32px;
+        position: relative;
+        z-index: 1;
+        border-left: 4px solid var(--primary);
+    }
+    .arabic-text {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+        color: var(--primary);
+        font-weight: 600;
+    }
+    .arabic-meaning {
+        font-size: 0.95rem;
+        color: var(--gray);
+        font-style: italic;
+    }
+    .error-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+    }
+    @media (max-width: 480px) {
+        .error-container {
+            padding: 40px 20px;
+        }
+        h1 { font-size: 2rem; }
+        .error-actions .btn { width: 100%; justify-content: center; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="error-wrapper fade-in">
+    <section class="error-container">
+        <div class="error-icon">
+            <svg class="icon"><use xlink:href="#fa-server"></use></svg>
+        </div>
+        <h1>Beklenmedik Hata</h1>
+        <p>Sunucumuzda bir fırtına koptu. Teknik ekibimiz (yani ben) durumu düzeltmek için çalışıyor.</p>
+        
+        <div class="arabic-quote">
+            <div class="arabic-text">"İnnallâhe me’as-sâbirîn"</div>
+            <div class="arabic-meaning">(Şüphesiz Allah sabredenlerle birliktedir)</div>
+        </div>
+
+        <div class="error-actions">
+            <a href="{{ url_for('views.index') }}" class="btn btn-primary">
+                <svg class="icon"><use xlink:href="#fa-home"></use></svg> Ana Sayfaya Dön
+            </a>
+            <a href="javascript:location.reload()" class="btn btn-secondary">
+                <svg class="icon"><use xlink:href="#fa-sync"></use></svg> Sayfayı Yenile
+            </a>
+        </div>
+    </section>
+</main>
+{% endblock %}

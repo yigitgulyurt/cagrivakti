@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block title %}{{ sehir }} İmsakiye 2026 | Haftalık, Aylık, Yıllık Çağrı Vakitleri{% endblock %}
+
+{% block brand_text %}{{ sehir }}{% endblock %}
+
+{% block content %}
+<div class="imsakiye-wrapper fade-in">
+    <div class="container">
+        <header class="imsakiye-header">
+            <div class="header-main">
+                <h1>{{ sehir }} <span class="year-badge">2026</span></h1>
+            </div>
+            <p class="subtitle">Haftalık, aylık ve yıllık çağrı vakitleri çizelgesi.</p>
+        </header>
+
+        <div class="imsakiye-tabs">
+            <button class="tab-btn active" data-tab="haftalik">Haftalık</button>
+            <button class="tab-btn" data-tab="aylik">Aylık</button>
+            <button class="tab-btn" data-tab="yillik">Yıllık</button>
+            {% if ramadan_info.status == 'active' or (ramadan_info.status == 'upcoming' and ramadan_info.days_to_start <= 30) %}
+            <button class="tab-btn" data-tab="ramazan">Ramazan</button>
+            {% endif %}
+        </div>
+
+        <div class="imsakiye-content">
+            <div id="imsakiye-table-container" class="table-responsive">
+                <table class="imsakiye-table">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>İmsak</th>
+                            <th>Güneş</th>
+                            <th>Öğle</th>
+                            <th>İkindi</th>
+                            <th>Akşam</th>
+                            <th>Yatsı</th>
+                        </tr>
+                    </thead>
+                    <tbody id="imsakiye-body">
+                        <!-- Veriler JS ile buraya gelecek -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="loading-spinner" class="loading-overlay" style="display: none;">
+                <div class="spinner"></div>
+                <p>Vakitler getiriliyor...</p>
+            </div>
+
+            <div id="error-message" class="error-container" style="display: none;">
+                <svg class="icon"><use xlink:href="#fa-circle-exclamation-solid"></use></svg>
+                <p>Vakitler getirilirken bir sorun çıktı. Lütfen bir süre sonra yeniden deneyin.</p>
+                <button class="btn btn-secondary btn-sm" onclick="fetchVakitler()">Yeniden Dene</button>
+            </div>
+        </div>
+
+        <div class="imsakiye-footer">
+            <div class="info-box">
+                <svg class="icon"><use xlink:href="#fa-circle-question"></use></svg>
+                <p>Vakitler T.C. Diyanet İşleri Başkanlığı ile uygundur. Bulunduğunuz konuma göre birkaç dakika değişiklik gösterebilir.</p>
+            </div>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="window.print()">
+                    <span>Yazdır</span>
+                </button>
+                <a href="{{ url_for('views.sehir_secimi') }}" class="btn btn-primary">
+                    <svg class="icon"><use xlink:href="#fa-map-marker-alt"></use></svg>
+                    <span>İl Değiştir</span>
+                </a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir=sehir, country=country_code) }}" class="btn btn-primary">
+                    <svg class="icon"><use xlink:href="#fa-clock-solid"></use></svg>
+                    <span>Bugünkü Vakitler</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --imsakiye-primary: #FFC107;
+    --imsakiye-bg: #0f0f0f;
+    --imsakiye-card: #1a1a1a;
+    --imsakiye-border: rgba(255, 255, 255, 0.08);
+    --imsakiye-accent: rgba(255, 193, 7, 0.1);
+}
+
+.imsakiye-wrapper {
+    padding: 60px 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.imsakiye-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.header-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 15px;
+}
+
+.back-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: var(--imsakiye-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid var(--imsakiye-border);
+}
+
+.back-btn:hover {
+    border-color: var(--imsakiye-primary);
+    color: var(--imsakiye-primary);
+    transform: translateX(-5px);
+}
+
+.imsakiye-header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+}
+
+.year-badge {
+    background: var(--imsakiye-primary);
+    color: #000;
+    padding: 4px 14px;
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+.subtitle {
+    color: #a0a0a0;
+    font-size: 1.1rem;
+}
+
+/* Tabs */
+.imsakiye-tabs {
+    display: flex;
+    background: var(--imsakiye-card);
+    padding: 6px;
+    border-radius: 20px;
+    gap: 6px;
+    margin-bottom: 40px;
+    border: 1px solid var(--imsakiye-border);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    background: transparent;
+    color: #a0a0a0;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.tab-btn:hover {
+    color: #fff;
+}
+
+.tab-btn.active {
+    background: var(--imsakiye-primary);
+    color: #000;
+}
+
+/* Table Card */
+.imsakiye-content {
+    background: var(--imsakiye-card);
+    border-radius: 32px;
+    border: 1px solid var(--imsakiye-border);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.imsakiye-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.imsakiye-table th {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px;
+    font-weight: 700;
+    color: var(--imsakiye-primary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--imsakiye-border);
+    text-align: center;
+}
+
+.imsakiye-table td {
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    font-size: 1.05rem;
+    color: #e0e0e0;
+    text-align: center;
+}
+
+.tarih-cell {
+    text-align: left !important;
+    padding-left: 30px !important;
+}
+
+.day-num {
+    font-weight: 800;
+    color: var(--imsakiye-primary);
+    margin-right: 10px;
+}
+
+.tarih-text {
+    font-weight: 600;
+}
+
+.tarih-sub {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 2px;
+}
+
+/* Bugün Vurgusu */
+.today-row {
+    background: rgba(255, 193, 7, 0.06) !important;
+    position: relative;
+}
+
+.today-row td {
+    color: var(--imsakiye-primary) !important;
+    font-weight: 700;
+}
+
+.today-row .tarih-cell::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--imsakiye-primary);
+}
+
+.today-badge {
+    background: var(--imsakiye-primary);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-left: 10px;
+    text-transform: uppercase;
+}
+
+/* Önemli Vakitler Vurgusu */
+.highlight-vakit {
+    background: rgba(255, 255, 255, 0.02);
+    font-weight: 700;
+}
+
+/* Footer Actions */
+.imsakiye-footer {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.info-box {
+    display: flex;
+    gap: 15px;
+    padding: 25px;
+    background: var(--imsakiye-accent);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 193, 7, 0.1);
+    color: #a0a0a0;
+}
+
+.info-box svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--imsakiye-primary);
+    flex-shrink: 0;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-outline {
+    border: 1px solid var(--imsakiye-border);
+    color: #fff;
+}
+
+.btn-outline:hover {
+    border-color: var(--imsakiye-primary);
+    color: var(--imsakiye-primary);
+    background: var(--imsakiye-accent);
+}
+
+@media (max-width: 768px) {
+    .imsakiye-wrapper { padding: 30px 15px; }
+    .imsakiye-header { margin-bottom: 30px; }
+    .header-main { gap: 15px; }
+    .imsakiye-tabs { flex-wrap: wrap; }
+    .tab-btn { flex: 1 1 45%; font-size: 0.85rem; }
+    
+    .imsakiye-table th, .imsakiye-table td { padding: 12px 10px; font-size: 0.85rem; }
+    .tarih-cell { padding-left: 15px !important; }
+    
+    .actions { flex-direction: column; }
+    .btn-action { justify-content: center; }
+}
+
+@media print {
+    body { background: #fff !important; color: #000 !important; }
+    .imsakiye-wrapper { padding: 0; }
+    .navbar, .imsakiye-tabs, .imsakiye-footer, .back-btn { display: none !important; }
+    .imsakiye-content { border: 1px solid #000; border-radius: 0; box-shadow: none; }
+    .imsakiye-table th { background: #f0f0f0 !important; color: #000 !important; border-bottom: 2px solid #000; }
+    .imsakiye-table td { color: #000 !important; border-bottom: 1px solid #ccc; }
+    .imsakiye-primary { color: #000 !important; }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const sehir = "{{ sehir }}";
+    const countryCode = "{{ country_code }}";
+    let currentTab = 'haftalik';
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTab = btn.dataset.tab;
+            fetchVakitler();
+        });
+    });
+
+    async function fetchVakitler() {
+        const body = document.getElementById('imsakiye-body');
+        const loading = document.getElementById('loading-spinner');
+        const error = document.getElementById('error-message');
+        const tableContainer = document.getElementById('imsakiye-table-container');
+
+        body.innerHTML = '';
+        loading.style.display = 'flex';
+        error.style.display = 'none';
+        tableContainer.style.opacity = '0.3';
+
+        try {
+            let url = `/api/vakitler?sehir=${sehir}&ulke=${countryCode}`;
+            
+            if (currentTab === 'aylik') {
+                const now = new Date();
+                url += `&ay=${now.getMonth() + 1}&yil=${now.getFullYear()}`;
+            } else if (currentTab === 'yillik') {
+                url += `&tam_yil=true`;
+            } else if (currentTab === 'ramazan') {
+                url += `&ramazan=true`;
+            } else {
+                // Haftalık için özel bir parametre yok ama API'den bugünden itibaren 7 günü alabiliriz
+        // Mevcut API v1 tam yılı destekliyor, biz oradan ilk 7 günü filtreleyebiliriz
+        // Ya da API'ye haftalık desteği eklenebilir. Şimdilik aylık veriden ilk 7 günü alalım.
+        const now = new Date();
+                url += `&ay=${now.getMonth() + 1}&yil=${now.getFullYear()}`;
+            }
+
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.durum === 'basarili') {
+                let vakitler = result.data.vakitler || [];
+                
+                if (currentTab === 'haftalik') {
+                    // Sadece bugünden itibaren 7 günü al
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayIndex = vakitler.findIndex(v => v.tarih >= today);
+                    if (todayIndex !== -1) {
+                        vakitler = vakitler.slice(todayIndex, todayIndex + 7);
+                    } else {
+                        vakitler = vakitler.slice(0, 7);
+                    }
+                }
+
+                if (vakitler.length === 0) {
+                    throw new Error('Bilgi bulunamadı');
+                }
+
+                renderTable(vakitler);
+                tableContainer.style.opacity = '1';
+            } else {
+                throw new Error(result.mesaj || 'Sorun çıktı');
+            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+            error.style.display = 'block';
+            tableContainer.style.opacity = '0';
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    function renderTable(vakitler) {
+        const body = document.getElementById('imsakiye-body');
+        const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+        const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+        // Bugünün tarihini al (YYYY-MM-DD formatında)
+        const today = new Date().toISOString().split('T')[0];
+
+        // Header'ları güncelle (İftar/Sahur için)
+        const isRamadanTab = currentTab === 'ramazan';
+        const headers = document.querySelectorAll('.imsakiye-table th');
+        if (headers.length >= 6) {
+            headers[1].textContent = isRamadanTab ? 'Sahur' : 'İmsak';
+            headers[5].textContent = isRamadanTab ? 'İftar' : 'Akşam';
+        }
+
+        vakitler.forEach((v, index) => {
+            const date = new Date(v.tarih);
+            const dateStr = `${date.getDate()} ${months[date.getMonth()]}`;
+            const dayStr = days[date.getDay()];
+            const isToday = v.tarih === today;
+
+            const tr = document.createElement('tr');
+            if (isToday) {
+                tr.classList.add('today-row');
+            }
+            
+            // Ramazan günü bilgisi (Eğer ramazan tabındaysak)
+            let tarihHtml = `
+                <span class="tarih-cell">${dateStr}</span>
+                <span class="tarih-sub">${dayStr}</span>
+            `;
+            
+            if (isRamadanTab) {
+                tarihHtml = `
+                    <div class="ramadan-day-wrapper">
+                        <span class="tarih-cell">${index + 1}. Gün</span>
+                        <span class="tarih-sub">${dateStr} ${dayStr}</span>
+                        ${isToday ? '<span class="today-badge">BUGÜN</span>' : ''}
+                    </div>
+                `;
+            }
+
+            tr.innerHTML = `
+                <td>${tarihHtml}</td>
+                <td>${v.imsak}</td>
+                <td>${v.gunes}</td>
+                <td>${v.ogle}</td>
+                <td>${v.ikindi}</td>
+                <td>${v.aksam}</td>
+                <td>${v.yatsi}</td>
+            `;
+            body.appendChild(tr);
+
+            // Eğer bugünse ve tablo içindeyse oraya kaydır (opsiyonel ama kullanışlı)
+            if (isToday && currentTab !== 'haftalik') {
+                setTimeout(() => {
+                    tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        });
+    }
+
+    // İlk yükleme
+    document.addEventListener('DOMContentLoaded', fetchVakitler);
+</script>
+{% endblock %}

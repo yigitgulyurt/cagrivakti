@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Tarayıcıda Aç - Çağrı Vakti{% endblock %}
+
+{% block extra_css %}
+<style>
+    .browser-wrapper {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .browser-container {
+        background: var(--card-bg);
+        padding: 40px;
+        border-radius: 24px;
+        max-width: 500px;
+        width: 100%;
+        box-shadow: var(--card-shadow);
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    h1 {
+        font-size: 1.8rem;
+        color: var(--primary);
+        margin-bottom: 16px;
+        font-weight: 700;
+    }
+    p {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+    .url-box {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 12px;
+        border-radius: 12px;
+        margin: 20px 0;
+        word-break: break-all;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--primary);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+    .instructions {
+        margin-top: 24px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        text-align: left;
+    }
+    .instructions ol {
+        margin: 0;
+        padding-left: 20px;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .instructions li {
+        margin-bottom: 12px;
+    }
+    .browser-icons {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin: 24px 0;
+    }
+    .browser-icon {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        border-radius: 12px;
+        margin: 0 auto;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="browser-wrapper fade-in">
+    <section class="browser-container">
+        <h1>Tarayıcıda Aç</h1>
+        <p>Bu siteyi tam verimli kullanmak için lütfen varsayılan tarayıcınızı kullanın.</p>
+        
+        <div class="url-box">
+            cagrivakti.com.tr
+        </div>
+        
+        <div class="instructions">
+            <ol>
+                <li>Uygulamanın sağ üst köşesindeki <strong>üç nokta (⋮)</strong> ya da <strong>paylaş</strong> simgesine dokunun.</li>
+                <li><strong>"Tarayıcıda Aç"</strong> ya da <strong>"Safari/Chrome'da Aç"</strong> seçeneğini seçin.</li>
+                <li>Site varsayılan tarayıcınızda açılacaktır.</li>
+            </ol>
+        </div>
+        
+        <div class="browser-icons">
+            <img src="https://i.imgur.com/aAsjnDp.jpeg" alt="Üç nokta" class="browser-icon">
+            <img src="https://i.imgur.com/mrluYQ4.jpeg" alt="Chrome" class="browser-icon">
+        </div>
+        
+        <p style="margin-top: 24px; font-size: 0.9rem;">Daha iyi bir kullanım için lütfen varsayılan tarayıcınızı kullanın.</p>
+    </section>
+</main>
+{% endblock %}

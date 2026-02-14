@@ -1,0 +1,575 @@
+{% extends "base.html" %}
+
+{% block title %}{{ seo_title }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
+{% block og_title %}{{ seo_title }}{% endblock %}
+{% block og_description %}{{ seo_description }}{% endblock %}
+
+{% block json_ld %}
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": "{{ seo_title }}",
+      "description": "{{ seo_description }}",
+      "mainEntity": {
+        "@type": "Place",
+        "name": "{{ sehir }}",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "{{ sehir }}",
+          "addressCountry": "{{ country_code }}"
+        }
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Ana Sayfa",
+          "item": "https://cagrivakti.com.tr"
+        },{
+          "@type": "ListItem",
+          "position": 2,
+          "name": "{{ sehir }} Namaz Vakitleri",
+          "item": "https://cagrivakti.com.tr{{ request.path }}"
+        }]
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "{{ sehir }} Namaz Vakitleri 2026",
+      "description": "{{ sehir }} için 2026 yılı günlük ve aylık namaz vakitleri verisi.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Çağrı Vakti"
+      },
+      "spatialCoverage": "{{ sehir }}, {{ country_code }}",
+      "variableMeasured": ["İmsak", "Güneş", "Öğle", "İkindi", "Akşam", "Yatsı"]
+    }
+  ]
+}
+{% endblock %}
+
+{% block brand_text %}{{ sehir }}{% endblock %}
+
+{% block breadcrumb_json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Ana Sayfa",
+    "item": "https://cagrivakti.com.tr"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "{{ sehir }}",
+    "item": "https://cagrivakti.com.tr/sehir/{{ sehir }}"
+  }]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <header class="header">
+        <h1>{{ sehir }}</h1>
+        <div class="header-buttons">
+            <a href="{{ url_for('views.index') }}" class="btn btn-secondary" title="Ana Sayfaya Dön">
+                <!-- SVG İkonu: Ev -->
+                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-home"></use></svg>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="{{ url_for('views.sehir_secimi') }}" class="btn btn-primary" title="Başka Bir Şehir Seç">
+                <!-- SVG İkonu: Konum İşareti -->
+                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-map-marker-alt"></use></svg>
+                <span>İl Değiştir</span>
+            </a>
+        </div>
+    </header>
+
+    {% if ramadan_info.is_laylat_al_qadr %}
+    <div class="qadr-night-alert fade-in">
+        <div class="qadr-icon">
+            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-star-and-crescent"></use></svg>
+        </div>
+        <div class="qadr-text">
+            <h3>Kadir Geceniz Kutlu Olsun</h3>
+            <p>Bu gece, bin aydan daha yararlı olan Kadir Gecesi'dir. Bu kutlu geceyi dua, yakarış ve tövbe ile yerine getirmeniz salık verilir.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <section class="daily-content-card" id="daily-content" title="Günün Dini İçeriği">
+        {% if ramadan_info.is_ramadan %}
+        <div class="daily-icon">
+            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-moon"></use></svg>
+        </div>
+        <div class="daily-text">
+            <span class="daily-label">Günün Ramazan İletisi</span>
+            <p id="ramadan-message">{{ ramadan_info.ramadan_content }}</p>
+        </div>
+        {% elif daily_content %}
+        <div class="daily-type">{{ daily_content.type }}</div>
+        <div class="daily-text">{{ daily_content.text }}</div>
+        <div class="daily-source">{{ daily_content.source }}</div>
+        {% else %}
+        <div class="skeleton skeleton-text" style="width: 20%; margin-bottom: 15px;"></div>
+        <div class="skeleton skeleton-text" style="width: 100%; height: 2rem; margin-bottom: 15px;"></div>
+        <div class="skeleton skeleton-text" style="width: 40%;"></div>
+        {% endif %}
+    </section>
+
+    <main class="vakitler-container">
+        <div class="vakitler-grid">
+            {% set vakit_list = [
+                ('imsak', 'İmsak'),
+                ('gunes', 'Güneş'),
+                ('ogle', 'Öğle'),
+                ('ikindi', 'İkindi'),
+                ('aksam', 'İftar' if ramadan_info.is_ramadan else 'Akşam'),
+                ('yatsi', 'Teravih' if ramadan_info.is_ramadan else 'Yatsı')
+            ] %}
+            
+            {% for id, label in vakit_list %}
+            <div class="vakit-card {% if vakitler[id] == '--:--' %}skeleton-card{% endif %}" id="card-{{ id }}">
+                <h2>{{ label }}</h2>
+                <span class="vakit-time" id="{{ id }}">
+                    {% if vakitler[id] == '--:--' %}
+                    <div class="skeleton skeleton-title" style="width: 80%; height: 3rem; margin: 0 auto;"></div>
+                    {% else %}
+                    {{ vakitler[id] }}
+                    {% endif %}
+                </span>
+                <div class="vakit-countdown" id="{{ id }}-countdown">
+                    {% if vakitler[id] == '--:--' %}
+                    <div class="skeleton skeleton-text" style="width: 60%; margin: 0 auto;"></div>
+                    {% else %}
+                    --:--:--
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <div class="prayer-warning-footer fade-in">
+        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-circle-info"></use></svg>
+        <span><strong>Uyarı:</strong> Vakitler konuma göre birkaç dakika değişebilir, önlemli olmak adına ezan sesini ya da yerel duyuruları izleyiniz.</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 25px;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    gap: 20px; /* Added gap */
+    flex-wrap: wrap; /* Allow wrapping for very long names/many buttons */
+}
+
+.header h1 {
+    font-size: 2.2em;
+    color: var(--primary);
+    font-weight: 800;
+    margin: 0;
+    flex: 1; /* Allow h1 to take available space */
+    min-width: 200px; /* Minimum width before wrapping */
+}
+
+.header-buttons {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+    flex-wrap: wrap; /* Allow buttons to wrap if they don't fit */
+}
+
+/* Uyarı Yazısı (Alt) */
+.prayer-warning-footer {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+    color: var(--gray);
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    opacity: 0.7;
+}
+
+.prayer-warning-footer strong {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.prayer-warning-footer .icon {
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+/* Kadir Gecesi Uyarısı */
+.qadr-night-alert {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+}
+
+.qadr-icon {
+    font-size: 2.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.qadr-text h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.qadr-text p {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+/* Günlük İçerik Kartı */
+.daily-content-card {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.daily-content-card::after {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 8rem;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+}
+
+.daily-type {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.daily-text {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-family: 'Amiri', serif;
+}
+
+.daily-source {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+/* Vakitler */
+.vakitler-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.vakit-card {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.vakit-card:hover {
+    transform: translateY(-5px);
+    background-color: var(--hover-color);
+    border-color: var(--primary);
+}
+
+.skeleton-card {
+    cursor: default;
+    pointer-events: none;
+}
+
+.vakit-card h2 {
+    color: var(--primary);
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.vakit-time {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text);
+    display: block;
+    margin-bottom: 15px;
+}
+
+.vakit-countdown {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--primary);
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    font-family: monospace;
+}
+
+@media (max-width: 768px) {
+    .container { padding: 15px 10px; }
+    .header { padding: 20px; flex-direction: column; text-align: center; gap: 15px; }
+    .header h1 { font-size: 1.8rem; margin: 0; min-width: 0; width: 100%; }
+    .header-buttons { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .header-buttons .btn { justify-content: center; width: 100%; padding: 12px 10px; font-size: 0.9rem; }
+    .header-buttons .btn span { display: inline; } /* Keep text visible on tablets */
+    
+    .qadr-night-alert { padding: 20px; flex-direction: column; text-align: center; gap: 15px; }
+    .qadr-icon { width: 60px; height: 60px; font-size: 2rem; }
+    .qadr-text h3 { font-size: 1.2rem; }
+    .qadr-text p { font-size: 0.95rem; }
+
+    .daily-content-card { padding: 20px; margin-bottom: 20px; }
+    .daily-text { font-size: 1.1rem; line-height: 1.5; }
+    .daily-type { font-size: 0.75rem; }
+    
+    .vakitler-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .vakit-card { padding: 15px 10px; border-radius: 16px; }
+    .vakit-card h2 { font-size: 1.1rem; margin-bottom: 8px; }
+    .vakit-time { font-size: 1.6rem; margin-bottom: 10px; }
+    .vakit-countdown { font-size: 1rem; padding: 8px; border-radius: 10px; }
+
+    .prayer-warning-footer { padding: 15px; font-size: 0.75rem; margin-top: 20px; flex-direction: column; text-align: center; }
+}
+
+@media (max-width: 480px) {
+    .header h1 { font-size: 1.5rem; }
+    .header-buttons { grid-template-columns: 1fr; }
+    .vakitler-grid { grid-template-columns: 1fr; }
+    .vakit-time { font-size: 1.8rem; }
+    .vakit-countdown { font-size: 1.1rem; }
+}
+</style>
+{% endblock %}
+
+{% block footer_js %}
+<script>
+    let mevcutSehir = "{{ sehir }}";
+    let mevcutUlke = "{{ country_code }}";
+    let namazVakitleri = JSON.parse('{{ vakitler|tojson|safe }}');
+
+    // LocalStorage Önbellek Yönetimi
+    const CACHE_KEY = `vakitler_${mevcutSehir}_${mevcutUlke}`;
+    const TODAY = new Date().toISOString().split('T')[0];
+
+    function getCachedVakitler() {
+        try {
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                // Sadece bugüne ait veriyi kullan
+                if (parsed.tarih === TODAY) {
+                    return parsed.data;
+                }
+            }
+        } catch (e) { console.error('Cache okuma hatası:', e); }
+        return null;
+    }
+
+    function setCachedVakitler(data) {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+                tarih: TODAY,
+                data: data
+            }));
+        } catch (e) { console.error('Cache yazma hatası:', e); }
+    }
+
+    function renderVakitler(vakitlerData) {
+        ['imsak', 'gunes', 'ogle', 'ikindi', 'aksam', 'yatsi'].forEach(v => {
+            const el = document.getElementById(v);
+            const card = document.getElementById(`card-${v}`);
+            const countdownEl = document.getElementById(`${v}-countdown`);
+            
+            if (el && vakitlerData[v]) {
+                el.textContent = vakitlerData[v];
+                card.classList.remove('skeleton-card');
+                
+                if (el.querySelector('.skeleton')) {
+                    el.innerHTML = vakitlerData[v];
+                }
+                if (countdownEl && countdownEl.querySelector('.skeleton')) {
+                    countdownEl.innerHTML = '--:--:--';
+                }
+            }
+        });
+    }
+
+    async function namazVakitleriniYukle() {
+        // 1. Önce cache'e bak
+        const cached = getCachedVakitler();
+        if (cached) {
+            namazVakitleri = cached;
+            renderVakitler(namazVakitleri);
+            updateCountdowns();
+            return; // Önbellek varsa API'ye gitme
+        }
+
+        try {
+            const response = await fetch(`/api/namaz_vakitleri?sehir=${mevcutSehir}&country=${mevcutUlke}`);
+            const data = await response.json();
+            
+            if (data.vakitler) {
+                // Timezone bilgisini namazVakitleri objesine ekle
+                namazVakitleri = {
+                    ...data.vakitler,
+                    timezone: data.timezone || 'Europe/Istanbul'
+                };
+                
+                setCachedVakitler(namazVakitleri);
+                renderVakitler(namazVakitleri);
+                
+                updateCountdowns();
+            }
+        } catch (error) {
+            console.error('Namaz vakitleri yüklenemedi:', error);
+        }
+    }
+
+    function updateCountdowns() {
+        const tz = namazVakitleri.timezone || 'Europe/Istanbul';
+        
+        // Yerel saati ve şehir saatini al
+        const now = new Date();
+        const cityNowStr = now.toLocaleString("en-US", {timeZone: tz});
+        const cityNow = new Date(cityNowStr);
+        
+        // Milisaniye cinsinden farkı hesapla (toLocaleString saniyeyi yuvarlayabilir, daha hassas fark için)
+        // Ancak geri sayım için cityNow yeterlidir.
+        
+        ['imsak', 'gunes', 'ogle', 'ikindi', 'aksam', 'yatsi'].forEach(vakit => {
+            const saat = namazVakitleri[vakit];
+            if (!saat || saat === "--:--" || saat.includes('skeleton')) return;
+            
+            const [hours, minutes] = saat.split(":").map(Number);
+            const vakitDate = new Date(cityNow);
+            vakitDate.setHours(hours, minutes, 0, 0);
+            
+            const countdownEl = document.getElementById(`${vakit}-countdown`);
+            if (!countdownEl) return;
+
+            // Eğer vakit geçtiyse bir sonraki günün vaktini mi hesaplamalıyız? 
+            // Şimdilik sadece "Vakit geçti" veya "Vakit geldi" gösteriyoruz.
+            if (vakitDate < cityNow) {
+                const diffMinutes = (cityNow - vakitDate) / 60000;
+                if (diffMinutes >= 0 && diffMinutes < 45) {
+                    countdownEl.textContent = 'Vakit geldi';
+                    countdownEl.style.color = '#10b981';
+                    countdownEl.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                } else {
+                    countdownEl.textContent = 'Vakit geçti';
+                    countdownEl.style.color = '';
+                    countdownEl.style.backgroundColor = '';
+                }
+                return;
+            }
+            
+            const timeDiff = vakitDate - cityNow;
+            const h = Math.floor(timeDiff / 3600000);
+            const m = Math.floor((timeDiff % 3600000) / 60000);
+            const s = Math.floor((timeDiff % 60000) / 1000);
+            
+            countdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            countdownEl.style.color = '';
+            countdownEl.style.backgroundColor = '';
+        });
+    }
+
+    async function dailyContentYukle() {
+        try {
+            const response = await fetch('/api/daily_content');
+            const data = await response.json();
+            
+            if (data && data.text) {
+                const dailyCard = document.getElementById('daily-content');
+                if (dailyCard) {
+                    let contentHtml = '';
+                    if (namazVakitleri.is_ramadan) {
+                        contentHtml = `
+                            <div class="daily-icon">
+                                <svg class="icon"><use xlink:href="#fa-moon"></use></svg>
+                            </div>
+                            <div class="daily-text">
+                                <span class="daily-label">Günün Ramazan İletisi</span>
+                                <p id="ramadan-message">${data.text}</p>
+                            </div>`;
+                    } else {
+                        contentHtml = `
+                            <div class="daily-type">${data.type || 'Günün Sözü'}</div>
+                            <div class="daily-text">${data.text}</div>
+                            <div class="daily-source">${data.source || ''}</div>`;
+                    }
+                    dailyCard.innerHTML = contentHtml;
+                }
+            }
+        } catch (error) {
+            console.error('Daily content yüklenemedi:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        await namazVakitleriniYukle();
+        await dailyContentYukle();
+        updateCountdowns();
+        setInterval(updateCountdowns, 1000);
+        // Sayfa açıkken 30 dakikada bir kontrol et (eskiden 1 dakikaydı)
+        setInterval(() => {
+            const cached = getCachedVakitler();
+            if (!cached) namazVakitleriniYukle();
+        }, 1800000);
+    });
+</script>
+{% endblock %}

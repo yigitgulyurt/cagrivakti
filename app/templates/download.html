@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Uygulamayı Yükle - Çağrı Vakti{% endblock %}
+
+{% block brand_text %}UYGULAMAYI YÜKLE{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <div class="download-wrapper">
+        <header class="download-header">
+            <div class="app-icon-large">
+                <img src="/static/icons/icon-192-192.webp" alt="Çağrı Vakti Simgesi">
+            </div>
+            <h1>Çağrı Vakti Cebinizde</h1>
+            <p>Hızlı, yalın ve reklamsız bir kullanım için uygulamayı aygıtınıza yükleyin.</p>
+        </header>
+
+        <!-- Android İçeriği -->
+        <div id="android-content" class="platform-section" style="display: none;">
+            <div class="install-card android-install">
+                <div class="card-icon">
+                    <svg class="icon"><use xlink:href="#brand-android"></use></svg>
+                </div>
+                <h3>Android İçin Yükle</h3>
+                <p>Uygulamayı Android aygıtınıza yüklemek için aşağıdaki basamakları izleyin:</p>
+                
+                <div class="platform-steps">
+                    <div class="step">
+                        <span class="step-num">1</span>
+                        <p>Sağ üstteki <strong>üç noktaya</strong> <svg class="icon inline-icon"><use xlink:href="#fa-ellipsis-vertical"></use></svg> tıklayın.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">2</span>
+                        <p>Aşağıdaki <strong>Ana Ekrana Ekle</strong> ya da <strong>Uygulamayı Yükle</strong> seçeneğine tıklayın.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">3</span>
+                        <p>Açılan ekrandan <strong>Yükle</strong> düğmesine tıklayın.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">4</span>
+                        <p>Onay için yeniden <strong>Yükle</strong> düğmesine tıklayın.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- iOS İçeriği -->
+        <div id="ios-content" class="platform-section" style="display: none;">
+            <div class="install-card ios-install">
+                <div class="card-icon">
+                    <svg class="icon"><use xlink:href="#brand-apple"></use></svg>
+                </div>
+                <h3>iOS (iPhone/iPad) İçin Yükle</h3>
+                <p>Apple aygıtınızda Safari kullanarak ana ekranınıza ekleyin.</p>
+                
+                <div class="platform-steps">
+                    <div class="step">
+                        <span class="step-num">1</span>
+                        <p>Safari alt menüsündeki <strong>Paylaş</strong> <svg class="icon inline-icon"><use xlink:href="#fa-share-square"></use></svg> simgesine dokunun.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">2</span>
+                        <p>Açılan menüde <strong>Ana Ekrana Ekle</strong> seçeneğini bulun ve dokunun.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">3</span>
+                        <p>Sağ üstteki <strong>Ekle</strong> düğmesine basarak süreci bitirin.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Masaüstü İçeriği -->
+        <div id="desktop-content" class="platform-section" style="display: none;">
+            <div class="desktop-single-card">
+                <div class="qr-card">
+                    <div class="card-icon">
+                        <svg class="icon"><use xlink:href="#fa-mobile-screen-button"></use></svg>
+                    </div>
+                    <h3>Telefona Yükle</h3>
+                    <p>Telefonunuzun kamerasını kullanarak QR kodu okutun ve hemen yükleyin.</p>
+                    <div class="qr-wrapper">
+                        <div class="qr-background">
+                            <canvas id="qr-code"></canvas>
+                        </div>
+                    </div>
+                    <p class="qr-link">cagrivakti.com.tr</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desteklenmeyen / Genel -->
+        <div id="generic-content" class="platform-section" style="display: none;">
+             <div class="install-card">
+                <h3>Uygulamayı Yükleyin</h3>
+                <p>Tarayıcınız üzerinden "Ana Ekrana Ekle" ya da "Yükle" seçeneğini kullanarak uygulamayı kurabilirsiniz.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.platform-section {
+    margin-bottom: 40px;
+}
+
+.download-wrapper {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.download-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.app-icon-large {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.app-icon-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.download-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.download-header p {
+    color: var(--gray);
+    font-size: 1.2rem;
+}
+
+.install-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+}
+
+.card-icon {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.platform-steps {
+    text-align: left;
+    max-width: 500px;
+    margin: 30px auto 0;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.step-num {
+    background: var(--primary);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: bold;
+}
+
+.step p {
+    margin: 0;
+    color: var(--text);
+}
+
+.desktop-single-card {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.qr-card {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 24px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: var(--card-shadow);
+}
+
+.qr-card h3 {
+    margin-bottom: 10px;
+}
+
+.qr-card p {
+    color: var(--gray);
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+.qr-wrapper {
+     display: flex;
+     justify-content: center;
+     margin-bottom: 20px;
+ }
+ 
+ .qr-background {
+      background: white;
+      width: 225px;
+      height: 225px;
+      border-radius: 24px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+ 
+ #qr-code {
+      display: block;
+      width: 200px;
+      height: 200px;
+      image-rendering: pixelated;
+  }
+
+.qr-link {
+    font-weight: bold;
+    color: var(--primary) !important;
+    margin: 0 !important;
+    font-size: 0.9rem !important;
+}
+
+.inline-icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}
+
+.icon {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    vertical-align: -0.125em;
+}
+
+@media (max-width: 768px) {
+    .download-header h1 { font-size: 2rem; }
+    .desktop-grid { grid-template-columns: 1fr; }
+    .install-card { padding: 30px 20px; }
+}
+</style>
+
+<!-- QR Code Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAndroid = /android/i.test(userAgent);
+    const isIOS = /iphone|ipad|ipod/i.test(userAgent);
+    const isMobile = isAndroid || isIOS;
+
+    // İçerik gösterimi
+    if (isAndroid) {
+        document.getElementById('android-content').style.display = 'block';
+    } else if (isIOS) {
+        document.getElementById('ios-content').style.display = 'block';
+    } else if (!isMobile) {
+        document.getElementById('desktop-content').style.display = 'block';
+        // QR Kod Oluştur
+         new QRious({
+              element: document.getElementById('qr-code'),
+              value: window.location.origin + window.location.pathname,
+              size: 1024, // Çok yüksek çözünürlük (Yuvarlama hatalarını yok eder)
+              padding: 0, // Kütüphane iç padding'ini sıfırlıyoruz
+              level: 'M',
+              foreground: '#000000',
+              background: 'transparent' // Arka plan şeffaf, sadece siyah kareler çizilir
+          });
+    } else {
+        document.getElementById('generic-content').style.display = 'block';
+    }
+
+    // PWA Kurulum Mantığı
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        const installBtns = ['androidInstallBtn', 'desktopInstallBtn'];
+        installBtns.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`PWA kurulum sonucu: ${outcome}`);
+                        deferredPrompt = null;
+                    }
+                });
+            }
+        });
+    });
+
+    // Zaten yüklüyse kontrol et
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        const btns = document.querySelectorAll('.btn-primary');
+        btns.forEach(btn => {
+            if (btn.id.includes('InstallBtn')) {
+                btn.textContent = 'Uygulama Yüklü';
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

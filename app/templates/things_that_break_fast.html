@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block title %}Orucu Bozan Durumlar Nelerdir? - Çağrı Vakti{% endblock %}
+
+{% block brand_text %}ORUCU BOZAN DURUMLAR NELERDİR ?{% endblock %}
+
+{% block content %}
+<main class="container fade-in">
+    <header class="ramadan-hero">
+        <div class="hero-icon danger">
+            <svg><use xlink:href="#fa-circle-exclamation-solid"></use></svg>
+        </div>
+        <h1>Orucu Bozan Durumlar</h1>
+        <p>Hangi durumlar orucu bozar, hangileri sadece kaza gerektirir? Merak edilen tüm detaylar.</p>
+    </header>
+
+    <div class="info-content-grid">
+        <!-- Orucu Bozan Temel Durumlar -->
+        <section class="info-card">
+            <div class="info-card-header">
+                <div class="card-icon-wrapper break-main">
+                    <svg class="icon"><use xlink:href="#fa-circle-xmark-solid"></use></svg>
+                </div>
+                <h2>Temel Bozan Durumlar</h2>
+            </div>
+            <div class="info-card-body">
+                <p>Orucun temel direği; yeme, içme ve nefsani arzulardan uzak durmaktır. Bunların bilerek ihlali orucu bozar.</p>
+                <ul class="status-list">
+                    <li>
+                        <svg class="li-icon"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>Bilerek bir şey yemek ya da içmek.</span>
+                    </li>
+                    <li>
+                        <svg class="li-icon"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>Tütün ürünlerini (sigara, nargile vb.) kullanmak.</span>
+                    </li>
+                    <li>
+                        <svg class="li-icon"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>Ağza giren yağmur veya karı bilerek yutmak.</span>
+                    </li>
+                    <li>
+                        <svg class="li-icon"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>İlaç, vitamin veya besin takviyesi almak.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Kaza Gerektiren Durumlar -->
+        <section class="info-card">
+            <div class="info-card-header">
+                <div class="card-icon-wrapper kaza-main">
+                    <svg class="icon"><use xlink:href="#fa-clock-rotate-left-solid"></use></svg>
+                </div>
+                <h2>Sadece Kaza Gerektirenler</h2>
+            </div>
+            <div class="info-card-body">
+                <p>Bazı durumlar kasıtlı olmasa da orucu bozar ve sadece bozulan günün yerine bir gün kaza tutulmasını gerektirir.</p>
+                <ul class="status-list">
+                    <li>
+                        <svg class="li-icon kaza"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>Abdest alırken boğaza yanlışlıkla su kaçması.</span>
+                    </li>
+                    <li>
+                        <svg class="li-icon kaza"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>İmsak vakti geçmediği sanısıyla yemeye devam etmek.</span>
+                    </li>
+                    <li>
+                        <svg class="li-icon kaza"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>İftar vakti geldi sanısıyla orucu erken açmak.</span>
+                    </li>
+                    <li>
+                        <svg class="li-icon kaza"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>Zorlama veya tehdit altında bir şey yemek.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Orucu Bozmayan Durumlar -->
+        <section class="info-card">
+            <div class="info-card-header">
+                <div class="card-icon-wrapper safe-main">
+                    <svg class="icon"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                </div>
+                <h2>Orucu Bozmayanlar</h2>
+            </div>
+            <div class="info-card-body">
+                <p>Halk arasında yanlış bilinen ancak fıkhen oruca engel teşkil etmeyen durumlar:</p>
+                <ul class="status-list">
+                    <li>
+                        <svg class="li-icon safe"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>Unutarak bir şey yemek veya içmek.</span>
+                    </li>
+                    <li>
+                        <svg class="li-icon safe"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>Duş almak, banyo yapmak veya yüzmek.</span>
+                    </li>
+                    <li>
+                        <svg class="li-icon safe"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>Parfüm, deodorant veya kolonya kullanmak.</span>
+                    </li>
+                    <li>
+                        <svg class="li-icon safe"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        <span>Kan vermek veya tedavi amaçlı iğne yaptırmak.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Bilgilendirme Kartı -->
+        <section class="info-card full-width info-main-card">
+            <div class="info-card-header">
+                <div class="card-icon-wrapper highlight-main">
+                    <svg class="icon"><use xlink:href="#fa-circle-question"></use></svg>
+                </div>
+                <h2>Önemli Bilgilendirme</h2>
+            </div>
+            <div class="info-card-body">
+                <div class="info-alert">
+                    <p>Oruçlu olduğunu unutarak yiyen içen kişi, hatırlar hatırlamaz yeme-içmeyi bırakmalı ve ağzını çalkalamalıdır. Unutarak yemenin orucu bozmadığına dair Peygamber Efendimiz'in (s.a.v) müjdesi bulunmaktadır.</p>
+                </div>
+                <p class="note">Kişisel sağlık durumları ve özel meseleler için Diyanet İşleri Başkanlığı'nın resmi fetva hattından bilgi almanız en doğrusudur.</p>
+            </div>
+        </section>
+    </div>
+</main>
+
+<style>
+:root {
+    --break-danger: #ef4444;
+    --break-kaza: #f59e0b;
+    --break-safe: #10b981;
+    --break-info: #3b82f6;
+    --ramadan-card: #1a1a1a;
+    --ramadan-border: rgba(255, 255, 255, 0.08);
+}
+
+.ramadan-hero {
+    text-align: center;
+    margin-bottom: 60px;
+    padding-top: 40px;
+}
+
+.hero-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--break-danger), #b91c1c);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+}
+
+.hero-icon svg {
+    width: 40px;
+    height: 40px;
+    fill: #fff;
+}
+
+.ramadan-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 15px;
+    letter-spacing: -1px;
+}
+
+.ramadan-hero p {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.info-content-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 60px;
+}
+
+.info-card {
+    background: var(--ramadan-card);
+    border-radius: 28px;
+    padding: 35px;
+    border: 1px solid var(--ramadan-border);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+}
+
+.info-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.info-card.full-width {
+    grid-column: span 3;
+}
+
+.card-icon-wrapper {
+    width: 50px; height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.break-main { background: rgba(239, 68, 68, 0.1); color: var(--break-danger); }
+.kaza-main { background: rgba(245, 158, 11, 0.1); color: var(--break-kaza); }
+.safe-main { background: rgba(16, 185, 129, 0.1); color: var(--break-safe); }
+.highlight-main { background: rgba(59, 130, 246, 0.1); color: var(--break-info); }
+
+.card-icon-wrapper svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+.info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.info-card-header h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.info-card-body p {
+    color: #b0b0b0;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.status-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 15px;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.li-icon {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    fill: var(--break-danger);
+    margin-top: 2px;
+}
+
+.li-icon.kaza { fill: var(--break-kaza); }
+.li-icon.safe { fill: var(--break-safe); }
+
+.info-alert {
+    background: rgba(59, 130, 246, 0.05);
+    border-left: 4px solid var(--break-info);
+    padding: 20px;
+    border-radius: 0 16px 16px 0;
+    margin-bottom: 20px;
+}
+
+.info-alert p {
+    margin-bottom: 0;
+    color: #fff;
+    font-weight: 500;
+}
+
+.note {
+    font-size: 0.9rem !important;
+    opacity: 0.7;
+    margin-top: 10px;
+}
+
+@media (max-width: 1100px) {
+    .info-content-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .info-card.full-width {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .info-content-grid {
+        grid-template-columns: 1fr;
+    }
+    .info-card.full-width {
+        grid-column: span 1;
+    }
+    .ramadan-hero {
+        margin-bottom: 40px;
+    }
+}
+</style>
+{% endblock %}

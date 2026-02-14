@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block title %}İmsakiye 2026 - İl Seçimi | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}İMSAKİYE 2026{% endblock %}
+
+{% block content %}
+<main class="selection-wrapper fade-in">
+    <header class="selection-header">
+        <h1>
+            <svg><use xlink:href="#fa-calendar-days"></use></svg>
+            2026 Ramazan İmsakiyesi
+        </h1>
+        <p class="subtitle">İl ve ilçenize ait imsakiye bilgilerine ulaşmak için aşağıdaki listeden seçiminizi yapın veya arama özelliğini kullanın.</p>
+        
+        <div class="search-container">
+            <svg class="search-icon"><use xlink:href="#fa-magnifying-glass"></use></svg>
+            <input type="text" id="citySearch" class="search-box" placeholder="İl veya ilçe ara...">
+        </div>
+    </header>
+
+    <div class="category-tabs">
+        <button class="category-tab active" data-category="turkey">
+            <svg><use xlink:href="#fa-location-dot"></use></svg>
+            Türkiye
+        </button>
+        <button class="category-tab" data-category="world">
+            <svg><use xlink:href="#fa-globe"></use></svg>
+            Dünya
+        </button>
+    </div>
+
+    <section class="category-content active" id="biggest">
+        <div class="city-grid" id="buyuk-sehirler-grid">
+            <!-- Initial Skeletons -->
+            {% for i in range(30) %}
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto;"></div>
+                </div>
+                <div class="vakit-bilgisi">
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto 5px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="category-content" id="turkey">
+        <h2 class="region-title" data-region="marmara">Marmara Bölgesi</h2>
+        <div class="city-grid" id="Marmara"></div>
+
+        <h2 class="region-title" data-region="ege">Ege Bölgesi</h2>
+        <div class="city-grid" id="Ege"></div>
+
+        <h2 class="region-title" data-region="akdeniz">Akdeniz Bölgesi</h2>
+        <div class="city-grid" id="Akdeniz"></div>
+
+        <h2 class="region-title" data-region="icanadolu">İç Anadolu Bölgesi</h2>
+        <div class="city-grid" id="IcAnadolu"></div>
+
+        <h2 class="region-title" data-region="karadeniz">Karadeniz Bölgesi</h2>
+        <div class="city-grid" id="Karadeniz"></div>
+
+        <h2 class="region-title" data-region="doguanadolu">Doğu Anadolu Bölgesi</h2>
+        <div class="city-grid" id="DoguAnadolu"></div>
+
+        <h2 class="region-title" data-region="guneydoguanadolu">Güneydoğu Anadolu Bölgesi</h2>
+        <div class="city-grid" id="GuneydoguAnadolu"></div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --selection-primary: #FFC107;
+    --selection-bg: #0f0f0f;
+    --selection-card: #1a1a1a;
+    --selection-border: rgba(255, 255, 255, 0.08);
+}
+
+.selection-wrapper {
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.selection-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.selection-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.selection-header h1 svg {
+    width: 40px;
+    height: 40px;
+    fill: var(--selection-primary);
+}
+
+.subtitle {
+    color: #a0a0a0;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+.search-container {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    width: 20px;
+    height: 20px;
+}
+
+.search-box {
+    width: 100%;
+    background: var(--selection-card);
+    border: 1px solid var(--selection-border);
+    border-radius: 100px;
+    padding: 16px 25px 16px 55px;
+    color: #fff;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.search-box:focus {
+    border-color: var(--selection-primary);
+    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
+    outline: none;
+}
+
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.category-tab {
+    background: var(--selection-card);
+    border: 1px solid var(--selection-border);
+    color: #a0a0a0;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.category-tab svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.category-tab:hover {
+    border-color: var(--selection-primary);
+    color: #fff;
+}
+
+.category-tab.active {
+    background: var(--selection-primary);
+    color: #000;
+    border-color: var(--selection-primary);
+}
+
+.category-content {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.category-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.region-title {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 40px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.region-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: var(--selection-primary);
+    border-radius: 2px;
+}
+
+.city-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.city-card {
+    background: var(--selection-card);
+    border: 1px solid var(--selection-border);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100px;
+}
+
+.city-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--selection-primary);
+    background: rgba(255, 193, 7, 0.03);
+}
+
+.city-name {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.vakit-bilgisi {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.city-card:hover .vakit-bilgisi {
+    color: var(--selection-primary);
+}
+
+@media (max-width: 768px) {
+    .selection-wrapper {\ padding: 40px 15px; }
+    .category-tabs { display: grid; grid-template-columns: 1fr 1fr; }
+    .category-tab { justify-content: center; }
+    .city-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+    .selection-header h1 { font-size: 1.8rem; }
+    .region-title { font-size: 1.2rem; }
+}
+
+/* Skeleton Styles */
+.skeleton-card {
+    background: var(--selection-card);
+    border: 1px solid var(--selection-border);
+    border-radius: 20px;
+    padding: 20px;
+    height: 100px;
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #222 25%, #2a2a2a 50%, #222 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes loading {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+</style>
+{% endblock %}
+
+{% block footer_js %}
+<script src="{{ url_for('static', filename='js/city-data.js') }}" defer></script>
+<script>
+    $(document).ready(function() {
+        renderCityGrid('#buyuk-sehirler-grid', buyukSehirler, 'TR', false);
+
+        setTimeout(() => {
+            Object.entries(turkiyeSehirleri).forEach(([bolge, sehirler]) => {
+                renderCityGrid(`#${bolge}`, sehirler, 'TR', true);
+            });
+        }, 500);
+
+        $('.category-tab').click(function() {
+            const category = $(this).data('category');
+            window.location.hash = category;
+            
+            $('.category-tab').removeClass('active');
+            $(this).addClass('active');
+            $('.category-content').removeClass('active');
+            $(`#${category}`).addClass('active');
+        });
+
+        if (window.location.hash) {
+            const hash = window.location.hash.substring(1);
+            const targetTab = $(`.category-tab[data-category="${hash}"]`);
+            if (targetTab.length) targetTab.click();
+        }
+
+        const requestQueue = [];
+        let isProcessing = false;
+
+        function processQueue() {
+            if (isProcessing || requestQueue.length === 0) return;
+            isProcessing = true;
+            const { url, callback } = requestQueue.shift();
+            
+            $.get(url)
+                .done(callback)
+                .always(() => {
+                    isProcessing = false;
+                    setTimeout(processQueue, 50);
+                });
+        }
+
+        function renderCityGrid(containerId, sehirler, countryCode, isLazy) {
+            const grid = $(containerId);
+            grid.empty();
+
+            sehirler.forEach((item, index) => {
+                const sehir = typeof item === 'object' ? item.sehir : item;
+                const itemCountryCode = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
+                
+                const CACHE_KEY = `vakitler_${sehir}_${itemCountryCode}`;
+                const TODAY = new Date().toISOString().split('T')[0];
+                const cached = localStorage.getItem(CACHE_KEY);
+                let cachedData = null;
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed.tarih === TODAY) {
+                        cachedData = parsed.data;
+                    }
+                }
+
+                const card = $('<div>')
+                    .addClass('city-card')
+                    .click(function() {
+                        if ($(this).hasClass('skeleton-card')) return;
+                        window.location.href = `/imsakiye/${sehir}?country=${itemCountryCode}`;
+                    });
+
+                const cityName = $('<div>').addClass('city-name');
+                const vakitBilgisi = $('<div>').addClass('vakit-bilgisi');
+                
+                const IS_RAMADAN = {{ 'true' if ramadan_info.is_ramadan else 'false' }};
+                const aksamLabel = IS_RAMADAN ? 'İftar' : 'Akşam';
+
+                if (cachedData) {
+                    card.addClass('content-loaded');
+                    cityName.text(sehir);
+                    if (cachedData.imsak !== "--:--") {
+                        vakitBilgisi.html(`İmsak: ${cachedData.imsak}<br>${aksamLabel}: ${cachedData.aksam}`);
+                    } else {
+                        vakitBilgisi.text('Vakit bulunamadı');
+                    }
+                } else {
+                    card.addClass('skeleton-card');
+                    cityName.append($('<div>').addClass('skeleton skeleton-text').css({width: '70%', margin: '0 auto'}));
+                    vakitBilgisi.append($('<div>').addClass('skeleton skeleton-text').css({width: '40%', margin: '0 auto 5px'}));
+                    vakitBilgisi.append($('<div>').addClass('skeleton skeleton-text').css({width: '40%', margin: '0 auto'}));
+                }
+
+                card.append(cityName).append(vakitBilgisi);
+                grid.append(card);
+                
+                function updateUI(vakitler) {
+                    card.removeClass('skeleton-card').addClass('content-loaded');
+                    cityName.empty().text(sehir);
+                    if (vakitler && vakitler.imsak !== "--:--") {
+                        vakitBilgisi.html(`İmsak: ${vakitler.imsak}<br>${aksamLabel}: ${vakitler.aksam}`);
+                    } else {
+                        vakitBilgisi.text('Vakit bulunamadı');
+                    }
+                }
+
+                if (cachedData) return;
+                
+                const url = `/api/namaz_vakitleri?sehir=${sehir}&country=${itemCountryCode}`;
+                const callback = function(data) {
+                    if (data.vakitler) {
+                        localStorage.setItem(CACHE_KEY, JSON.stringify({
+                            tarih: TODAY,
+                            data: data.vakitler
+                        }));
+                        updateUI(data.vakitler);
+                    } else if (!card.hasClass('content-loaded')) {
+                        card.removeClass('skeleton-card').addClass('content-loaded');
+                        cityName.empty().text(sehir);
+                        vakitBilgisi.text('Hata oluştu');
+                    }
+                };
+
+                if (!isLazy) {
+                    $.get(url).done(callback);
+                } else {
+                    requestQueue.push({ url, callback });
+                    processQueue();
+                }
+            });
+        }
+
+        $('.search-box').on('input', function() {
+            const searchText = $(this).val().toLowerCase();
+            $('.city-card').each(function() {
+                const text = $(this).text().toLowerCase();
+                $(this).toggle(text.includes(searchText));
+            });
+
+            $('.category-content').each(function() {
+                const content = $(this);
+                if (searchText.length > 0) {
+                    content.find('.region-title').each(function() {
+                        const title = $(this);
+                        const nextGrid = title.next('.city-grid');
+                        title.toggle(nextGrid.find('.city-card:visible').length > 0);
+                    });
+                } else {
+                    $('.region-title').show();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

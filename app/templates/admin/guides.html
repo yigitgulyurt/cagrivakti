@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Rehber Yönetimi | Admin{% endblock %}
+
+{% block brand_text %}REHBER YÖNETİMİ{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    .btn-primary {
+        background: var(--primary);
+        color: var(--dark);
+        padding: 10px 20px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+    }
+    .data-table {
+        width: 100%;
+        background: var(--card-bg);
+        border-radius: 24px;
+        overflow: hidden;
+        border-collapse: collapse;
+        border: 1px solid rgba(255, 193, 7, 0.1);
+    }
+    .data-table th, .data-table td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .data-table th {
+        background: rgba(255, 193, 7, 0.05);
+        color: var(--primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+    .data-table tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-success { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+    .badge-danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-sm:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container fade-in">
+    <div class="header-actions">
+        <h1>Rehber Yazıları</h1>
+        <a href="{{ url_for('views.admin_guide_edit') }}" class="btn-primary">
+            <i class="fas fa-plus"></i> Yeni Rehber Ekle
+        </a>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Başlık</th>
+                <th>Kategori</th>
+                <th>Slug</th>
+                <th>Durum</th>
+                <th>Son Güncelleme</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for guide in guides %}
+            <tr>
+                <td>{{ guide.title }}</td>
+                <td>{{ guide.category }}</td>
+                <td><code>{{ guide.slug }}</code></td>
+                <td>
+                    {% if guide.is_active %}
+                    <span class="badge badge-success">Aktif</span>
+                    {% else %}
+                    <span class="badge badge-danger">Pasif</span>
+                    {% endif %}
+                </td>
+                <td>{{ guide.updated_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                <td class="actions">
+                    <a href="{{ url_for('views.admin_guide_edit', guide_id=guide.id) }}" class="btn-sm">
+                        <i class="fas fa-edit"></i> Düzenle
+                    </a>
+                    <a href="{{ url_for('views.bilgi_kosesi_detay', slug=guide.slug) }}" target="_blank" class="btn-sm">
+                        <i class="fas fa-eye"></i> Görüntüle
+                    </a>
+                    <form action="{{ url_for('views.admin_guide_delete', guide_id=guide.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Bu rehberi silmek istediğinize emin misiniz?');">
+                        <button type="submit" class="btn-sm" style="color: #dc3545; background: none; border: 1px solid rgba(220, 53, 69, 0.2); cursor: pointer;">
+                            <i class="fas fa-trash"></i> Sil
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center;">Henüz rehber yazısı eklenmemiş.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
