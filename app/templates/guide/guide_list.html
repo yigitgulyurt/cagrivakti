@@ -194,7 +194,7 @@
                 {{ get_display_name(guide.category) }}
             </div>
             <h2>{{ get_display_name(guide.title) }}</h2>
-            <p>{{ get_display_name(guide.description) }}</p>
+            <p>{{ get_display_name(guide.description if guide.description else "") }}</p>
             <div class="guide-footer">
                 <span class="read-more">Okumaya Başla <svg class="icon" style="width:16px;height:16px;"><use xlink:href="#fa-chevron-right-solid"></use></svg></span>
                 <span class="update-date">{{ guide.last_updated }}</span>

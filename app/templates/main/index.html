@@ -201,7 +201,7 @@
                         {{ get_display_name(guide.category) }}
                     </div>
                     <h3>{{ get_display_name(guide.title) }}</h3>
-                    <p>{{ get_display_name(guide.description[:100]) }}...</p>
+                    <p>{{ get_display_name(guide.description[:100] if guide.description else "") }}...</p>
                 </div>
                 <div class="guide-card-footer">
                     <span class="read-btn">İncele <svg class="icon"><use xlink:href="#fa-chevron-right-solid"></use></svg></span>
