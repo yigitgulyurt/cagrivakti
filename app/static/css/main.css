@@ -109,6 +109,43 @@ body {
     to { opacity: 1; transform: scale(1); }
 }
 
+/* Breadcrumb Stilleri */
+.breadcrumb-nav {
+    margin-bottom: 20px;
+    padding: 10px 0;
+}
+
+.breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--gray);
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    padding: 0 10px;
+    color: var(--gray);
+    opacity: 0.5;
+}
+
+.breadcrumb-item a {
+    color: var(--gray);
+    transition: var(--transition);
+}
+
+.breadcrumb-item a:hover {
+    color: var(--primary);
+}
+
+.breadcrumb-item.active {
+    color: var(--text);
+    font-weight: 600;
+}
+
 /* Hoş Geldin Modalı Stilleri */
 .welcome-modal-overlay {
     position: fixed;

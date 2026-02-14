@@ -32,6 +32,11 @@
         },{
           "@type": "ListItem",
           "position": 2,
+          "name": "Şehirler",
+          "item": "https://cagrivakti.com.tr/sehir"
+        },{
+          "@type": "ListItem",
+          "position": 3,
           "name": "{{ get_display_name(sehir) }} Namaz Vakitleri",
           "item": "https://cagrivakti.com.tr{{ request.path }}"
         }]
@@ -76,6 +81,15 @@
 
 {% block content %}
 <div class="container fade-in">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+        <ol class="breadcrumb-list">
+            <li class="breadcrumb-item"><a href="{{ url_for('views.index') }}">Ana Sayfa</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('views.sehir_secimi') }}">Şehirler</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ get_display_name(sehir) }}</li>
+        </ol>
+    </nav>
+
     <header class="header">
         <h1>{{ get_display_name(sehir) }}</h1>
         <div class="header-buttons">
