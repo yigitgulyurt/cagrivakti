@@ -13,7 +13,6 @@ def is_latin_only(text):
     return bool(re.match(r'^[A-Za-z0-9\-\_\s\.]+$', text))
 
 @api_bp.route('/sehirler')
-@limiter.limit("100 per hour")
 @cache.cached(timeout=86400, query_string=True)
 def sehirleri_getir():
     country_code = request.args.get('country', 'TR')
@@ -22,7 +21,6 @@ def sehirleri_getir():
     return jsonify(UserService.get_sehirler(country_code))
 
 @api_bp.route('/sehir_kaydet', methods=['POST'])
-@limiter.limit("20 per hour")
 def sehir_kaydet():
     data = request.get_json()
     sehir = data.get('sehir')
@@ -38,7 +36,6 @@ def sehir_kaydet():
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
 
 @api_bp.route('/namaz_vakitleri')
-@limiter.limit("60 per hour")
 @cache.cached(timeout=3600, query_string=True)
 def namaz_vakitlerini_al_api():
     sehir = request.args.get('sehir')
@@ -70,7 +67,6 @@ def namaz_vakitlerini_al_api():
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/sonraki_vakit')
-@limiter.limit("120 per hour")
 def sonraki_vakti_getir():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
@@ -82,7 +78,6 @@ def sonraki_vakti_getir():
     return jsonify(result)
 
 @api_bp.route('/update_city', methods=['POST'])
-@limiter.limit("10 per hour")
 def update_city():
     try:
         data = request.get_json()
@@ -97,14 +92,12 @@ def update_city():
         return jsonify({"success": False, "error": str(e)})
 
 @api_bp.route('/daily_content')
-@limiter.limit("100 per hour")
 @cache.cached(timeout=86400)
 def daily_content():
     return jsonify(get_daily_content())
 
 # Public API v1
 @api_bp.route('/vakitler')
-@limiter.limit("100 per hour", exempt_when=lambda: request.headers.get('X-API-Key') in current_app.config.get('VIP_API_KEYS', []))
 def public_api_vakitler():
     sehir = request.args.get('sehir')
     country_code = request.args.get('ulke', 'TR').upper()
