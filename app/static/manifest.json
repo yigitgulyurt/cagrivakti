@@ -1,6 +1,7 @@
 {
   "name": "Çağrı Vakti",
   "short_name": "Çağrı",
+  "version": "2.8",
   "description": "Dünya genelinde namaz vakitleri, dini bilgi köşesi ve güncel içerikler. Çağrı Vakti ile modern, hızlı ve doğru bilgilere ulaşın.",
   "start_url": "/",
   "display": "standalone",
@@ -54,6 +55,12 @@
     }
   ],
   "shortcuts": [
+    {
+      "name": "Konum Bul",
+      "short_name": "Konum Bul",
+      "url": "/konum-bul",
+      "icons": [{ "src": "/static/icons/icon-96-96.webp", "sizes": "96x96", "type": "image/webp" }]
+    },
     {
       "name": "Şehir Seçimi",
       "short_name": "Şehir Seç",

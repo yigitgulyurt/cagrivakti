@@ -55,29 +55,9 @@ def create_app(config_class=Config):
 
     # Context Processors
     from app.services.ramadan_service import RamadanService
+    from app.services import CITY_DISPLAY_NAME_MAPPING
     from datetime import datetime
     
-    # Şehir isimlerini Türkçe karakterli göstermek için eşleme
-    CITY_DISPLAY_NAME_MAPPING = {
-        # Türkiye
-        "Adiyaman": "Adıyaman", "Agri": "Ağrı", "Aydin": "Aydın", "Balikesir": "Balıkesir", "Bingol": "Bingöl",
-        "Bitlis": "Bitlis", "Cankiri": "Çankırı", "Corum": "Çorum", "Diyarbakir": "Diyarbakır", "Duzce": "Düzce",
-        "Elazig": "Elazığ", "Gumushane": "Gümüşhane", "Igdir": "Iğdır", "Istanbul": "İstanbul", "Izmir": "İzmir",
-        "Kahramanmaras": "Kahramanmaraş", "Karabuk": "Karabük", "Kirikkale": "Kırıkkale", "Kirklareli": "Kırklareli",
-        "Kirsehir": "Kırşehir", "Kutahya": "Kütahya", "Mus": "Muş", "Nigde": "Niğde", "Sanliurfa": "Şanlıurfa",
-        "Sirnak": "Şırnak", "Tekirdag": "Tekirdağ", "Usak": "Uşak",
-        # Uluslararası
-        "New-York": "New York", "Los-Angeles": "Los Angeles", "Mexico-City": "Mexico City", "San-Salvador": "San Salvador",
-        "Guatemala-City": "Guatemala City", "Tegucigalpa": "Tegucigalpa", "Panama-City": "Panama City", 
-        "Santo-Domingo": "Santo Domingo", "Port-au-Prince": "Port-au-Prince", "Saint-Johns": "Saint John's",
-        "Saint-Georges": "Saint George's", "Port-of-Spain": "Port of Spain", "Rio-de-Janeiro": "Rio de Janeiro",
-        "Buenos-Aires": "Buenos Aires", "Andorra-la-Vella": "Andorra la Vella", "St.-Petersburg": "St. Petersburg",
-        "Nur-Sultan": "Nur-Sultan", "New-Delhi": "New Delhi", "Hong-Kong": "Hong Kong", "Kuala-Lumpur": "Kuala Lumpur",
-        "Phnom-Penh": "Phnom Penh", "Bandar-Seri-Begawan": "Bandar Seri Begawan", "Port-Moresby": "Port Moresby",
-        "N-Djamena": "N'Djamena", "Addis-Ababa": "Addis Ababa", "Cape-Town": "Cape Town", "Sao-Tome": "São Tomé",
-        "Saint-Denis": "Saint-Denis", "Mecca": "Mekke", "Medina": "Medine", "Jerusalem": "Kudüs"
-    }
-
     @app.context_processor
     def inject_global_data():
         def get_display_name(city_name):
@@ -87,6 +67,7 @@ def create_app(config_class=Config):
         return dict(
             ramadan_info=RamadanService.get_ramadan_info(),
                 current_year=datetime.now().year,
+                app_version=app.config.get('APP_VERSION', '1.0'),
                 get_display_name=get_display_name,
                 CITY_DISPLAY_NAME_MAPPING=CITY_DISPLAY_NAME_MAPPING
             )
@@ -125,7 +106,12 @@ def setup_logging(app):
                         f.write(f" Sayı: {data['count']:<5} | Son: {data['last_seen']} | Mesaj: {msg}\n")
                 
                 f.write("\n [ Ziyaretçi Özeti ]\n")
-                sorted_visits = sorted(app_stats['visits'].items(), key=lambda x: sum(p['count'] for p in x[1].values() if isinstance(p, dict)), reverse=True)
+                # En son ziyaret edene göre sırala (last_seen değerine göre)
+                sorted_visits = sorted(
+                    app_stats['visits'].items(), 
+                    key=lambda x: max(p['last_seen'] for p in x[1].values() if isinstance(p, dict)), 
+                    reverse=True
+                )
                 for ip, paths in sorted_visits:
                     total_ip_visits = sum(p['count'] for p in paths.values() if isinstance(p, dict))
                     last_ip_seen = max(p['last_seen'] for p in paths.values() if isinstance(p, dict))

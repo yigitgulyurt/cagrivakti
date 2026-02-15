@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, make_response, send_from_directory, current_app, abort, flash, jsonify
 from functools import wraps
-from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city
+from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city, CITY_DISPLAY_NAME_MAPPING
 from app.models import NamazVakti, ContactMessage, DailyContent, Guide
 from app.extensions import cache, db, limiter
 from datetime import datetime
@@ -66,14 +66,18 @@ def sehir_sayfasi(sehir):
     title = f"{sehir} Namaz Vakitleri {datetime.now().strftime('%d.%m.%Y')} - Ezan Saatleri"
     description = f"{sehir} ezan vakitleri: İmsak {vakitler['imsak']}, Öğle {vakitler['ogle']}, Akşam {vakitler['aksam']}. {sehir} günlük namaz vakitleri ve aylık imsakiye."
     
-    return render_template('city/city_page.html', 
+    response = make_response(render_template('city/city_page.html', 
                          sehir=sehir, 
                          country_code=country_code,
                          vakitler=vakitler,
                          daily_content=get_daily_content(),
                          ramadan_info=RamadanService.get_ramadan_info(),
                          seo_title=title,
-                         seo_description=description)
+                         seo_description=description))
+    
+    # PWA shortcut ismi için cookie set et (1 yıl geçerli)
+    response.set_cookie('user_city', sehir, max_age=31536000, path='/')
+    return response
 
 @views_bp.route('/sehir')
 @cache.cached(timeout=3600)
@@ -175,9 +179,50 @@ def serve_sw():
 
 @views_bp.route('/manifest.json')
 def serve_manifest():
-    response = make_response(send_from_directory(os.path.join(current_app.root_path, 'static'), 'manifest.json'))
-    response.headers['Cache-Control'] = 'public, max-age=86400'
-    return response
+    manifest_path = os.path.join(current_app.root_path, 'static', 'manifest.json')
+    try:
+        with open(manifest_path, 'r', encoding='utf-8') as f:
+            manifest_data = json.load(f)
+        
+        # Kullanıcının şehrini cookie'den al
+        user_city = request.cookies.get('user_city')
+        
+        # "Konum Bul" shortcut'ını bul ve güncelle
+        if "shortcuts" in manifest_data:
+            for shortcut in manifest_data["shortcuts"]:
+                if shortcut.get("url") == "/konum-bul":
+                    if user_city:
+                        display_name = CITY_DISPLAY_NAME_MAPPING.get(user_city, user_city)
+                        shortcut["name"] = f"Vakitler: {display_name}"
+                        shortcut["short_name"] = display_name
+                    break
+            else:
+                # Eğer listede yoksa (fallback) ekle
+                shortcut_name = "Konum Bul"
+                short_name = "Konum Bul"
+                if user_city:
+                    display_name = CITY_DISPLAY_NAME_MAPPING.get(user_city, user_city)
+                    shortcut_name = f"Vakitler: {display_name}"
+                    short_name = display_name
+                
+                konum_shortcut = {
+                    "name": shortcut_name,
+                    "short_name": short_name,
+                    "url": "/konum-bul",
+                    "icons": [{ "src": "/static/icons/icon-96-96.webp", "sizes": "96x96", "type": "image/webp" }]
+                }
+                manifest_data["shortcuts"].insert(0, konum_shortcut)
+        
+        response = jsonify(manifest_data)
+        # Önbelleği agresif bir şekilde devre dışı bırak
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        response.headers['Surrogate-Control'] = 'no-store'
+        return response
+    except Exception as e:
+        current_app.logger.error(f"Manifest generation error: {e}")
+        return send_from_directory(os.path.join(current_app.root_path, 'static'), 'manifest.json')
 
 @views_bp.route('/ilkelerimiz')
 @cache.cached(timeout=86400)

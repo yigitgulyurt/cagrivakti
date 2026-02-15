@@ -169,6 +169,9 @@ function getLatinName(turkishName) {
                         // LocalStorage'a Latin halini kaydet
                         localStorage.setItem('user_city', latinCityName);
                         
+                        // Cookie'ye de kaydet (PWA shortcut için)
+                        document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
+                        
                         statusIcon.innerHTML = '<svg class="icon"><use xlink:href="#fa-check-circle"></use></svg>';
                         statusTitle.textContent = "Şehir Bulundu!";
                         statusText.textContent = `${originalCityName} olarak kaydedildi ve yönlendiriliyorsunuz...`;

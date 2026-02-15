@@ -1,5 +1,5 @@
 // Service Worker - Namaz Vakitleri
-const CACHE_NAME = 'namaz-vakitleri-v2.7'; // Versiyon güncellendi
+const CACHE_NAME = 'namaz-vakitleri-v2.8'; // Versiyon güncellendi (PWA Shortcut ve Şehir Eşleme)
 
 // API istekleri için Cache-First, sonra Network (Offline için)
 const API_CACHE_NAME = 'api-cache-v1';
