@@ -5,6 +5,7 @@ from app.models import NamazVakti, ContactMessage, DailyContent, Guide
 from app.extensions import cache, db, limiter
 from datetime import datetime
 import os
+import json
 import bleach
 import requests
 from threading import Thread
