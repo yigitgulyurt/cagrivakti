@@ -752,27 +752,6 @@
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Menü ve Ayarlar"
-    },
-    {
-      "src": "/static/screenshot-pc/ana-sayfa.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Masaüstü Ana Sayfa"
-    },
-    {
-      "src": "/static/screenshot-pc/imsakiye.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Masaüstü İmsakiye"
-    },
-    {
-      "src": "/static/screenshot-pc/il-secimi_turkiye.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Masaüstü İl Seçimi"
     }
   ]
 }
