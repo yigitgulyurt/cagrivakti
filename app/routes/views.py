@@ -383,27 +383,6 @@ def iletisim():
 
     return render_template('main/contact.html')
 
-@views_bp.route('/api/widget-data')
-def widget_data():
-    """PWA Widget için veri sağlar."""
-    # Şehir bilgisini al (Query -> Cookie -> Varsayılan)
-    sehir = request.args.get('city') or request.cookies.get('user_city') or 'istanbul'
-    country_code = request.args.get('country') or 'TR'
-    
-    # Vakitleri getir
-    vakitler = PrayerService.get_vakitler(sehir, country_code)
-    
-    # Adaptive Card formatına uygun JSON döndür
-    return jsonify({
-        "city": sehir.capitalize(),
-        "imsak": vakitler['imsak'],
-        "gunes": vakitler['gunes'],
-        "ogle": vakitler['ogle'],
-        "ikindi": vakitler['ikindi'],
-        "aksam": vakitler['aksam'],
-        "yatsi": vakitler['yatsi']
-    })
-
 def admin_required(f):
     """Admin yetkisi kontrolü için decorator."""
     @wraps(f)

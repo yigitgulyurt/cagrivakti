@@ -762,25 +762,5 @@
     "window-controls-overlay",
     "standalone",
     "minimal-ui"
-  ],
-  "widgets": [
-    {
-      "name": "Namaz Vakitleri",
-      "short_name": "Vakitler",
-      "description": "Günlük namaz vakitlerini hızlıca görüntüleyin.",
-      "tag": "namaz-vakitleri",
-      "template": "widget",
-      "ms_ac_template": "/static/widgets/widget_template.json",
-      "data": "/api/widget-data",
-      "type": "application/json",
-      "icons": [
-        {
-          "src": "/static/icons/android/android-launchericon-192-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ],
-      "screenshots": []
-    }
   ]
 }
