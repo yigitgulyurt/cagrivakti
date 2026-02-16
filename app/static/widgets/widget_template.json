@@ -1,0 +1,43 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${city} Namaz Vakitleri",
+      "size": "Medium",
+      "weight": "Bolder",
+      "horizontalAlignment": "Center"
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "İmsak",
+          "value": "${imsak}"
+        },
+        {
+          "title": "Güneş",
+          "value": "${gunes}"
+        },
+        {
+          "title": "Öğle",
+          "value": "${ogle}"
+        },
+        {
+          "title": "İkindi",
+          "value": "${ikindi}"
+        },
+        {
+          "title": "Akşam",
+          "value": "${aksam}"
+        },
+        {
+          "title": "Yatsı",
+          "value": "${yatsi}"
+        }
+      ]
+    }
+  ]
+}
