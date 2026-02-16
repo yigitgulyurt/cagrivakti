@@ -189,25 +189,6 @@
         </div>
     </div>
 
-    <!-- Hoş Geldin Modalı -->
-    <div id="welcomeModal" class="welcome-modal-overlay">
-        <div class="welcome-modal">
-            <div class="welcome-icon">
-                <svg class="icon" style="width: 80px; height: 80px;" aria-hidden="true"><use xlink:href="#fa-mosque"></use></svg>
-            </div>
-            <h2>Hoş Geldiniz!</h2>
-            <p>Çağrı vakitlerini en yalın, en hızlı ve reklamsız şekilde izleyebileceğiniz çağdaş platformumuza hoş geldiniz.</p>
-            <div class="welcome-buttons">
-                <a href="{{ url_for('views.neden_biz') }}" class="btn btn-primary" onclick="closeWelcomeModal()" title="Neden Bizi Seçmelisiniz?">
-                    <span>Neden Biz?</span>
-                </a>
-                <a href="{{ url_for('views.index') }}" class="btn btn-secondary" onclick="closeWelcomeModal()" title="Uygulamayı Kullanmaya Başla">
-                    <span>Kullanmaya Başla</span>
-                </a>
-            </div>
-        </div>
-    </div>
-
     {% block extra_js %}{% endblock %}
     
     <!-- Scripts -->
@@ -225,30 +206,6 @@
 
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
-
-        // Hoş Geldin Modalı Kontrolü
-        function checkWelcomeModal() {
-            const hasVisited = localStorage.getItem('hasVisitedCagriVakti');
-            if (!hasVisited) {
-                const modal = document.getElementById('welcomeModal');
-                if (modal) {
-                    modal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }
-            }
-        }
-
-        function closeWelcomeModal() {
-            const modal = document.getElementById('welcomeModal');
-            if (modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-                localStorage.setItem('hasVisitedCagriVakti', 'true');
-            }
-        }
-
-        // Sayfa yüklendiğinde modalı kontrol et
-        window.addEventListener('DOMContentLoaded', checkWelcomeModal);
 
         // Manifest URL'ini kullanıcı şehrine göre güncelle (Cache busting ve Parametre)
         window.addEventListener('DOMContentLoaded', () => {
@@ -282,13 +239,15 @@
             // Eğer reload sonrası ise hemen göster
             if (sessionStorage.getItem('reloadingForPWA')) {
                 pwaBanner.classList.add('active');
+                pwaBanner.classList.add('ready'); // Büyük ve ortalı görünüm
+                
                 const pwaText = document.querySelector('.pwa-text p');
                 const installBtn = document.getElementById('pwaInstallBtn');
                 
-                if (pwaText) pwaText.textContent = 'Konum doğrulandı. Yüklemek için tıklayın!';
+                if (pwaText) pwaText.textContent = 'Konumunuz doğrulandı. Uygulamayı hemen yükleyebilirsiniz.';
                 if (installBtn) {
                     installBtn.textContent = 'Yükle (Hazır)';
-                    installBtn.classList.add('pulse-animation'); // Dikkat çekmek için
+                    installBtn.classList.add('pulse-animation');
                 }
                 
                 sessionStorage.removeItem('reloadingForPWA');

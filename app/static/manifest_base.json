@@ -717,7 +717,7 @@
     "education",
     "productivity"
   ],
-  "screenshots": [
+  "screenshots" : [
     {
       "src": "/static/screenshots/1.jpg",
       "sizes": "1080x1920",
