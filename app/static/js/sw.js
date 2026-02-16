@@ -92,6 +92,26 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(event.request.url);
 
+    // Widget ve API istekleri için özel handler
+    if (url.pathname === '/api/widget-data' || url.pathname.includes('widget.json')) {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => response)
+                .catch(() => {
+                    if (url.pathname === '/api/widget-data') {
+                        return new Response(JSON.stringify({
+                            city: "Bağlantı Yok",
+                            next_prayer: "-",
+                            remaining_time: "-",
+                            next_prayer_time: "-"
+                        }), { headers: { 'Content-Type': 'application/json' }});
+                    }
+                    return new Response("{}", { headers: { 'Content-Type': 'application/json' }});
+                })
+        );
+        return;
+    }
+
     // API istekleri (Vakitler vb.) - Network-First, ama Cache'e kaydet ve hata durumunda Cache'den getir
     if (url.pathname.startsWith('/api/namaz_vakitleri') || url.pathname.startsWith('/api/vakitler/')) {
         event.respondWith(

@@ -143,7 +143,6 @@ def widget_data():
         
         # Windows Widget formatına uygun JSON yapısı (Düz JSON)
         return jsonify({
-            "template": "cagri-vakti-template",
             "city": sehir.replace('-', ' ').title(),
             "next_prayer": next_vakit_data.get('sonraki_vakit_ismi', '').title(),
             "remaining_time": remaining,
@@ -152,7 +151,6 @@ def widget_data():
     except Exception as e:
         current_app.logger.error(f"Widget Data Error: {str(e)}")
         return jsonify({
-            "template": "cagri-vakti-template",
             "city": "Hata",
             "next_prayer": "",
             "remaining_time": "",
