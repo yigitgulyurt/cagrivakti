@@ -246,12 +246,17 @@ def widget_data():
             
         bugun = datetime.now().strftime("%d.%m.%Y")
         
-        return jsonify({
+        response = jsonify({
             "city": sehir.replace('-', ' ').title(),
             "nextPrayerName": next_vakit_name,
             "nextPrayerTime": next_vakit_time,
             "date": bugun,
             "backgroundImageUrl": "https://cagrivakti.com.tr/static/icons/android/android-launchericon-512-512.png" 
         })
+        
+        # Add CORS headers specifically for widget
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET'
+        return response
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -777,6 +777,7 @@
         {
           "src": "/static/screenshots/1.jpg",
           "sizes": "1080x1920",
+          "type": "image/jpeg",
           "label": "Widget Önizlemesi"
         }
       ],

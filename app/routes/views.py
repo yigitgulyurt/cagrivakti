@@ -223,6 +223,14 @@ def serve_manifest():
                 }
                 manifest_data["shortcuts"].insert(0, new_shortcut)
         
+        # Update widgets with user city
+        if "widgets" in manifest_data and user_city and is_latin_only(user_city):
+            for widget in manifest_data["widgets"]:
+                if "data" in widget:
+                    # Check if query params already exist
+                    separator = "&" if "?" in widget["data"] else "?"
+                    widget["data"] = f"{widget['data']}{separator}city={user_city}"
+
         response = jsonify(manifest_data)
         # Önbelleği agresif bir şekilde devre dışı bırak
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
