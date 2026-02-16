@@ -24,8 +24,7 @@ const PRECACHE_ASSETS = [
     '/static/icons/favicon.ico',
     '/static/icons/android/android-launchericon-192-192.png',
     '/static/icons/android/android-launchericon-512-512.png',
-    '/static/icons/ios/180.png',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Amiri&display=swap'
+    '/static/icons/ios/180.png'
 ];
 
 self.addEventListener("message", (event) => {
@@ -39,8 +38,27 @@ self.addEventListener('install', async (event) => {
     caches.open(CACHE)
       .then((cache) => {
         console.log('[SW] Caching app shell and offline page');
-        return cache.addAll([...PRECACHE_ASSETS, offlineFallbackPage]);
+        return cache.addAll(PRECACHE_ASSETS);
       })
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      // Eski cacheleri temizle (v3.0 olmayanlar)
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE) {
+            console.log('[SW] Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+      // Hemen kontrolü ele al
+      await self.clients.claim();
+    })()
   );
 });
 
@@ -48,15 +66,35 @@ if (workbox.navigationPreload.isSupported()) {
   workbox.navigationPreload.enable();
 }
 
-// Tüm istekler için Stale-While-Revalidate stratejisi
+// 1. HTML Sayfaları (Navigation) -> NetworkFirst
+// Önce internetten almaya çalış, yoksa cache'e bak, o da yoksa offline sayfası
 workbox.routing.registerRoute(
-  new RegExp('/*'),
+  ({ request }) => request.mode === 'navigate',
+  new workbox.strategies.NetworkFirst({
+    cacheName: CACHE,
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 50,
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 gün
+      }),
+    ],
+  })
+);
+
+// 2. Statik Dosyalar (CSS, JS, Images, Fonts) -> StaleWhileRevalidate
+// Hızlı açılış için cache, arka planda güncelle
+workbox.routing.registerRoute(
+  ({ request }) =>
+    request.destination === 'style' ||
+    request.destination === 'script' ||
+    request.destination === 'image' ||
+    request.destination === 'font',
   new workbox.strategies.StaleWhileRevalidate({
     cacheName: CACHE,
     plugins: [
       new workbox.expiration.ExpirationPlugin({
         maxEntries: 200,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 gün
+        maxAgeSeconds: 60 * 24 * 60 * 60, // 60 gün
       }),
     ],
   })
