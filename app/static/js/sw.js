@@ -54,6 +54,37 @@ self.addEventListener('activate', (event) => {
     );
 });
 
+// Widget Events
+self.addEventListener('widgetinstall', (event) => {
+    console.log('Widget installed:', event.widget);
+    event.waitUntil(
+        // Widget kurulumunda gerekli verileri önceden alabiliriz
+        caches.open(API_CACHE_NAME).then((cache) => {
+            return fetch('/api/widget-data').then((response) => {
+                return cache.put('/api/widget-data', response);
+            });
+        })
+    );
+});
+
+self.addEventListener('widgetuninstall', (event) => {
+    console.log('Widget uninstalled:', event.widget);
+});
+
+self.addEventListener('widgetresume', (event) => {
+    console.log('Widget resumed:', event.widget);
+    // Widget her görüntülendiğinde veriyi tazelemeyi dene
+    event.waitUntil(
+        fetch('/api/widget-data')
+            .then((response) => {
+                 caches.open(API_CACHE_NAME).then((cache) => {
+                    cache.put('/api/widget-data', response.clone());
+                });
+            })
+            .catch(() => console.log('Widget data update failed'))
+    );
+});
+
 // İstekleri Yakalama (Fetch)
 self.addEventListener('fetch', (event) => {
     // Sadece GET isteklerini işle
