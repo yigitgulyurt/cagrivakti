@@ -102,9 +102,16 @@ def widget_data():
     PWA Widget'ı için özel veri endpoint'i.
     Cookie'den kullanıcı şehrini okur ve bir sonraki vakit bilgisini döndürür.
     """
+    # CORS headers ekleyerek widget'ın erişimini garanti altına al
+    response_headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    }
+
     sehir = request.cookies.get('user_city')
     if not sehir:
-        # Varsayılan şehir
+        # Cookie yoksa varsayılan
         sehir = 'istanbul'
     
     # Güvenlik kontrolü
@@ -117,14 +124,14 @@ def widget_data():
         
         if not next_vakit_data or 'error' in next_vakit_data:
             return jsonify({
-                "template_id": "cagri-vakti-template",
+                "template": "cagri-vakti-template",
                 "data": {
                     "city": sehir.upper(),
                     "next_prayer": "Hata",
                     "remaining_time": "--:--",
                     "next_prayer_time": "--:--"
                 }
-            })
+            }), 200, response_headers
 
         # Veriyi hazırla
         remaining = next_vakit_data.get('kalan_sure', '')
@@ -134,26 +141,27 @@ def widget_data():
             if len(parts) >= 2:
                 remaining = f"{parts[0]} sa {parts[1]} dk"
         
+        # Windows Widget formatına uygun JSON yapısı
         return jsonify({
-            "template_id": "cagri-vakti-template",
+            "template": "cagri-vakti-template",
             "data": {
                 "city": sehir.replace('-', ' ').title(),
                 "next_prayer": next_vakit_data.get('sonraki_vakit_ismi', '').title(),
                 "remaining_time": remaining,
                 "next_prayer_time": next_vakit_data.get('sonraki_vakit_saati', '')
             }
-        })
+        }), 200, response_headers
     except Exception as e:
         current_app.logger.error(f"Widget Data Error: {str(e)}")
         return jsonify({
-            "template_id": "cagri-vakti-template",
+            "template": "cagri-vakti-template",
             "data": {
                 "city": "Hata",
                 "next_prayer": "",
                 "remaining_time": "",
                 "next_prayer_time": ""
             }
-        })
+        }), 200, response_headers
 
 # Public API v1
 @api_bp.route('/vakitler')
