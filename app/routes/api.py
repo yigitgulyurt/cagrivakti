@@ -141,26 +141,22 @@ def widget_data():
             if len(parts) >= 2:
                 remaining = f"{parts[0]} sa {parts[1]} dk"
         
-        # Windows Widget formatına uygun JSON yapısı
+        # Windows Widget formatına uygun JSON yapısı (Düz JSON)
         return jsonify({
             "template": "cagri-vakti-template",
-            "data": {
-                "city": sehir.replace('-', ' ').title(),
-                "next_prayer": next_vakit_data.get('sonraki_vakit_ismi', '').title(),
-                "remaining_time": remaining,
-                "next_prayer_time": next_vakit_data.get('sonraki_vakit_saati', '')
-            }
+            "city": sehir.replace('-', ' ').title(),
+            "next_prayer": next_vakit_data.get('sonraki_vakit_ismi', '').title(),
+            "remaining_time": remaining,
+            "next_prayer_time": next_vakit_data.get('sonraki_vakit_saati', '')
         }), 200, response_headers
     except Exception as e:
         current_app.logger.error(f"Widget Data Error: {str(e)}")
         return jsonify({
             "template": "cagri-vakti-template",
-            "data": {
-                "city": "Hata",
-                "next_prayer": "",
-                "remaining_time": "",
-                "next_prayer_time": ""
-            }
+            "city": "Hata",
+            "next_prayer": "",
+            "remaining_time": "",
+            "next_prayer_time": ""
         }), 200, response_headers
 
 # Public API v1
