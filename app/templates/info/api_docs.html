@@ -415,7 +415,7 @@
                 
                 <div class="endpoint-box">
                     <span class="method-badge">GET</span>
-                    https://cagrivakti.com.tr/api/vakitler
+                    https://api.cagrivakti.com.tr/vakitler
                 </div>
 
                 <div style="background: rgba(33, 150, 243, 0.1); border-left: 4px solid var(--api-secondary); padding: 20px; border-radius: 12px;">
@@ -506,7 +506,7 @@
 
                 <div id="code-js" class="tab-content">
                     <pre><code><span class="code-keyword">const</span> <span class="code-function">fetchVakitler</span> = <span class="code-keyword">async</span> () => {
-  <span class="code-keyword">const</span> url = <span class="json-string">'https://cagrivakti.com.tr/api/vakitler?sehir=Istanbul'</span>;
+  <span class="code-keyword">const</span> url = <span class="json-string">'https://api.cagrivakti.com.tr/vakitler?sehir=Istanbul'</span>;
   <span class="code-keyword">try</span> {
     <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(url);
     <span class="code-keyword">const</span> data = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();
@@ -520,7 +520,7 @@
                 <div id="code-python" class="tab-content">
                     <pre><code><span class="code-keyword">import</span> requests
 
-url = <span class="json-string">"https://cagrivakti.com.tr/api/vakitler"</span>
+url = <span class="json-string">"https://api.cagrivakti.com.tr/vakitler"</span>
 params = {
     <span class="json-string">"sehir"</span>: <span class="json-string">"Istanbul"</span>,
     <span class="json-string">"ulke"</span>: <span class="json-string">"TR"</span>
@@ -533,7 +533,7 @@ data = response.<span class="code-function">json</span>()
 
                 <div id="code-php" class="tab-content">
                     <pre><code><span class="code-keyword">&lt;?php</span>
-$url = <span class="json-string">"https://cagrivakti.com.tr/api/vakitler?sehir=Istanbul"</span>;
+$url = <span class="json-string">"https://api.cagrivakti.com.tr/vakitler?sehir=Istanbul"</span>;
 $response = <span class="code-function">file_get_contents</span>($url);
 $data = <span class="code-function">json_decode</span>($response, <span class="code-keyword">true</span>);
 <span class="code-function">print_r</span>($data);
@@ -552,7 +552,7 @@ $data = <span class="code-function">json_decode</span>($response, <span class="c
                     <h4 style="color: #fff; margin-bottom: 10px;">Şehir Listesi</h4>
                     <div class="endpoint-box" style="margin-bottom: 10px;">
                         <span class="method-badge">GET</span>
-                        /api/sehirler?country=TR
+                        https://api.cagrivakti.com.tr/sehirler?country=TR
                     </div>
                     <p style="font-size: 0.9rem; color: var(--api-text-muted);">Belirtilen ülkeye ait desteklenen şehir listesini döner.</p>
                 </div>
@@ -561,7 +561,7 @@ $data = <span class="code-function">json_decode</span>($response, <span class="c
                     <h4 style="color: #fff; margin-bottom: 10px;">Sonraki Vakit</h4>
                     <div class="endpoint-box" style="margin-bottom: 10px;">
                         <span class="method-badge">GET</span>
-                        /api/sonraki_vakit?sehir=Istanbul
+                        https://api.cagrivakti.com.tr/sonraki_vakit?sehir=Istanbul
                     </div>
                     <p style="font-size: 0.9rem; color: var(--api-text-muted);">Belirtilen şehir için yaklaşan ilk vakti ve kalan süreyi döner.</p>
                 </div>
@@ -734,7 +734,7 @@ $data = <span class="code-function">json_decode</span>($response, <span class="c
         const tarih = document.getElementById('pg-tarih').value;
         const yil = document.getElementById('pg-yil').value;
         const ay = document.getElementById('pg-ay').value;
-        const baseUrl = window.location.origin + '/api/vakitler';
+        const baseUrl = 'https://api.cagrivakti.com.tr/vakitler';
         
         let url = `${baseUrl}?sehir=${sehir}`;
         

@@ -185,7 +185,7 @@ def setup_api_logging(app):
     
     @app.before_request
     def log_api_request():
-        if request.path.startswith('/api'):
+        if request.blueprint == 'api' or (request.host and request.host.startswith('api.')):
             # IP adresini al
             if request.headers.get('X-Forwarded-For'):
                 ip = request.headers.get('X-Forwarded-For').split(',')[0]

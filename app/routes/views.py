@@ -163,7 +163,6 @@ def serve_robots():
     content = "User-agent: *\n"
     content += "Allow: /\n"
     content += "Disallow: /admin/\n"
-    content += "Disallow: /api/\n"
     content += "Disallow: /offline\n"
     content += "Disallow: /static/data/\n"
     content += f"Sitemap: {url_for('views.serve_sitemap', _external=True)}\n"

@@ -16,7 +16,7 @@ def setup_middleware(app):
             return
             
         # API ve Static dosyaları loglama
-        if '/api/' in path or '/static/' in path or path.endswith(('.ico', '.json', '.txt')):
+        if request.blueprint == 'api' or (request.host and request.host.startswith('api.')) or '/static/' in path or path.endswith(('.ico', '.json', '.txt')):
             return
             
         try:

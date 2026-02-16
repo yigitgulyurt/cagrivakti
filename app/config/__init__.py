@@ -2,11 +2,18 @@ import os
 from dotenv import load_dotenv
 
     # .env dosyasını yükle
-load_dotenv()
+    load_dotenv()
+    
+    SERVER_NAME = os.environ.get('SERVER_NAME')
     
 
 class Config:
     APP_VERSION = "2.8"
+    SERVER_NAME = os.environ.get('SERVER_NAME')
+    # Subdomainler arası session paylaşımı için
+    if SERVER_NAME:
+        SESSION_COOKIE_DOMAIN = '.' + SERVER_NAME
+    
     SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(24))
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False

@@ -62,7 +62,7 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
     // API istekleri (Vakitler vb.) - Network-First, ama Cache'e kaydet ve hata durumunda Cache'den getir
-    if (url.pathname.startsWith('/api/namaz_vakitleri') || url.pathname.startsWith('/api/vakitler/')) {
+    if (url.hostname === 'api.cagrivakti.com.tr' && (url.pathname.startsWith('/namaz_vakitleri') || url.pathname.startsWith('/vakitler/'))) {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {

@@ -4,7 +4,7 @@ from app.extensions import cache, limiter
 from datetime import datetime, date, timedelta
 import re
 
-api_bp = Blueprint('api', __name__, url_prefix='/api')
+api_bp = Blueprint('api', __name__, subdomain='api')
 
 def is_latin_only(text):
     """Metnin yalnızca Latin karakterler, sayılar ve izin verilen sembollerden oluştuğunu kontrol eder."""

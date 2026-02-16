@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (!data) {
-                const response = await fetch(`/api/namaz_vakitleri?sehir=${city}&country=${country}`);
+                const response = await fetch(`https://api.cagrivakti.com.tr/namaz_vakitleri?sehir=${city}&country=${country}`);
                 data = await response.json();
                 
                 if (data.vakitler) {

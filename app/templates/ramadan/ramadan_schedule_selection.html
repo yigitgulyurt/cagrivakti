@@ -418,7 +418,7 @@
                 if (cachedData) return;
 
                 // API isteğini sıraya ekle
-                const url = `/api/namaz_vakitleri?sehir=${sehir}&country=${itemCountryCode}`;
+                const url = `https://api.cagrivakti.com.tr/namaz_vakitleri?sehir=${sehir}&country=${itemCountryCode}`;
                 const callback = function(data) {
                     if (data.vakitler) {
                         localStorage.setItem(CACHE_KEY, JSON.stringify({
