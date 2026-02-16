@@ -54,63 +54,12 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Widget Events
-self.addEventListener('widgetinstall', (event) => {
-    console.log('Widget installed:', event.widget);
-    event.waitUntil(
-        // Widget kurulumunda gerekli verileri önceden alabiliriz
-        caches.open(API_CACHE_NAME).then((cache) => {
-            return fetch('/api/widget-data').then((response) => {
-                return cache.put('/api/widget-data', response);
-            });
-        })
-    );
-});
-
-self.addEventListener('widgetuninstall', (event) => {
-    console.log('Widget uninstalled:', event.widget);
-});
-
-self.addEventListener('widgetresume', (event) => {
-    console.log('Widget resumed:', event.widget);
-    // Widget her görüntülendiğinde veriyi tazelemeyi dene
-    event.waitUntil(
-        fetch('/api/widget-data')
-            .then((response) => {
-                 caches.open(API_CACHE_NAME).then((cache) => {
-                    cache.put('/api/widget-data', response.clone());
-                });
-            })
-            .catch(() => console.log('Widget data update failed'))
-    );
-});
-
 // İstekleri Yakalama (Fetch)
 self.addEventListener('fetch', (event) => {
     // Sadece GET isteklerini işle
     if (event.request.method !== 'GET') return;
 
     const url = new URL(event.request.url);
-
-    // Widget ve API istekleri için özel handler
-    if (url.pathname === '/api/widget-data' || url.pathname.includes('widget.json')) {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => response)
-                .catch(() => {
-                    if (url.pathname === '/api/widget-data') {
-                        return new Response(JSON.stringify({
-                            city: "Bağlantı Yok",
-                            next_prayer: "-",
-                            remaining_time: "-",
-                            next_prayer_time: "-"
-                        }), { headers: { 'Content-Type': 'application/json' }});
-                    }
-                    return new Response("{}", { headers: { 'Content-Type': 'application/json' }});
-                })
-        );
-        return;
-    }
 
     // API istekleri (Vakitler vb.) - Network-First, ama Cache'e kaydet ve hata durumunda Cache'den getir
     if (url.pathname.startsWith('/api/namaz_vakitleri') || url.pathname.startsWith('/api/vakitler/')) {
