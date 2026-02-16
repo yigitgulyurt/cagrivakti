@@ -1,11 +1,8 @@
 import os
 from dotenv import load_dotenv
 
-    # .env dosyasını yükle
-    load_dotenv()
-    
-    SERVER_NAME = os.environ.get('SERVER_NAME')
-    
+# .env dosyasını yükle
+load_dotenv()
 
 class Config:
     APP_VERSION = "2.8"
