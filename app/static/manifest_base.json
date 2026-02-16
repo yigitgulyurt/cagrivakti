@@ -770,8 +770,8 @@
       "description": "Günlük namaz vakitlerini ve kalan süreyi gösterir.",
       "tag": "cagri-vakti-widget",
       "template": "cagri-vakti-template",
-      "ms_ac_template": "https://cagrivakti.com.tr/static/widgets/widget.json",
-      "data": "https://cagrivakti.com.tr/api/widget-data",
+      "ms_ac_template": "/static/widgets/widget.json",
+      "data": "/api/widget-data",
       "type": "application/json",
       "screenshots": [
         {
