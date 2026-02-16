@@ -2,8 +2,8 @@ from flask import request, render_template, current_app
 import time
 
 # Son loglanan IP ve yolları tutmak için basit bir cache (IP, Path) -> Timestamp
-_log_cache = {}
-_CACHE_TIMEOUT = 300  # 5 dakika (saniye cinsinden)
+# _log_cache = {}
+# _CACHE_TIMEOUT = 300  # 5 dakika (saniye cinsinden)
 
 def setup_middleware(app):
     @app.before_request
@@ -26,24 +26,8 @@ def setup_middleware(app):
             else:
                 ip = request.remote_addr
             
-            # Eşsizlik kontrolü (Cache üzerinden)
-            cache_key = (ip, path)
-            current_time = time.time()
-            
-            if cache_key in _log_cache:
-                last_logged = _log_cache[cache_key]
-                if current_time - last_logged < _CACHE_TIMEOUT:
-                    return # Henüz 5 dakika geçmediği için loglama
-            
-            # Cache'i güncelle ve logla
-            _log_cache[cache_key] = current_time
+            # Her isteği kaydet (Deduplication kaldırıldı)
             app.logger.info(f'{ip} ziyaret: {path}')
-            
-            # Cache temizliği (Bellek şişmesini önlemek için arada bir temizle)
-            if len(_log_cache) > 1000:
-                expired_keys = [k for k, v in _log_cache.items() if current_time - v > _CACHE_TIMEOUT]
-                for k in expired_keys:
-                    del _log_cache[k]
                     
         except Exception as e:
             app.logger.error(f"Loglama hatası: {str(e)}")
@@ -61,7 +45,7 @@ def setup_middleware(app):
         # Not: inline scriptler ve dış kütüphaneler (fontlar, ikonlar) için gerekli izinler
         csp = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com; "
+            "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data: https:; "

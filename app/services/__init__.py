@@ -322,11 +322,11 @@ class PrayerService:
         cached_data = cache.get(cache_key)
         if cached_data:
             from flask import current_app
-            current_app.logger.info(f"Cache Hit: {cache_key}")
+            current_app.logger.debug(f"Cache Hit: {cache_key}")
             return cached_data
         
         from flask import current_app
-        current_app.logger.info(f"Cache Miss: {cache_key}")
+        current_app.logger.debug(f"Cache Miss: {cache_key}")
         
         # 2. DB Kontrolü
         try:

@@ -417,6 +417,7 @@
 
     // LocalStorage Önbellek Yönetimi
     const CACHE_KEY = `vakitler_${mevcutSehir}_${mevcutUlke}`;
+    const DAILY_CONTENT_CACHE_KEY = 'daily_content_cache';
     const TODAY = new Date().toISOString().split('T')[0];
 
     function getCachedVakitler() {
@@ -440,6 +441,28 @@
                 data: data
             }));
         } catch (e) { console.error('Cache yazma hatası:', e); }
+    }
+
+    function getCachedDailyContent() {
+        try {
+            const cached = localStorage.getItem(DAILY_CONTENT_CACHE_KEY);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed.tarih === TODAY) {
+                    return parsed.data;
+                }
+            }
+        } catch (e) { console.error('Daily content cache okuma hatası:', e); }
+        return null;
+    }
+
+    function setCachedDailyContent(data) {
+        try {
+            localStorage.setItem(DAILY_CONTENT_CACHE_KEY, JSON.stringify({
+                tarih: TODAY,
+                data: data
+            }));
+        } catch (e) { console.error('Daily content cache yazma hatası:', e); }
     }
 
     function renderVakitler(vakitlerData) {
@@ -480,7 +503,8 @@
                 // Timezone bilgisini namazVakitleri objesine ekle
                 namazVakitleri = {
                     ...data.vakitler,
-                    timezone: data.timezone || 'Europe/Istanbul'
+                    timezone: data.timezone || 'Europe/Istanbul',
+                    is_ramadan: (typeof namazVakitleri.is_ramadan !== 'undefined') ? namazVakitleri.is_ramadan : false
                 };
                 
                 setCachedVakitler(namazVakitleri);
@@ -542,32 +566,44 @@
         });
     }
 
+    function renderDailyContent(data) {
+        const dailyCard = document.getElementById('daily-content');
+        if (dailyCard && data && data.text) {
+            let contentHtml = '';
+            if (namazVakitleri.is_ramadan) {
+                contentHtml = `
+                    <div class="daily-icon">
+                        <svg class="icon"><use xlink:href="#fa-moon"></use></svg>
+                    </div>
+                    <div class="daily-text">
+                        <span class="daily-label">Günün Ramazan İletisi</span>
+                        <p id="ramadan-message">${data.text}</p>
+                    </div>`;
+            } else {
+                contentHtml = `
+                    <div class="daily-type">${data.type || 'Günün Sözü'}</div>
+                    <div class="daily-text">${data.text}</div>
+                    <div class="daily-source">${data.source || ''}</div>`;
+            }
+            dailyCard.innerHTML = contentHtml;
+        }
+    }
+
     async function dailyContentYukle() {
+        // 1. Önce cache'e bak
+        const cached = getCachedDailyContent();
+        if (cached) {
+            renderDailyContent(cached);
+            return;
+        }
+
         try {
             const response = await fetch('/api/daily_content');
             const data = await response.json();
             
             if (data && data.text) {
-                const dailyCard = document.getElementById('daily-content');
-                if (dailyCard) {
-                    let contentHtml = '';
-                    if (namazVakitleri.is_ramadan) {
-                        contentHtml = `
-                            <div class="daily-icon">
-                                <svg class="icon"><use xlink:href="#fa-moon"></use></svg>
-                            </div>
-                            <div class="daily-text">
-                                <span class="daily-label">Günün Ramazan İletisi</span>
-                                <p id="ramadan-message">${data.text}</p>
-                            </div>`;
-                    } else {
-                        contentHtml = `
-                            <div class="daily-type">${data.type || 'Günün Sözü'}</div>
-                            <div class="daily-text">${data.text}</div>
-                            <div class="daily-source">${data.source || ''}</div>`;
-                    }
-                    dailyCard.innerHTML = contentHtml;
-                }
+                setCachedDailyContent(data);
+                renderDailyContent(data);
             }
         } catch (error) {
             console.error('Daily content yüklenemedi:', error);

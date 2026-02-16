@@ -561,11 +561,53 @@ def admin_logs():
     api_logs = ""
     bot_logs = ""
     
+    # Log Analizi (Görselleştirme için)
+    import re
+    from collections import Counter
+    
+    stats = {'hourly': {}, 'pages': {}}
+    
     if os.path.exists(log_file):
-        with open(log_file, 'r', encoding='utf-8') as f:
-            # Son 200 satırı al (Performans için)
-            lines = f.readlines()
-            web_logs = "".join(lines[-200:])
+        try:
+            with open(log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                # Son 200 satırı gösterim için al
+                web_logs = "".join(lines[-200:])
+                
+                # Analiz için TÜM satırları kullan (Limit kaldırıldı)
+                analyze_lines = lines
+                
+            # Hem eski (INFO in ...) hem yeni formatı destekleyen regex
+            log_pattern = re.compile(r'\[(.*?)\] (?:INFO in .*: )?.*? ziyaret: (.*)')
+            hourly_counts = Counter()
+            page_counts = Counter()
+            
+            for line in analyze_lines:
+                match = log_pattern.search(line)
+                if match:
+                    timestamp_str, path = match.groups()
+                    try:
+                        # Sadece saati al (Örn: 14:00)
+                        if ' ' in timestamp_str:
+                            hour = timestamp_str.split(' ')[1][:2] + ":00"
+                        else:
+                            # T ile ayrılmış olabilir veya sadece saat olabilir
+                            hour = timestamp_str[11:13] + ":00" if len(timestamp_str) > 13 else "00:00"
+                            
+                        hourly_counts[hour] += 1
+                        page_counts[path.strip()] += 1
+                    except Exception as e:
+                        current_app.logger.error(f"Log satır hatası: {e} - Satır: {line}")
+                        continue
+            
+            stats['hourly'] = dict(sorted(hourly_counts.items()))
+            stats['pages'] = dict(page_counts.most_common())
+            
+            # Debug log
+            # current_app.logger.info(f"Log analizi tamamlandı: {len(hourly_counts)} saat dilimi, {len(page_counts)} sayfa.")
+            
+        except Exception as e:
+            current_app.logger.error(f"Log analiz hatası: {e}")
             
     if os.path.exists(api_log_file):
         with open(api_log_file, 'r', encoding='utf-8') as f:
@@ -581,10 +623,12 @@ def admin_logs():
         return jsonify({
             'web_logs': web_logs if web_logs else 'Log verisi bulunamadı.',
             'api_logs': api_logs if api_logs else 'API log verisi bulunamadı.',
-            'bot_logs': bot_logs if bot_logs else 'Bot log verisi bulunamadı.'
+            'bot_logs': bot_logs if bot_logs else 'Bot log verisi bulunamadı.',
+            'stats': stats
         })
 
     return render_template('admin/logs.html', 
                          web_logs=web_logs, 
                          api_logs=api_logs,
-                         bot_logs=bot_logs)
+                         bot_logs=bot_logs,
+                         stats=stats)

@@ -5,6 +5,7 @@
 {% block brand_text %}LOG PANELİ{% endblock %}
 
 {% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
     .admin-container {
         padding: 40px 20px;
@@ -116,6 +117,43 @@
         color: #3fb950;
         border: 1px solid rgba(63, 185, 80, 0.2);
     }
+    .admin-select {
+        background: #0d1117;
+        color: #e6edf3;
+        border: 1px solid #30363d;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238b949e%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px top 50%;
+        background-size: 10px auto;
+        padding-right: 30px;
+        min-width: 140px;
+    }
+    .admin-select:hover {
+        border-color: #8b949e;
+        background-color: #161b22;
+    }
+    .admin-select:focus {
+        outline: none;
+        border-color: #f0b726; /* primary color approx */
+        box-shadow: 0 0 0 3px rgba(240, 183, 38, 0.1);
+    }
+    .chart-controls {
+        background: #161b22;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #30363d;
+    }
+    .control-group {
+        display: flex;
+        align-items: center;
+    }
 </style>
 {% endblock %}
 
@@ -149,9 +187,202 @@
         <h2><svg class="icon"><use xlink:href="#fa-robot"></use></svg> Bot Aktivite Raporu</h2>
         <div id="bot_logs" class="log-viewer">{{ bot_logs if bot_logs else 'Bot log verisi bulunamadı.' }}</div>
     </div>
+
+    <div class="log-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+            <h2 style="margin-bottom: 0;"><svg class="icon"><use xlink:href="#fa-chart-bar"></use></svg> Ziyaretçi İstatistikleri (Günlük Tüm Kayıtlar)</h2>
+            
+            <div class="chart-controls" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div class="control-group">
+                    <label for="hourlySort" style="color: #8b949e; margin-right: 10px; font-size: 0.9rem;">Saatlik:</label>
+                    <select id="hourlySort" class="admin-select">
+                        <option value="time_asc">Zaman (00-24)</option>
+                        <option value="time_desc">Zaman (24-00)</option>
+                        <option value="count_desc">En Yoğun</option>
+                        <option value="count_asc">En Sakin</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="pageSort" style="color: #8b949e; margin-right: 10px; font-size: 0.9rem;">Sayfa:</label>
+                    <select id="pageSort" class="admin-select">
+                        <option value="count_desc">En Çok Ziyaret</option>
+                        <option value="count_asc">En Az Ziyaret</option>
+                        <option value="name_asc">İsim (A-Z)</option>
+                        <option value="name_desc">İsim (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 40px;">
+            <div style="height: 300px; position: relative;">
+                <canvas id="hourlyChart"></canvas>
+            </div>
+            <div id="pageChartContainer" style="position: relative; min-height: 400px;">
+                <canvas id="pageChart"></canvas>
+            </div>
+        </div>
+        <div id="no-data-message" style="display: none; padding: 20px; text-align: center; color: #8b949e;">
+            <p>Görüntülenecek istatistik verisi bulunamadı veya log formatı desteklenmiyor.</p>
+        </div>
+    </div>
 </div>
 
 <script>
+let hourlyChartInstance = null;
+let pageChartInstance = null;
+let globalStats = null;
+
+function sortData(dataObj, sortType) {
+    const entries = Object.entries(dataObj);
+    
+    entries.sort((a, b) => {
+        const keyA = a[0];
+        const valA = a[1];
+        const keyB = b[0];
+        const valB = b[1];
+
+        switch (sortType) {
+            case 'time_asc':
+            case 'name_asc':
+                return keyA.localeCompare(keyB);
+            case 'time_desc':
+            case 'name_desc':
+                return keyB.localeCompare(keyA);
+            case 'count_desc':
+                return valB - valA;
+            case 'count_asc':
+                return valA - valB;
+            default:
+                return 0;
+        }
+    });
+
+    return {
+        labels: entries.map(e => e[0]),
+        values: entries.map(e => e[1])
+    };
+}
+
+function renderCharts(hourlyData, pageData) {
+    const hourlyEl = document.getElementById('hourlyChart');
+    const pageEl = document.getElementById('pageChart');
+    
+    if (!hourlyEl || !pageEl) {
+        console.error("Canvas elements not found");
+        return;
+    }
+
+    const hourlyCtx = hourlyEl.getContext('2d');
+    const pageCtx = pageEl.getContext('2d');
+
+    if (hourlyChartInstance) hourlyChartInstance.destroy();
+    if (pageChartInstance) pageChartInstance.destroy();
+
+    const gridColor = 'rgba(255, 255, 255, 0.1)';
+    const textColor = '#8b949e';
+
+    hourlyChartInstance = new Chart(hourlyCtx, {
+        type: 'line',
+        data: {
+            labels: hourlyData.labels,
+            datasets: [{
+                label: 'Saatlik Ziyaret',
+                data: hourlyData.values,
+                borderColor: '#3fb950',
+                backgroundColor: 'rgba(63, 185, 80, 0.2)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#3fb950'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: textColor } }
+            },
+            scales: {
+                y: { 
+                    ticks: { color: textColor }, 
+                    grid: { color: gridColor },
+                    beginAtZero: true
+                },
+                x: { 
+                    ticks: { color: textColor }, 
+                    grid: { color: gridColor } 
+                }
+            }
+        }
+    });
+
+    // Sayfa grafiğinin yüksekliğini veri sayısına göre ayarla
+    const pageContainer = document.getElementById('pageChartContainer');
+    // Her öğe için yaklaşık 30px, minimum 400px
+    const dynamicHeight = Math.max(400, pageData.labels.length * 30);
+    pageContainer.style.height = dynamicHeight + 'px';
+
+    pageChartInstance = new Chart(pageCtx, {
+        type: 'bar',
+        data: {
+            labels: pageData.labels,
+            datasets: [{
+                label: 'Sayfa Ziyaretleri',
+                data: pageData.values,
+                backgroundColor: 'rgba(56, 139, 253, 0.7)',
+                borderColor: '#388bfd',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { labels: { color: textColor } }
+            },
+            scales: {
+                y: { 
+                    ticks: { color: textColor }, 
+                    grid: { color: gridColor } 
+                },
+                x: { 
+                    ticks: { color: textColor }, 
+                    grid: { color: gridColor },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function updateCharts() {
+    if (!globalStats) return;
+
+    const hourlySort = document.getElementById('hourlySort').value;
+    const pageSort = document.getElementById('pageSort').value;
+
+    const hourlyData = sortData(globalStats.hourly, hourlySort);
+    const pageData = sortData(globalStats.pages, pageSort);
+
+    renderCharts(hourlyData, pageData);
+}
+
+function initCharts(stats) {
+    if (!stats || !stats.hourly) {
+        console.warn("initCharts called with invalid data:", stats);
+        return;
+    }
+    
+    globalStats = stats;
+    updateCharts();
+}
+
+// Add event listeners for sorting
+document.getElementById('hourlySort').addEventListener('change', updateCharts);
+document.getElementById('pageSort').addEventListener('change', updateCharts);
+
 document.getElementById('refreshLogs').addEventListener('click', async function() {
     const btn = this;
     const btnText = btn.querySelector('span');
@@ -174,6 +405,10 @@ document.getElementById('refreshLogs').addEventListener('click', async function(
         if (!response.ok) throw new Error('Sunucu hatası');
 
         const data = await response.json();
+
+        if (data.stats) {
+            initCharts(data.stats);
+        }
 
         // Logları güncelle ve renklendir (basit bir regex ile)
         Object.keys(viewers).forEach(key => {
@@ -215,6 +450,29 @@ window.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById(id);
         if (el) el.scrollTop = el.scrollHeight;
     });
+    
+    // Initial Chart Load
+    try {
+        const statsData = '{{ stats|tojson|safe }}';
+        console.log("Raw stats data:", statsData);
+        
+        if (statsData && statsData !== '{}') {
+            const initialStats = JSON.parse(statsData);
+            if (Object.keys(initialStats.hourly).length > 0) {
+                initCharts(initialStats);
+            } else {
+                console.log("No hourly data to display");
+                document.getElementById('no-data-message').style.display = 'block';
+            }
+        } else {
+            console.log("Stats object is empty");
+            document.getElementById('no-data-message').style.display = 'block';
+        }
+    } catch(e) { 
+        console.error("Chart init error:", e); 
+        document.getElementById('no-data-message').textContent = 'Grafik yüklenirken hata oluştu: ' + e.message;
+        document.getElementById('no-data-message').style.display = 'block';
+    }
 });
 </script>
 {% endblock %}
