@@ -1,10 +1,10 @@
-// Service Worker - Namaz Vakitleri (Workbox Powered)
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
+// Service Worker - Namaz Vakitleri
+const CACHE_NAME = 'namaz-vakitleri-v2.12'; // Versiyon güncellendi (Icon Clean-up)
 
-const CACHE = "namaz-vakitleri-offline-v3.0";
-const offlineFallbackPage = "/offline";
+// API istekleri için Cache-First, sonra Network (Offline için)
+const API_CACHE_NAME = 'api-cache-v1';
 
-// Önbelleğe alınacak kritik dosyalar (App Shell)
+// Önbelleğe alınacak statik dosyalar ve sayfalar
 const PRECACHE_ASSETS = [
     '/',
     '/offline',
@@ -20,91 +20,138 @@ const PRECACHE_ASSETS = [
     '/MUSTAFA-KEMAL-ATATÜRK',
     '/static/js/jquery.min.js',
     '/static/js/city-data.js',
-    '/static/css/main.css',
     '/static/icons/favicon.ico',
     '/static/icons/android/android-launchericon-192-192.png',
     '/static/icons/android/android-launchericon-512-512.png',
-    '/static/icons/ios/180.png'
+    '/static/icons/ios/180.png',
+    '/static/icons/windows11/Square150x150Logo.scale-100.png',
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Amiri&display=swap'
 ];
 
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
+// Yükleme (Install) - Kritik dosyaları önbelleğe al
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            console.log('[SW] Pre-caching critical assets');
+            return cache.addAll(PRECACHE_ASSETS);
+        }).then(() => self.skipWaiting())
+    );
 });
 
-self.addEventListener('install', async (event) => {
-  event.waitUntil(
-    caches.open(CACHE)
-      .then((cache) => {
-        console.log('[SW] Caching app shell and offline page');
-        return cache.addAll(PRECACHE_ASSETS);
-      })
-  );
-});
-
+// Aktifleştirme (Activate) - Eski önbellekleri temizle
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    (async () => {
-      // Eski cacheleri temizle (v3.0 olmayanlar)
-      const cacheNames = await caches.keys();
-      await Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE) {
-            console.log('[SW] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-      // Hemen kontrolü ele al
-      await self.clients.claim();
-    })()
-  );
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME) {
+                        console.log('[SW] Removing old cache:', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        }).then(() => self.clients.claim())
+    );
 });
 
-if (workbox.navigationPreload.isSupported()) {
-  workbox.navigationPreload.enable();
-}
+// İstekleri Yakalama (Fetch)
+self.addEventListener('fetch', (event) => {
+    // Sadece GET isteklerini işle
+    if (event.request.method !== 'GET') return;
 
-// 1. HTML Sayfaları (Navigation) -> NetworkFirst
-// Önce internetten almaya çalış, yoksa cache'e bak, o da yoksa offline sayfası
-workbox.routing.registerRoute(
-  ({ request }) => request.mode === 'navigate',
-  new workbox.strategies.NetworkFirst({
-    cacheName: CACHE,
-    plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 50,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 gün
-      }),
-    ],
-  })
-);
+    const url = new URL(event.request.url);
 
-// 2. Statik Dosyalar (CSS, JS, Images, Fonts) -> StaleWhileRevalidate
-// Hızlı açılış için cache, arka planda güncelle
-workbox.routing.registerRoute(
-  ({ request }) =>
-    request.destination === 'style' ||
-    request.destination === 'script' ||
-    request.destination === 'image' ||
-    request.destination === 'font',
-  new workbox.strategies.StaleWhileRevalidate({
-    cacheName: CACHE,
-    plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 200,
-        maxAgeSeconds: 60 * 24 * 60 * 60, // 60 gün
-      }),
-    ],
-  })
-);
+    // API istekleri (Vakitler vb.) - Network-First, ama Cache'e kaydet ve hata durumunda Cache'den getir
+    if (url.pathname.startsWith('/api/namaz_vakitleri') || url.pathname.startsWith('/api/vakitler/')) {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    // Sadece başarılı yanıtları önbelleğe al
+                    if (response.ok) {
+                        const responseClone = response.clone();
+                        caches.open(API_CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
+                    return response;
+                })
+                .catch(async () => {
+                    const cachedResponse = await caches.match(event.request);
+                    if (cachedResponse) return cachedResponse;
+                    
+                    // Eğer cache'de de yoksa, anlamlı bir hata dön (undefined dönmemeli)
+                    return new Response(JSON.stringify({
+                        durum: "hata",
+                        mesaj: "İnternet bağlantısı yok ve veri henüz önbelleğe alınmamış."
+                    }), {
+                        status: 503,
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                })
+        );
+        return;
+    }
 
-// Offline Fallback logic (Workbox Catch Handler)
-// Eğer StaleWhileRevalidate hem cache'de bulamaz hem de network'e erişemezse burası çalışır
-workbox.routing.setCatchHandler(async ({ event }) => {
-  if (event.request.destination === 'document' || event.request.mode === 'navigate') {
-    return caches.match(offlineFallbackPage);
-  }
-  return Response.error();
+    // HTML sayfaları için Network-First, hata durumunda önce Cache'e bak, yoksa Offline sayfası
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    // Sadece başarılı ve geçerli yanıtları önbelleğe al
+                    // Offline sayfasını veya hata sayfalarını dinamik olarak ana URL'lere kaydetme
+                    if (response.ok && response.status === 200 && !response.url.includes('/offline')) {
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
+                    return response;
+                })
+                .catch(async () => {
+                        // Çevrimdışı durumunda:
+                        // 1. Önce tam URL ile cache'e bak (Query params dahil)
+                        const cachedResponse = await caches.match(event.request);
+                        if (cachedResponse) return cachedResponse;
+                        
+                        // 2. Query params olmadan bak (Örn: /sehir/Istanbul?country=TR -> /sehir/Istanbul)
+                        const url = new URL(event.request.url);
+                        const cleanResponse = await caches.match(url.pathname, { ignoreSearch: true });
+                        if (cleanResponse) return cleanResponse;
+
+                        // 3. Eğer bir alt sayfa ise (Örn: /sehir/Istanbul), ana route'u dene (/sehir)
+                        if (url.pathname.startsWith('/sehir/')) {
+                            const sehirResponse = await caches.match('/sehir');
+                            if (sehirResponse) return sehirResponse;
+                        }
+                        
+                        if (url.pathname.startsWith('/imsakiye/')) {
+                            const imsakiyeResponse = await caches.match('/imsakiye');
+                            if (imsakiyeResponse) return imsakiyeResponse;
+                        }
+
+                        // 4. Hiçbiri yoksa offline fallback
+                        return caches.match('/offline');
+                    })
+        );
+        return;
+    }
+
+    // Statik dosyalar için Stale-While-Revalidate stratejisi
+    event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+            const fetchPromise = fetch(event.request).then((networkResponse) => {
+                // Geçerli bir yanıt aldığımızda önbelleği güncelle
+                if (networkResponse && networkResponse.status === 200) {
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseToCache);
+                    });
+                }
+                return networkResponse;
+            });
+
+            // Önbellekte varsa hemen döndür, yoksa ağı bekle
+            return cachedResponse || fetchPromise;
+        })
+    );
 });
