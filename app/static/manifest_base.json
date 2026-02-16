@@ -762,5 +762,30 @@
     "window-controls-overlay",
     "standalone",
     "minimal-ui"
+  ],
+  "widgets": [
+    {
+      "name": "Çağrı Vakti",
+      "short_name": "Vakitler",
+      "description": "Güncel namaz vaktini ve sıradaki vakti gösterir.",
+      "tag": "namaz-vakitleri-widget",
+      "template": "/static/widgets/namaz_widget.json",
+      "ms_ac_template": "/static/widgets/namaz_widget.json",
+      "data": "/api/widget/data",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/static/screenshots/1.jpg",
+          "sizes": "1080x1920",
+          "label": "Widget Önizlemesi"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/static/icons/android/android-launchericon-192-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ]
 }
