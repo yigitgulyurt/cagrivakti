@@ -49,8 +49,8 @@ def setup_middleware(app):
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data: https:; "
-            "connect-src 'self' https://nominatim.openstreetmap.org https://cagrivakti.com.tr; "
-            "frame-ancestors 'self'; "
+            "connect-src 'self' https://nominatim.openstreetmap.org; "
+            "frame-ancestors 'none'; "
             "base-uri 'self'; "
             "form-action 'self';"
         )

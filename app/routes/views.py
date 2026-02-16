@@ -223,35 +223,7 @@ def serve_manifest():
                 }
                 manifest_data["shortcuts"].insert(0, new_shortcut)
         
-        # Update widgets with user city and ensure absolute URLs
-        if "widgets" in manifest_data:
-            base_url = request.host_url.rstrip('/')
-            for widget in manifest_data["widgets"]:
-                # Inject city
-                if user_city and is_latin_only(user_city) and "data" in widget:
-                    # Check if query params already exist
-                    separator = "&" if "?" in widget["data"] else "?"
-                    widget["data"] = f"{widget['data']}{separator}city={user_city}"
-                
-                # Convert to absolute URLs
-                for key in ["template", "ms_ac_template", "data"]:
-                    if key in widget and widget[key].startswith("/"):
-                        widget[key] = f"{base_url}{widget[key]}"
-                
-                # Convert icons
-                if "icons" in widget:
-                    for icon in widget["icons"]:
-                        if "src" in icon and icon["src"].startswith("/"):
-                            icon["src"] = f"{base_url}{icon['src']}"
-
-                # Convert screenshots
-                if "screenshots" in widget:
-                    for screenshot in widget["screenshots"]:
-                        if "src" in screenshot and screenshot["src"].startswith("/"):
-                            screenshot["src"] = f"{base_url}{screenshot['src']}"
-
         response = jsonify(manifest_data)
-        response.headers['Content-Type'] = 'application/manifest+json'
         # Önbelleği agresif bir şekilde devre dışı bırak
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
         response.headers['Pragma'] = 'no-cache'
