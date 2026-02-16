@@ -195,10 +195,16 @@ function getLatinName(turkishName) {
             let msg = "Konum izni reddedildi veya konum alınamadı.";
             if (error.code === error.PERMISSION_DENIED) {
                 msg = "Konum izni verilmedi. Lütfen tarayıcı ayarlarından izin verin.";
+            } else if (error.code === error.TIMEOUT) {
+                msg = "Konum alma işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.";
             }
             showError(msg);
         },
-        { timeout: 10000 }
+        { 
+            timeout: 30000,     // 30 saniye bekle (önceki 10s az geliyordu)
+            maximumAge: 300000, // 5 dakikalık eski konumu kabul et (hız için)
+            enableHighAccuracy: false // GPS yerine WiFi/Baz istasyonu kullan (daha hızlı)
+        }
     );
 }
 

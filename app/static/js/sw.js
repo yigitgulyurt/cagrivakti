@@ -1,5 +1,5 @@
 // Service Worker - Namaz Vakitleri
-const CACHE_NAME = 'namaz-vakitleri-v2.8'; // Versiyon güncellendi (PWA Shortcut ve Şehir Eşleme)
+const CACHE_NAME = 'namaz-vakitleri-v2.12'; // Versiyon güncellendi (Icon Clean-up)
 
 // API istekleri için Cache-First, sonra Network (Offline için)
 const API_CACHE_NAME = 'api-cache-v1';
@@ -21,15 +21,10 @@ const PRECACHE_ASSETS = [
     '/static/js/jquery.min.js',
     '/static/js/city-data.js',
     '/static/icons/favicon.ico',
-    '/static/icons/icon-48-48.webp',
-    '/static/icons/icon-72-72.webp',
-    '/static/icons/icon-96-96.webp',
-    '/static/icons/icon-144-144.webp',
-    '/static/icons/icon-152-152.webp',
-    '/static/icons/icon-192-192.webp',
-    '/static/icons/icon-512-512.webp',
-    '/static/icons/og-image.webp',
-    '/manifest.json',
+    '/static/icons/android/android-launchericon-192-192.png',
+    '/static/icons/android/android-launchericon-512-512.png',
+    '/static/icons/ios/180.png',
+    '/static/icons/windows11/Square150x150Logo.scale-100.png',
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Amiri&display=swap'
 ];
 

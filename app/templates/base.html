@@ -48,21 +48,21 @@
 
     <!-- Favicon ve App Icons -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/icon-192-192.webp') }}">
-    <link rel="mask-icon" href="{{ url_for('static', filename='icons/icon-512-512.webp') }}" color="#FFC107">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/ios/180.png') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}" color="#FFC107">
 
     <!-- PWA Meta Etiketleri -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#121212">
     <meta name="msapplication-TileColor" content="#121212">
-    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='icons/icon-144-144.webp') }}">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='icons/windows11/Square150x150Logo.scale-100.png') }}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Çağrı">
     
     <!-- iOS Splash Screens -->
-    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='icons/icon-512-512.webp') }}">
+    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}">
 
     <!-- Fontlar
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -174,7 +174,7 @@
     <div id="pwaInstallBanner" class="pwa-install-banner" title="Uygulamayı Yükle">
         <div class="pwa-content">
             <div class="pwa-icon">
-                <img src="{{ url_for('static', filename='icons/icon-96-96.webp') }}" alt="Çağrı Vakti Uygulama İkonu" loading="lazy">
+                <img src="{{ url_for('static', filename='icons/android/android-launchericon-96-96.png') }}" alt="Çağrı Vakti Uygulama İkonu" loading="lazy">
             </div>
             <div class="pwa-text">
                 <h3>Uygulamayı Yükleyin</h3>
@@ -250,6 +250,23 @@
         // Sayfa yüklendiğinde modalı kontrol et
         window.addEventListener('DOMContentLoaded', checkWelcomeModal);
 
+        // Manifest URL'ini kullanıcı şehrine göre güncelle (Cache busting ve Parametre)
+        window.addEventListener('DOMContentLoaded', () => {
+            const userCityMatch = document.cookie.match(/user_city=([^;]+)/);
+            if (userCityMatch && userCityMatch[1]) {
+                const city = userCityMatch[1];
+                const manifestLink = document.querySelector('link[rel="manifest"]');
+                if (manifestLink) {
+                    const url = new URL(manifestLink.href, window.location.origin);
+                    url.searchParams.set('city', city);
+                    // Tarayıcının cache'ini zorlamak için versiyon ekle
+                    // url.searchParams.set('v', '2.11'); 
+                    manifestLink.href = url.toString();
+                    // console.log('Manifest updated for:', city);
+                }
+            }
+        });
+
         // PWA Kurulum Mantığı
         let deferredPrompt;
         const pwaBanner = document.getElementById('pwaInstallBanner');
@@ -262,8 +279,22 @@
             // Olayı sakla ki daha sonra tetikleyebilelim
             deferredPrompt = e;
             
+            // Eğer reload sonrası ise hemen göster
+            if (sessionStorage.getItem('reloadingForPWA')) {
+                pwaBanner.classList.add('active');
+                const pwaText = document.querySelector('.pwa-text p');
+                const installBtn = document.getElementById('pwaInstallBtn');
+                
+                if (pwaText) pwaText.textContent = 'Konum doğrulandı. Yüklemek için tıklayın!';
+                if (installBtn) {
+                    installBtn.textContent = 'Yükle (Hazır)';
+                    installBtn.classList.add('pulse-animation'); // Dikkat çekmek için
+                }
+                
+                sessionStorage.removeItem('reloadingForPWA');
+            } 
             // Eğer kullanıcı daha önce bu oturumda kapatmadıysa banner'ı göster
-            if (!sessionStorage.getItem('pwaBannerDismissed')) {
+            else if (!sessionStorage.getItem('pwaBannerDismissed')) {
                 setTimeout(() => {
                     pwaBanner.classList.add('active');
                 }, 3000); // 3 saniye sonra göster
@@ -273,15 +304,93 @@
         if (installBtn) {
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
-                    // Kurulum istemini göster
-                    deferredPrompt.prompt();
-                    // Kullanıcının cevabını bekle
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`PWA kurulum sonucu: ${outcome}`);
-                    // İstem kullanıldı, temizle
-                    deferredPrompt = null;
-                    // Banner'ı gizle
-                    pwaBanner.classList.remove('active');
+                    // 1. Şehir kontrolü (Cookie)
+                    const userCity = document.cookie.split('; ').find(row => row.startsWith('user_city='));
+                    const pwaText = document.querySelector('.pwa-text p');
+                    
+                    if (!userCity) {
+                        // Şehir yoksa bulmaya çalış
+                        const originalText = installBtn.textContent;
+                        
+                        installBtn.textContent = 'Hazırlanıyor...';
+                        if (pwaText) pwaText.textContent = 'Size özel vakitleri sunabilmek için konumunuz alınıyor...';
+                        installBtn.disabled = true;
+
+                        try {
+                            // Konum izni iste
+                            if (navigator.geolocation) {
+                                const position = await new Promise((resolve, reject) => {
+                                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                                        timeout: 10000,
+                                        maximumAge: 60000
+                                    });
+                                });
+
+                                const lat = position.coords.latitude;
+                                const lon = position.coords.longitude;
+
+                                // Şehir ismini bul (Nominatim)
+                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=tr`);
+                                const data = await response.json();
+
+                                if (data && data.address) {
+                                    let originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
+                                    
+                                    if (originalCityName) {
+                                        originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
+                                        
+                                        // Basit Latin çevirisi ve Normalizasyon
+                                        const charMap = {
+                                            'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G',
+                                            'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O',
+                                            'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U'
+                                        };
+                                        const latinCityName = originalCityName.split('').map(char => charMap[char] || char).join('')
+                                            .replace(/\s+/g, '-').replace(/[^A-Za-z0-9\-]/g, '');
+
+                                        // Cookie'ye kaydet
+                                        document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
+                                        
+                                        // LocalStorage'a da kaydet (Konum bul sayfası için)
+                                        localStorage.setItem('user_city', latinCityName);
+                                        
+                                        if (pwaText) pwaText.textContent = `${originalCityName} bulundu! Uygulama verileri güncelleniyor...`;
+                                        
+                                        // Sayfayı yenile ve işlemi sonlandır
+                                        sessionStorage.setItem('reloadingForPWA', 'true');
+                                        
+                                        await new Promise(r => setTimeout(r, 1000));
+                                        window.location.reload();
+                                        return;
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.error("Konum alınamadı:", err);
+                            if (pwaText) pwaText.textContent = 'Konum alınamadı, varsayılan ayarlarla devam ediliyor.';
+                            installBtn.textContent = originalText;
+                            installBtn.disabled = false;
+                            // Hata durumunda normal akışa devam et
+                        }
+                    }
+
+                    // Eğer buraya geldiysek ya cookie vardı ya da konum alınamadı (varsayılan kurulum)
+                    try {
+                        // Kurulum istemini göster
+                        deferredPrompt.prompt();
+                        // Kullanıcının cevabını bekle
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`PWA kurulum sonucu: ${outcome}`);
+                        // İstem kullanıldı, temizle
+                        deferredPrompt = null;
+                        // Banner'ı gizle
+                        pwaBanner.classList.remove('active');
+                    } catch (promptError) {
+                         console.error("Otomatik kurulum başlatılamadı:", promptError);
+                         if (pwaText) pwaText.textContent = 'Kurulum hazır! Yükle butonuna tekrar basın.';
+                         installBtn.textContent = 'Yükle';
+                         installBtn.disabled = false;
+                    }
                 }
             });
         }

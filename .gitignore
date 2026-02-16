@@ -26,6 +26,7 @@ app/logs/cagrivakti-api.log
 app/logs/cagrivakti-web.log
 app/logs/cagrivakti-bot.log
 app/logs/error_details.log
+app/logs/error.log
 
 # Database Migrations
 # Standard practice is to keep migrations but ignore local db state

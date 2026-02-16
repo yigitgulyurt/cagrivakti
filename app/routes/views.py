@@ -180,39 +180,48 @@ def serve_sw():
 
 @views_bp.route('/manifest.json')
 def serve_manifest():
-    manifest_path = os.path.join(current_app.root_path, 'static', 'manifest.json')
+    # manifest_base.json dosyasını kullan (önceden manifest.json idi, isim değişikliği yapıldı)
+    manifest_path = os.path.join(current_app.root_path, 'static', 'manifest_base.json')
     try:
         with open(manifest_path, 'r', encoding='utf-8') as f:
             manifest_data = json.load(f)
         
-        # Kullanıcının şehrini cookie'den al
-        user_city = request.cookies.get('user_city')
+        # Kullanıcının şehrini cookie'den veya query parametresinden al
+        user_city = request.cookies.get('user_city') or request.args.get('city')
         
-        # "Konum Bul" shortcut'ını bul ve güncelle
         if "shortcuts" in manifest_data:
+            found = False
             for shortcut in manifest_data["shortcuts"]:
+                # Mevcut konum-bul shortcut'ını güncelle
                 if shortcut.get("url") == "/konum-bul":
+                    found = True
                     if user_city:
                         display_name = CITY_DISPLAY_NAME_MAPPING.get(user_city, user_city)
-                        shortcut["name"] = f"Vakitler: {display_name}"
+                        shortcut["name"] = f"{display_name} Vakitleri"
                         shortcut["short_name"] = display_name
+                        shortcut["url"] = f"/sehir/{user_city}"
+                        # İkonu güncelle
+                        shortcut["icons"] = [{
+                            "src": "/static/icons/android/android-launchericon-96-96.png",
+                            "sizes": "96x96",
+                            "type": "image/png"
+                        }]
                     break
-            else:
-                # Eğer listede yoksa (fallback) ekle
-                shortcut_name = "Konum Bul"
-                short_name = "Konum Bul"
-                if user_city:
-                    display_name = CITY_DISPLAY_NAME_MAPPING.get(user_city, user_city)
-                    shortcut_name = f"Vakitler: {display_name}"
-                    short_name = display_name
-                
-                konum_shortcut = {
-                    "name": shortcut_name,
-                    "short_name": short_name,
-                    "url": "/konum-bul",
-                    "icons": [{ "src": "/static/icons/icon-96-96.webp", "sizes": "96x96", "type": "image/webp" }]
+            
+            # Eğer listede yoksa ve şehir varsa yeni ekle
+            if not found and user_city:
+                display_name = CITY_DISPLAY_NAME_MAPPING.get(user_city, user_city)
+                new_shortcut = {
+                    "name": f"{display_name} Vakitleri",
+                    "short_name": display_name,
+                    "url": f"/sehir/{user_city}",
+                    "icons": [{
+                        "src": "/static/icons/android/android-launchericon-96-96.png",
+                        "sizes": "96x96",
+                        "type": "image/png"
+                    }]
                 }
-                manifest_data["shortcuts"].insert(0, konum_shortcut)
+                manifest_data["shortcuts"].insert(0, new_shortcut)
         
         response = jsonify(manifest_data)
         # Önbelleği agresif bir şekilde devre dışı bırak
@@ -223,7 +232,7 @@ def serve_manifest():
         return response
     except Exception as e:
         current_app.logger.error(f"Manifest generation error: {e}")
-        return send_from_directory(os.path.join(current_app.root_path, 'static'), 'manifest.json')
+        return send_from_directory(os.path.join(current_app.root_path, 'static'), 'manifest_base.json')
 
 @views_bp.route('/ilkelerimiz')
 @cache.cached(timeout=86400)

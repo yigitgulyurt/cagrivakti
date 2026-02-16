@@ -332,17 +332,43 @@
 }
 
 @media (max-width: 768px) {
-    .imsakiye-wrapper { padding: 30px 15px; }
-    .imsakiye-header { margin-bottom: 30px; }
-    .header-main { gap: 15px; }
-    .imsakiye-tabs { flex-wrap: wrap; }
-    .tab-btn { flex: 1 1 45%; font-size: 0.85rem; }
+    .imsakiye-wrapper { padding: 20px 5px; }
+    .imsakiye-header { margin-bottom: 20px; }
+    .header-main { gap: 10px; }
+    .imsakiye-tabs { flex-wrap: wrap; gap: 4px; }
+    .tab-btn { flex: 1 1 45%; font-size: 0.8rem; padding: 10px; }
     
-    .imsakiye-table th, .imsakiye-table td { padding: 12px 10px; font-size: 0.85rem; }
-    .tarih-cell { padding-left: 15px !important; }
+    .imsakiye-table th, .imsakiye-table td { 
+        padding: 8px 2px; 
+        font-size: 0.75rem; 
+        text-align: center;
+    }
+    
+    .imsakiye-table th {
+        font-size: 0.7rem;
+        letter-spacing: 0;
+        padding: 10px 2px;
+    }
+
+    .tarih-cell { 
+        padding-left: 0 !important; 
+        font-weight: 700;
+        font-size: 0.75rem;
+        display: block;
+    }
+    
+    .tarih-sub {
+        font-size: 0.65rem;
+    }
     
     .actions { flex-direction: column; }
     .btn-action { justify-content: center; }
+    
+    /* Make table scrollable if it really doesn't fit on tiny screens */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 @media print {
