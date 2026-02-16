@@ -753,5 +753,39 @@
       "form_factor": "narrow",
       "label": "Menü ve Ayarlar"
     }
+  ],
+  "dir": "ltr",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "widgets": [
+    {
+      "name": "Çağrı Vakti",
+      "short_name": "Vakitler",
+      "description": "Günlük namaz vakitlerini ve kalan süreyi gösterir.",
+      "tag": "cagri-vakti-widget",
+      "template": "cagri-vakti-template",
+      "ms_ac_template": "https://cagrivakti.com.tr/static/widgets/widget.json",
+      "data": "https://cagrivakti.com.tr/api/widget-data",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/static/icons/windows11/Wide310x150Logo.scale-100.png",
+          "sizes": "310x150",
+          "label": "Widget Önizlemesi"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/static/icons/windows11/Square150x150Logo.scale-100.png",
+          "sizes": "150x150"
+        }
+      ]
+    }
   ]
 }

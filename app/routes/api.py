@@ -96,6 +96,65 @@ def update_city():
 def daily_content():
     return jsonify(get_daily_content())
 
+@api_bp.route('/widget-data')
+def widget_data():
+    """
+    PWA Widget'ı için özel veri endpoint'i.
+    Cookie'den kullanıcı şehrini okur ve bir sonraki vakit bilgisini döndürür.
+    """
+    sehir = request.cookies.get('user_city')
+    if not sehir:
+        # Varsayılan şehir
+        sehir = 'istanbul'
+    
+    # Güvenlik kontrolü
+    if not is_latin_only(sehir):
+        sehir = 'istanbul'
+        
+    try:
+        # Bir sonraki vakti al
+        next_vakit_data = PrayerService.get_next_vakit(sehir, 'TR')
+        
+        if not next_vakit_data or 'error' in next_vakit_data:
+            return jsonify({
+                "template_id": "cagri-vakti-template",
+                "data": {
+                    "city": sehir.upper(),
+                    "next_prayer": "Hata",
+                    "remaining_time": "--:--",
+                    "next_prayer_time": "--:--"
+                }
+            })
+
+        # Veriyi hazırla
+        remaining = next_vakit_data.get('kalan_sure', '')
+        # "02:15:30" formatından "02 sa 15 dk" formatına çevir (sadece saat ve dakika)
+        if remaining:
+            parts = remaining.split(':')
+            if len(parts) >= 2:
+                remaining = f"{parts[0]} sa {parts[1]} dk"
+        
+        return jsonify({
+            "template_id": "cagri-vakti-template",
+            "data": {
+                "city": sehir.replace('-', ' ').title(),
+                "next_prayer": next_vakit_data.get('sonraki_vakit_ismi', '').title(),
+                "remaining_time": remaining,
+                "next_prayer_time": next_vakit_data.get('sonraki_vakit_saati', '')
+            }
+        })
+    except Exception as e:
+        current_app.logger.error(f"Widget Data Error: {str(e)}")
+        return jsonify({
+            "template_id": "cagri-vakti-template",
+            "data": {
+                "city": "Hata",
+                "next_prayer": "",
+                "remaining_time": "",
+                "next_prayer_time": ""
+            }
+        })
+
 # Public API v1
 @api_bp.route('/vakitler')
 def public_api_vakitler():
