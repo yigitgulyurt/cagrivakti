@@ -58,9 +58,24 @@ def namaz_vakitlerini_al_api():
                 if v in vakitler:
                     sirali_vakitler[v] = vakitler[v]
             
+            # Yarının imsak vaktini de al
+            yarin_tarih = None
+            if tarih:
+                try:
+                    tarih_obj = datetime.strptime(tarih, '%Y-%m-%d')
+                    yarin_tarih = (tarih_obj + timedelta(days=1)).strftime('%Y-%m-%d')
+                except:
+                    pass
+            else:
+                yarin_tarih = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+            
+            yarin_vakitler = PrayerService.get_vakitler(sehir, country_code, yarin_tarih)
+            yarin_imsak = yarin_vakitler.get('imsak') if yarin_vakitler else None
+
             return jsonify({
                 'vakitler': sirali_vakitler,
-                'timezone': tz_info
+                'timezone': tz_info,
+                'yarin': {'imsak': yarin_imsak} if yarin_imsak else None
             })
         return jsonify({'error': 'Vakit bulunamadı'}), 404
     except Exception as e:

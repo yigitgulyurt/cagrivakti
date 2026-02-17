@@ -504,6 +504,7 @@
                 namazVakitleri = {
                     ...data.vakitler,
                     timezone: data.timezone || 'Europe/Istanbul',
+                    yarin: data.yarin || null,
                     is_ramadan: (typeof namazVakitleri.is_ramadan !== 'undefined') ? namazVakitleri.is_ramadan : false
                 };
                 
@@ -581,19 +582,101 @@
         });
 
         // Eğer tüm vakitler geçtiyse (Yatsı sonrası), sonraki vakit yarın İmsak'tır
-        if (minDiff === Infinity && namazVakitleri['imsak']) {
-            const saat = namazVakitleri['imsak'];
-            const [hours, minutes] = saat.split(":").map(Number);
+        if (minDiff === Infinity) {
+            // Yatsı vakti geçtikten sonra İmsak kartını güncelle
+            const imsakEl = document.getElementById('imsak');
+            const imsakCountdownEl = document.getElementById('imsak-countdown');
             
-            // Yarınki imsak (Yaklaşık hesap: Bugünkünü yarın olarak alıyoruz)
-            // Not: Tam doğruluk için yarının verisi gerekir ama API'den sadece bugünü çekiyoruz şu an.
-            const vakitDate = new Date(cityNow);
-            vakitDate.setDate(vakitDate.getDate() + 1);
-            vakitDate.setHours(hours, minutes, 0, 0);
-            
-            minDiff = vakitDate - cityNow;
-            nextVakitName = 'imsak';
-            nextVakitTime = saat;
+            if (namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
+                const nextImsakTime = namazVakitleri.yarin.imsak;
+                const [hours, minutes] = nextImsakTime.split(":").map(Number);
+                
+                const vakitDate = new Date(cityNow);
+                // Eğer saat 23:59 ise yarınki imsak için 1 gün ekle
+                // Eğer gece yarısı (00:01) ise zaten gün değiştiği için bugünün imsak'ı olacak
+                // ANCAK: Gece yarısı geçince namazVakitleri yenilenmediyse hala dünün verisi var demektir.
+                // Bu durumda hala dünün tarihi + 1 gün yapmalıyız.
+                // Basit mantık: Yatsı'dan sonra her zaman bir sonraki İmsak hedeflenir.
+                // Yatsı saati < Şu an < Gece Yarısı: Tarih = Yarın
+                // Gece Yarısı < Şu an < İmsak: Tarih = Bugün
+                
+                // Yatsı saatini kontrol et
+                const yatsiSaat = namazVakitleri['yatsi'];
+                const [yH, yM] = yatsiSaat.split(":").map(Number);
+                const yatsiDate = new Date(cityNow);
+                yatsiDate.setHours(yH, yM, 0, 0);
+                
+                if (cityNow > yatsiDate) {
+                     // Gece yarısı kontrolü (00:00 - İmsak arası mı?)
+                     // Eğer cityNow saat 00:00 ile İmsak arası ise, gün zaten değişmiştir.
+                     // Ancak namazVakitleri objesi eski (dünün) verisi olabilir.
+                     // Eğer namazVakitleri.tarih != cityNow.toISOString().split('T')[0] ise veri eskidir.
+                     
+                     // Basit çözüm: Yatsı geçtikten sonra hedef her zaman YARINKİ imsak saatidir.
+                     // Eğer saat 23:00 ise (Yatsı 20:00), hedef Yarın 05:00
+                     // Eğer saat 01:00 ise (Yatsı dün 20:00), hedef Bugün 05:00
+                     
+                     // Bu karmaşayı çözmek için:
+                     // 1. namazVakitleri.yarin.imsak'ı al.
+                     // 2. Bu saati bugünün tarihiyle oluştur.
+                     // 3. Eğer oluşan tarih < cityNow ise (yani saat 01:00, imsak 05:00 ise tarih > cityNow olur, sorun yok. Ama saat 06:00 ise tarih < cityNow olur)
+                     // Durum: Yatsı sonrası (23:00). İmsak 05:00. Hedef: Yarın 05:00.
+                     // Durum: Gece yarısı sonrası (01:00). İmsak 05:00. Hedef: Bugün 05:00.
+                     
+                     let targetDate = new Date(cityNow);
+                     targetDate.setHours(hours, minutes, 0, 0);
+                     
+                     if (targetDate < cityNow) {
+                         targetDate.setDate(targetDate.getDate() + 1);
+                     }
+                     
+                     minDiff = targetDate - cityNow;
+                     nextVakitName = 'imsak';
+                     nextVakitTime = nextImsakTime;
+                     
+                     // İmsak Kartını Güncelle (Sadece Yatsı geçtikten sonra)
+                     if (imsakEl) imsakEl.textContent = nextImsakTime;
+                     
+                     // İmsak Geri Sayımını Güncelle
+                     if (imsakCountdownEl) {
+                        const h = Math.floor(minDiff / 3600000);
+                        const m = Math.floor((minDiff % 3600000) / 60000);
+                        const s = Math.floor((minDiff % 60000) / 1000);
+                        imsakCountdownEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                        imsakCountdownEl.style.color = '';
+                        imsakCountdownEl.style.backgroundColor = '';
+                     }
+                }
+            } else if (namazVakitleri['imsak']) {
+                // Fallback (Yarın verisi yoksa eski mantık)
+                const saat = namazVakitleri['imsak'];
+                const [hours, minutes] = saat.split(":").map(Number);
+                
+                const vakitDate = new Date(cityNow);
+                vakitDate.setDate(vakitDate.getDate() + 1);
+                vakitDate.setHours(hours, minutes, 0, 0);
+                
+                minDiff = vakitDate - cityNow;
+                nextVakitName = 'imsak';
+                nextVakitTime = saat;
+            }
+        }
+
+        // Gün değişimi kontrolü (Gece yarısı tetikleyicisi)
+        const currentDataDate = namazVakitleri.tarih; // API'den gelen tarih (YYYY-MM-DD)
+        const todayStr = cityNow.toISOString().split('T')[0];
+        
+        // Eğer verideki tarih bugünün tarihi değilse ve saat 00:00'ı geçtiyse yenile
+        // Not: Yatsı sonrası İmsak sayacı bozulmasın diye sadece tarih değişince yenileme yapıyoruz.
+        // Ancak kullanıcı "10 Şubat gece yarısına geldikten sonra imsak vakti hala 11 şubatta kalsın" dedi.
+        // Bu yüzden gece yarısı olsa bile hemen yenilemek yerine, belki de bir süre beklemeli miyiz?
+        // Hayır, yenilenince zaten yeni günün İmsak verisi gelecek (ki o da aynı saat).
+        // Tek fark: İmsak kartında "Yarın" yerine "Bugün" yazacak gibi düşünebiliriz ama UI'da tarih yazmıyor, sadece saat yazıyor.
+        // Dolayısıyla yenilemekte sorun yok.
+        
+        if (currentDataDate && currentDataDate !== todayStr) {
+            console.log("Gün değişti, veriler yenileniyor...");
+            namazVakitleriniYukle(); // Bu asenkron çalışır, bir sonraki intervalda güncel veriler gelir.
         }
 
         // Navbar Güncelleme
