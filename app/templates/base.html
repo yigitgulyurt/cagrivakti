@@ -119,6 +119,7 @@
 
     <nav class="navbar">
         <a href="{{ url_for('views.index') }}" class="nav-brand" title="Ana Sayfa">{% block brand_text %}ÇAĞRI{% endblock %}</a>
+        <div id="navbar-vakit-countdown" style="display: none; margin-left: 15px; font-size: 0.85rem; font-weight: 600; color: var(--primary); white-space: nowrap;"></div>
         <button class="nav-toggle" id="navToggle" aria-label="Menüyü Aç/Kapat">
             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-bars"></use></svg>
         </button>

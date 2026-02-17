@@ -27,7 +27,8 @@ app/logs/cagrivakti-web.log
 app/logs/cagrivakti-bot.log
 app/logs/error_details.log
 app/logs/error.log
-
+logs/*
+!logs/.gitkeep
 # Database Migrations
 # Standard practice is to keep migrations but ignore local db state
 migrations/*.db

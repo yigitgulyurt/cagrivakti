@@ -518,12 +518,19 @@
     }
 
     function updateCountdowns() {
+        if (!namazVakitleri) return;
+
         const tz = namazVakitleri.timezone || 'Europe/Istanbul';
         
         // Yerel saati ve şehir saatini al
         const now = new Date();
         const cityNowStr = now.toLocaleString("en-US", {timeZone: tz});
         const cityNow = new Date(cityNowStr);
+        
+        // Navbar için değişkenler
+        let nextVakitName = null;
+        let nextVakitTime = null;
+        let minDiff = Infinity;
         
         // Milisaniye cinsinden farkı hesapla (toLocaleString saniyeyi yuvarlayabilir, daha hassas fark için)
         // Ancak geri sayım için cityNow yeterlidir.
@@ -535,6 +542,14 @@
             const [hours, minutes] = saat.split(":").map(Number);
             const vakitDate = new Date(cityNow);
             vakitDate.setHours(hours, minutes, 0, 0);
+            
+            // Navbar için en yakın gelecek vakti bul
+            const diffForNavbar = vakitDate - cityNow;
+            if (diffForNavbar > 0 && diffForNavbar < minDiff) {
+                minDiff = diffForNavbar;
+                nextVakitName = vakit;
+                nextVakitTime = saat;
+            }
             
             const countdownEl = document.getElementById(`${vakit}-countdown`);
             if (!countdownEl) return;
@@ -564,6 +579,43 @@
             countdownEl.style.color = '';
             countdownEl.style.backgroundColor = '';
         });
+
+        // Eğer tüm vakitler geçtiyse (Yatsı sonrası), sonraki vakit yarın İmsak'tır
+        if (minDiff === Infinity && namazVakitleri['imsak']) {
+            const saat = namazVakitleri['imsak'];
+            const [hours, minutes] = saat.split(":").map(Number);
+            
+            // Yarınki imsak (Yaklaşık hesap: Bugünkünü yarın olarak alıyoruz)
+            // Not: Tam doğruluk için yarının verisi gerekir ama API'den sadece bugünü çekiyoruz şu an.
+            const vakitDate = new Date(cityNow);
+            vakitDate.setDate(vakitDate.getDate() + 1);
+            vakitDate.setHours(hours, minutes, 0, 0);
+            
+            minDiff = vakitDate - cityNow;
+            nextVakitName = 'imsak';
+            nextVakitTime = saat;
+        }
+
+        // Navbar Güncelleme
+        const navEl = document.getElementById('navbar-vakit-countdown');
+        if (navEl && nextVakitName) {
+            const h = Math.floor(minDiff / 3600000);
+            const m = Math.floor((minDiff % 3600000) / 60000);
+            const s = Math.floor((minDiff % 60000) / 1000);
+            
+            const map = {'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': 'Öğle', 'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'};
+            const displayName = map[nextVakitName] || nextVakitName;
+            
+            navEl.style.display = 'flex';
+            navEl.style.alignItems = 'center';
+            // Mobil uyumluluk için font ayarı
+            if (window.innerWidth < 768) {
+                navEl.style.fontSize = '0.75rem';
+                navEl.style.marginLeft = '10px';
+            }
+            
+            navEl.innerHTML = `<span style="opacity:0.8; margin-right:5px">${displayName}: ${nextVakitTime}</span> <span style="font-family:monospace; font-weight:700; background: rgba(255,193,7,0.1); padding: 2px 6px; border-radius: 4px; color: var(--primary);">${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}</span> <span style="opacity:0.8; margin-left:5px">kaldı</span>`;
+        }
     }
 
     function renderDailyContent(data) {
