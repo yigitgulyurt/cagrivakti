@@ -689,15 +689,54 @@
             const map = {'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': 'Öğle', 'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'};
             const displayName = map[nextVakitName] || nextVakitName;
             
+            // Stil Ayarları
             navEl.style.display = 'flex';
             navEl.style.alignItems = 'center';
-            // Mobil uyumluluk için font ayarı
-            if (window.innerWidth < 768) {
+            navEl.style.gap = '8px';
+            navEl.style.padding = '4px 12px';
+            navEl.style.borderRadius = '20px';
+            navEl.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+            navEl.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            navEl.style.marginLeft = '15px';
+            navEl.style.transition = 'all 0.3s ease';
+            
+            // Mobil uyumluluk
+            const isMobile = window.innerWidth < 768;
+            if (isMobile) {
                 navEl.style.fontSize = '0.75rem';
-                navEl.style.marginLeft = '10px';
+                navEl.style.padding = '2px 8px';
+                navEl.style.marginLeft = 'auto'; // Sağa yasla
+                navEl.style.marginRight = '10px';
+            } else {
+                navEl.style.fontSize = '0.9rem';
             }
             
-            navEl.innerHTML = `<span style="opacity:0.8; margin-right:5px">${displayName}: ${nextVakitTime}</span> <span style="font-family:monospace; font-weight:700; background: rgba(255,193,7,0.1); padding: 2px 6px; border-radius: 4px; color: var(--primary);">${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}</span> <span style="opacity:0.8; margin-left:5px">kaldı</span>`;
+            // HTML İçeriği
+            let iconHtml = '';
+            // Vakit ikonları (FontAwesome classları varsayımıyla, yoksa SVG kullanılabilir)
+            // Projede SVG sprite kullanılıyor, uygun icon ID'lerini kullanmalıyız.
+            // Şimdilik basit bir saat ikonu veya nokta kullanalım.
+            
+            const timeHtml = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            
+            if (isMobile) {
+                // Mobilde daha kompakt görünüm: "İkindi 02:45:12"
+                navEl.innerHTML = `
+                    <span style="color: var(--text-muted); font-weight: 500;">${displayName}</span>
+                    <span style="font-family: 'Roboto Mono', monospace; font-weight: 700; color: var(--primary); letter-spacing: -0.5px;">${timeHtml}</span>
+                `;
+            } else {
+                // Masaüstünde detaylı görünüm
+                navEl.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1;">
+                        <span style="font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">${displayName} Vaktine</span>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-weight: 600; color: var(--text);">${nextVakitTime}</span>
+                            <span style="font-family: 'Roboto Mono', monospace; font-weight: 700; color: var(--primary); background: rgba(255, 193, 7, 0.1); padding: 0 4px; border-radius: 4px;">${timeHtml}</span>
+                        </div>
+                    </div>
+                `;
+            }
         }
     }
 
