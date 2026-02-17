@@ -713,21 +713,21 @@
             
             // Mobil uyumluluk için font ayarı
             if (window.innerWidth < 768) {
-                navEl.style.fontSize = '0.85rem'; // Biraz büyütüldü (eskisi 0.75rem)
+                navEl.style.fontSize = '0.8rem';
                 navEl.style.marginLeft = '10px';
             } else {
-                navEl.style.fontSize = '1rem'; // Masaüstü için varsayılan font boyutu
+                navEl.style.fontSize = '0.9rem';
             }
             
             navEl.innerHTML = `
-                <div style="display: flex; flex-direction: column; line-height: 1.1; text-align: right;">
-                    <span style="font-size: 1.1em; opacity: 1; font-weight: 700; color: #ffc107;">${displayName}</span>
-                    <span style="font-weight: 800; color: #fff; font-size: 1.2em;">${nextVakitTime}</span>
+                <div style="display: flex; flex-direction: column; line-height: 1; text-align: right; justify-content: center;">
+                    <span style="font-size: 1em; opacity: 1; font-weight: 700; color: #ffc107;">${displayName}</span>
+                    <span style="font-weight: 800; color: #fff; font-size: 1.1em;">${nextVakitTime}</span>
                 </div>
-                <div style="background: rgba(255, 193, 7, 0.15); color: #ffc107; padding: 4px 10px; border-radius: 6px; font-family: 'Courier New', monospace; font-weight: 800; font-size: 1.25em; letter-spacing: 0.5px; border: 1px solid rgba(255, 193, 7, 0.4); animation: navbar-pulse 1s infinite ease-in-out; margin: 0 5px;">
+                <div style="background: rgba(255, 193, 7, 0.15); color: #ffc107; padding: 0px 8px; border-radius: 6px; font-family: 'Courier New', monospace; font-weight: 800; font-size: 1.3em; line-height: 1.2; letter-spacing: 0.5px; border: 1px solid rgba(255, 193, 7, 0.4); animation: navbar-pulse 1s infinite ease-in-out; margin: 0 5px;">
                     ${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}
                 </div>
-                <span style="font-size: 1.1em; opacity: 0.9; align-self: center; font-weight: 600; color: #ffc107;">kaldı</span>
+                <span style="font-size: 1em; opacity: 0.9; align-self: center; font-weight: 600; color: #ffc107;">kaldı</span>
             `;
         }
     }
