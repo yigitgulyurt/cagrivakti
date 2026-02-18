@@ -427,31 +427,47 @@
         });
 
         // Navbar Toggle
-        const navToggle = document.getElementById('navToggle');
-        const navLinks = document.getElementById('navLinks');
+        document.addEventListener('DOMContentLoaded', () => {
+            const navToggle = document.getElementById('navToggle');
+            const navLinks = document.getElementById('navLinks');
 
-        if (navToggle && navLinks) {
-            navToggle.addEventListener('click', () => {
-                navLinks.classList.toggle('active');
-                const icon = navToggle.querySelector('use');
-                if (navLinks.classList.contains('active')) {
-                    icon.setAttribute('xlink:href', '#fa-xmark');
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    icon.setAttribute('xlink:href', '#fa-bars');
-                    document.body.style.overflow = 'auto';
-                }
-            });
-
-            // Menü linklerine tıklandığında menüyü kapat
-            navLinks.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinks.classList.remove('active');
-                    navToggle.querySelector('use').setAttribute('xlink:href', '#fa-bars');
-                    document.body.style.overflow = 'auto';
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Tıklama olayının yayılmasını engelle
+                    navLinks.classList.toggle('active');
+                    const icon = navToggle.querySelector('use');
+                    if (navLinks.classList.contains('active')) {
+                        icon.setAttribute('xlink:href', '#fa-xmark');
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        icon.setAttribute('xlink:href', '#fa-bars');
+                        document.body.style.overflow = 'auto';
+                    }
                 });
-            });
-        }
+
+                // Menü linklerine tıklandığında menüyü kapat
+                navLinks.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        navLinks.classList.remove('active');
+                        const icon = navToggle.querySelector('use');
+                        if (icon) icon.setAttribute('xlink:href', '#fa-bars');
+                        document.body.style.overflow = 'auto';
+                    });
+                });
+                
+                // Menü dışına tıklandığında kapatma
+                document.addEventListener('click', (e) => {
+                    if (navLinks.classList.contains('active') && 
+                        !navLinks.contains(e.target) && 
+                        !navToggle.contains(e.target)) {
+                        navLinks.classList.remove('active');
+                        const icon = navToggle.querySelector('use');
+                        if (icon) icon.setAttribute('xlink:href', '#fa-bars');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            }
+        });
     </script>
 
     {% block footer_js %}{% endblock %}

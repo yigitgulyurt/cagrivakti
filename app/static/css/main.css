@@ -441,7 +441,8 @@ body {
     color: var(--text);
     font-size: 1.5rem;
     cursor: pointer;
-    z-index: 1001;
+    position: relative;
+    z-index: 1002;
     padding: 5px;
 }
 
