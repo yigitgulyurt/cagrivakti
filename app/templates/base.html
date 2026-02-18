@@ -236,7 +236,7 @@
         });
 
         // PWA Kurulum Mantığı
-        let deferredPrompt;
+        window.deferredPrompt = null;
         const pwaBanner = document.getElementById('pwaInstallBanner');
         const installBtn = document.getElementById('pwaInstallBtn');
         const closeBtn = document.getElementById('pwaCloseBtn');
@@ -255,7 +255,29 @@
             // Chrome 67 ve öncesinde otomatik gösterimi engelle
             e.preventDefault();
             // Olayı sakla ki daha sonra tetikleyebilelim
-            deferredPrompt = e;
+            window.deferredPrompt = e;
+            
+            // Eğer indirme sayfasındaysak ve kullanıcı etkileşimi gerekmiyorsa (bazı tarayıcılar izin verir)
+            // veya kullanıcı zaten bir butona tıkladıysa hemen tetiklemeyi deneyebiliriz.
+            // Ancak çoğu modern tarayıcı kullanıcı etkileşimi ister.
+            // Bu yüzden indirme sayfasındaysak banner'ı hemen ve büyük gösterelim.
+            if (window.isDownloadPage) {
+                 // Otomatik prompt denemesi (Tarayıcı izin verirse)
+                 try {
+                     e.prompt();
+                 } catch (err) {
+                     console.log('Otomatik prompt engellendi, manuel buton bekleniyor.');
+                 }
+                 
+                 // Fallback: Butonları aktifleştir
+                 const androidBtn = document.querySelector('.android-install .install-card');
+                 if (androidBtn) {
+                     androidBtn.style.cursor = 'pointer';
+                     androidBtn.onclick = () => {
+                         e.prompt();
+                     };
+                 }
+            }
             
             // Eğer reload sonrası ise hemen göster
             if (sessionStorage.getItem('reloadingForPWA')) {
@@ -283,8 +305,23 @@
 
         if (installBtn) {
             installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    // 1. Şehir kontrolü (Cookie)
+                if (window.deferredPrompt) {
+                    // Prompt'u göster
+                    window.deferredPrompt.prompt();
+                    // Kullanıcının seçimini bekle
+                    const { outcome } = await window.deferredPrompt.userChoice;
+                    console.log(`User response to the install prompt: ${outcome}`);
+                    // Prompt'u sıfırla
+                    window.deferredPrompt = null;
+                    // Banner'ı kapat
+                    closePwaBanner();
+                    return;
+                }
+                
+                // Eğer deferredPrompt yoksa (iOS veya zaten yüklü veya desteklenmiyor)
+                // Mevcut akışa devam et (Konum bulma vb.)
+                
+                // 1. Şehir kontrolü (Cookie)
                     const userCity = document.cookie.split('; ').find(row => row.startsWith('user_city='));
                     const pwaText = document.querySelector('.pwa-text p');
                     

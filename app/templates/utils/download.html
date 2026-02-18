@@ -285,70 +285,65 @@
 }
 </style>
 
+{% endblock %}
+
+{% block extra_js %}
 <!-- QR Code Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isAndroid = /android/i.test(userAgent);
-    const isIOS = /iphone|ipad|ipod/i.test(userAgent);
-    const isMobile = isAndroid || isIOS;
+    // Bu sayfanın indirme sayfası olduğunu belirt
+    window.isDownloadPage = true;
 
-    // İçerik gösterimi
-    if (isAndroid) {
-        document.getElementById('android-content').style.display = 'block';
-    } else if (isIOS) {
-        document.getElementById('ios-content').style.display = 'block';
-    } else if (!isMobile) {
-        document.getElementById('desktop-content').style.display = 'block';
-        // QR Kod Oluştur
-         new QRious({
-              element: document.getElementById('qr-code'),
-              value: window.location.origin + window.location.pathname,
-              size: 1024, // Çok yüksek çözünürlük (Yuvarlama hatalarını yok eder)
-              padding: 0, // Kütüphane iç padding'ini sıfırlıyoruz
-              level: 'M',
-              foreground: '#000000',
-              background: 'transparent' // Arka plan şeffaf, sadece siyah kareler çizilir
-          });
-    } else {
-        document.getElementById('generic-content').style.display = 'block';
+    // Eğer deferredPrompt zaten geldiyse (sayfa yüklendikten sonra hızlıca)
+    if (window.deferredPrompt) {
+        try {
+            window.deferredPrompt.prompt();
+        } catch(e) { console.log('Auto prompt failed'); }
     }
-
-    // PWA Kurulum Mantığı
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
+    
+    // Platform tespiti ve ilgili içeriği gösterme
+    document.addEventListener('DOMContentLoaded', function() {
+        const ua = navigator.userAgent.toLowerCase();
+        const isAndroid = ua.indexOf("android") > -1;
+        const isIOS = /iphone|ipad|ipod/.test(ua);
         
-        const installBtns = ['androidInstallBtn', 'desktopInstallBtn'];
-        installBtns.forEach(id => {
-            const btn = document.getElementById(id);
-            if (btn) {
-                btn.addEventListener('click', async () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-                        console.log(`PWA kurulum sonucu: ${outcome}`);
-                        deferredPrompt = null;
+        // Tüm bölümleri gizle
+        document.querySelectorAll('.platform-section').forEach(el => el.style.display = 'none');
+        
+        if (isAndroid) {
+            document.getElementById('android-content').style.display = 'block';
+            
+            // Android kartına tıklayınca yükleme tetikle
+            const androidCard = document.querySelector('.android-install');
+            if (androidCard) {
+                androidCard.style.cursor = 'pointer';
+                androidCard.addEventListener('click', () => {
+                    if (window.deferredPrompt) {
+                        window.deferredPrompt.prompt();
+                    } else {
+                        alert('Uygulama yükleme penceresi tarayıcınız tarafından hazırlanıyor veya uygulamanız zaten yüklü.');
                     }
                 });
             }
-        });
-    });
-
-    // Zaten yüklüyse kontrol et
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        const btns = document.querySelectorAll('.btn-primary');
-        btns.forEach(btn => {
-            if (btn.id.includes('InstallBtn')) {
-                btn.textContent = 'Uygulama Yüklü';
-                btn.disabled = true;
-                btn.style.opacity = '0.7';
+        } else if (isIOS) {
+            document.getElementById('ios-content').style.display = 'block';
+        } else {
+            // Masaüstü
+            document.getElementById('desktop-content').style.display = 'block';
+            
+            // QR Kod Oluşturma
+            if (typeof QRious !== 'undefined') {
+                new QRious({
+                    element: document.getElementById('qr-code'),
+                    value: window.location.origin + window.location.pathname,
+                    size: 200,
+                    level: 'M',
+                    foreground: '#000000',
+                    background: 'transparent'
+                });
             }
-        });
-    }
-});
+        }
+    });
 </script>
 {% endblock %}
