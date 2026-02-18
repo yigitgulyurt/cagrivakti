@@ -135,6 +135,30 @@
             {% endfor %}
         </div>
     </section>
+
+    <!-- SEO ve Botlar İçin Tüm Şehir Linkleri (NoScript / Fallback) -->
+    <noscript>
+        <section class="seo-city-list" style="margin-top: 50px; padding: 20px;">
+            <h3>Tüm Şehirler</h3>
+            <ul style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px;">
+                {% for city in cities %}
+                <li>
+                    <a href="{{ url_for('views.sehir_sayfasi', sehir=city.name, country=city.country) }}" title="{{ city.name }} Namaz Vakitleri">
+                        {{ city.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </noscript>
+    
+    <!-- JavaScript yüklendiğinde bu bölüm gizlenebilir veya botlar için açık bırakılabilir -->
+    <div class="all-cities-seo" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">
+        {% for city in cities %}
+        <a href="{{ url_for('views.sehir_sayfasi', sehir=city.name, country=city.country) }}">{{ city.name }}</a>
+        {% endfor %}
+    </div>
+
 </div>
 {% endblock %}
 

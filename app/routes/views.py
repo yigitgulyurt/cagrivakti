@@ -83,7 +83,27 @@ def sehir_sayfasi(sehir):
 @views_bp.route('/sehir')
 @cache.cached(timeout=3600)
 def sehir_secimi():
-    return render_template('city/city_selection.html')
+    # SEO İçin Server-Side Rendering: Tüm şehirleri backend'den çekip gönderiyoruz
+    # Türkiye Şehirleri (Bölgelere göre gruplu değil düz liste olarak alıp template'de işleyebiliriz veya burada gruplayabiliriz)
+    # Performans için sadece isim ve ülke kodu listesi gönderelim.
+    
+    # Not: UserService.get_sehirler('ALL') tüm şehirleri döndürüyor olabilir ama yapıya bakmamız lazım.
+    # Sitemap fonksiyonunda kullanıldığı gibi:
+    all_cities = UserService.get_sehirler('ALL')
+    
+    # Şehir verilerini (isim, ülke) listesi haline getirelim
+    city_data = []
+    for city in all_cities:
+        country = get_country_for_city(city)
+        # Sadece Türkiye şehirlerini öne çıkarmak veya hepsini göndermek isteyebiliriz.
+        # Sayfa yapısına uygun olarak hepsini gönderelim, template'de JS ile filtreleme zaten var ama
+        # SEO için HTML içinde olması önemli.
+        city_data.append({'name': city, 'country': country})
+        
+    # Şehirleri alfabetik sırala
+    city_data.sort(key=lambda x: x['name'])
+
+    return render_template('city/city_selection.html', cities=city_data)
 
 @views_bp.route('/kible-pusulasi')
 @cache.cached(timeout=86400)
