@@ -434,8 +434,22 @@
     let namazVakitleri = JSON.parse('{{ vakitler|tojson|safe }}');
 
     // LocalStorage Önbellek Yönetimi
-    const CACHE_KEY = `vakitler_${mevcutSehir}_${mevcutUlke}`;
-    const DAILY_CONTENT_CACHE_KEY = 'daily_content_cache';
+    // Versiyon kontrolü: Eski cache'leri temizlemek için suffix ekledik
+    const CACHE_VERSION = 'v2';
+    const CACHE_KEY = `vakitler_${mevcutSehir}_${mevcutUlke}_${CACHE_VERSION}`;
+    const DAILY_CONTENT_CACHE_KEY = `daily_content_cache_${CACHE_VERSION}`;
+
+    // Eski cache'leri temizle (v1 veya versiyonsuz)
+    try {
+        const oldKey = `vakitler_${mevcutSehir}_${mevcutUlke}`;
+        if (localStorage.getItem(oldKey)) {
+            localStorage.removeItem(oldKey);
+        }
+        if (localStorage.getItem('daily_content_cache')) {
+            localStorage.removeItem('daily_content_cache');
+        }
+    } catch (e) { console.error('Eski cache temizleme hatası:', e); }
+    
     
     // TODAY hesaplaması: Şehrin yerel saatine göre yapılmalı
     const _now = new Date();

@@ -317,7 +317,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function initHomeCountdown(city, country) {
         try {
-            const CACHE_KEY = `vakitler_${city}_${country}`;
+            // Versiyon kontrolü: Eski cache'leri temizlemek için suffix ekledik
+            const CACHE_VERSION = 'v2';
+            const CACHE_KEY = `vakitler_${city}_${country}_${CACHE_VERSION}`;
+            
+            // Eski cache'i temizle
+            try {
+                const oldKey = `vakitler_${city}_${country}`;
+                if (localStorage.getItem(oldKey)) {
+                    localStorage.removeItem(oldKey);
+                }
+            } catch (e) { console.error('Eski cache temizleme hatası:', e); }
+
             const cached = localStorage.getItem(CACHE_KEY);
             let data = null;
 
