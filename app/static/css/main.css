@@ -443,7 +443,19 @@ body {
     cursor: pointer;
     position: relative;
     z-index: 1002;
-    padding: 5px;
+    padding: 10px; /* Arttırıldı */
+    width: 44px;   /* Mobil için ideal tıklama alanı */
+    height: 44px;  /* Mobil için ideal tıklama alanı */
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-toggle:active {
+    transform: scale(0.95); /* Tıklama efekti */
+}
+
+.nav-toggle svg {
+    pointer-events: none; /* Tıklamayı butona geçir */
 }
 
 @media (max-width: 768px) {

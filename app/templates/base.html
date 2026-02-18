@@ -432,17 +432,36 @@
             const navLinks = document.getElementById('navLinks');
 
             if (navToggle && navLinks) {
-                navToggle.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Tıklama olayının yayılmasını engelle
-                    navLinks.classList.toggle('active');
-                    const icon = navToggle.querySelector('use');
-                    if (navLinks.classList.contains('active')) {
-                        icon.setAttribute('xlink:href', '#fa-xmark');
-                        document.body.style.overflow = 'hidden';
-                    } else {
-                        icon.setAttribute('xlink:href', '#fa-bars');
-                        document.body.style.overflow = 'auto';
+                // Menü aç/kapat fonksiyonu
+                function toggleMenu(e) {
+                    if (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
                     }
+                    
+                    const isActive = navLinks.classList.contains('active');
+                    const icon = navToggle.querySelector('use');
+                    
+                    if (isActive) {
+                        navLinks.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+                        if (icon) icon.setAttribute('xlink:href', '#fa-bars');
+                    } else {
+                        navLinks.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                        if (icon) icon.setAttribute('xlink:href', '#fa-xmark');
+                    }
+                }
+
+                // Click olayını dinle
+                navToggle.addEventListener('click', toggleMenu);
+                
+                // Dokunmatik cihazlar için touchstart desteği (bazı durumlarda gerekebilir)
+                navToggle.addEventListener('touchstart', (e) => {
+                    // Touchstart tetiklendiğinde click'i beklemeden işlem yapabiliriz
+                    // Ancak çift tetiklemeyi önlemek için dikkatli olunmalı.
+                    // Genellikle click yeterlidir, ama sorun devam ederse bu blok aktif edilebilir.
+                    // Şimdilik sadece click yeterli olmalı.
                 });
 
                 // Menü linklerine tıklandığında menüyü kapat
@@ -466,6 +485,8 @@
                         document.body.style.overflow = 'auto';
                     }
                 });
+            } else {
+                console.error('Navbar elementleri bulunamadı!');
             }
         });
     </script>
