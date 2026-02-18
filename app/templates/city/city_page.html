@@ -5,6 +5,14 @@
 {% block og_title %}{{ seo_title }}{% endblock %}
 {% block og_description %}{{ seo_description }}{% endblock %}
 
+{% block canonical %}
+{% if country_code == 'TR' %}
+{{ url_for('views.sehir_sayfasi', sehir=sehir, _external=True) }}
+{% else %}
+{{ url_for('views.sehir_sayfasi', sehir=sehir, country=country_code, _external=True) }}
+{% endif %}
+{% endblock %}
+
 {% block json_ld %}
 {
   "@context": "https://schema.org",
