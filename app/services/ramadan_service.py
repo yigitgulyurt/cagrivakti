@@ -14,6 +14,70 @@ class RamadanService:
     }
 
     @classmethod
+    def get_ramadan_dates(cls, year):
+        if year in cls.RAMADAN_DATES:
+            return cls.RAMADAN_DATES[year]
+        
+        # API'den çekme denemesi
+        try:
+            # Hicri yıl tahmini: (Y - 622) * 1.03
+            hijri_year = int((year - 622) * 1.030684)
+            
+            # Bu hicri yıldaki Ramazan'ı bul
+            dates = cls._fetch_ramadan_for_hijri_year(hijri_year)
+            
+            # Eğer bu Ramazan, aradığımız Miladi yılın içinde değilse, bir sonraki/önceki yıla bak
+            if dates:
+                start_year = dates['start'].year
+                # Eğer Ramazan başlangıcı aradığımız yıldan önceyse, bir sonraki hicri yıla bak
+                # Ancak Ramazan yıl sonuna denk gelip diğer yıla sarkabilir, bu yüzden
+                # sadece başlangıç yılı çok gerideyse (örn bir önceki yıl) artırırız.
+                # Basit mantık: Eğer start_year < year ise H+1 dene.
+                # Eğer start_year > year ise H-1 dene.
+                if start_year < year:
+                     dates = cls._fetch_ramadan_for_hijri_year(hijri_year + 1)
+                elif start_year > year:
+                     dates = cls._fetch_ramadan_for_hijri_year(hijri_year - 1)
+            
+            if dates:
+                cls.RAMADAN_DATES[year] = dates
+                return dates
+                
+        except Exception as e:
+            print(f"Ramazan tarihleri API'den çekilemedi: {e}")
+            
+        return None
+
+    @staticmethod
+    def _fetch_ramadan_for_hijri_year(h_year):
+        import requests
+        try:
+            url = f"http://api.aladhan.com/v1/hToGCalendar/9/{h_year}"
+            resp = requests.get(url, timeout=5)
+            if resp.status_code == 200:
+                data = resp.json().get('data', [])
+                if data:
+                    # İlk gün
+                    first_day = data[0]['gregorian']['date'] # DD-MM-YYYY
+                    # Son gün
+                    last_day = data[-1]['gregorian']['date']
+                    # Kadir gecesi (27. gün)
+                    kadir_idx = 26 if len(data) >= 27 else -1
+                    kadir_day = data[kadir_idx]['gregorian']['date']
+                    
+                    def parse_date(d_str):
+                        return datetime.strptime(d_str, "%d-%m-%Y").date()
+
+                    return {
+                        "start": parse_date(first_day),
+                        "end": parse_date(last_day),
+                        "laylat_al_qadr": parse_date(kadir_day)
+                    }
+        except Exception as e:
+            print(f"API hatası ({h_year}): {e}")
+        return None
+
+    @classmethod
     def get_ramadan_info(cls, current_date=None):
         if current_date is None:
             # Türkiye saatine göre bugün
@@ -27,7 +91,7 @@ class RamadanService:
             return cached_info
 
         year = current_date.year
-        dates = cls.RAMADAN_DATES.get(year)
+        dates = cls.get_ramadan_dates(year)
         
         res = {"is_ramadan": False, "status": "none"}
         
