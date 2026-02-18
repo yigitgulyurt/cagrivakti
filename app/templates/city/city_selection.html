@@ -262,6 +262,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    text-decoration: none; /* Link alt çizgisini kaldır */
+    color: inherit; /* Metin rengini koru */
 }
 
 .skeleton-card {
@@ -396,13 +398,14 @@
                     }
                 }
 
-                const card = $('<div>')
+                const card = $('<a>')
                     .addClass('city-card')
-                    .click(function() {
-                        if ($(this).hasClass('skeleton-card')) return;
-                        // Çevrimdışı uyumluluk için doğrudan yönlendir
-                        // Sunucu tarafındaki tercih kaydı sehir_sayfasi route'unda zaten yapılıyor
-                        window.location.href = `/sehir/${sehir}?country=${itemCountryCode}`;
+                    .attr('href', `/sehir/${sehir}?country=${itemCountryCode}`)
+                    .click(function(e) {
+                        if ($(this).hasClass('skeleton-card')) {
+                            e.preventDefault();
+                            return;
+                        }
                     });
 
                 const cityName = $('<div>').addClass('city-name');
