@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 from app.extensions import db, cache
 from app.models import NamazVakti, DailyContent, Guide
-from flask import request, session
+from flask import request, session, current_app
 from .ramadan_service import RamadanService
 
 # Varsayılan değerler
@@ -14,26 +14,28 @@ DEFAULT_COUNTRY = 'TR'
 DEFAULT_CITY = 'Istanbul'
 DEFAULT_TZ = 'Europe/Istanbul'
 
-# Uygulama dizinlerini ayarla
-SERVICES_DIR = os.path.dirname(os.path.abspath(__file__))
-APP_DIR = os.path.dirname(SERVICES_DIR)
-DATA_DIR = os.path.join(APP_DIR, 'data')
+# Uygulama kök dizinini al (app/services/.. -> app/)
+APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(APP_ROOT, 'data')
 
-def load_json_data(filename):
+def _load_json_data(filename):
     try:
         file_path = os.path.join(DATA_DIR, filename)
-        if os.path.exists(file_path):
-            with open(file_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        return {}
+        if not os.path.exists(file_path):
+            return {}
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
     except Exception as e:
         print(f"Error loading {filename}: {e}")
         return {}
 
-# Şehir isimlerini Türkçe karakterli göstermek için eşleme
-CITY_DISPLAY_NAME_MAPPING = load_json_data('city_display_names.json')
+# Verileri Yükle
+_cities_data = _load_json_data('cities.json')
+CITY_DISPLAY_NAME_MAPPING = _cities_data.get('display_names', {})
+_COUNTRY_MAP = _cities_data.get('country_map', {})
+_CITY_LISTS = _cities_data.get('lists', {})
 
-# Bellek içi singleton veriler
+# Timezone cache
 _CITY_TIMEZONE_MAPPING_CACHE = None
 
 def get_timezone_for_city(sehir, country_code='TR'):
@@ -42,24 +44,21 @@ def get_timezone_for_city(sehir, country_code='TR'):
     """
     global _CITY_TIMEZONE_MAPPING_CACHE
     if _CITY_TIMEZONE_MAPPING_CACHE is None:
-        raw_data = load_json_data('city_timezones.json')
+        raw_timezones = _load_json_data('timezones.json')
         _CITY_TIMEZONE_MAPPING_CACHE = {}
-        for key, value in raw_data.items():
-            if '|' in key:
-                parts = key.split('|')
-                if len(parts) == 2:
-                    city, country = parts
-                    _CITY_TIMEZONE_MAPPING_CACHE[(city, country)] = value
+        for key, tz in raw_timezones.items():
+            try:
+                city, country = key.split('|')
+                _CITY_TIMEZONE_MAPPING_CACHE[(city, country)] = tz
+            except ValueError:
+                continue
     
     # Doğrudan erişim (O(1))
     return _CITY_TIMEZONE_MAPPING_CACHE.get((sehir.lower(), country_code.lower()), DEFAULT_TZ)
 
 def get_country_for_city(sehir):
     """Şehrin bağlı olduğu ülke kodunu döndürür."""
-    global _CITY_COUNTRY_MAPPING_CACHE
-    if _CITY_COUNTRY_MAPPING_CACHE is None:
-        _CITY_COUNTRY_MAPPING_CACHE = load_json_data('city_countries.json')
-    return _CITY_COUNTRY_MAPPING_CACHE.get(sehir, 'TR')
+    return _COUNTRY_MAP.get(sehir, 'TR')
 
 def get_current_date(timezone_str=DEFAULT_TZ):
     """Verilen timezone'a göre yerel saati döndürür."""
@@ -93,16 +92,13 @@ class UserService:
 
     @staticmethod
     def get_sehirler(country_code=DEFAULT_COUNTRY):
-        global _CITIES_BY_COUNTRY_CACHE
-        if _CITIES_BY_COUNTRY_CACHE is None:
-             _CITIES_BY_COUNTRY_CACHE = load_json_data('cities_by_country.json')
-        
+        # Ülkeye göre şehir listesi
         if country_code == 'TR':
-            return _CITIES_BY_COUNTRY_CACHE.get('TR', [])
+            return _CITY_LISTS.get('TR', [])
         elif country_code == 'INT':
-            return _CITIES_BY_COUNTRY_CACHE.get('INT', [])
+            return _CITY_LISTS.get('INT', [])
         elif country_code == 'ALL':
-            return _CITIES_BY_COUNTRY_CACHE.get('TR', []) + _CITIES_BY_COUNTRY_CACHE.get('INT', [])
+            return _CITY_LISTS.get('TR', []) + _CITY_LISTS.get('INT', [])
         return [DEFAULT_CITY]
 
 class PrayerService:

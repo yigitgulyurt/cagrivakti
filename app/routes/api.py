@@ -20,12 +20,6 @@ def sehirleri_getir():
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
     return jsonify(UserService.get_sehirler(country_code))
 
-@api_bp.route('/city-mappings')
-@cache.cached(timeout=86400)
-def get_city_mappings():
-    from app.services import CITY_DISPLAY_NAME_MAPPING
-    return jsonify(CITY_DISPLAY_NAME_MAPPING)
-
 @api_bp.route('/sehir_kaydet', methods=['POST'])
 def sehir_kaydet():
     data = request.get_json()
@@ -144,7 +138,7 @@ def public_api_vakitler():
             ramadan_info = RamadanService.get_ramadan_info()
             
             # RamadanService'den o yıla ait tarihleri al
-            dates = RamadanService.RAMADAN_DATES.get(int(yil))
+            dates = RamadanService.get_ramadan_dates_by_year(int(yil))
             if dates:
                 start_date = dates["start"]
                 end_date = dates["end"]
