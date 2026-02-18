@@ -436,7 +436,16 @@
     // LocalStorage Önbellek Yönetimi
     const CACHE_KEY = `vakitler_${mevcutSehir}_${mevcutUlke}`;
     const DAILY_CONTENT_CACHE_KEY = 'daily_content_cache';
-    const TODAY = new Date().toISOString().split('T')[0];
+    
+    // TODAY hesaplaması: Şehrin yerel saatine göre yapılmalı
+    const _now = new Date();
+    const _tz = namazVakitleri.timezone || 'Europe/Istanbul';
+    const _cityNowStr = _now.toLocaleString("en-US", {timeZone: _tz});
+    const _cityNow = new Date(_cityNowStr);
+    const _year = _cityNow.getFullYear();
+    const _month = String(_cityNow.getMonth() + 1).padStart(2, '0');
+    const _day = String(_cityNow.getDate()).padStart(2, '0');
+    const TODAY = `${_year}-${_month}-${_day}`;
 
     function getCachedVakitler() {
         try {
@@ -682,7 +691,14 @@
 
         // Gün değişimi kontrolü (Gece yarısı tetikleyicisi)
         const currentDataDate = namazVakitleri.tarih; // API'den gelen tarih (YYYY-MM-DD)
-        const todayStr = cityNow.toISOString().split('T')[0];
+        
+        // cityNow objesi hedef şehrin saatini "yerel saat" gibi tutuyor.
+        // Bu yüzden toISOString() yerine doğrudan get metodlarını kullanmalıyız.
+        // Çünkü toISOString() UTC'ye çevirir ve timezone farkından dolayı tarihi geri atabilir.
+        const year = cityNow.getFullYear();
+        const month = String(cityNow.getMonth() + 1).padStart(2, '0');
+        const day = String(cityNow.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
         
         // Eğer verideki tarih bugünün tarihi değilse ve saat 00:00'ı geçtiyse yenile
         // Not: Yatsı sonrası İmsak sayacı bozulmasın diye sadece tarih değişince yenileme yapıyoruz.
