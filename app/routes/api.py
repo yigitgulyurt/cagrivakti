@@ -138,7 +138,7 @@ def public_api_vakitler():
             ramadan_info = RamadanService.get_ramadan_info()
             
             # RamadanService'den o yıla ait tarihleri al
-            dates = RamadanService.get_ramadan_dates_by_year(int(yil))
+            dates = RamadanService.RAMADAN_DATES.get(int(yil))
             if dates:
                 start_date = dates["start"]
                 end_date = dates["end"]

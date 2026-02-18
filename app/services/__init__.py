@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 from app.extensions import db, cache
 from app.models import NamazVakti, DailyContent, Guide
-from flask import request, session, current_app
+from flask import request, session
 from .ramadan_service import RamadanService
 
 # Varsayılan değerler
@@ -14,28 +14,31 @@ DEFAULT_COUNTRY = 'TR'
 DEFAULT_CITY = 'Istanbul'
 DEFAULT_TZ = 'Europe/Istanbul'
 
-# Uygulama kök dizinini al (app/services/.. -> app/)
-APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(APP_ROOT, 'data')
+# Şehir isimlerini Türkçe karakterli göstermek için eşleme
+CITY_DISPLAY_NAME_MAPPING = {
+    # Türkiye
+    "Adiyaman": "Adıyaman", "Agri": "Ağrı", "Aydin": "Aydın", "Balikesir": "Balıkesir", "Bingol": "Bingöl",
+    "Bitlis": "Bitlis", "Cankiri": "Çankırı", "Corum": "Çorum", "Diyarbakir": "Diyarbakır", "Duzce": "Düzce",
+    "Elazig": "Elazığ", "Gumushane": "Gümüşhane", "Igdir": "Iğdır", "Istanbul": "İstanbul", "Izmir": "İzmir",
+    "Kahramanmaras": "Kahramanmaraş", "Karabuk": "Karabük", "Kirikkale": "Kırıkkale", "Kirklareli": "Kırklareli",
+    "Kirsehir": "Kırşehir", "Kutahya": "Kütahya", "Mus": "Muş", "Nigde": "Niğde", "Sanliurfa": "Şanlıurfa",
+    "Sirnak": "Şırnak", "Tekirdag": "Tekirdağ", "Usak": "Uşak",
+    # Uluslararası
+    "New-York": "New York", "Los-Angeles": "Los Angeles", "Mexico-City": "Mexico City", "San-Salvador": "San Salvador",
+    "Guatemala-City": "Guatemala City", "Tegucigalpa": "Tegucigalpa", "Panama-City": "Panama City", 
+    "Santo-Domingo": "Santo Domingo", "Port-au-Prince": "Port-au-Prince", "Saint-Johns": "Saint John's",
+    "Saint-Georges": "Saint George's", "Port-of-Spain": "Port of Spain", "Rio-de-Janeiro": "Rio de Janeiro",
+    "Buenos-Aires": "Buenos Aires", "Andorra-la-Vella": "Andorra la Vella", "St.-Petersburg": "St. Petersburg",
+    "Nur-Sultan": "Nur-Sultan", "New-Delhi": "New Delhi", "Hong-Kong": "Hong Kong", "Kuala-Lumpur": "Kuala Lumpur",
+    "Phnom-Penh": "Phnom Penh", "Bandar-Seri-Begawan": "Bandar Seri Begawan", "Port-Moresby": "Port Moresby",
+    "N-Djamena": "N'Djamena", "Addis-Ababa": "Addis Ababa", "Cape-Town": "Cape Town", "Sao-Tome": "São Tomé",
+    "Saint-Denis": "Saint-Denis", "Mecca": "Mekke", "Medina": "Medine", "Jerusalem": "Kudüs"
+}
 
-def _load_json_data(filename):
-    try:
-        file_path = os.path.join(DATA_DIR, filename)
-        if not os.path.exists(file_path):
-            return {}
-        with open(file_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Error loading {filename}: {e}")
-        return {}
+# Uygulama kök dizinini al
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-# Verileri Yükle
-_cities_data = _load_json_data('cities.json')
-CITY_DISPLAY_NAME_MAPPING = _cities_data.get('display_names', {})
-_COUNTRY_MAP = _cities_data.get('country_map', {})
-_CITY_LISTS = _cities_data.get('lists', {})
-
-# Timezone cache
+# Bellek içi singleton veriler
 _CITY_TIMEZONE_MAPPING_CACHE = None
 
 def get_timezone_for_city(sehir, country_code='TR'):
@@ -44,21 +47,165 @@ def get_timezone_for_city(sehir, country_code='TR'):
     """
     global _CITY_TIMEZONE_MAPPING_CACHE
     if _CITY_TIMEZONE_MAPPING_CACHE is None:
-        raw_timezones = _load_json_data('timezones.json')
-        _CITY_TIMEZONE_MAPPING_CACHE = {}
-        for key, tz in raw_timezones.items():
-            try:
-                city, country = key.split('|')
-                _CITY_TIMEZONE_MAPPING_CACHE[(city, country)] = tz
-            except ValueError:
-                continue
+        _CITY_TIMEZONE_MAPPING_CACHE = {
+            # Turkey
+            ('istanbul', 'tr'): 'Europe/Istanbul',
+            ('ankara', 'tr'): 'Europe/Istanbul',
+            ('izmir', 'tr'): 'Europe/Istanbul',
+            # International - North America
+            ('washington', 'us'): 'America/New_York',
+            ('new-york', 'us'): 'America/New_York',
+            ('los-angeles', 'us'): 'America/Los_Angeles',
+            ('ottawa', 'ca'): 'America/Toronto',
+            ('toronto', 'ca'): 'America/Toronto',
+            ('mexico-city', 'mx'): 'America/Mexico_City',
+            ('havana', 'cu'): 'America/Havana',
+            # South America
+            ('brasilia', 'br'): 'America/Sao_Paulo',
+            ('sao-paulo', 'br'): 'America/Sao_Paulo',
+            ('rio-de-janeiro', 'br'): 'America/Sao_Paulo',
+            ('buenos-aires', 'ar'): 'America/Argentina/Buenos_Aires',
+            ('santiago', 'cl'): 'America/Santiago',
+            ('bogota', 'co'): 'America/Bogota',
+            ('lima', 'pe'): 'America/Lima',
+            ('caracas', 've'): 'America/Caracas',
+            # Europe
+            ('london', 'gb'): 'Europe/London',
+            ('paris', 'fr'): 'Europe/Paris',
+            ('berlin', 'de'): 'Europe/Berlin',
+            ('rome', 'it'): 'Europe/Rome',
+            ('madrid', 'es'): 'Europe/Madrid',
+            ('amsterdam', 'nl'): 'Europe/Amsterdam',
+            ('brussels', 'be'): 'Europe/Brussels',
+            ('vienna', 'at'): 'Europe/Vienna',
+            ('bern', 'ch'): 'Europe/Zurich',
+            ('lisbon', 'pt'): 'Europe/Lisbon',
+            ('athens', 'gr'): 'Europe/Athens',
+            ('dublin', 'ie'): 'Europe/Dublin',
+            ('stockholm', 'se'): 'Europe/Stockholm',
+            ('oslo', 'no'): 'Europe/Oslo',
+            ('copenhagen', 'dk'): 'Europe/Copenhagen',
+            ('helsinki', 'fi'): 'Europe/Helsinki',
+            ('reykjavik', 'is'): 'Atlantic/Reykjavik',
+            ('moscow', 'ru'): 'Europe/Moscow',
+            ('kiev', 'ua'): 'Europe/Kiev',
+            ('warsaw', 'pl'): 'Europe/Warsaw',
+            ('prague', 'cz'): 'Europe/Prague',
+            ('budapest', 'hu'): 'Europe/Budapest',
+            ('bucharest', 'ro'): 'Europe/Bucharest',
+            ('sofia', 'bg'): 'Europe/Sofia',
+            ('belgrade', 'rs'): 'Europe/Belgrade',
+            ('sarajevo', 'ba'): 'Europe/Sarajevo',
+            ('skopje', 'mk'): 'Europe/Skopje',
+            ('tirana', 'al'): 'Europe/Tirane',
+            ('pristina', 'xk'): 'Europe/Belgrade',
+            ('zagreb', 'hr'): 'Europe/Zagreb',
+            # Middle East
+            ('mecca', 'sa'): 'Asia/Riyadh',
+            ('medina', 'sa'): 'Asia/Riyadh',
+            ('riyadh', 'sa'): 'Asia/Riyadh',
+            ('baku', 'az'): 'Asia/Baku',
+            ('tbilisi', 'ge'): 'Asia/Tbilisi',
+            ('yerevan', 'am'): 'Asia/Yerevan',
+            ('baghdad', 'iq'): 'Asia/Baghdad',
+            ('tehran', 'ir'): 'Asia/Tehran',
+            ('damascus', 'sy'): 'Asia/Damascus',
+            ('beirut', 'lb'): 'Asia/Beirut',
+            ('amman', 'jo'): 'Asia/Amman',
+            ('jerusalem', 'il'): 'Asia/Jerusalem',
+            ('dubai', 'ae'): 'Asia/Dubai',
+            ('kuwait', 'kw'): 'Asia/Kuwait',
+            ('doha', 'qa'): 'Asia/Qatar',
+            ('muscat', 'om'): 'Asia/Muscat',
+            ('manama', 'bh'): 'Asia/Bahrain',
+            ('sanaa', 'ye'): 'Asia/Aden',
+            ('nicosia', 'cy'): 'Asia/Nicosia',
+            # Asia
+            ('nur-sultan', 'kz'): 'Asia/Almaty',
+            ('almaty', 'kz'): 'Asia/Almaty',
+            ('tashkent', 'uz'): 'Asia/Tashkent',
+            ('ashgabat', 'tm'): 'Asia/Ashgabat',
+            ('bishkek', 'kg'): 'Asia/Bishkek',
+            ('dushanbe', 'tj'): 'Asia/Dushanbe',
+            ('kabul', 'af'): 'Asia/Kabul',
+            ('islamabad', 'pk'): 'Asia/Karachi',
+            ('new-delhi', 'in'): 'Asia/Kolkata',
+            ('tokyo', 'jp'): 'Asia/Tokyo',
+            ('seoul', 'kr'): 'Asia/Seoul',
+            ('beijing', 'cn'): 'Asia/Shanghai',
+            ('jakarta', 'id'): 'Asia/Jakarta',
+            ('singapore', 'sg'): 'Asia/Singapore',
+            ('kuala-lumpur', 'my'): 'Asia/Kuala_Lumpur',
+            ('bangkok', 'th'): 'Asia/Bangkok',
+            ('manila', 'ph'): 'Asia/Manila',
+            ('hanoi', 'vn'): 'Asia/Ho_Chi_Minh',
+            # Oceania
+            ('sydney', 'au'): 'Australia/Sydney',
+            ('melbourne', 'au'): 'Australia/Melbourne',
+            ('perth', 'au'): 'Australia/Perth',
+            ('auckland', 'nz'): 'Pacific/Auckland',
+            # Africa
+            ('cairo', 'eg'): 'Africa/Cairo',
+            ('tripoli', 'ly'): 'Africa/Tripoli',
+            ('tunis', 'tn'): 'Africa/Tunis',
+            ('algiers', 'dz'): 'Africa/Algiers',
+            ('rabat', 'ma'): 'Africa/Casablanca',
+            ('khartoum', 'sd'): 'Africa/Khartoum',
+            ('abuja', 'ng'): 'Africa/Lagos',
+            ('dakar', 'sn'): 'Africa/Dakar',
+            ('nairobi', 'ke'): 'Africa/Nairobi',
+            ('addis-ababa', 'et'): 'Africa/Addis_Ababa',
+            ('pretoria', 'za'): 'Africa/Johannesburg',
+            ('cape-town', 'za'): 'Africa/Johannesburg',
+            ('kinshasa', 'cd'): 'Africa/Kinshasa',
+            ('juba', 'ss'): 'Africa/Juba'
+        }
     
     # Doğrudan erişim (O(1))
     return _CITY_TIMEZONE_MAPPING_CACHE.get((sehir.lower(), country_code.lower()), DEFAULT_TZ)
 
 def get_country_for_city(sehir):
     """Şehrin bağlı olduğu ülke kodunu döndürür."""
-    return _COUNTRY_MAP.get(sehir, 'TR')
+    mapping = {
+        # Türkiye
+        'Istanbul': 'TR', 'Ankara': 'TR', 'Izmir': 'TR',
+        # North America
+        'Washington': 'US', 'New-York': 'US', 'Los-Angeles': 'US',
+        'Ottawa': 'CA', 'Toronto': 'CA', 'Mexico-City': 'MX', 'Havana': 'CU',
+        # South America
+        'Brasilia': 'BR', 'Sao-Paulo': 'BR', 'Rio-de-Janeiro': 'BR',
+        'Buenos-Aires': 'AR', 'Santiago': 'CL', 'Bogota': 'CO',
+        'Lima': 'PE', 'Caracas': 'VE',
+        # Europe
+        'London': 'GB', 'Paris': 'FR', 'Berlin': 'DE', 'Rome': 'IT',
+        'Madrid': 'ES', 'Amsterdam': 'NL', 'Brussels': 'BE', 'Vienna': 'AT',
+        'Bern': 'CH', 'Lisbon': 'PT', 'Athens': 'GR', 'Dublin': 'IE',
+        'Stockholm': 'SE', 'Oslo': 'NO', 'Copenhagen': 'DK', 'Helsinki': 'FI',
+        'Reykjavik': 'IS', 'Moscow': 'RU', 'Kiev': 'UA', 'Warsaw': 'PL',
+        'Prague': 'CZ', 'Budapest': 'HU', 'Bucharest': 'RO', 'Sofia': 'BG',
+        'Belgrade': 'RS', 'Sarajevo': 'BA', 'Skopje': 'MK', 'Tirana': 'AL',
+        'Pristina': 'XK', 'Zagreb': 'HR',
+        # Middle East
+        'Mecca': 'SA', 'Medina': 'SA', 'Riyadh': 'SA', 'Baku': 'AZ',
+        'Tbilisi': 'GE', 'Yerevan': 'AM', 'Baghdad': 'IQ', 'Tehran': 'IR',
+        'Damascus': 'SY', 'Beirut': 'LB', 'Amman': 'JO', 'Jerusalem': 'IL',
+        'Dubai': 'AE', 'Kuwait': 'KW', 'Doha': 'QA',
+        'Muscat': 'OM', 'Manama': 'BH', 'Sanaa': 'YE', 'Nicosia': 'CY',
+        # Asia
+        'Nur-Sultan': 'KZ', 'Almaty': 'KZ', 'Tashkent': 'UZ', 'Ashgabat': 'TM',
+        'Bishkek': 'KG', 'Dushanbe': 'TJ', 'Kabul': 'AF', 'Islamabad': 'PK',
+        'New-Delhi': 'IN', 'Tokyo': 'JP', 'Seoul': 'KR', 'Beijing': 'CN',
+        'Jakarta': 'ID', 'Singapore': 'SG', 'Kuala-Lumpur': 'MY',
+        'Bangkok': 'TH', 'Manila': 'PH', 'Hanoi': 'VN',
+        # Oceania
+        'Sydney': 'AU', 'Melbourne': 'AU', 'Perth': 'AU', 'Auckland': 'NZ',
+        # Africa
+        'Cairo': 'EG', 'Tripoli': 'LY', 'Tunis': 'TN', 'Algiers': 'DZ',
+        'Rabat': 'MA', 'Khartoum': 'SD', 'Abuja': 'NG', 'Dakar': 'SN',
+        'Nairobi': 'KE', 'Addis-Ababa': 'ET', 'Pretoria': 'ZA', 'Cape-Town': 'ZA',
+        'Kinshasa': 'CD', 'Juba': 'SS'
+    }
+    return mapping.get(sehir, 'TR')
 
 def get_current_date(timezone_str=DEFAULT_TZ):
     """Verilen timezone'a göre yerel saati döndürür."""
@@ -94,11 +241,33 @@ class UserService:
     def get_sehirler(country_code=DEFAULT_COUNTRY):
         # Ülkeye göre şehir listesi
         if country_code == 'TR':
-            return _CITY_LISTS.get('TR', [])
+            return [
+                "Adana", "Adiyaman", "Afyonkarahisar", "Agri", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin",
+                "Aydin", "Balikesir", "Bartin", "Batman", "Bayburt", "Bilecik", "Bingol", "Bitlis", "Bolu", "Burdur", "Bursa",
+                "Canakkale", "Cankiri", "Corum", "Denizli", "Diyarbakir", "Duzce", "Edirne", "Elazig", "Erzincan", "Erzurum",
+                "Eskisehir", "Gaziantep", "Giresun", "Gumushane", "Hakkari", "Hatay", "Igdir", "Isparta", "Istanbul", "Izmir",
+                "Kahramanmaras", "Karabuk", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kirikkale", "Kirklareli", "Kirsehir",
+                "Kilis", "Kocaeli", "Konya", "Kutahya", "Malatya", "Manisa", "Mardin", "Mersin", "Mugla", "Mus", "Nevsehir",
+                "Nigde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Sanliurfa", "Siirt", "Sinop", "Sirnak", "Sivas",
+                "Tekirdag", "Tokat", "Trabzon", "Tunceli", "Usak", "Van", "Yalova", "Yozgat", "Zonguldak"
+            ]
         elif country_code == 'INT':
-            return _CITY_LISTS.get('INT', [])
+            return [
+                "Washington", "New-York", "Los-Angeles", "Ottawa", "Toronto", "Mexico-City", "Havana",
+                "Brasilia", "Sao-Paulo", "Rio-de-Janeiro", "Buenos-Aires", "Santiago", "Bogota", "Lima", "Caracas",
+                "London", "Paris", "Berlin", "Rome", "Madrid", "Amsterdam", "Brussels", "Vienna", "Bern", "Lisbon",
+                "Athens", "Dublin", "Stockholm", "Oslo", "Copenhagen", "Helsinki", "Reykjavik", "Moscow", "Kiev",
+                "Warsaw", "Prague", "Budapest", "Bucharest", "Sofia", "Belgrade", "Sarajevo", "Skopje", "Tirana",
+                "Pristina", "Zagreb", "Mecca", "Medina", "Riyadh", "Baku", "Tbilisi", "Yerevan", "Baghdad", "Tehran",
+                "Damascus", "Beirut", "Amman", "Jerusalem", "Dubai", "Kuwait", "Doha", "Muscat", "Manama",
+                "Sanaa", "Nicosia", "Nur-Sultan", "Almaty", "Tashkent", "Ashgabat", "Bishkek", "Dushanbe", "Kabul",
+                "Islamabad", "New-Delhi", "Tokyo", "Seoul", "Beijing", "Jakarta", "Singapore", "Kuala-Lumpur",
+                "Bangkok", "Manila", "Hanoi", "Sydney", "Melbourne", "Perth", "Auckland", "Cairo", "Tripoli",
+                "Tunis", "Algiers", "Rabat", "Khartoum", "Abuja", "Dakar", "Nairobi", "Addis-Ababa", "Pretoria",
+                "Cape-Town", "Kinshasa", "Juba"
+            ]
         elif country_code == 'ALL':
-            return _CITY_LISTS.get('TR', []) + _CITY_LISTS.get('INT', [])
+            return UserService.get_sehirler('TR') + UserService.get_sehirler('INT')
         return [DEFAULT_CITY]
 
 class PrayerService:
