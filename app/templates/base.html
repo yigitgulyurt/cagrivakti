@@ -241,6 +241,16 @@
         const installBtn = document.getElementById('pwaInstallBtn');
         const closeBtn = document.getElementById('pwaCloseBtn');
 
+        // Banner'ı kapatma fonksiyonu
+        function closePwaBanner() {
+            if (pwaBanner) {
+                pwaBanner.classList.remove('active');
+                pwaBanner.classList.remove('ready');
+                // Bu oturumda tekrar gösterme
+                sessionStorage.setItem('pwaBannerDismissed', 'true');
+            }
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             // Chrome 67 ve öncesinde otomatik gösterimi engelle
             e.preventDefault();
@@ -354,7 +364,7 @@
                         // İstem kullanıldı, temizle
                         deferredPrompt = null;
                         // Banner'ı gizle
-                        pwaBanner.classList.remove('active');
+                        closePwaBanner();
                     } catch (promptError) {
                          console.error("Otomatik kurulum başlatılamadı:", promptError);
                          if (pwaText) pwaText.textContent = 'Kurulum hazır! Yükle butonuna tekrar basın.';
@@ -366,10 +376,10 @@
         }
 
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                pwaBanner.classList.remove('active');
-                // Bu oturumda tekrar gösterme
-                sessionStorage.setItem('pwaBannerDismissed', 'true');
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closePwaBanner();
             });
         }
 
