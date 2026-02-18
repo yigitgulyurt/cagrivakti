@@ -143,15 +143,9 @@
             <ul style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px;">
                 {% for city in cities %}
                 <li>
-                    {% if city.country == 'TR' %}
-                    <a href="{{ url_for('views.sehir_sayfasi', sehir=city.name) }}" title="{{ city.name }} Namaz Vakitleri">
-                        {{ city.name }}
-                    </a>
-                    {% else %}
                     <a href="{{ url_for('views.sehir_sayfasi', sehir=city.name, country=city.country) }}" title="{{ city.name }} Namaz Vakitleri">
                         {{ city.name }}
                     </a>
-                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
@@ -161,11 +155,7 @@
     <!-- JavaScript yüklendiğinde bu bölüm gizlenebilir veya botlar için açık bırakılabilir -->
     <div class="all-cities-seo" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">
         {% for city in cities %}
-        {% if city.country == 'TR' %}
-        <a href="{{ url_for('views.sehir_sayfasi', sehir=city.name) }}">{{ city.name }}</a>
-        {% else %}
         <a href="{{ url_for('views.sehir_sayfasi', sehir=city.name, country=city.country) }}">{{ city.name }}</a>
-        {% endif %}
         {% endfor %}
     </div>
 
@@ -432,11 +422,9 @@
                     }
                 }
 
-                const url = itemCountryCode === 'TR' ? `/sehir/${sehir}` : `/sehir/${sehir}?country=${itemCountryCode}`;
-                
                 const card = $('<a>')
                     .addClass('city-card')
-                    .attr('href', url)
+                    .attr('href', `/sehir/${sehir}?country=${itemCountryCode}`)
                     .click(function(e) {
                         if ($(this).hasClass('skeleton-card')) {
                             e.preventDefault();

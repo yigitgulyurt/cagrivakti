@@ -146,34 +146,20 @@ def serve_sitemap():
     
     # Şehir sayfaları (TR + INT)
     sehirler = UserService.get_sehirler('ALL')
-    
-    # Büyük şehirler listesi (Öncelikli indeksleme için)
-    major_cities = ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya', 'Adana', 'Konya', 'Gaziantep', 'Sanliurfa', 'Kocaeli']
-    
     for sehir in sehirler:
         # get_country_for_city yardımıyla doğru ülke kodu alınır
         country = get_country_for_city(sehir)
         
-        # Öncelik belirleme
-        priority = "0.8"
-        if sehir in major_cities:
-            priority = "1.0"
-        
-        # URL oluştururken TR ise country parametresini ekleme (Daha temiz URL için)
-        url_params = {'sehir': sehir, '_external': True}
-        if country != 'TR':
-            url_params['country'] = country
-            
         pages.append({
-            "loc": url_for('views.sehir_sayfasi', **url_params),
+            "loc": url_for('views.sehir_sayfasi', sehir=sehir, country=country, _external=True),
             "lastmod": datetime.now().strftime("%Y-%m-%d"),
-            "priority": priority
+            "priority": "0.9"
         })
         # İmsakiye sayfaları
         pages.append({
             "loc": url_for('views.imsakiye_detay', sehir=sehir, country=country, _external=True),
             "lastmod": datetime.now().strftime("%Y-%m-%d"),
-            "priority": "0.7" if sehir in major_cities else "0.6"
+            "priority": "0.7"
         })
         
     # Bilgi Köşesi sayfaları
