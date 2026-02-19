@@ -46,8 +46,7 @@
             <p>Dünya genelinde çağrı vakitleri, imsakiye ve dini içerikler. Çağdaş arayüz ve doğru verilerle her an yanınızdayız.</p>
             
             <!-- Geri Sayım Kapsayıcı (Layout Shift'i önlemek için sabit alan) -->
-            {% if request.cookies.get('user_city') %}
-            <div class="home-countdown-fixed-height">
+            <div class="home-countdown-fixed-height" id="main-countdown-container" style="display: none;">
                 <!-- Geri Sayım Skeleton (Yüklenirken görünür) -->
                 <div id="countdown-skeleton" class="home-countdown-container fade-in">
                     <div class="countdown-card skeleton-card">
@@ -66,7 +65,11 @@
                     </div>
                 </div>
             </div>
-            {% endif %}
+            <script>
+                if (localStorage.getItem('user_city')) {
+                    document.getElementById('main-countdown-container').style.display = 'block';
+                }
+            </script>
             
             <div class="cta-buttons">
                 <a href="{{ url_for('views.sehir_secimi') }}" class="btn-ultra-hero" title="Şehir Seçimi Yap">
