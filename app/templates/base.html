@@ -334,8 +334,8 @@
                 const pwaTitle = document.querySelector('.pwa-text h3');
                 const installBtn = document.getElementById('pwaInstallBtn');
                 
-                if (pwaTitle) pwaTitle.textContent = 'Kuruluma Hazır!';
-                if (pwaText) pwaText.textContent = 'Her şey hazır! Size özel namaz vakitlerini ve imsakiyeyi görüntülemek için uygulamayı şimdi yükleyebilirsiniz.';
+                if (pwaTitle) pwaTitle.textContent = 'Kuruluma Hazır';
+                if (pwaText) pwaText.textContent = 'Her şey hazır, şimdi uygulamayı yükleyebilirsin.';
                 if (installBtn) {
                     installBtn.innerHTML = '<svg class="icon" style="font-size: 1.2em; margin-right: 8px;"><use xlink:href="#fa-download-solid-full"></use></svg> Uygulamayı Yükle';
                     installBtn.classList.add('pulse-animation');
@@ -376,8 +376,9 @@
                                 
                                 // Toast göster
                                 if (toast && toastMsg) {
-                                    toastMsg.textContent = 'Konum izni isteniyor...';
+                                    toastMsg.textContent = 'Konum uydudan alınıyor...';
                                     toast.classList.add('active');
+                                    toast.classList.remove('success'); // Reset success state
                                 }
 
                                 try {
@@ -387,7 +388,7 @@
                                     });
                                     
                                     // Konum alındı
-                                    if (toastMsg) toastMsg.textContent = 'Konum alındı, şehir bulunuyor...';
+                                    if (toastMsg) toastMsg.textContent = 'Şehir bilgisi işleniyor...';
                                     
                                     const lat = position.coords.latitude;
                                     const lon = position.coords.longitude;
@@ -409,6 +410,7 @@
                                                 localStorage.setItem('user_city', latinCityName);
                                                 
                                                 if (toastMsg) toastMsg.textContent = `Şehir bulundu: ${originalCityName}`;
+                                                if (toast) toast.classList.add('success');
                                                 
                                                 // Biraz bekle sonra yenile
                                                 setTimeout(() => {
