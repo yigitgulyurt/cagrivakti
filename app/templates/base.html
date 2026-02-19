@@ -181,6 +181,24 @@
     {% block modals %}
     {% endblock %}
 
+    <!-- PWA Ön Bilgilendirme Modalı -->
+    <div id="locationPermissionModal" class="custom-modal-backdrop" style="display: none;">
+        <div class="custom-modal-content">
+            <div class="modal-icon">
+                <svg class="icon"><use xlink:href="#fa-location-dot"></use></svg>
+            </div>
+            <h3>Konum İzni Gerekiyor</h3>
+            <p>Size özel namaz vakitlerini sunabilmek için konumunuzu tespit etmemiz gerekiyor. Birazdan tarayıcınız konum izni isteyecektir, lütfen onaylayın.</p>
+            <div class="modal-actions">
+                <button id="denyLocationBtn" class="btn btn-secondary">Vazgeç</button>
+                <button id="allowLocationBtn" class="btn btn-primary">İzin Ver</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Bildirim Alanı -->
+    <div id="toastContainer" class="toast-container"></div>
+
     <!-- PWA Kurulum Banner'ı -->
     <div id="pwaInstallBanner" class="pwa-install-banner" title="Uygulamayı Yükle">
         <div class="pwa-content">
@@ -269,6 +287,111 @@
             }
         }
 
+        // Toast Bildirim Fonksiyonu
+        function showToast(message, icon = '#fa-info-circle') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-item';
+            toast.innerHTML = `
+                <div class="toast-icon"><svg class="icon"><use xlink:href="${icon}"></use></svg></div>
+                <div class="toast-message">${message}</div>
+            `;
+            container.appendChild(toast);
+
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                toast.classList.add('removing');
+                toast.addEventListener('animationend', () => toast.remove());
+            }, 3000);
+        }
+
+        // Konum İzni Modalı
+        const locModal = document.getElementById('locationPermissionModal');
+        const allowBtn = document.getElementById('allowLocationBtn');
+        const denyBtn = document.getElementById('denyLocationBtn');
+
+        if (denyBtn) {
+            denyBtn.addEventListener('click', () => {
+                locModal.classList.remove('active');
+                setTimeout(() => { locModal.style.display = 'none'; }, 300);
+            });
+        }
+
+        if (allowBtn) {
+            allowBtn.addEventListener('click', async () => {
+                locModal.classList.remove('active');
+                setTimeout(() => { locModal.style.display = 'none'; }, 300);
+                
+                showToast('Konumunuz tespit ediliyor...', '#fa-location-crosshairs');
+                
+                try {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        });
+                    });
+
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    showToast('Konum bulundu! Şehir bilgisi alınıyor...', '#fa-map-pin');
+
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=tr`);
+                    const data = await response.json();
+
+                    if (data && data.address) {
+                        let originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
+                        
+                        if (originalCityName) {
+                            originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
+                            const latinCityName = getLatinNameGlobal(originalCityName);
+                            
+                            // Kaydet
+                            document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
+                            localStorage.setItem('user_city', latinCityName);
+                            
+                            showToast(`Şehir bulundu: ${originalCityName}`, '#fa-check-circle');
+                            
+                            // Banner'ı Hazır Durumuna Getir
+                            updateBannerToReady(originalCityName);
+                        } else {
+                            throw new Error('Şehir adı bulunamadı');
+                        }
+                    } else {
+                        throw new Error('Adres verisi alınamadı');
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                    showToast('Konum alınamadı, varsayılan ile devam ediliyor.', '#fa-circle-exclamation');
+                    // Hata olsa bile kuruluma izin ver
+                    updateBannerToReady('Varsayılan');
+                }
+            });
+        }
+
+        function updateBannerToReady(cityName) {
+            if (!pwaBanner) return;
+            
+            pwaBanner.classList.add('ready');
+            pwaBanner.classList.add('active');
+            
+            const pwaTitle = pwaBanner.querySelector('.pwa-text h3');
+            const pwaText = pwaBanner.querySelector('.pwa-text p');
+            
+            if (pwaTitle) pwaTitle.textContent = 'Kurulum Hazır';
+            if (pwaText) pwaText.innerHTML = `Konumunuz <strong>${cityName}</strong> olarak ayarlandı.<br>Uygulamayı yükleyerek namaz vakitlerine ana ekranınızdan ulaşabilirsiniz.`;
+            
+            if (installBtn) {
+                installBtn.textContent = 'Yüklemeyi Tamamla';
+                installBtn.classList.add('pulse-animation');
+            }
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             // İndir sayfasında ise native banner'ın çıkmasına izin ver (preventDefault yapma)
             // Diğer sayfalarda otomatik gösterimi engelle
@@ -284,7 +407,6 @@
             // Eğer indir sayfasındaysak ve kullanıcı bir butona basarsa tetiklemek için hazır olsun
             if (isDownloadPage) {
                 console.log('PWA native prompt allowed on download page');
-                // İndir sayfasında özel butonları aktif et (varsa)
                 const downloadPageBtn = document.getElementById('pwa-install-btn-main');
                 if (downloadPageBtn) {
                     downloadPageBtn.style.display = 'inline-block';
@@ -301,24 +423,8 @@
                 return; // Custom banner'ı gösterme
             }
             
-            // Eğer reload sonrası ise hemen göster
-            if (sessionStorage.getItem('reloadingForPWA')) {
-                pwaBanner.classList.add('active');
-                pwaBanner.classList.add('ready'); // Büyük ve ortalı görünüm
-                
-                const pwaText = document.querySelector('.pwa-text p');
-                const installBtn = document.getElementById('pwaInstallBtn');
-                
-                if (pwaText) pwaText.textContent = 'Konumunuz doğrulandı. Uygulamayı hemen yükleyebilirsiniz.';
-                if (installBtn) {
-                    installBtn.textContent = 'Yükle (Hazır)';
-                    installBtn.classList.add('pulse-animation');
-                }
-                
-                sessionStorage.removeItem('reloadingForPWA');
-            } 
             // Eğer kullanıcı daha önce bu oturumda kapatmadıysa banner'ı göster
-            else if (!sessionStorage.getItem('pwaBannerDismissed')) {
+            if (!sessionStorage.getItem('pwaBannerDismissed')) {
                 setTimeout(() => {
                     pwaBanner.classList.add('active');
                 }, 3000); // 3 saniye sonra göster
@@ -327,70 +433,14 @@
 
         if (installBtn) {
             installBtn.addEventListener('click', async () => {
-                if (window.deferredPrompt) {
-                    // 1. Şehir kontrolü (Cookie)
-                    const userCity = document.cookie.split('; ').find(row => row.startsWith('user_city='));
-                    const pwaText = document.querySelector('.pwa-text p');
-                    
-                    if (!userCity) {
-                        // Şehir yoksa bulmaya çalış
-                        const originalText = installBtn.textContent;
-                        
-                        installBtn.textContent = 'Hazırlanıyor...';
-                        if (pwaText) pwaText.textContent = 'Size özel vakitleri sunabilmek için konumunuz alınıyor...';
-                        installBtn.disabled = true;
+                if (!window.deferredPrompt) return;
 
-                        try {
-                            // Konum izni iste
-                            const position = await new Promise((resolve, reject) => {
-                                navigator.geolocation.getCurrentPosition(resolve, reject);
-                            });
-                            
-                            // Konum alındı, şehri bul
-                            const lat = position.coords.latitude;
-                            const lon = position.coords.longitude;
-                            
-                            if (pwaText) pwaText.textContent = 'Şehriniz tespit ediliyor...';
-                            
-                            try {
-                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=tr`);
-                                const data = await response.json();
-                                
-                                if (data && data.address) {
-                                    let originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
-                                    
-                                    if (originalCityName) {
-                                        originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
-                                        const latinCityName = getLatinNameGlobal(originalCityName);
-                                        
-                                        // Cookie ve LocalStorage güncelle
-                                        document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
-                                        localStorage.setItem('user_city', latinCityName);
-                                        
-                                        console.log(`PWA install location found: ${originalCityName} -> ${latinCityName}`);
-                                    }
-                                }
-                            } catch (geoError) {
-                                console.error('Reverse geocoding failed:', geoError);
-                                // Geocoding başarısız olsa bile reload et, belki cookie zaten vardır veya sonraki adımda halledilir
-                            }
+                // 1. Şehir kontrolü
+                const userCity = document.cookie.split('; ').find(row => row.startsWith('user_city='));
+                const isReady = pwaBanner.classList.contains('ready');
 
-                            // Konum alındı, sayfayı yenile ve banner'ı tekrar göster
-                            sessionStorage.setItem('reloadingForPWA', 'true');
-                            window.location.reload();
-                            return; // Buradan çık, sayfa yenilenecek
-                            
-                        } catch (error) {
-                            console.log('Konum hatası:', error);
-                            // Konum alınamazsa varsayılan ile devam et
-                            if (pwaText) pwaText.textContent = 'Konum alınamadı, yine de yükleyebilirsiniz.';
-                        } finally {
-                            installBtn.textContent = originalText;
-                            installBtn.disabled = false;
-                        }
-                    }
-
-                    // 2. Yükleme işlemini başlat
+                // Eğer şehir varsa veya zaten "Hazır" modundaysak direkt yükle
+                if (userCity || isReady) {
                     window.deferredPrompt.prompt();
                     
                     const { outcome } = await window.deferredPrompt.userChoice;
@@ -398,6 +448,13 @@
                     
                     window.deferredPrompt = null;
                     closePwaBanner();
+                } else {
+                    // Şehir yok, izin iste
+                    if (locModal) {
+                        locModal.style.display = 'flex';
+                        // Reflow hack
+                        setTimeout(() => locModal.classList.add('active'), 10);
+                    }
                 }
             });
         }
