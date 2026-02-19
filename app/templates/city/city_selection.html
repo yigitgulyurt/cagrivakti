@@ -423,8 +423,15 @@
                 }
 
                 const card = $('<a>')
-                    .addClass('city-card')
-                    .attr('href', `/sehir/${sehir}?country=${itemCountryCode}`)
+                    .addClass('city-card');
+                
+                let cardHref = `/sehir/${sehir}?country=${itemCountryCode}`;
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('source') === 'pwa_install') {
+                    cardHref += '&source=pwa_install';
+                }
+                
+                card.attr('href', cardHref)
                     .click(function(e) {
                         if ($(this).hasClass('skeleton-card')) {
                             e.preventDefault();

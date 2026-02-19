@@ -322,8 +322,11 @@
                 return; // Custom banner'ı gösterme
             }
             
-            // Eğer reload sonrası ise hemen göster
-            if (sessionStorage.getItem('reloadingForPWA')) {
+            // Eğer reload sonrası ise veya manuel konum seçiminden döndüysek hemen göster
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPwaReturn = urlParams.get('source') === 'pwa_install';
+            
+            if (sessionStorage.getItem('reloadingForPWA') || isPwaReturn) {
                 pwaBanner.classList.add('active');
                 pwaBanner.classList.add('ready'); // Büyük ve ortalı görünüm
                 
@@ -337,6 +340,12 @@
                 }
                 
                 sessionStorage.removeItem('reloadingForPWA');
+                
+                // URL'den parametreyi temizle
+                if (isPwaReturn) {
+                    const newUrl = window.location.pathname + window.location.search.replace(/[\?&]source=pwa_install/, '').replace(/^&/, '?');
+                    window.history.replaceState({}, document.title, newUrl);
+                }
             } 
             // Eğer kullanıcı daha önce bu oturumda kapatmadıysa banner'ı göster
             else if (!sessionStorage.getItem('pwaBannerDismissed')) {
@@ -416,19 +425,20 @@
                                         throw new Error('Şehir bulunamadı');
                                     } catch (geoError) {
                                         console.error('Reverse geocoding failed:', geoError);
-                                        if (toastMsg) toastMsg.textContent = 'Şehir otomatik bulunamadı.';
+                                        if (toastMsg) toastMsg.textContent = 'Şehir bulunamadı, konum sayfasına yönlendiriliyorsunuz...';
                                         setTimeout(() => {
-                                            sessionStorage.setItem('reloadingForPWA', 'true'); // Yine de yenile, belki kullanıcı seçer
-                                            window.location.reload();
+                                            // PWA kurulumu için geldiğimizi belirtmek üzere parametre ekliyoruz
+                                            window.location.href = '/konum-bul?source=pwa_install';
                                         }, 1500);
                                     }
 
                                 } catch (error) {
                                     console.log('Konum hatası:', error);
-                                    if (toastMsg) toastMsg.textContent = 'Konum izni verilmedi.';
+                                    if (toastMsg) toastMsg.textContent = 'Konum alınamadı, manuel seçim için yönlendiriliyorsunuz...';
                                     setTimeout(() => {
-                                        if (toast) toast.classList.remove('active');
-                                    }, 2000);
+                                        // PWA kurulumu için geldiğimizi belirtmek üzere parametre ekliyoruz
+                                        window.location.href = '/konum-bul?source=pwa_install';
+                                    }, 1500);
                                 }
                                 
                                 // Event listener'ı temizle (gerekirse)
