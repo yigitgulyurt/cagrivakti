@@ -394,39 +394,68 @@
                                     const lon = position.coords.longitude;
                                     
                                     // Reverse Geocoding
+                                    let originalCityName = null;
+
+                                    // 1. Deneme: Nominatim (OpenStreetMap)
                                     try {
                                         const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=tr`);
-                                        const data = await response.json();
-                                        
-                                        if (data && data.address) {
-                                            let originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
-                                            
-                                            if (originalCityName) {
-                                                originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
-                                                const latinCityName = getLatinNameGlobal(originalCityName);
-                                                
-                                                // Cookie ve LocalStorage güncelle
-                                                document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
-                                                localStorage.setItem('user_city', latinCityName);
-                                                
-                                                if (toastMsg) toastMsg.textContent = `Şehir bulundu: ${originalCityName}`;
-                                                if (toast) toast.classList.add('success');
-                                                
-                                                // Biraz bekle sonra yenile
-                                                setTimeout(() => {
-                                                    sessionStorage.setItem('reloadingForPWA', 'true');
-                                                    window.location.reload();
-                                                }, 1500);
-                                                return;
+                                        if (response.ok) {
+                                            const data = await response.json();
+                                            if (data && data.address) {
+                                                originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
                                             }
                                         }
-                                        throw new Error('Şehir bulunamadı');
-                                    } catch (geoError) {
-                                        console.error('Reverse geocoding failed:', geoError);
-                                        if (toastMsg) toastMsg.textContent = 'Şehir otomatik bulunamadı.';
+                                    } catch (err) {
+                                        console.warn('Nominatim failed, trying fallback...');
+                                    }
+
+                                    // 2. Deneme: BigDataCloud (Fallback)
+                                    if (!originalCityName) {
+                                        try {
+                                            if (toastMsg) toastMsg.textContent = 'Alternatif servis deneniyor...';
+                                            const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=tr`);
+                                            if (response.ok) {
+                                                const data = await response.json();
+                                                // BigDataCloud field mapping
+                                                originalCityName = data.city || data.locality || data.principalSubdivision;
+                                            }
+                                        } catch (err) {
+                                            console.error('Fallback geocoding failed:', err);
+                                        }
+                                    }
+
+                                    if (originalCityName) {
+                                        // Başarılı
+                                        originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
+                                        const latinCityName = getLatinNameGlobal(originalCityName);
+                                        
+                                        // Cookie ve LocalStorage güncelle
+                                        document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
+                                        localStorage.setItem('user_city', latinCityName);
+                                        
+                                        if (toastMsg) toastMsg.textContent = `Şehir bulundu: ${originalCityName}`;
+                                        if (toast) {
+                                            toast.classList.add('success');
+                                            // Başarı ikonunu göster (spinner gizlenir css ile)
+                                            const icon = toast.querySelector('.toast-success-icon use');
+                                            if(icon) icon.setAttribute('xlink:href', '#fa-check-circle');
+                                        }
+                                        
+                                        // Biraz bekle sonra yenile
                                         setTimeout(() => {
-                                            sessionStorage.setItem('reloadingForPWA', 'true'); // Yine de yenile, belki kullanıcı seçer
+                                            sessionStorage.setItem('reloadingForPWA', 'true');
                                             window.location.reload();
+                                        }, 1500);
+                                    } else {
+                                        // Başarısız - Manuel Seçime Yönlendir
+                                        console.error('All reverse geocoding attempts failed.');
+                                        if (toastMsg) toastMsg.textContent = 'Otomatik konum bulunamadı.';
+                                        if (toast) toast.classList.remove('success'); // Hata durumunda success olmamalı
+                                        
+                                        setTimeout(() => {
+                                            if (toastMsg) toastMsg.textContent = 'Manuel seçime yönlendiriliyorsunuz...';
+                                            // Hata durumunda da yönlendir
+                                            window.location.href = "{{ url_for('views.sehir_secimi') }}";
                                         }, 1500);
                                     }
 

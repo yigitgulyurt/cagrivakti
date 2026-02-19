@@ -430,6 +430,14 @@
                             e.preventDefault();
                             return;
                         }
+                        
+                        // Kullanıcı manuel seçim yaptı:
+                        // 1. Tercihi kaydet
+                        document.cookie = `user_city=${sehir}; path=/; max-age=31536000; SameSite=Lax`;
+                        localStorage.setItem('user_city', sehir);
+                        
+                        // 2. Gidilen sayfada PWA Ready State banner'ını tetikle
+                        sessionStorage.setItem('reloadingForPWA', 'true');
                     });
 
                 const cityName = $('<div>').addClass('city-name');
