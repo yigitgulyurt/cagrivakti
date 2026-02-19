@@ -398,151 +398,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* Custom Modal */
-.custom-modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-.custom-modal-backdrop.active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.custom-modal-content {
-    background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 32px;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    transform: scale(0.9);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.custom-modal-backdrop.active .custom-modal-content {
-    transform: scale(1);
-}
-
-.modal-icon {
-    width: 80px;
-    height: 80px;
-    background: rgba(255, 193, 7, 0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 24px;
-    color: var(--primary);
-    font-size: 2.5rem;
-}
-
-.custom-modal-content h3 {
-    font-size: 1.5rem;
-    margin-bottom: 12px;
-    color: var(--text);
-}
-
-.custom-modal-content p {
-    color: var(--gray);
-    margin-bottom: 32px;
-    line-height: 1.6;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-}
-
-.modal-actions .btn {
-    flex: 1;
-    justify-content: center;
-}
-
-/* Toast Notifications */
-.toast-container {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    pointer-events: none;
-    width: 90%;
-    max-width: 400px;
-}
-
-.toast-item {
-    background: rgba(30, 30, 30, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    color: var(--text);
-    pointer-events: all;
-    animation: toastSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.toast-item.removing {
-    animation: toastSlideDown 0.3s ease forwards;
-}
-
-.toast-icon {
-    color: var(--primary);
-    font-size: 1.2rem;
-    flex-shrink: 0;
-}
-
-.toast-message {
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-
-@keyframes toastSlideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes toastSlideDown {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(20px); }
-}
-
-/* Enhanced PWA Ready Banner */
-.pwa-install-banner.ready {
-    background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
-    border: 1px solid rgba(255, 193, 7, 0.3);
-    box-shadow: 0 0 40px rgba(255, 193, 7, 0.15);
-}
-
-.pwa-install-banner.ready .pwa-icon img {
-    border: 2px solid var(--primary);
-    padding: 2px;
-    background: transparent;
-}
-
 /* Navbar Stilleri */
 .navbar {
     padding: .5rem 2rem;
@@ -642,6 +497,162 @@ body {
     .welcome-modal p {
         font-size: 1rem;
     }
+}
+
+/* Location Explanation Modal */
+.location-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.location-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.location-modal {
+    background: var(--card-bg);
+    width: 90%;
+    max-width: 400px;
+    padding: 30px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+    text-align: center;
+    transform: scale(0.9);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.location-modal-overlay.active .location-modal {
+    transform: scale(1);
+}
+
+.location-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.location-icon-wrapper .icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+}
+
+.location-modal h3 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+.location-modal p {
+    color: var(--gray);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 11000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    width: 90%;
+    max-width: 350px;
+}
+
+.custom-toast {
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    color: var(--text);
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 4px solid var(--primary);
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.custom-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast-icon {
+    color: var(--primary);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.toast-content {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Enhanced PWA Banner */
+.pwa-install-banner {
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+/* Ready State for PWA Banner */
+.pwa-install-banner.ready {
+    border-color: #4CAF50;
+    box-shadow: 0 -10px 40px rgba(76, 175, 80, 0.25);
+    transform: translateY(0) scale(1.02);
+}
+
+.pwa-install-banner.ready .pwa-text h3 {
+    color: #4CAF50;
+}
+
+.pwa-install-banner.ready .pwa-icon img {
+    border: 2px solid #4CAF50;
+    padding: 2px;
+}
+
+.pwa-install-banner .pwa-text h3 {
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+}
+
+.pwa-install-banner .pwa-text p {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.pwa-actions .btn {
+    white-space: nowrap;
 }
 .footer-brand {
     font-size: 1.5rem;
