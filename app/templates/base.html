@@ -71,23 +71,9 @@
 
     <!-- CSS Dosyaları -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-
-    <!-- In-App Browser Redirect Library -->
-    <script src="{{ url_for('static', filename='js/InAppRedirect.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            new InAppRedirect({
-                appName: 'Çağrı Vakti',
-                primaryColor: '#FFC107',
-                onDetect: (data) => console.log('In-App Browser Detected:', data.ua),
-                onAction: () => {
-                    if (typeof gtag !== 'undefined') {
-                        gtag('event', 'in_app_browser_action', { 'event_category': 'Engagement' });
-                    }
-                }
-            });
-        });
-    </script>
+    
+    <!-- API Preconnect -->
+    <link rel="preconnect" href="https://api.cagrivakti.com.tr">
 
     {% block extra_css %}{% endblock %}
 
@@ -227,11 +213,27 @@
     {% block extra_js %}{% endblock %}
     
     <!-- Scripts -->
-    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-cagrivakti.js') }}"></script>
     
+    <!-- In-App Browser Redirect Library -->
+    <script src="{{ url_for('static', filename='js/InAppRedirect.js') }}" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new InAppRedirect({
+                appName: 'Çağrı Vakti',
+                primaryColor: '#FFC107',
+                onDetect: (data) => console.log('In-App Browser Detected:', data.ua),
+                onAction: () => {
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'in_app_browser_action', { 'event_category': 'Engagement' });
+                    }
+                }
+            });
+        });
+    </script>
+
     <!-- Global Scripts -->
     <script>
-        // Bağlantı Durumu Kontrolü
         function updateOnlineStatus() {
             // Sadece bağlantı koptuğunda offline sayfasına yönlendirilebilir 
             // ya da uygulama genelinde sessizce yönetilebilir.

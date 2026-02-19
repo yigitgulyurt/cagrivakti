@@ -1,5 +1,5 @@
 // Service Worker - Namaz Vakitleri
-const CACHE_NAME = 'namaz-vakitleri-v2.12'; // Versiyon güncellendi (Icon Clean-up)
+const CACHE_NAME = 'namaz-vakitleri-v2.13'; // Versiyon güncellendi (Icon Clean-up)
 
 // API istekleri için Cache-First, sonra Network (Offline için)
 const API_CACHE_NAME = 'api-cache-v1';
@@ -18,14 +18,13 @@ const PRECACHE_ASSETS = [
     '/iletisim',
     '/ilkelerimiz',
     '/MUSTAFA-KEMAL-ATATÜRK',
-    '/static/js/jquery.min.js',
+    '/static/js/jquery-cagrivakti.js',
     '/static/js/city-data.js',
     '/static/icons/favicon.ico',
     '/static/icons/android/android-launchericon-192-192.png',
     '/static/icons/android/android-launchericon-512-512.png',
     '/static/icons/ios/180.png',
-    '/static/icons/windows11/Square150x150Logo.scale-100.png',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Amiri&display=swap'
+    '/static/icons/windows11/Square150x150Logo.scale-100.png'
 ];
 
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
