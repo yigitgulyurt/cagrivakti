@@ -218,6 +218,34 @@
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
 
+        // Şehir eşleştirme ve normalizasyon fonksiyonları
+        const CITY_DISPLAY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else '{}' }};
+        const REVERSE_CITY_MAPPING = Object.fromEntries(
+            Object.entries(CITY_DISPLAY_MAPPING).map(([latin, turkish]) => [turkish, latin])
+        );
+
+        function getLatinName(turkishName) {
+            // 1. Direct reverse mapping check
+            if (REVERSE_CITY_MAPPING[turkishName]) {
+                return REVERSE_CITY_MAPPING[turkishName];
+            }
+
+            // 2. Generic normalization for other Turkish characters
+            const charMap = {
+                'ç': 'c', 'Ç': 'C',
+                'ğ': 'g', 'Ğ': 'G',
+                'ı': 'i', 'İ': 'I',
+                'ö': 'o', 'Ö': 'O',
+                'ş': 's', 'Ş': 'S',
+                'ü': 'u', 'Ü': 'U'
+            };
+            
+            let normalized = turkishName.split('').map(char => charMap[char] || char).join('');
+            
+            // URL safe format: space to dash, remove non-latin
+            return normalized.replace(/\s+/g, '-').replace(/[^A-Za-z0-9\-]/g, '');
+        }
+
         // Manifest URL'ini kullanıcı şehrine göre güncelle (Cache busting ve Parametre)
         window.addEventListener('DOMContentLoaded', () => {
             const userCityMatch = document.cookie.match(/user_city=([^;]+)/);
@@ -328,7 +356,34 @@
                                 navigator.geolocation.getCurrentPosition(resolve, reject);
                             });
                             
-                            // Konum alındı, sayfayı yenile ve banner'ı tekrar göster
+                            // Konum alındı, şehir bulunuyor...
+                            if (pwaText) pwaText.textContent = 'Konum alındı, şehir belirleniyor...';
+                            
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            
+                            // Nominatim Reverse Geocoding
+                            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=tr`);
+                            const data = await response.json();
+                            
+                            if (data && data.address) {
+                                let originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
+                                
+                                if (originalCityName) {
+                                    originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
+                                    const latinCityName = getLatinName(originalCityName);
+                                    
+                                    // LocalStorage'a Latin halini kaydet
+                                    localStorage.setItem('user_city', latinCityName);
+                                    
+                                    // Cookie'ye de kaydet (PWA shortcut için)
+                                    document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
+                                    
+                                    console.log('City found via geolocation:', latinCityName);
+                                }
+                            }
+                            
+                            // Sayfayı yenile ve banner'ı tekrar göster
                             sessionStorage.setItem('reloadingForPWA', 'true');
                             window.location.reload();
                             return; // Buradan çık, sayfa yenilenecek
