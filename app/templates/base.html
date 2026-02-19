@@ -390,11 +390,22 @@
 
         if (installBtn) {
             installBtn.addEventListener('click', async () => {
-                if (window.deferredPrompt) {
+                console.log('Install button clicked');
+                
+                if (!window.deferredPrompt) {
+                    console.warn('deferredPrompt not available');
+                    // Eğer prompt yoksa (örneğin desktop'ta test ediliyorsa veya zaten yüklüyse)
+                    // Kullanıcıya bilgi ver veya manuel yönlendirme yap
+                    showToast('Yükleme özelliği şu anda kullanılamıyor veya tarayıcınız desteklemiyor.', 'fa-circle-exclamation-solid');
+                    return;
+                }
+
+                try {
                     // 1. Şehir kontrolü (Cookie)
                     const userCity = document.cookie.split('; ').find(row => row.startsWith('user_city='));
                     
                     if (!userCity) {
+                        console.log('City not found, showing modal');
                         // Şehir yoksa önce modalı göster
                         if (locationModal) locationModal.classList.add('active');
                         
@@ -419,7 +430,10 @@
                             denyLocationBtn.addEventListener('click', handleDeny);
                         });
 
-                        if (!userConfirmed) return;
+                        if (!userConfirmed) {
+                            console.log('User denied location permission');
+                            return;
+                        }
 
                         // İşlem başlıyor
                         const originalText = installBtn.textContent;
@@ -473,6 +487,7 @@
                             installBtn.disabled = false;
                         }
                     } else {
+                        console.log('City found, showing prompt');
                         // Şehir zaten varsa direkt prompt
                         window.deferredPrompt.prompt();
                         const { outcome } = await window.deferredPrompt.userChoice;
@@ -480,6 +495,9 @@
                         window.deferredPrompt = null;
                         closePwaBanner();
                     }
+                } catch (err) {
+                    console.error('Install flow error:', err);
+                    showToast('Yükleme sırasında bir hata oluştu.', 'fa-circle-exclamation-solid');
                 }
             });
         }

@@ -515,11 +515,13 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    pointer-events: none; /* Gizliyken tıklamayı engellemesin */
 }
 
 .location-modal-overlay.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto; /* Aktifken tıklanabilsin */
 }
 
 .location-modal {
