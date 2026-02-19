@@ -679,9 +679,18 @@ body {
 
 /* Pulse Animation for Install Button */
 @keyframes pulse-animation {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+    0% { 
+        transform: scale(1); 
+        box-shadow: 0 10px 20px rgba(255, 193, 7, 0.2), 0 0 0 0 rgba(255, 193, 7, 0.7); 
+    }
+    70% { 
+        transform: scale(1.05); 
+        box-shadow: 0 15px 25px rgba(255, 193, 7, 0.4), 0 0 0 15px rgba(255, 193, 7, 0); 
+    }
+    100% { 
+        transform: scale(1); 
+        box-shadow: 0 10px 20px rgba(255, 193, 7, 0.2), 0 0 0 0 rgba(255, 193, 7, 0); 
+    }
 }
 
 .pulse-animation {
@@ -723,22 +732,22 @@ body {
     box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
 }
 
-/* --- Custom Location Permission Modal --- */
+/* --- Custom Location Permission Modal (Modernized) --- */
 .custom-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
     z-index: 10000;
     display: flex;
     justify-content: center;
     align-items: center;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .custom-modal-overlay.active {
@@ -747,69 +756,127 @@ body {
 }
 
 .custom-modal {
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 20px;
+    background: linear-gradient(145deg, #1a1a1a, #222);
+    padding: 40px 30px;
+    border-radius: 32px;
     width: 90%;
-    max-width: 400px;
+    max-width: 420px;
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    transform: scale(0.9) translateY(20px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .custom-modal-overlay.active .custom-modal {
-    transform: translateY(0);
+    transform: scale(1) translateY(0);
 }
 
 .modal-icon {
-    font-size: 3rem;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
     color: var(--primary);
-    margin-bottom: 20px;
+    font-size: 2.5rem;
+    position: relative;
+}
+
+.modal-icon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 1px solid var(--primary);
+    opacity: 0.3;
+    animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    100% { transform: scale(1.5); opacity: 0; }
 }
 
 .custom-modal h3 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
+    font-size: 1.6rem;
+    margin-bottom: 16px;
     color: var(--text);
+    font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
 .custom-modal p {
     color: var(--gray);
-    margin-bottom: 25px;
+    margin-bottom: 32px;
     line-height: 1.6;
+    font-size: 1.05rem;
 }
 
 .modal-actions {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
 }
 
 .modal-actions .btn {
     flex: 1;
-    padding: 12px;
-    border-radius: 10px;
+    padding: 14px 20px;
+    border-radius: 16px;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-/* --- Process Toast Notification --- */
+.modal-actions .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+}
+
+.modal-actions .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-actions .btn-primary {
+    background: var(--primary);
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+.modal-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+}
+
+/* --- Process Toast Notification (Enhanced) --- */
 .process-toast {
     position: fixed;
-    bottom: 30px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: var(--dark);
-    border: 1px solid var(--primary);
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 193, 7, 0.2);
     color: var(--text);
-    padding: 15px 25px;
+    padding: 16px 24px;
     border-radius: 50px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 16px;
     z-index: 10001;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    min-width: 280px;
 }
 
 .process-toast.active {
@@ -817,16 +884,38 @@ body {
 }
 
 .toast-spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 193, 7, 0.3);
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 193, 7, 0.2);
     border-top-color: var(--primary);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 1s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
+    flex-shrink: 0;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
+.toast-success-icon {
+    display: none;
+    color: #4CAF50;
+    font-size: 1.5rem;
+    animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.process-toast.success .toast-spinner {
+    display: none;
+}
+
+.process-toast.success .toast-success-icon {
+    display: block;
+}
+
+.process-toast.success {
+    border-color: #4CAF50;
+    box-shadow: 0 10px 40px rgba(76, 175, 80, 0.2);
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
 }
 
 /* --- Enhanced Ready Banner Styles --- */

@@ -187,11 +187,11 @@
             <div class="modal-icon">
                 <svg class="icon"><use xlink:href="#fa-map-marker-alt"></use></svg>
             </div>
-            <h3>Konum İzni Gerekiyor</h3>
-            <p>Size özel ezan vakitlerini sunabilmek için konumunuzu tespit etmemiz gerekiyor. Tarayıcınızın soracağı konum iznine lütfen onay verin.</p>
+            <h3>Size Özel Vakitler</h3>
+            <p>Doğru namaz vakitlerini hesaplayabilmemiz için konum bilginize ihtiyacımız var. İzin verdiğinizde konumunuz anlık olarak alınacak ve cihazınıza kaydedilecektir.</p>
             <div class="modal-actions">
-                <button id="denyLocationBtn" class="btn btn-secondary">Vazgeç</button>
-                <button id="allowLocationBtn" class="btn btn-primary">İzin Ver</button>
+                <button id="denyLocationBtn" class="btn btn-secondary">Daha Sonra</button>
+                <button id="allowLocationBtn" class="btn btn-primary">Konumu Paylaş</button>
             </div>
         </div>
     </div>
@@ -199,22 +199,25 @@
     <!-- Process Toast -->
     <div id="processToast" class="process-toast">
         <div class="toast-spinner"></div>
+        <svg class="icon toast-success-icon"><use xlink:href="#fa-check-circle"></use></svg>
         <span id="toastMessage">İşlem yapılıyor...</span>
     </div>
 
     <!-- PWA Kurulum Banner'ı -->
-    <div id="pwaInstallBanner" class="pwa-install-banner" title="Uygulamayı Yükle">
+    <div id="pwaInstallBanner" class="pwa-install-banner" title="Çağrı Vakti'ni Yükle">
         <div class="pwa-content">
             <div class="pwa-icon">
                 <img src="{{ url_for('static', filename='icons/android/android-launchericon-96-96.png') }}" alt="Çağrı Vakti Uygulama İkonu" loading="lazy">
             </div>
             <div class="pwa-text">
-                <h3>Uygulamayı Yükleyin</h3>
-                <p>Çağrı vakitlerine hızlı erişim için ana ekranınıza ekleyin.</p>
+                <h3>Çağrı Vakti'ni Yükleyin</h3>
+                <p>Size özel namaz vakitleri ve imsakiye için uygulamayı ana ekranınıza ekleyin.</p>
             </div>
         </div>
         <div class="pwa-actions">
-            <button id="pwaInstallBtn" class="btn btn-primary btn-sm" title="Uygulamayı Cihaza Yükle">Yükle</button>
+            <button id="pwaInstallBtn" class="btn btn-primary btn-sm" title="Uygulamayı Cihaza Yükle">
+                <svg class="icon" aria-hidden="true" style="margin-right: 4px;"><use xlink:href="#fa-download-solid-full"></use></svg> Yükle
+            </button>
             <button id="pwaCloseBtn" class="btn-close-pwa" title="Kapat">
                 <svg class="icon" aria-hidden="true"><use xlink:href="#fa-xmark"></use></svg>
             </button>
@@ -322,30 +325,23 @@
                 return; // Custom banner'ı gösterme
             }
             
-            // Eğer reload sonrası ise veya manuel konum seçiminden döndüysek hemen göster
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPwaReturn = urlParams.get('source') === 'pwa_install';
-            
-            if (sessionStorage.getItem('reloadingForPWA') || isPwaReturn) {
+            // Eğer reload sonrası ise hemen göster
+            if (sessionStorage.getItem('reloadingForPWA')) {
                 pwaBanner.classList.add('active');
                 pwaBanner.classList.add('ready'); // Büyük ve ortalı görünüm
                 
                 const pwaText = document.querySelector('.pwa-text p');
+                const pwaTitle = document.querySelector('.pwa-text h3');
                 const installBtn = document.getElementById('pwaInstallBtn');
                 
-                if (pwaText) pwaText.textContent = 'Tüm ayarlar tamamlandı! Cihazınıza özel namaz vakitlerini görüntülemek için uygulamayı şimdi yükleyebilirsiniz.';
+                if (pwaTitle) pwaTitle.textContent = 'Kuruluma Hazır!';
+                if (pwaText) pwaText.textContent = 'Her şey hazır! Size özel namaz vakitlerini ve imsakiyeyi görüntülemek için uygulamayı şimdi yükleyebilirsiniz.';
                 if (installBtn) {
-                    installBtn.innerHTML = '<svg class="icon" style="font-size: 1.2em;"><use xlink:href="#fa-download"></use></svg> Uygulamayı Yükle';
+                    installBtn.innerHTML = '<svg class="icon" style="font-size: 1.2em; margin-right: 8px;"><use xlink:href="#fa-download-solid-full"></use></svg> Uygulamayı Yükle';
                     installBtn.classList.add('pulse-animation');
                 }
                 
                 sessionStorage.removeItem('reloadingForPWA');
-                
-                // URL'den parametreyi temizle
-                if (isPwaReturn) {
-                    const newUrl = window.location.pathname + window.location.search.replace(/[\?&]source=pwa_install/, '').replace(/^&/, '?');
-                    window.history.replaceState({}, document.title, newUrl);
-                }
             } 
             // Eğer kullanıcı daha önce bu oturumda kapatmadıysa banner'ı göster
             else if (!sessionStorage.getItem('pwaBannerDismissed')) {
@@ -425,20 +421,19 @@
                                         throw new Error('Şehir bulunamadı');
                                     } catch (geoError) {
                                         console.error('Reverse geocoding failed:', geoError);
-                                        if (toastMsg) toastMsg.textContent = 'Şehir bulunamadı, konum sayfasına yönlendiriliyorsunuz...';
+                                        if (toastMsg) toastMsg.textContent = 'Şehir otomatik bulunamadı.';
                                         setTimeout(() => {
-                                            // PWA kurulumu için geldiğimizi belirtmek üzere parametre ekliyoruz
-                                            window.location.href = '/konum-bul?source=pwa_install';
+                                            sessionStorage.setItem('reloadingForPWA', 'true'); // Yine de yenile, belki kullanıcı seçer
+                                            window.location.reload();
                                         }, 1500);
                                     }
 
                                 } catch (error) {
                                     console.log('Konum hatası:', error);
-                                    if (toastMsg) toastMsg.textContent = 'Konum alınamadı, manuel seçim için yönlendiriliyorsunuz...';
+                                    if (toastMsg) toastMsg.textContent = 'Konum izni verilmedi.';
                                     setTimeout(() => {
-                                        // PWA kurulumu için geldiğimizi belirtmek üzere parametre ekliyoruz
-                                        window.location.href = '/konum-bul?source=pwa_install';
-                                    }, 1500);
+                                        if (toast) toast.classList.remove('active');
+                                    }, 2000);
                                 }
                                 
                                 // Event listener'ı temizle (gerekirse)

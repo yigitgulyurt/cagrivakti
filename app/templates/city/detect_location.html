@@ -13,7 +13,7 @@
             <p id="status-text">Size en yakın şehri bulmak için cihazınızın konum bilgisi kullanılıyor...</p>
             
             <div id="error-actions" class="error-actions" style="display: none;">
-                <a href="{{ url_for('views.sehir_secimi') }}" id="manual-select-btn" class="btn btn-primary">Elle Şehir Seç</a>
+                <a href="{{ url_for('views.sehir_secimi') }}" class="btn btn-primary">Elle Şehir Seç</a>
                 <button onclick="getLocation()" class="btn btn-secondary">Tekrar Dene</button>
             </div>
         </div>
@@ -120,20 +120,6 @@ function getLatinName(turkishName) {
     const statusTitle = document.getElementById('status-title');
     const statusText = document.getElementById('status-text');
     const errorActions = document.getElementById('error-actions');
-    const manualSelectBtn = document.getElementById('manual-select-btn');
-
-    // URL parametrelerini kontrol et
-    const urlParams = new URLSearchParams(window.location.search);
-    const source = urlParams.get('source');
-
-    // Eğer PWA kurulumu için geldiysek, elle seçim butonuna parametre ekle
-    if (source === 'pwa_install' && manualSelectBtn) {
-        const currentHref = manualSelectBtn.getAttribute('href');
-        if (currentHref && !currentHref.includes('source=')) {
-            const separator = currentHref.includes('?') ? '&' : '?';
-            manualSelectBtn.setAttribute('href', `${currentHref}${separator}source=pwa_install`);
-        }
-    }
 
     // Önce LocalStorage kontrolü yap
     const cityUrlPattern = document.querySelector('.location-wrapper').dataset.cityUrl;
@@ -144,12 +130,7 @@ function getLatinName(turkishName) {
         statusText.textContent = `${getDisplayName(savedCity)} için yönlendiriliyorsunuz...`;
         
         setTimeout(() => {
-            let redirectUrl = cityUrlPattern.replace('PLACEHOLDER', savedCity);
-            if (source === 'pwa_install') {
-                const separator = redirectUrl.includes('?') ? '&' : '?';
-                redirectUrl += `${separator}source=pwa_install`;
-            }
-            window.location.href = redirectUrl;
+            window.location.href = cityUrlPattern.replace('PLACEHOLDER', savedCity);
         }, 800);
         return;
     }
@@ -196,12 +177,7 @@ function getLatinName(turkishName) {
                         statusText.textContent = `${originalCityName} olarak kaydedildi ve yönlendiriliyorsunuz...`;
                         
                         setTimeout(() => {
-                            let redirectUrl = cityUrlPattern.replace('PLACEHOLDER', latinCityName);
-                            if (source === 'pwa_install') {
-                                const separator = redirectUrl.includes('?') ? '&' : '?';
-                                redirectUrl += `${separator}source=pwa_install`;
-                            }
-                            window.location.href = redirectUrl;
+                            window.location.href = cityUrlPattern.replace('PLACEHOLDER', latinCityName);
                         }, 1000);
                     } else {
                         showError("Konumunuzdan şehir bilgisi alınamadı.");
