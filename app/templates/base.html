@@ -252,31 +252,35 @@
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Chrome 67 ve öncesinde otomatik gösterimi engelle
-            e.preventDefault();
+            // İndir sayfasında ise native banner'ın çıkmasına izin ver (preventDefault yapma)
+            // Diğer sayfalarda otomatik gösterimi engelle
+            const isDownloadPage = window.location.pathname.includes('/indir') || window.location.pathname.includes('/uygulamayi-indir');
+            
+            if (!isDownloadPage) {
+                e.preventDefault();
+            }
+            
             // Olayı sakla ki daha sonra tetikleyebilelim
             window.deferredPrompt = e;
             
-            // Eğer indirme sayfasındaysak ve kullanıcı etkileşimi gerekmiyorsa (bazı tarayıcılar izin verir)
-            // veya kullanıcı zaten bir butona tıkladıysa hemen tetiklemeyi deneyebiliriz.
-            // Ancak çoğu modern tarayıcı kullanıcı etkileşimi ister.
-            // Bu yüzden indirme sayfasındaysak banner'ı hemen ve büyük gösterelim.
-            if (window.isDownloadPage) {
-                 // Otomatik prompt denemesi (Tarayıcı izin verirse)
-                 try {
-                     e.prompt();
-                 } catch (err) {
-                     console.log('Otomatik prompt engellendi, manuel buton bekleniyor.');
-                 }
-                 
-                 // Fallback: Butonları aktifleştir
-                 const androidBtn = document.querySelector('.android-install .install-card');
-                 if (androidBtn) {
-                     androidBtn.style.cursor = 'pointer';
-                     androidBtn.onclick = () => {
-                         e.prompt();
-                     };
-                 }
+            // Eğer indir sayfasındaysak ve kullanıcı bir butona basarsa tetiklemek için hazır olsun
+            if (isDownloadPage) {
+                console.log('PWA native prompt allowed on download page');
+                // İndir sayfasında özel butonları aktif et (varsa)
+                const downloadPageBtn = document.getElementById('pwa-install-btn-main');
+                if (downloadPageBtn) {
+                    downloadPageBtn.style.display = 'inline-block';
+                    downloadPageBtn.addEventListener('click', async () => {
+                        if (window.deferredPrompt) {
+                            window.deferredPrompt.prompt();
+                            const { outcome } = await window.deferredPrompt.userChoice;
+                            console.log(`User response to the install prompt: ${outcome}`);
+                            window.deferredPrompt = null;
+                            downloadPageBtn.style.display = 'none';
+                        }
+                    });
+                }
+                return; // Custom banner'ı gösterme
             }
             
             // Eğer reload sonrası ise hemen göster
@@ -306,22 +310,7 @@
         if (installBtn) {
             installBtn.addEventListener('click', async () => {
                 if (window.deferredPrompt) {
-                    // Prompt'u göster
-                    window.deferredPrompt.prompt();
-                    // Kullanıcının seçimini bekle
-                    const { outcome } = await window.deferredPrompt.userChoice;
-                    console.log(`User response to the install prompt: ${outcome}`);
-                    // Prompt'u sıfırla
-                    window.deferredPrompt = null;
-                    // Banner'ı kapat
-                    closePwaBanner();
-                    return;
-                }
-                
-                // Eğer deferredPrompt yoksa (iOS veya zaten yüklü veya desteklenmiyor)
-                // Mevcut akışa devam et (Konum bulma vb.)
-                
-                // 1. Şehir kontrolü (Cookie)
+                    // 1. Şehir kontrolü (Cookie)
                     const userCity = document.cookie.split('; ').find(row => row.startsWith('user_city='));
                     const pwaText = document.querySelector('.pwa-text p');
                     
@@ -335,79 +324,33 @@
 
                         try {
                             // Konum izni iste
-                            if (navigator.geolocation) {
-                                const position = await new Promise((resolve, reject) => {
-                                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                                        timeout: 10000,
-                                        maximumAge: 60000
-                                    });
-                                });
-
-                                const lat = position.coords.latitude;
-                                const lon = position.coords.longitude;
-
-                                // Şehir ismini bul (Nominatim)
-                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=tr`);
-                                const data = await response.json();
-
-                                if (data && data.address) {
-                                    let originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
-                                    
-                                    if (originalCityName) {
-                                        originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
-                                        
-                                        // Basit Latin çevirisi ve Normalizasyon
-                                        const charMap = {
-                                            'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G',
-                                            'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O',
-                                            'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U'
-                                        };
-                                        const latinCityName = originalCityName.split('').map(char => charMap[char] || char).join('')
-                                            .replace(/\s+/g, '-').replace(/[^A-Za-z0-9\-]/g, '');
-
-                                        // Cookie'ye kaydet
-                                        document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
-                                        
-                                        // LocalStorage'a da kaydet (Konum bul sayfası için)
-                                        localStorage.setItem('user_city', latinCityName);
-                                        
-                                        if (pwaText) pwaText.textContent = `${originalCityName} bulundu! Uygulama verileri güncelleniyor...`;
-                                        
-                                        // Sayfayı yenile ve işlemi sonlandır
-                                        sessionStorage.setItem('reloadingForPWA', 'true');
-                                        
-                                        await new Promise(r => setTimeout(r, 1000));
-                                        window.location.reload();
-                                        return;
-                                    }
-                                }
-                            }
-                        } catch (err) {
-                            console.error("Konum alınamadı:", err);
-                            if (pwaText) pwaText.textContent = 'Konum alınamadı, varsayılan ayarlarla devam ediliyor.';
+                            const position = await new Promise((resolve, reject) => {
+                                navigator.geolocation.getCurrentPosition(resolve, reject);
+                            });
+                            
+                            // Konum alındı, sayfayı yenile ve banner'ı tekrar göster
+                            sessionStorage.setItem('reloadingForPWA', 'true');
+                            window.location.reload();
+                            return; // Buradan çık, sayfa yenilenecek
+                            
+                        } catch (error) {
+                            console.log('Konum hatası:', error);
+                            // Konum alınamazsa varsayılan ile devam et
+                            if (pwaText) pwaText.textContent = 'Konum alınamadı, yine de yükleyebilirsiniz.';
+                        } finally {
                             installBtn.textContent = originalText;
                             installBtn.disabled = false;
-                            // Hata durumunda normal akışa devam et
                         }
                     }
 
-                    // Eğer buraya geldiysek ya cookie vardı ya da konum alınamadı (varsayılan kurulum)
-                    try {
-                        // Kurulum istemini göster
-                        deferredPrompt.prompt();
-                        // Kullanıcının cevabını bekle
-                        const { outcome } = await deferredPrompt.userChoice;
-                        console.log(`PWA kurulum sonucu: ${outcome}`);
-                        // İstem kullanıldı, temizle
-                        deferredPrompt = null;
-                        // Banner'ı gizle
-                        closePwaBanner();
-                    } catch (promptError) {
-                         console.error("Otomatik kurulum başlatılamadı:", promptError);
-                         if (pwaText) pwaText.textContent = 'Kurulum hazır! Yükle butonuna tekrar basın.';
-                         installBtn.textContent = 'Yükle';
-                         installBtn.disabled = false;
-                    }
+                    // 2. Yükleme işlemini başlat
+                    window.deferredPrompt.prompt();
+                    
+                    const { outcome } = await window.deferredPrompt.userChoice;
+                    console.log(`User response to the install prompt: ${outcome}`);
+                    
+                    window.deferredPrompt = null;
+                    closePwaBanner();
                 }
             });
         }
@@ -427,68 +370,31 @@
         });
 
         // Navbar Toggle
-        document.addEventListener('DOMContentLoaded', () => {
-            const navToggle = document.getElementById('navToggle');
-            const navLinks = document.getElementById('navLinks');
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
 
-            if (navToggle && navLinks) {
-                // Menü aç/kapat fonksiyonu
-                function toggleMenu(e) {
-                    if (e) {
-                        e.stopPropagation();
-                        e.preventDefault();
-                    }
-                    
-                    const isActive = navLinks.classList.contains('active');
-                    const icon = navToggle.querySelector('use');
-                    
-                    if (isActive) {
-                        navLinks.classList.remove('active');
-                        document.body.style.overflow = 'auto';
-                        if (icon) icon.setAttribute('xlink:href', '#fa-bars');
-                    } else {
-                        navLinks.classList.add('active');
-                        document.body.style.overflow = 'hidden';
-                        if (icon) icon.setAttribute('xlink:href', '#fa-xmark');
-                    }
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                const icon = navToggle.querySelector('use');
+                if (navLinks.classList.contains('active')) {
+                    icon.setAttribute('xlink:href', '#fa-xmark');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    icon.setAttribute('xlink:href', '#fa-bars');
+                    document.body.style.overflow = 'auto';
                 }
+            });
 
-                // Click olayını dinle
-                navToggle.addEventListener('click', toggleMenu);
-                
-                // Dokunmatik cihazlar için touchstart desteği (bazı durumlarda gerekebilir)
-                navToggle.addEventListener('touchstart', (e) => {
-                    // Touchstart tetiklendiğinde click'i beklemeden işlem yapabiliriz
-                    // Ancak çift tetiklemeyi önlemek için dikkatli olunmalı.
-                    // Genellikle click yeterlidir, ama sorun devam ederse bu blok aktif edilebilir.
-                    // Şimdilik sadece click yeterli olmalı.
+            // Menü linklerine tıklandığında menüyü kapat
+            navLinks.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    navToggle.querySelector('use').setAttribute('xlink:href', '#fa-bars');
+                    document.body.style.overflow = 'auto';
                 });
-
-                // Menü linklerine tıklandığında menüyü kapat
-                navLinks.querySelectorAll('.nav-link').forEach(link => {
-                    link.addEventListener('click', () => {
-                        navLinks.classList.remove('active');
-                        const icon = navToggle.querySelector('use');
-                        if (icon) icon.setAttribute('xlink:href', '#fa-bars');
-                        document.body.style.overflow = 'auto';
-                    });
-                });
-                
-                // Menü dışına tıklandığında kapatma
-                document.addEventListener('click', (e) => {
-                    if (navLinks.classList.contains('active') && 
-                        !navLinks.contains(e.target) && 
-                        !navToggle.contains(e.target)) {
-                        navLinks.classList.remove('active');
-                        const icon = navToggle.querySelector('use');
-                        if (icon) icon.setAttribute('xlink:href', '#fa-bars');
-                        document.body.style.overflow = 'auto';
-                    }
-                });
-            } else {
-                console.error('Navbar elementleri bulunamadı!');
-            }
-        });
+            });
+        }
     </script>
 
     {% block footer_js %}{% endblock %}
