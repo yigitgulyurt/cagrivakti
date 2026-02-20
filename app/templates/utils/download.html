@@ -90,8 +90,8 @@
                     <p>Telefonunuzun kamerasını kullanarak QR kodu okutun ve hemen yükleyin.</p>
                     <div class="qr-wrapper">
                         <div class="qr-background">
-                            <canvas id="qr-code"></canvas>
-                        </div>
+                    <img src="{{ url_for('static', filename='image/qr/download-qr.webp') }}" alt="İndirme QR Kodu" style="width: 200px; height: 200px; object-fit: contain;">
+                </div>
                     </div>
                     <p class="qr-link">cagrivakti.com.tr</p>
                 </div>
@@ -301,9 +301,7 @@
 .telegram-card .btn-primary:hover {background-color:#0099e0;box-shadow:0 5px 15px rgba(0,136,204,0.3)}
 </style>
 
-<!-- QR Code Library -->
-<script src="{{ url_for('static', filename='js/qrious.min.js') }}"></script>
-
+<!-- QR Code Library Removed -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -321,24 +319,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Masaüstünde PWA butonunu ve container'ı gizle
         const pwaContainer = document.getElementById('pwa-install-container');
         if (pwaContainer) pwaContainer.style.display = 'none';
-        
-        // QR Kod Oluştur
-        const qrElement = document.getElementById('qr-code');
-        if (qrElement && typeof QRious !== 'undefined') {
-             try {
-                 new QRious({
-                      element: qrElement,
-                      value: window.location.origin + window.location.pathname,
-                      size: 1024, // Çok yüksek çözünürlük (Yuvarlama hatalarını yok eder)
-                      padding: 0, // Kütüphane iç padding'ini sıfırlıyoruz
-                      level: 'M',
-                      foreground: '#000000',
-                      background: 'transparent' // Arka plan şeffaf, sadece siyah kareler çizilir
-                  });
-             } catch (e) {
-                 console.warn('QRious init failed:', e);
-             }
-        }
     } else {
         document.getElementById('generic-content').style.display = 'block';
     }

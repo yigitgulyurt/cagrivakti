@@ -1,5 +1,5 @@
 // Service Worker - Namaz Vakitleri
-const CACHE_NAME = 'namaz-vakitleri-v2.15'; // Versiyon güncellendi (Added qrious.min.js)
+const CACHE_NAME = 'namaz-vakitleri-v2.16'; // Versiyon güncellendi (Removed qrious.min.js)
 
 // API istekleri için Cache-First, sonra Network (Offline için)
 const API_CACHE_NAME = 'api-cache-v1';
@@ -19,7 +19,6 @@ const PRECACHE_ASSETS = [
     '/ilkelerimiz',
     '/MUSTAFA-KEMAL-ATATÜRK',
     '/static/js/jquery-cagrivakti.js',
-    '/static/js/qrious.min.js',
     '/static/js/city-data.js',
     '/static/icons/favicon.ico',
     '/static/icons/android/android-launchericon-192-192.png',
