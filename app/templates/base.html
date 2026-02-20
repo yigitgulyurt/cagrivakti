@@ -296,6 +296,14 @@
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
+            // Masaüstü cihazlarda PWA kurulumunu tamamen engelle
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (!isMobile) {
+                e.preventDefault();
+                console.log('PWA prompt suppressed on desktop');
+                return;
+            }
+
             // İndir sayfasında ise native banner'ın çıkmasına izin ver (preventDefault yapma)
             // Diğer sayfalarda otomatik gösterimi engelle
             const isDownloadPage = window.location.pathname.includes('/indir') || window.location.pathname.includes('/uygulamayi-indir');
@@ -351,6 +359,27 @@
                     pwaBanner.classList.add('active');
                 }, 1000); // 1 saniye sonra göster
             }
+        });
+
+        // iOS ve Desteklenmeyen Tarayıcılar İçin Fallback Logic
+        window.addEventListener('load', () => {
+             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+             const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+             const isDismissed = sessionStorage.getItem('pwaBannerDismissed');
+             const isDownloadPage = window.location.pathname.includes('/indir') || window.location.pathname.includes('/uygulamayi-indir');
+             
+             if (isMobile && !isStandalone && !isDismissed && !isDownloadPage) {
+                 // beforeinstallprompt'un tetiklenip tetiklenmediğini kontrol et (Android için biraz bekle)
+                 setTimeout(() => {
+                     if (!window.deferredPrompt) {
+                         // Eğer native prompt yoksa, banner'ı yine de göster (Redirect modu)
+                         if (pwaBanner) {
+                             pwaBanner.classList.add('active');
+                             // Buton metnini gerekirse güncelle (Şimdilik "Yükle" kalabilir)
+                         }
+                     }
+                 }, 3000); // 3 saniye bekle
+             }
         });
 
         if (installBtn) {
@@ -492,6 +521,9 @@
                     
                     window.deferredPrompt = null;
                     closePwaBanner();
+                } else {
+                    // Fallback: Native prompt yoksa (iOS vb.) indir sayfasına yönlendir
+                    window.location.href = "{{ url_for('views.indir') }}";
                 }
             });
         }
