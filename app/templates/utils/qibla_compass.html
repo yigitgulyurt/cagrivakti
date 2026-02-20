@@ -661,16 +661,20 @@
     // QR Code Generation
     document.addEventListener('DOMContentLoaded', () => {
         const qrElement = document.getElementById('qr-code-canvas');
-        if (qrElement) {
-            new QRious({
-                element: qrElement,
-                value: window.location.href,
-                size: 160,
-                padding: 10,
-                level: 'M',
-                foreground: '#000000',
-                background: 'white'
-            });
+        if (qrElement && typeof QRious !== 'undefined') {
+            try {
+                new QRious({
+                    element: qrElement,
+                    value: window.location.href,
+                    size: 160,
+                    padding: 10,
+                    level: 'M',
+                    foreground: '#000000',
+                    background: 'white'
+                });
+            } catch (e) {
+                console.warn('QRious init failed:', e);
+            }
         }
     });
 
