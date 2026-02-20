@@ -58,6 +58,12 @@
             return this;
         }
 
+        ready(fn) {
+            if (document.readyState !== 'loading') fn();
+            else document.addEventListener('DOMContentLoaded', fn);
+            return this;
+        }
+
         on(event, handler) {
             return this.each(function() {
                 this.addEventListener(event, handler);
