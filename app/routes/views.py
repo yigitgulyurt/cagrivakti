@@ -121,6 +121,7 @@ def offline():
     return render_template('utils/offline.html')
 
 @views_bp.route('/sitemap.xml')
+@cache.cached(timeout=86400)
 def serve_sitemap():
     """Dinamik Sitemap oluşturur."""
     from flask import make_response
@@ -173,11 +174,10 @@ def serve_sitemap():
     sitemap_xml = render_template('utils/sitemap_template.xml', pages=pages)
     response = make_response(sitemap_xml)
     response.headers["Content-Type"] = "application/xml"
-    # 24 saat cache
-    response.headers["Cache-Control"] = "public, max-age=86400"
     return response
 
 @views_bp.route('/robots.txt')
+@cache.cached(timeout=86400)
 def serve_robots():
     """robots.txt dosyasını sunar."""
     content = "User-agent: *\n"
@@ -189,8 +189,6 @@ def serve_robots():
     
     response = make_response(content)
     response.headers["Content-Type"] = "text/plain"
-    # 24 saat cache
-    response.headers["Cache-Control"] = "public, max-age=86400"
     return response
 
 @views_bp.route('/sw.js')
