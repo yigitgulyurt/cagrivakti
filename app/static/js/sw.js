@@ -1,5 +1,5 @@
 // Service Worker - Namaz Vakitleri
-const CACHE_NAME = 'namaz-vakitleri-v2.13'; // Versiyon güncellendi (Icon Clean-up)
+const CACHE_NAME = 'namaz-vakitleri-v2.16'; // Versiyon güncellendi (Micro-jQuery)
 
 // API istekleri için Cache-First, sonra Network (Offline için)
 const API_CACHE_NAME = 'api-cache-v1';
@@ -19,6 +19,7 @@ const PRECACHE_ASSETS = [
     '/ilkelerimiz',
     '/MUSTAFA-KEMAL-ATATÜRK',
     '/static/js/jquery-cagrivakti.js',
+    '/static/js/qrious.min.js',
     '/static/js/city-data.js',
     '/static/icons/favicon.ico',
     '/static/icons/android/android-launchericon-192-192.png',
@@ -138,16 +139,26 @@ self.addEventListener('fetch', (event) => {
     // Statik dosyalar için Stale-While-Revalidate stratejisi
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
-            const fetchPromise = fetch(event.request).then((networkResponse) => {
-                // Geçerli bir yanıt aldığımızda önbelleği güncelle
-                if (networkResponse && networkResponse.status === 200) {
-                    const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseToCache);
-                    });
-                }
-                return networkResponse;
-            });
+            const fetchPromise = fetch(event.request)
+                .then((networkResponse) => {
+                    // Geçerli bir yanıt aldığımızda önbelleği güncelle
+                    if (networkResponse && networkResponse.status === 200) {
+                        const responseToCache = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseToCache);
+                        });
+                    }
+                    return networkResponse;
+                })
+                .catch((err) => {
+                    // Eğer önbellekte veri varsa, arka plan güncelleme hatasını yut (Sessizce logla)
+                    if (cachedResponse) {
+                        console.warn('[SW] Background fetch failed for ' + event.request.url);
+                        return;
+                    }
+                    // Önbellek yoksa hatayı fırlat (Offline sayfasına düşmesi veya tarayıcının hatayı göstermesi için)
+                    throw err;
+                });
 
             // Önbellekte varsa hemen döndür, yoksa ağı bekle
             return cachedResponse || fetchPromise;

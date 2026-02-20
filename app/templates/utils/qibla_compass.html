@@ -566,8 +566,8 @@
             Bu deneyim sadece akıllı telefonlarda mevcuttur.
         </p>
         
-        <div class="qr-container">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data={{ request.url }}&margin=10" alt="QR Code" width="160" height="160">
+        <div class="qr-code">
+            <canvas id="qr-code-canvas"></canvas>
             <span class="qr-label">Hemen Telefondan Aç</span>
         </div>
 
@@ -655,7 +655,22 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- QR Code Library -->
+<script src="{{ url_for('static', filename='js/qrious.min.js') }}"></script>
 <script>
+    // QR Code Generation
+    document.addEventListener('DOMContentLoaded', () => {
+        new QRious({
+            element: document.getElementById('qr-code-canvas'),
+            value: window.location.href,
+            size: 160,
+            padding: 10,
+            level: 'M',
+            foreground: '#000000',
+            background: 'white'
+        });
+    });
+
     const dial = document.getElementById('compass-dial');
     const marksContainer = document.getElementById('compass-marks');
     const permBtn = document.getElementById('permission-btn');
