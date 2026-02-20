@@ -64,8 +64,13 @@
     <!-- iOS Splash Screens -->
     <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}">
 
-    <!-- CSS Dosyaları -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <!-- CSS Dosyaları (Preload ile Non-blocking) -->
+    <link rel="preload" href="{{ url_for('static', filename='css/main.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"></noscript>
+    
+    <!-- Scripts (Defer ile Non-blocking) -->
+    <script src="{{ url_for('static', filename='js/jquery-cagrivakti.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/InAppRedirect.js') }}" defer></script>
     
     <!-- API Preconnect -->
     <link rel="preconnect" href="https://api.cagrivakti.com.tr">
@@ -210,23 +215,21 @@
 
     {% block extra_js %}{% endblock %}
     
-    <!-- Scripts -->
-    <script src="{{ url_for('static', filename='js/jquery-cagrivakti.js') }}"></script>
-    
-    <!-- In-App Browser Redirect Library -->
-    <script src="{{ url_for('static', filename='js/InAppRedirect.js') }}" defer></script>
+    <!-- In-App Browser Redirect Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            new InAppRedirect({
-                appName: 'Çağrı Vakti',
-                primaryColor: '#FFC107',
-                onDetect: (data) => console.log('In-App Browser Detected:', data.ua),
-                onAction: () => {
-                    if (typeof gtag !== 'undefined') {
-                        gtag('event', 'in_app_browser_action', { 'event_category': 'Engagement' });
+            if (typeof InAppRedirect !== 'undefined') {
+                new InAppRedirect({
+                    appName: 'Çağrı Vakti',
+                    primaryColor: '#FFC107',
+                    onDetect: (data) => console.log('In-App Browser Detected:', data.ua),
+                    onAction: () => {
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'in_app_browser_action', { 'event_category': 'Engagement' });
+                        }
                     }
-                }
-            });
+                });
+            }
         });
     </script>
 
