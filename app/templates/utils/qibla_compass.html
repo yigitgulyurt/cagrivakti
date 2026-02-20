@@ -844,7 +844,8 @@
         // Harita kaldırıldı
     }
 
-    function initCompass() {
+    // Initialize Page (Show Button)
+    function initPage() {
         // Cihaz tespiti: Masaüstü ise hiç başlatma
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         if (!isMobile && window.innerWidth > 1024) {
@@ -858,8 +859,36 @@
             return;
         }
 
+        // Show start button
+        permBtn.style.display = 'flex';
+        updateStatus("Başlatmak için butona basın.", "active");
+    }
+
+    // Start Compass Process (Called by Button)
+    async function startCompass() {
+        permBtn.style.display = 'none';
+        
+        // 1. iOS Permission Request (Must be first)
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const state = await DeviceOrientationEvent.requestPermission();
+                logDebug(`iOS İzin Durumu: ${state}`);
+                if (state !== 'granted') {
+                    updateStatus("Sensör izni reddedildi.", "error");
+                    permBtn.style.display = 'flex';
+                    return;
+                }
+            } catch (err) {
+                logDebug(`iOS Sensör Hatası: ${err}`);
+                updateStatus("Sensör hatası.", "error");
+                permBtn.style.display = 'flex';
+                return;
+            }
+        }
+
+        // 2. Geolocation Request
         updateStatus("Konum isteniyor...", "");
-        logDebug("Geolocation başlatıldı.");
+        logDebug("Geolocation başlatılıyor...");
         
         navigator.geolocation.getCurrentPosition(position => {
             userLat = position.coords.latitude;
@@ -878,56 +907,23 @@
             updateStatus("Sensörler başlatılıyor...", "active");
             logDebug(`Konum tamam: ${userLat.toFixed(2)},${userLon.toFixed(2)}`);
             
-            // Konum alındıktan sonra otomatik sensörleri başlatmayı dene
-            setupOrientation(true); 
+            // 3. Activate Sensors
+            activateSensors();
         }, error => {
-            updateStatus("Konum alınamadı. Manuel başlatın.", "error");
+            updateStatus("Konum alınamadı. Tekrar deneyin.", "error");
             logDebug(`Konum Hatası: ${error.message}`);
-            permBtn.style.display = 'flex'; // Hata durumunda butonu göster
+            permBtn.style.display = 'flex';
         }, { 
             enableHighAccuracy: true,
             timeout: 10000
         });
     }
 
-    // Buton tıklama olayını en başta ve her zaman çalışacak şekilde bağla
+    // Button Event Listener
     permBtn.addEventListener('click', function() {
         logDebug("Butona basıldı!");
-        this.style.background = "rgba(255,255,255,0.3)"; // Görsel geri bildirim
-        setupOrientation(false);
+        startCompass();
     });
-
-    function setupOrientation(isAuto = false) {
-        logDebug(`setupOrientation(auto=${isAuto}) çağrıldı.`);
-        // iOS 13+ Özel İzin İsteme (Otomatik başlatılamaz, kullanıcı etkileşimi şart)
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            if (isAuto) {
-                updateStatus("Başlatmak için dokunun.", "active");
-                permBtn.style.display = 'flex'; // iOS'ta butonu göster (mecburiyetten)
-                return;
-            }
-            
-            logDebug("iOS İzin İsteği gönderiliyor...");
-            DeviceOrientationEvent.requestPermission()
-                .then(state => {
-                    logDebug(`iOS İzin Durumu: ${state}`);
-                    if (state === 'granted') {
-                        permBtn.style.display = 'none';
-                        activateSensors();
-                    } else {
-                        updateStatus("İzin verilmedi.", "error");
-                    }
-                })
-                .catch(err => {
-                    logDebug(`iOS Sensör Hatası: ${err}`);
-                    updateStatus("Başlatılamadı.", "error");
-                });
-        } else {
-            // Android / Standart (Otomatik başlatılabilir)
-            logDebug("Standart Sensörler aktifleştiriliyor...");
-            activateSensors();
-        }
-    }
 
     let lastHeading = 0;
     let sensorActive = false;
@@ -1058,6 +1054,6 @@
         });
     }
 
-    initCompass();
+    initPage();
 </script>
 {% endblock %}
