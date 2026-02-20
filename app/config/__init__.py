@@ -6,6 +6,7 @@ load_dotenv()
 
 class Config:
     APP_VERSION = "2.8"
+    STATIC_VERSION = "2.8" # Statik dosyalar için versiyon (Değiştirildiğinde cache yenilenir)
     SERVER_NAME = os.environ.get('SERVER_NAME')
     # Subdomainler arası session paylaşımı için
     if SERVER_NAME:

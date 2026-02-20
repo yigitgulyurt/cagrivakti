@@ -56,6 +56,33 @@ def create_app(config_class=Config):
 
     # API Kullanım Loglaması
     setup_api_logging(app)
+    
+    # Statik Dosyalar İçin Cache-Control (1 Yıl)
+    @app.after_request
+    def add_header(response):
+        if 'Cache-Control' not in response.headers:
+            # Statik dosyalar için uzun süreli cache
+            if request.path.startswith('/static/'):
+                # 1 Yıl = 31536000 saniye
+                response.headers['Cache-Control'] = 'public, max-age=31536000'
+        return response
+
+    # Cache Busting (Versiyonlama)
+    @app.url_defaults
+    def hashed_url_for_static_file(endpoint, values):
+        if 'static' == endpoint or endpoint.endswith('.static'):
+            filename = values.get('filename')
+            if filename:
+                if '.' in filename:
+                    # Global versiyon numarasını kullan
+                    # Config'den STATIC_VERSION'ı al, yoksa APP_VERSION, o da yoksa 1.0
+                    version = app.config.get('STATIC_VERSION') or app.config.get('APP_VERSION') or '1.0'
+                    
+                    param_name = 'v'
+                    while param_name in values:
+                        param_name = '_' + param_name
+                    
+                    values[param_name] = version
 
     # Context Processors
     from app.services.ramadan_service import RamadanService
