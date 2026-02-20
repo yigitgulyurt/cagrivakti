@@ -256,27 +256,6 @@
 </div>
 {% endblock %}
 
-{% block extra_css %}
-<style>
-.telegram-bot-promo {padding:60px 20px;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,193,7,0.1);border-bottom:1px solid rgba(255,193,7,0.1);margin:40px 0}
-.promo-container {max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:40px;background:rgba(255,255,255,0.03);padding:40px;border-radius:24px;border:1px solid rgba(255,255,255,0.05)}
-.promo-icon {font-size:4rem;color:var(--primary);background:rgba(255,193,7,0.1);width:120px;height:120px;display:flex;align-items:center;justify-content:center;border-radius:30px;flex-shrink:0;animation:promoFloat 3s ease-in-out infinite}
-.promo-content h2 {font-size:2rem;margin-bottom:16px;color:var(--text)}
-.promo-content p {font-size:1.1rem;color:var(--gray);margin-bottom:32px;line-height:1.6}
-.promo-btn {padding:16px 32px;font-size:1.1rem;border-radius:16px}
-@keyframes promoFloat {0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes pulse-animation {0%{transform:scale(1);box-shadow:0 10px 20px rgba(255,193,7,0.2),0 0 0 0 rgba(255,193,7,0.7)}70%{transform:scale(1.05);box-shadow:0 10px 20px rgba(255,193,7,0.2),0 0 0 10px rgba(255,193,7,0)}}
-.pulse-animation {animation:pulse-animation 2s infinite;background-color:var(--primary-hover) !important;color:#000 !important;font-weight:bold}
-
-@media (max-width: 768px) {
-    .promo-container {flex-direction:column;text-align:center;padding:30px 20px}
-    .promo-icon {width:100px;height:100px;font-size:3rem}
-    .promo-content h2 {font-size:1.5rem}
-    .promo-content p {font-size:1rem}
-}
-</style>
-{% endblock %}
-
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1424,6 +1403,23 @@ document.addEventListener('DOMContentLoaded', function() {
 @media (max-width: 480px) {
     .hero h1 { font-size: 2rem; }
     .status-badge { font-size: 0.8rem; padding: 6px 12px; }
+}
+
+.telegram-bot-promo {padding:60px 20px;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,193,7,0.1);border-bottom:1px solid rgba(255,193,7,0.1);margin:40px 0}
+.promo-container {max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:40px;background:rgba(255,255,255,0.03);padding:40px;border-radius:24px;border:1px solid rgba(255,255,255,0.05)}
+.promo-icon {font-size:4rem;color:var(--primary);background:rgba(255,193,7,0.1);width:120px;height:120px;display:flex;align-items:center;justify-content:center;border-radius:30px;flex-shrink:0;animation:promoFloat 3s ease-in-out infinite}
+.promo-content h2 {font-size:2rem;margin-bottom:16px;color:var(--text)}
+.promo-content p {font-size:1.1rem;color:var(--gray);margin-bottom:32px;line-height:1.6}
+.promo-btn {padding:16px 32px;font-size:1.1rem;border-radius:16px}
+@keyframes promoFloat {0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse-animation {0%{transform:scale(1);box-shadow:0 10px 20px rgba(255,193,7,0.2),0 0 0 0 rgba(255,193,7,0.7)}70%{transform:scale(1.05);box-shadow:0 10px 20px rgba(255,193,7,0.2),0 0 0 10px rgba(255,193,7,0)}}
+.pulse-animation {animation:pulse-animation 2s infinite;background-color:var(--primary-hover) !important;color:#000 !important;font-weight:bold}
+
+@media (max-width: 768px) {
+    .promo-container {flex-direction:column;text-align:center;padding:30px 20px}
+    .promo-icon {width:100px;height:100px;font-size:3rem}
+    .promo-content h2 {font-size:1.5rem}
+    .promo-content p {font-size:1rem}
 }
 </style>
 {% endblock %}
