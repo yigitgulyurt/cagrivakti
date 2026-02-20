@@ -7,6 +7,7 @@ load_dotenv()
 class Config:
     APP_VERSION = "2.8"
     STATIC_VERSION = "2.8" # Statik dosyalar için versiyon (Değiştirildiğinde cache yenilenir)
+    SEND_FILE_MAX_AGE_DEFAULT = 31536000 # Flask static dosya cache süresi (1 Yıl)
     SERVER_NAME = os.environ.get('SERVER_NAME')
     # Subdomainler arası session paylaşımı için
     if SERVER_NAME:

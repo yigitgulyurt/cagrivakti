@@ -60,19 +60,26 @@ def create_app(config_class=Config):
     # Statik Dosyalar İçin Cache-Control (1 Yıl)
     @app.after_request
     def add_header(response):
-        if 'Cache-Control' not in response.headers:
-            # Statik dosyalar için uzun süreli cache
-            if request.path.startswith('/static/'):
-                # 1 Yıl = 31536000 saniye
-                response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
-                
-                # Expires header ekle (PageSpeed bazen bunu da kontrol eder)
-                from datetime import datetime, timedelta
-                expires = datetime.now() + timedelta(days=365)
-                response.headers['Expires'] = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
-                
-                # Vary header (CDN ve Proxy'ler için)
-                response.headers['Vary'] = 'Accept-Encoding'
+        # Statik dosyalar için uzun süreli cache (Daima overwrite)
+        # request.endpoint == 'static' kontrolü Flask'ın kendi static handler'ını yakalar
+        if request.endpoint == 'static' or request.path.startswith('/static/'):
+            # Cache-Control: 1 Yıl, Immutable
+            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+            
+            # Expires header ekle (PageSpeed bazen bunu da kontrol eder)
+            from datetime import datetime, timedelta
+            expires = datetime.now() + timedelta(days=365)
+            response.headers['Expires'] = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            
+            # Vary header (CDN ve Proxy'ler için)
+            response.headers['Vary'] = 'Accept-Encoding'
+            
+            # Access-Control-Allow-Origin (CORS - Fontlar vb. için gerekebilir)
+            response.headers['Access-Control-Allow-Origin'] = '*'
+        
+        # Diğer route'lar için mevcut header'ları koru
+        elif 'Cache-Control' not in response.headers:
+             response.headers['Cache-Control'] = 'no-cache'
 
         return response
 
