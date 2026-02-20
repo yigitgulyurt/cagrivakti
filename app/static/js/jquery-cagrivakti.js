@@ -183,7 +183,10 @@
                 if (typeof content === 'string') {
                     this.insertAdjacentHTML('beforeend', content);
                 } else if (content instanceof Init) {
-                    content.each(child => this.appendChild(child));
+                    var self = this;
+                    content.each(function(i, child) {
+                         self.appendChild(child); 
+                    });
                 } else if (content instanceof HTMLElement) {
                     this.appendChild(content);
                 }
