@@ -167,6 +167,8 @@
     {% block modals %}
     {% endblock %}
 
+    {% set is_mobile = request.user_agent and (request.user_agent.platform in ['android', 'iphone', 'ipad'] or 'mobile' in request.user_agent.string.lower()) %}
+    {% if is_mobile %}
     <!-- Custom Location Permission Modal -->
     <div id="locationPermissionModal" class="custom-modal-overlay">
         <div class="custom-modal">
@@ -209,6 +211,7 @@
             </button>
         </div>
     </div>
+    {% endif %}
 
     {% block extra_js %}{% endblock %}
     
