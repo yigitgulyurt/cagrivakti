@@ -311,15 +311,18 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (!isMobile) {
         document.getElementById('desktop-content').style.display = 'block';
         // QR Kod Oluştur
-         new QRious({
-              element: document.getElementById('qr-code'),
-              value: window.location.origin + window.location.pathname,
-              size: 1024, // Çok yüksek çözünürlük (Yuvarlama hatalarını yok eder)
-              padding: 0, // Kütüphane iç padding'ini sıfırlıyoruz
-              level: 'M',
-              foreground: '#000000',
-              background: 'transparent' // Arka plan şeffaf, sadece siyah kareler çizilir
-          });
+        const qrElement = document.getElementById('qr-code');
+        if (qrElement) {
+             new QRious({
+                  element: qrElement,
+                  value: window.location.origin + window.location.pathname,
+                  size: 1024, // Çok yüksek çözünürlük (Yuvarlama hatalarını yok eder)
+                  padding: 0, // Kütüphane iç padding'ini sıfırlıyoruz
+                  level: 'M',
+                  foreground: '#000000',
+                  background: 'transparent' // Arka plan şeffaf, sadece siyah kareler çizilir
+              });
+        }
     } else {
         document.getElementById('generic-content').style.display = 'block';
     }

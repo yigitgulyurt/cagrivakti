@@ -660,15 +660,18 @@
 <script>
     // QR Code Generation
     document.addEventListener('DOMContentLoaded', () => {
-        new QRious({
-            element: document.getElementById('qr-code-canvas'),
-            value: window.location.href,
-            size: 160,
-            padding: 10,
-            level: 'M',
-            foreground: '#000000',
-            background: 'white'
-        });
+        const qrElement = document.getElementById('qr-code-canvas');
+        if (qrElement) {
+            new QRious({
+                element: qrElement,
+                value: window.location.href,
+                size: 160,
+                padding: 10,
+                level: 'M',
+                foreground: '#000000',
+                background: 'white'
+            });
+        }
     });
 
     const dial = document.getElementById('compass-dial');
