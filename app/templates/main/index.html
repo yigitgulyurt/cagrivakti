@@ -25,7 +25,7 @@
 {% block content %}
 <div class="landing-wrapper">
     <section class="hero">
-        <div class="hero-content fade-in">
+        <div class="hero-content">
             <div class="hero-badges">
                 <a href="{{ url_for('views.imsakiye_secimi') }}" class="status-badge update" title="{{ current_year }} Güncel İmsakiye Verileri">
                     <svg class="icon" aria-hidden="true"><use xlink:href="#fa-check-circle"></use></svg>
@@ -48,7 +48,7 @@
             <!-- Geri Sayım Kapsayıcı (Layout Shift'i önlemek için sabit alan) -->
             <div class="home-countdown-fixed-height" id="main-countdown-container" style="display: none;">
                 <!-- Geri Sayım Skeleton (Yüklenirken görünür) -->
-                <div id="countdown-skeleton" class="home-countdown-container fade-in">
+                <div id="countdown-skeleton" class="home-countdown-container">
                     <div class="countdown-card skeleton-card">
                         <div class="skeleton-line label"></div>
                         <div class="skeleton-line time"></div>
@@ -57,7 +57,7 @@
                 </div>
                 
                 <!-- Canlı Geri Sayım Bölümü (Yüklendikten sonra görünür) -->
-                <div id="home-countdown-wrapper" class="home-countdown-container fade-in" style="display: none; opacity: 0;">
+                <div id="home-countdown-wrapper" class="home-countdown-container" style="display: none; opacity: 0;">
                     <div class="countdown-card">
                         <div class="countdown-label" id="next-vakit-name">...</div>
                         <div class="countdown-time" id="home-countdown-timer">00:00:00</div>
@@ -219,7 +219,7 @@
         </div>
     </section>
 {% endif %}
-    <section class="telegram-bot-promo fade-in">
+    <section class="telegram-bot-promo">
         <div class="promo-container">
             <div class="promo-icon">
                 <svg class="icon"><use xlink:href="#fa-paper-plane"></use></svg>
