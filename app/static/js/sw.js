@@ -1,5 +1,5 @@
 // Service Worker - Namaz Vakitleri
-const CACHE_NAME = 'namaz-vakitleri-v2.16'; // Versiyon güncellendi (Micro-jQuery)
+const CACHE_NAME = 'namaz-vakitleri-v2.15'; // Versiyon güncellendi (Added qrious.min.js)
 
 // API istekleri için Cache-First, sonra Network (Offline için)
 const API_CACHE_NAME = 'api-cache-v1';
