@@ -135,13 +135,58 @@ def public_api_vakitler():
 
         if is_ramadan_request:
             from app.services.ramadan_service import RamadanService
-            ramadan_info = RamadanService.get_ramadan_info()
+            # İstenen yıl için örnek bir tarih oluştur (Ramazan genellikle yılın ortalarında olur ama garanti olsun diye yılın ortası)
+            # Ancak get_ramadan_info o anki tarihi baz alıyor.
+            # Bizim belirli bir yılın Ramazan'ını bulmamız lazım.
             
-            # RamadanService'den o yıla ait tarihleri al
-            dates = RamadanService.RAMADAN_DATES.get(int(yil))
-            if dates:
-                start_date = dates["start"]
-                end_date = dates["end"]
+            target_year = int(yil)
+            
+            # Bu yılın Ramazan başlangıcını bulmak için basit bir döngü veya tahmin yapabiliriz.
+            # Hicri takvim her yıl 11 gün geriye gelir.
+            # 2025: 1 Mart
+            # 2026: 18 Şubat
+            # ...
+            
+            # RamadanService'e yeni bir metod eklemek en doğrusu olurdu ama şimdilik burada çözelim.
+            # RamadanService.gregorian_to_hijri statik metodunu kullanabiliriz.
+            
+            # Hedef yılın ortasından başlayıp Ramazan ayını (9. ay) arayalım.
+            # Veya daha basit: O yılın her ayının 1'ine bakıp Hicri 9. ayı bulana kadar tarayalım.
+            
+            start_date = None
+            end_date = None
+            
+            # O yılın her gününü taramak pahalı olabilir. Ay başlarına bakalım.
+            # Hicri aylar Gregoryen aylarla örtüşmez ama başlangıcı yakalamak için yeterli olabilir.
+            # Daha iyi yöntem: O yılın 1 Ocak'ından itibaren Hicri 9. aya denk gelen ilk günü bulmak.
+            
+            # Hızlı çözüm: O yılın 1. ayından 12. ayına kadar 1. ve 15. günleri kontrol et.
+            # Hicri 9. ayı bulduğumuzda, o ayın 1. gününü (start) ve son gününü (end) hesaplayalım.
+            
+            found = False
+            # 1 Ocak'tan başla
+            curr = date(target_year, 1, 1)
+            # Bir sonraki yıla kadar
+            while curr.year == target_year:
+                h_y, h_m, h_d = RamadanService.gregorian_to_hijri(curr)
+                if h_m == 9:
+                    # Ramazan ayı içindeyiz!
+                    # Başlangıç tarihini bulmak için:
+                    # Şu anki günden (h_d - 1) gün geriye git
+                    start_date = curr - timedelta(days=h_d - 1)
+                    
+                    # Bitiş tarihini bulmak için:
+                    # Hicri aylar 29 veya 30 çeker. Tabular takvimde 9. ay 30 çeker.
+                    # Start date'e 29 gün ekle (toplam 30 gün)
+                    end_date = start_date + timedelta(days=29)
+                    
+                    found = True
+                    break
+                
+                # 15 gün atla (Ramazan'ı kaçırmamak için 29 günden az atlamalıyız)
+                curr += timedelta(days=15)
+            
+            if found and start_date and end_date:
                 vakitler_list = PrayerService.get_vakitler_range(sehir, country_code, start_date, end_date)
                 return jsonify({
                     'durum': 'basarili', 
@@ -157,7 +202,7 @@ def public_api_vakitler():
                     }
                 })
             else:
-                return jsonify({'durum': 'hata', 'mesaj': 'Ramazan tarihleri bulunamadı.'}), 404
+                return jsonify({'durum': 'hata', 'mesaj': f'{yil} yılı için Ramazan tarihleri bulunamadı.'}), 404
 
         if ay or tip_param == 'aylik':
             ay = int(ay) if ay else datetime.now().month
