@@ -11,6 +11,9 @@ import requests
 from threading import Thread
 
 import re
+import hashlib
+
+WIDGET_VERSION = "1.0"
 
 views_bp = Blueprint('views', __name__)
 
@@ -372,6 +375,16 @@ def embed_widget(sehir):
     
     display_name = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace("-", " ").title())
 
+    # ETag Generation (Smart Caching)
+    # ETag = Hash(Version + City + Date + Theme + Params)
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    version_string = f"{WIDGET_VERSION}-{sehir}-{current_date}-{theme}-{bg_color}-{text_color}"
+    etag = hashlib.md5(version_string.encode('utf-8')).hexdigest()
+
+    # Check if client has matching ETag (If-None-Match)
+    if request.if_none_match and request.if_none_match.contains(etag):
+        return "", 304
+
     response = make_response(render_template('embed/widget.html', 
                          sehir=sehir,
                          display_name=display_name,
@@ -380,8 +393,12 @@ def embed_widget(sehir):
                          bg_color=bg_color,
                          text_color=text_color))
     
-    # Embed widget cache süresi (1 saat)
-    response.headers['Cache-Control'] = 'public, max-age=3600'
+    # Cache Control: Public, but MUST revalidate with server (no-cache)
+    # Browser will cache, but ask server "Is this ETag still valid?" every time.
+    # If valid -> 304 (Not Modified) -> Instant load, no data transfer
+    # If invalid -> 200 (OK) -> New content
+    response.headers['Cache-Control'] = 'public, no-cache'
+    response.set_etag(etag)
             
     return response
 
