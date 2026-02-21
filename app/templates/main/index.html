@@ -945,19 +945,19 @@ document.addEventListener('DOMContentLoaded', function() {
 .skeleton-line.label {
     width: 60%;
     height: 1.2rem;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .skeleton-line.time {
-    width: 80%;
-    height: 4rem;
-    margin-bottom: 15px;
+    width: 60%;
+    height: clamp(3rem, 12vw, 4.2rem);
+    margin-bottom: 10px;
     border-radius: 12px;
 }
 
 .skeleton-line.location {
     width: 40%;
-    height: 1rem;
+    height: 1.5rem;
 }
 
 @keyframes skeleton-loading {
@@ -966,8 +966,14 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 @media (min-width: 992px) {
+    .skeleton-line.label {
+        height: 1.5rem;
+        margin-bottom: 15px;
+    }
+
     .skeleton-line.time {
-        height: 6rem;
+        width: 75%;
+        height: 6.6rem;
     }
 }
 
