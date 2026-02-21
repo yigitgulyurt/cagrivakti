@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ sehir }} Namaz Vakitleri Widget</title>
+    <style>
+        :root {
+            --primary: #FFC107;
+            --dark: #121212;
+            --card-bg: #1E1E1E;
+            --text: #FFFFFF;
+            --gray: #94a3b8;
+        }
+
+        /* Light Theme Override */
+        [data-theme="light"] {
+            --primary: #f59e0b;
+            --dark: #ffffff;
+            --card-bg: #f3f4f6;
+            --text: #1f2937;
+            --gray: #6b7280;
+        }
+
+        /* Custom Colors Override if provided */
+        {% if bg_color %}
+        body { background-color: {{ bg_color }} !important; }
+        .widget-container { background-color: {{ bg_color }} !important; }
+        {% endif %}
+        
+        {% if text_color %}
+        body, .city-name, .time-label, .time-value { color: {{ text_color }} !important; }
+        {% endif %}
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: transparent;
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        .widget-container {
+            background-color: var(--card-bg);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+        }
+
+        .city-name {
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+        
+        .logo-link {
+            font-size: 10px;
+            text-decoration: none;
+            color: var(--gray);
+            opacity: 0.7;
+        }
+        
+        .logo-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .times-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            flex-grow: 1;
+        }
+
+        .time-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(128, 128, 128, 0.1);
+            border-radius: 4px;
+            padding: 4px;
+        }
+
+        .time-label {
+            font-size: 10px;
+            color: var(--gray);
+            margin-bottom: 2px;
+        }
+
+        .time-value {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* Layout variations based on width */
+        @media (max-width: 250px) {
+            .times-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 150px) {
+            .times-grid {
+                display: flex;
+                flex-direction: column;
+            }
+            .time-item {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 4px 8px;
+            }
+            .time-label {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body data-theme="{{ theme }}">
+    <div class="widget-container">
+        <div class="header">
+            <span class="city-name">{{ sehir }}</span>
+            <a href="https://namazvakitleri.yigitgulyurt.com/sehir/{{ sehir }}" target="_blank" class="logo-link">namazvakitleri</a>
+        </div>
+        <div class="times-grid">
+            <div class="time-item">
+                <span class="time-label">İmsak</span>
+                <span class="time-value">{{ vakitler['imsak'] }}</span>
+            </div>
+            <div class="time-item">
+                <span class="time-label">Güneş</span>
+                <span class="time-value">{{ vakitler['gunes'] }}</span>
+            </div>
+            <div class="time-item">
+                <span class="time-label">Öğle</span>
+                <span class="time-value">{{ vakitler['ogle'] }}</span>
+            </div>
+            <div class="time-item">
+                <span class="time-label">İkindi</span>
+                <span class="time-value">{{ vakitler['ikindi'] }}</span>
+            </div>
+            <div class="time-item">
+                <span class="time-label">Akşam</span>
+                <span class="time-value">{{ vakitler['aksam'] }}</span>
+            </div>
+            <div class="time-item">
+                <span class="time-label">Yatsı</span>
+                <span class="time-value">{{ vakitler['yatsi'] }}</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}{{ seo_title }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+    <div class="text-center mb-5">
+        <h1 class="page-title" style="font-size: 2.5rem; margin-bottom: 15px;">
+            <span style="color: var(--primary);">Namaz Vakitleri</span> Widget
+        </h1>
+        <p style="color: var(--gray); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+            Web siteniz için ücretsiz, hızlı ve özelleştirilebilir namaz vakitleri aracı. 
+            Aşağıdaki ayarları kullanarak widget'ınızı oluşturun ve kodu sitenize yapıştırın.
+        </p>
+    </div>
+
+    <div class="row" style="display: flex; flex-wrap: wrap; gap: 40px;">
+        <!-- Settings Column -->
+        <div class="col-md-5" style="flex: 1; min-width: 300px;">
+            <div class="card" style="background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+                <h3 style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; color: var(--text);">
+                    <i class="fas fa-cog" style="color: var(--primary); margin-right: 10px;"></i>Ayarlar
+                </h3>
+                
+                <form id="widget-form">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; color: var(--gray);">Şehir Seçin</label>
+                        <select id="city-select" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
+                            {% for city in cities %}
+                            <option value="{{ city }}" {% if city == 'Istanbul' %}selected{% endif %}>{{ city }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; color: var(--gray);">Tema</label>
+                        <div class="theme-options" style="display: flex; gap: 10px;">
+                            <label class="theme-option" style="cursor: pointer; flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                <input type="radio" name="theme" value="dark" checked style="margin-right: 8px;"> <span style="color: var(--text);">Koyu</span>
+                            </label>
+                            <label class="theme-option" style="cursor: pointer; flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                <input type="radio" name="theme" value="light" style="margin-right: 8px;"> <span style="color: var(--text);">Açık</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display: flex; gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 20px; flex: 1;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--gray);">Genişlik (px)</label>
+                            <input type="number" id="width-input" value="300" min="200" max="800" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 20px; flex: 1;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--gray);">Yükseklik (px)</label>
+                            <input type="number" id="height-input" value="220" min="150" max="600" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Preview Column -->
+        <div class="col-md-7" style="flex: 1.5; min-width: 300px;">
+            <div class="card" style="background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); height: 100%;">
+                <h3 style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; color: var(--text);">
+                    <i class="fas fa-eye" style="color: var(--primary); margin-right: 10px;"></i>Önizleme
+                </h3>
+                
+                <div class="preview-area" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; display: flex; justify-content: center; align-items: center; min-height: 300px; margin-bottom: 30px; overflow: hidden;">
+                    <iframe id="preview-frame" src="" width="300" height="220" frameborder="0" scrolling="no"></iframe>
+                </div>
+
+                <div class="code-area">
+                    <label style="display: block; margin-bottom: 8px; color: var(--gray);">Sitene Ekle (Kopyala & Yapıştır)</label>
+                    <div style="position: relative;">
+                        <textarea id="embed-code" readonly style="width: 100%; height: 100px; padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid var(--primary); color: #a5d6a7; font-family: monospace; resize: none; font-size: 0.9rem;"></textarea>
+                        <button id="copy-btn" style="position: absolute; top: 10px; right: 10px; background: var(--primary); color: var(--dark); border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: all 0.2s;">
+                            Kopyala
+                        </button>
+                    </div>
+                    <p style="color: var(--gray); font-size: 0.8rem; margin-top: 8px;">
+                        <i class="fas fa-info-circle"></i> Bu kodu sitenizin HTML yapısında istediğiniz yere yapıştırın.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const citySelect = document.getElementById('city-select');
+        const themeInputs = document.getElementsByName('theme');
+        const widthInput = document.getElementById('width-input');
+        const heightInput = document.getElementById('height-input');
+        const previewFrame = document.getElementById('preview-frame');
+        const embedCode = document.getElementById('embed-code');
+        const copyBtn = document.getElementById('copy-btn');
+
+        function updateWidget() {
+            const city = citySelect.value;
+            let theme = 'dark';
+            for (const input of themeInputs) {
+                if (input.checked) theme = input.value;
+            }
+            const width = widthInput.value;
+            const height = heightInput.value;
+
+            // Get base URL dynamically
+            const baseUrl = window.location.origin;
+            const widgetUrl = `${baseUrl}/embed/${city}?theme=${theme}`;
+
+            // Update Preview
+            previewFrame.src = widgetUrl;
+            previewFrame.width = width;
+            previewFrame.height = height;
+
+            // Update Code
+            const code = `<iframe src="${widgetUrl}" width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>`;
+            embedCode.value = code;
+        }
+
+        // Event Listeners
+        citySelect.addEventListener('change', updateWidget);
+        widthInput.addEventListener('input', updateWidget);
+        heightInput.addEventListener('input', updateWidget);
+        themeInputs.forEach(input => input.addEventListener('change', updateWidget));
+
+        // Copy Function
+        copyBtn.addEventListener('click', function() {
+            embedCode.select();
+            embedCode.setSelectionRange(0, 99999); // Mobile compatibility
+
+            try {
+                navigator.clipboard.writeText(embedCode.value).then(() => {
+                    showCopied();
+                }).catch(() => {
+                    document.execCommand('copy');
+                    showCopied();
+                });
+            } catch (err) {
+                document.execCommand('copy');
+                showCopied();
+            }
+        });
+
+        function showCopied() {
+            const originalText = copyBtn.innerText;
+            copyBtn.innerText = 'Kopyalandı!';
+            copyBtn.style.backgroundColor = '#4caf50';
+            copyBtn.style.color = '#fff';
+            
+            setTimeout(() => {
+                copyBtn.innerText = originalText;
+                copyBtn.style.backgroundColor = '';
+                copyBtn.style.color = '';
+            }, 2000);
+        }
+
+        // Initial render
+        updateWidget();
+    });
+</script>
+{% endblock %}

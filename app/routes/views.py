@@ -325,6 +325,57 @@ def bilgi_kosesi_detay(slug):
     guides = get_guides()
     return render_template('guide/guide_detail.html', guide=guide, guides=guides)
 
+@views_bp.route('/sitene-ekle')
+@cache.cached(timeout=86400)
+def sitene_ekle():
+    """Kullanıcıların sitelerine ekleyebileceği embed kodunu oluşturma sayfası."""
+    # Tüm şehirleri gönder (Dropdown için)
+    all_cities = UserService.get_sehirler('ALL')
+    all_cities.sort()
+    
+    title = "Namaz Vakitleri Widget - Sitenize Ekleyin"
+    description = "Web siteniz için ücretsiz namaz vakitleri widget'ı. Renkleri özelleştirin, şehrinizi seçin ve kodu sitenize ekleyin."
+    
+    return render_template('embed/builder.html', 
+                         cities=all_cities,
+                         seo_title=title,
+                         seo_description=description)
+
+@views_bp.route('/embed/<sehir>')
+def embed_widget(sehir):
+    """İframe içinde gösterilecek widget sayfası."""
+    if not is_latin_only(sehir):
+        abort(400)
+        
+    country_code = request.args.get('country', 'TR')
+    
+    # Bugünün vakitlerini getir
+    try:
+        vakitler = PrayerService.get_vakitler(sehir, country_code)
+    except:
+        return "Şehir bulunamadı", 404
+
+    # Tema parametreleri
+    theme = request.args.get('theme', 'dark')
+    bg_color = request.args.get('bg', '')
+    text_color = request.args.get('text', '')
+    
+    response = make_response(render_template('embed/widget.html', 
+                         sehir=sehir,
+                         vakitler=vakitler,
+                         theme=theme,
+                         bg_color=bg_color,
+                         text_color=text_color))
+    
+    # Embed widget cache süresi (1 saat)
+    response.headers['Cache-Control'] = 'public, max-age=3600'
+    
+    # İframe izni (varsayılan kısıtlamayı kaldır)
+    if 'X-Frame-Options' in response.headers:
+        response.headers.remove('X-Frame-Options')
+        
+    return response
+
 @views_bp.route('/konum-bul')
 def konum_bul():
     return render_template('city/detect_location.html')
