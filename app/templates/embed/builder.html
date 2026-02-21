@@ -4,126 +4,471 @@
 {% block description %}{{ seo_description }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
-    <div class="text-center mb-5">
-        <h1 class="page-title" style="font-size: 2.5rem; margin-bottom: 15px;">
+<style>
+    :root {
+        --card-bg-glass: rgba(30, 30, 30, 0.6);
+        --border-color: rgba(255, 255, 255, 0.1);
+        --input-bg: rgba(0, 0, 0, 0.3);
+        --primary-hover: #e0a800;
+        --text-muted: #aaa;
+    }
+
+    .builder-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .page-subtitle {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .builder-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 30px;
+        align-items: start;
+    }
+
+    @media (max-width: 992px) {
+        .builder-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .builder-card {
+        background: var(--card-bg-glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text);
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .card-header i {
+        color: var(--primary);
+        margin-right: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 8px;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+    }
+
+    /* Custom Radio Buttons for Theme */
+    .theme-options {
+        display: flex;
+        gap: 12px;
+    }
+
+    .theme-option {
+        flex: 1;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .theme-option input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .theme-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .theme-option input:checked + .theme-box {
+        background: rgba(255, 193, 7, 0.15);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .theme-box i {
+        margin-right: 8px;
+    }
+
+    /* Preset Buttons */
+    .preset-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+    }
+
+    .preset-btn {
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text);
+        padding: 12px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .preset-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .preset-btn.active {
+        background: var(--primary);
+        color: #000; /* Dark text on primary color */
+        border-color: var(--primary);
+    }
+
+    .preset-icon {
+        font-size: 1.4rem;
+        margin-bottom: 6px;
+        opacity: 0.8;
+    }
+
+    .preset-dim {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 2px;
+        font-family: monospace;
+    }
+
+    /* Scale Controls */
+    .scale-control {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .scale-buttons {
+        display: flex;
+        gap: 10px;
+        background: var(--input-bg);
+        padding: 4px;
+        border-radius: 8px;
+    }
+
+    .scale-btn {
+        flex: 1;
+        background: transparent;
+        color: var(--text-muted);
+        border: none;
+        padding: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .scale-btn:hover {
+        color: var(--text);
+    }
+
+    .scale-btn.active {
+        background: var(--primary);
+        color: #000;
+        font-weight: 700;
+    }
+
+    /* Size Inputs */
+    .size-inputs {
+        display: flex;
+        gap: 15px;
+    }
+
+    /* Preview Area */
+    .preview-container {
+        background: radial-gradient(circle at center, #2a2a2a 0%, #1a1a1a 100%);
+        padding: 40px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px;
+        margin-bottom: 30px;
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Checkerboard pattern for transparency */
+    .preview-container::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: 
+            linear-gradient(45deg, #222 25%, transparent 25%), 
+            linear-gradient(-45deg, #222 25%, transparent 25%), 
+            linear-gradient(45deg, transparent 75%, #222 75%), 
+            linear-gradient(-45deg, transparent 75%, #222 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        opacity: 0.1;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    #preview-frame {
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        border-radius: 12px; /* Matches widget border radius */
+        background: transparent;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+
+    /* Code Area */
+    .code-wrapper {
+        position: relative;
+        margin-top: 10px;
+    }
+
+    #embed-code {
+        width: 100%;
+        height: 120px;
+        padding: 15px;
+        border-radius: 8px;
+        background: #0d1117; /* Code block bg */
+        border: 1px solid var(--border-color);
+        color: #58a6ff; /* Code syntax color */
+        font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+        resize: none;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    #embed-code:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .copy-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .copy-btn:hover {
+        background: var(--primary);
+        color: #000;
+    }
+
+    .help-text {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+</style>
+
+<div class="builder-container">
+    <div class="page-header">
+        <h1 class="page-title">
             <span style="color: var(--primary);">Namaz Vakitleri</span> Widget
         </h1>
-        <p style="color: var(--gray); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
-            Web siteniz için ücretsiz, hızlı ve özelleştirilebilir namaz vakitleri aracı. 
-            Aşağıdaki ayarları kullanarak widget'ınızı oluşturun ve kodu sitenize yapıştırın.
+        <p class="page-subtitle">
+            Web siteniz için ücretsiz, hızlı ve tamamen özelleştirilebilir namaz vakitleri aracı. 
+            Ayarları yapın, anında önizleyin ve kodu sitenize ekleyin.
         </p>
     </div>
 
-    <div class="row" style="display: flex; flex-wrap: wrap; gap: 40px;">
+    <div class="builder-grid">
         <!-- Settings Column -->
-        <div class="col-md-5" style="flex: 1; min-width: 300px;">
-            <div class="card" style="background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
-                <h3 style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; color: var(--text);">
-                    <i class="fas fa-cog" style="color: var(--primary); margin-right: 10px;"></i>Ayarlar
-                </h3>
-                
-                <form id="widget-form">
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; color: var(--gray);">Şehir Seçin</label>
-                        <select id="city-select" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
-                            {% for city in cities %}
-                            <option value="{{ city }}" {% if city == 'Istanbul' %}selected{% endif %}>{{ city }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; color: var(--gray);">Tema</label>
-                        <div class="theme-options" style="display: flex; gap: 10px;">
-                            <label class="theme-option" style="cursor: pointer; flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                                <input type="radio" name="theme" value="dark" checked style="margin-right: 8px;"> <span style="color: var(--text);">Koyu</span>
-                            </label>
-                            <label class="theme-option" style="cursor: pointer; flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                                <input type="radio" name="theme" value="light" style="margin-right: 8px;"> <span style="color: var(--text);">Açık</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; color: var(--gray);">Hazır Boyutlar</label>
-                        <div class="preset-buttons" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            <!-- Standard Presets -->
-                            <button type="button" class="preset-btn" data-w="300" data-h="250" style="background: var(--primary); color: var(--dark); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
-                                <i class="fas fa-square" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
-                                Kare<br><span style="font-size: 0.75rem; opacity: 0.8;">300x250</span>
-                            </button>
-
-                            <button type="button" class="preset-btn" data-w="300" data-h="600" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
-                                <i class="fas fa-columns" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
-                                Dikey Detay<br><span style="font-size: 0.75rem; opacity: 0.8;">300x600</span>
-                            </button>
-
-                            <button type="button" class="preset-btn" data-w="160" data-h="400" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
-                                <i class="fas fa-arrows-alt-v" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
-                                İnce Dikey<br><span style="font-size: 0.75rem; opacity: 0.8;">160x400</span>
-                            </button>
-
-                            <button type="button" class="preset-btn" data-w="728" data-h="90" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
-                                <i class="fas fa-arrows-alt-h" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
-                                Banner<br><span style="font-size: 0.75rem; opacity: 0.8;">728x90</span>
-                            </button>
-                            
-                            <button type="button" class="preset-btn" data-w="500" data-h="400" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
-                                <i class="fas fa-layer-group" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
-                                Tam Özellik<br><span style="font-size: 0.75rem; opacity: 0.8;">500x400</span>
-                            </button>
-                        </div>
-
-                        <!-- Scale Controls -->
-                        <div class="scale-control" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                            <label style="display: block; margin-bottom: 8px; color: var(--gray); font-size: 0.9rem;">Boyut Oranı (Scale)</label>
-                            <div class="scale-buttons" style="display: flex; gap: 10px;">
-                                <button type="button" class="scale-btn active" data-scale="1" style="flex: 1; background: var(--primary); color: var(--dark); border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;">1x</button>
-                                <button type="button" class="scale-btn" data-scale="1.5" style="flex: 1; background: rgba(255,255,255,0.1); color: var(--text); border: none; padding: 8px; border-radius: 4px; cursor: pointer;">1.5x</button>
-                                <button type="button" class="scale-btn" data-scale="2" style="flex: 1; background: rgba(255,255,255,0.1); color: var(--text); border: none; padding: 8px; border-radius: 4px; cursor: pointer;">2x</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row" style="display: flex; gap: 20px;">
-                        <div class="form-group" style="margin-bottom: 20px; flex: 1;">
-                            <label style="display: block; margin-bottom: 8px; color: var(--gray);">Genişlik (px)</label>
-                            <input type="number" id="width-input" value="300" min="150" max="1200" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
-                        </div>
-                        
-                        <div class="form-group" style="margin-bottom: 20px; flex: 1;">
-                            <label style="display: block; margin-bottom: 8px; color: var(--gray);">Yükseklik (px)</label>
-                            <input type="number" id="height-input" value="250" min="50" max="1200" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
-                        </div>
-                    </div>
-                </form>
+        <div class="builder-card">
+            <div class="card-header">
+                <i class="fas fa-sliders-h"></i>
+                Ayarlar
             </div>
+            
+            <form id="widget-form">
+                <!-- City Selection -->
+                <div class="form-group">
+                    <label class="form-label">Şehir</label>
+                    <select id="city-select" class="form-control">
+                        {% for city in cities %}
+                        <option value="{{ city }}" {% if city == 'Istanbul' %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Theme Selection -->
+                <div class="form-group">
+                    <label class="form-label">Tema</label>
+                    <div class="theme-options">
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="dark" checked>
+                            <span class="theme-box">
+                                <i class="fas fa-moon"></i> Koyu
+                            </span>
+                        </label>
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="light">
+                            <span class="theme-box">
+                                <i class="fas fa-sun"></i> Açık
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Presets -->
+                <div class="form-group">
+                    <label class="form-label">Hazır Boyutlar</label>
+                    <div class="preset-grid">
+                        <button type="button" class="preset-btn active" data-w="300" data-h="250">
+                            <i class="fas fa-square preset-icon"></i>
+                            Kare
+                            <span class="preset-dim">300x250</span>
+                        </button>
+
+                        <button type="button" class="preset-btn" data-w="400" data-h="500">
+                            <i class="fas fa-columns preset-icon"></i>
+                            Dikey Detay
+                            <span class="preset-dim">400x500</span>
+                        </button>
+
+                        <button type="button" class="preset-btn" data-w="160" data-h="600">
+                            <i class="fas fa-arrows-alt-v preset-icon"></i>
+                            İnce Dikey
+                            <span class="preset-dim">160x600</span>
+                        </button>
+
+                        <button type="button" class="preset-btn" data-w="728" data-h="90">
+                            <i class="fas fa-arrows-alt-h preset-icon"></i>
+                            Banner
+                            <span class="preset-dim">728x90</span>
+                        </button>
+                        
+                        <button type="button" class="preset-btn" data-w="500" data-h="400">
+                            <i class="fas fa-layer-group preset-icon"></i>
+                            Tam Özellik
+                            <span class="preset-dim">500x400</span>
+                        </button>
+                    </div>
+
+                    <!-- Scale Controls -->
+                    <div class="scale-control">
+                        <label class="form-label">Boyut Oranı (Scale)</label>
+                        <div class="scale-buttons">
+                            <button type="button" class="scale-btn active" data-scale="1">1x</button>
+                            <button type="button" class="scale-btn" data-scale="1.5">1.5x</button>
+                            <button type="button" class="scale-btn" data-scale="2">2x</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Dimensions -->
+                <div class="size-inputs">
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label class="form-label">Genişlik (px)</label>
+                        <input type="number" id="width-input" value="300" min="150" max="1200" class="form-control">
+                    </div>
+                    
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label class="form-label">Yükseklik (px)</label>
+                        <input type="number" id="height-input" value="250" min="50" max="1200" class="form-control">
+                    </div>
+                </div>
+            </form>
         </div>
 
         <!-- Preview Column -->
-        <div class="col-md-7" style="flex: 1.5; min-width: 300px;">
-            <div class="card" style="background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); height: 100%;">
-                <h3 style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; color: var(--text);">
-                    <i class="fas fa-eye" style="color: var(--primary); margin-right: 10px;"></i>Önizleme
-                </h3>
-                
-                <div class="preview-area" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; display: flex; justify-content: center; align-items: center; min-height: 300px; margin-bottom: 30px; overflow: hidden;">
-                    <iframe id="preview-frame" src="" width="300" height="220" frameborder="0" scrolling="no"></iframe>
-                </div>
+        <div class="builder-card">
+            <div class="card-header">
+                <i class="fas fa-eye"></i>
+                Canlı Önizleme
+            </div>
+            
+            <div class="preview-container">
+                <iframe id="preview-frame" src="" width="300" height="250" frameborder="0" scrolling="no"></iframe>
+            </div>
 
-                <div class="code-area">
-                    <label style="display: block; margin-bottom: 8px; color: var(--gray);">Sitene Ekle (Kopyala & Yapıştır)</label>
-                    <div style="position: relative;">
-                        <textarea id="embed-code" readonly style="width: 100%; height: 100px; padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid var(--primary); color: #a5d6a7; font-family: monospace; resize: none; font-size: 0.9rem;"></textarea>
-                        <button id="copy-btn" style="position: absolute; top: 10px; right: 10px; background: var(--primary); color: var(--dark); border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: all 0.2s;">
-                            Kopyala
-                        </button>
-                    </div>
-                    <p style="color: var(--gray); font-size: 0.8rem; margin-top: 8px;">
-                        <i class="fas fa-info-circle"></i> Bu kodu sitenizin HTML yapısında istediğiniz yere yapıştırın.
-                    </p>
+            <div class="code-section">
+                <label class="form-label">Sitene Ekle (Kopyala & Yapıştır)</label>
+                <div class="code-wrapper">
+                    <textarea id="embed-code" readonly></textarea>
+                    <button id="copy-btn" class="copy-btn">
+                        <i class="fas fa-copy"></i> Kopyala
+                    </button>
                 </div>
+                <p class="help-text">
+                    <i class="fas fa-info-circle"></i> Bu iframe kodunu sitenizin HTML yapısında görünmesini istediğiniz yere yapıştırın.
+                </p>
             </div>
         </div>
     </div>
@@ -131,7 +476,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Embed URL'ini oluştururken tam domain kullan
         const baseUrl = window.location.origin;
         const citySelect = document.getElementById('city-select');
         const themeInputs = document.getElementsByName('theme');
@@ -155,8 +499,6 @@
             const width = widthInput.value;
             const height = heightInput.value;
 
-            // Tam URL kullan, relative path değil
-            // Bu, 'self' origin kontrolünü kolaylaştırır
             const widgetUrl = `${baseUrl}/embed/${city}?theme=${theme}`;
 
             previewFrame.src = widgetUrl;
@@ -171,6 +513,11 @@
         // Preset Button Logic
         presetBtns.forEach(btn => {
             btn.addEventListener('click', function() {
+                // Remove active class from all presets
+                presetBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked
+                this.classList.add('active');
+
                 const w = parseInt(this.getAttribute('data-w'));
                 const h = parseInt(this.getAttribute('data-h'));
                 
@@ -180,23 +527,9 @@
                 widthInput.value = w;
                 heightInput.value = h;
                 
-                // Highlight active preset
-                presetBtns.forEach(b => {
-                    b.style.background = 'rgba(255,255,255,0.05)';
-                    b.style.color = 'var(--text)';
-                });
-                this.style.background = 'var(--primary)';
-                this.style.color = 'var(--dark)';
-                
                 // Reset Scale to 1x
-                scaleBtns.forEach(b => {
-                    b.style.background = 'rgba(255,255,255,0.1)';
-                    b.style.color = 'var(--text)';
-                    if (b.getAttribute('data-scale') === '1') {
-                        b.style.background = 'var(--primary)';
-                        b.style.color = 'var(--dark)';
-                    }
-                });
+                scaleBtns.forEach(b => b.classList.remove('active'));
+                document.querySelector('.scale-btn[data-scale="1"]').classList.add('active');
 
                 updateWidget();
             });
@@ -205,66 +538,43 @@
         // Scale Button Logic
         scaleBtns.forEach(btn => {
             btn.addEventListener('click', function() {
+                // Remove active from all scales
+                scaleBtns.forEach(b => b.classList.remove('active'));
+                // Add active to clicked
+                this.classList.add('active');
+
                 const scale = parseFloat(this.getAttribute('data-scale'));
                 
                 widthInput.value = Math.round(currentBaseWidth * scale);
                 heightInput.value = Math.round(currentBaseHeight * scale);
                 
-                // Highlight Scale
-                scaleBtns.forEach(b => {
-                    b.style.background = 'rgba(255,255,255,0.1)';
-                    b.style.color = 'var(--text)';
-                });
-                this.style.background = 'var(--primary)';
-                this.style.color = 'var(--dark)';
-                
                 updateWidget();
             });
         });
 
-        // Event Listeners
+        // Event Listeners for Inputs
         citySelect.addEventListener('change', updateWidget);
+        
         widthInput.addEventListener('input', function() {
-             // Clear preset highlight on manual input
-             presetBtns.forEach(b => {
-                 b.style.background = 'rgba(255,255,255,0.05)';
-                 b.style.color = 'var(--text)';
-             });
-             // Reset scale highlight
-             scaleBtns.forEach(b => {
-                 b.style.background = 'rgba(255,255,255,0.1)';
-                 b.style.color = 'var(--text)';
-             });
-             
-             // Update base to current manual input so scaling works from this point
+             presetBtns.forEach(b => b.classList.remove('active'));
+             scaleBtns.forEach(b => b.classList.remove('active'));
              currentBaseWidth = parseInt(this.value) || 300;
-             // currentBaseHeight is tricky if they only changed width. 
-             // Ideally we just detach scaling logic or treat current as 1x base.
-             
              updateWidget();
         });
+        
         heightInput.addEventListener('input', function() {
-             // Clear preset highlight on manual input
-             presetBtns.forEach(b => {
-                 b.style.background = 'rgba(255,255,255,0.05)';
-                 b.style.color = 'var(--text)';
-             });
-             // Reset scale highlight
-             scaleBtns.forEach(b => {
-                 b.style.background = 'rgba(255,255,255,0.1)';
-                 b.style.color = 'var(--text)';
-             });
-             
+             presetBtns.forEach(b => b.classList.remove('active'));
+             scaleBtns.forEach(b => b.classList.remove('active'));
              currentBaseHeight = parseInt(this.value) || 250;
-             
              updateWidget();
         });
+        
         themeInputs.forEach(input => input.addEventListener('change', updateWidget));
 
         // Copy Function
         copyBtn.addEventListener('click', function() {
             embedCode.select();
-            embedCode.setSelectionRange(0, 99999); // Mobile compatibility
+            embedCode.setSelectionRange(0, 99999);
 
             try {
                 navigator.clipboard.writeText(embedCode.value).then(() => {
@@ -280,14 +590,14 @@
         });
 
         function showCopied() {
-            const originalText = copyBtn.innerText;
-            copyBtn.innerText = 'Kopyalandı!';
-            copyBtn.style.backgroundColor = '#4caf50';
+            const originalHtml = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Kopyalandı';
+            copyBtn.style.background = '#4caf50';
             copyBtn.style.color = '#fff';
             
             setTimeout(() => {
-                copyBtn.innerText = originalText;
-                copyBtn.style.backgroundColor = '';
+                copyBtn.innerHTML = originalHtml;
+                copyBtn.style.background = '';
                 copyBtn.style.color = '';
             }, 2000);
         }
