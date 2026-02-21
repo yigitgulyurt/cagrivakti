@@ -229,7 +229,8 @@
             }
             
             .header {
-                flex-direction: row;
+                flex-direction: column; /* Stack City and Countdown vertically to save width */
+                align-items: flex-start;
                 margin-bottom: 0;
                 padding-bottom: 0;
                 border-bottom: none;
@@ -237,6 +238,7 @@
                 border-right: 1px solid rgba(128, 128, 128, 0.2);
                 padding-right: 15px;
                 min-width: fit-content;
+                justify-content: center;
             }
             
             .header-left {
@@ -335,8 +337,8 @@
                 <a href="https://cagrivakti.com.tr/sehir/{{ sehir }}" target="_blank" class="city-link">
                     <span class="city-name">{{ display_name }}</span>
                 </a>
-                <span id="next-prayer-countdown" class="next-prayer-countdown"></span>
             </div>
+            <span id="next-prayer-countdown" class="next-prayer-countdown"></span>
             <a href="https://cagrivakti.com.tr" target="_blank" class="logo-link">Çağrı Vakti</a>
         </div>
         <div class="times-grid">
