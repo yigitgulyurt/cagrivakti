@@ -1,6 +1,64 @@
 {% extends "base.html" %}
 
 {% block title %}{{ seo_title }}{% endblock %}
+
+{% block footer_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if the tour hasn't been shown yet
+    if (!localStorage.getItem('tour_shown')) {
+        const driver = window.driver.js.driver;
+        
+        const driverObj = driver({
+            showProgress: true,
+            allowClose: false,
+            nextBtnText: 'İleri',
+            prevBtnText: 'Geri',
+            doneBtnText: 'Anladım, Başla',
+            steps: [
+                { 
+                    element: '.nav-brand', 
+                    popover: { 
+                        title: 'Ana Sayfa', 
+                        description: 'Logoya tıklayarak dilediğiniz zaman ana sayfaya dönebilirsiniz.',
+                        side: "bottom",
+                        align: 'start'
+                    } 
+                },
+                { 
+                    element: '#btn-discover-time', 
+                    popover: { 
+                        title: 'Vakti Keşfet', 
+                        description: 'İlinizi listeden seçerek namaz vakitlerini, iftar/sahur saatlerini ve diğer bilgileri görüntüleyebilirsiniz.' 
+                    } 
+                },
+                { 
+                    element: '#location-button', 
+                    popover: { 
+                        title: 'Konumumu Bul', 
+                        description: 'Konumunuzu otomatik olarak algılayarak size en yakın merkezin namaz vakitlerini anında getirir.' 
+                    } 
+                },
+                { 
+                    element: window.innerWidth > 992 ? '.nav-links' : '#navToggle', 
+                    popover: { 
+                        title: 'Menü ve Araçlar', 
+                        description: 'İmsakiye, Kıble Pusulası, Ramazan Bilgileri, Bilgi Köşesi ve diğer tüm araçlara buradan ulaşabilirsiniz.' 
+                    } 
+                }
+            ],
+            onDestroyed: () => {
+                // Tour finished or skipped
+                localStorage.setItem('tour_shown', 'true');
+            }
+        });
+
+        // Start the tour
+        driverObj.drive();
+    }
+});
+</script>
+{% endblock %}
 {% block description %}{{ seo_description }}{% endblock %}
 {% block og_title %}{{ seo_title }}{% endblock %}
 {% block og_description %}{{ seo_description }}{% endblock %}
@@ -72,7 +130,7 @@
             </script>
             
             <div class="cta-buttons">
-                <a href="{{ url_for('views.sehir_secimi') }}" class="btn-ultra-hero" title="Şehir Seçimi Yap">
+                <a href="{{ url_for('views.sehir_secimi') }}" id="btn-discover-time" class="btn-ultra-hero" title="Şehir Seçimi Yap">
                     <div class="btn-inner">
                         <div class="btn-icon-box">
                             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-sun"></use></svg>
