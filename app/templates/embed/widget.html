@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ sehir }} Namaz Vakitleri Widget</title>
+    <title>{{ display_name }} Namaz Vakitleri Widget</title>
     <style>
         :root {
             --primary: #FFC107;
@@ -11,6 +11,7 @@
             --card-bg: #1E1E1E;
             --text: #FFFFFF;
             --gray: #94a3b8;
+            --success: #10b981;
         }
 
         /* Light Theme Override */
@@ -61,11 +62,26 @@
             border-bottom: 1px solid rgba(128, 128, 128, 0.2);
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+        }
+
         .city-name {
             font-weight: bold;
             font-size: 14px;
             text-transform: uppercase;
             color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .next-prayer-countdown {
+            font-size: 12px;
+            color: var(--gray);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
         }
         
         .logo-link {
@@ -73,6 +89,7 @@
             text-decoration: none;
             color: var(--gray);
             opacity: 0.7;
+            white-space: nowrap;
         }
         
         .logo-link:hover {
@@ -95,6 +112,16 @@
             background-color: rgba(128, 128, 128, 0.1);
             border-radius: 4px;
             padding: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .time-item.active {
+            border: 1px solid var(--primary);
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+        
+        [data-theme="light"] .time-item.active {
+            background-color: rgba(245, 158, 11, 0.1);
         }
 
         .time-label {
@@ -106,6 +133,14 @@
         .time-value {
             font-weight: 600;
             font-size: 13px;
+        }
+
+        .prayer-countdown {
+            font-size: 10px;
+            color: var(--gray);
+            margin-top: 2px;
+            display: none; /* Hidden by default */
+            font-variant-numeric: tabular-nums;
         }
 
         /* Layout variations based on width */
@@ -128,41 +163,174 @@
             .time-label {
                 margin-bottom: 0;
             }
+            .prayer-countdown {
+                display: none !important;
+            }
+        }
+
+        /* Show countdowns when enough space */
+        @media (min-width: 400px) and (min-height: 200px) {
+            .prayer-countdown {
+                display: block;
+            }
+            .time-item {
+                padding: 8px 4px;
+            }
         }
     </style>
 </head>
 <body data-theme="{{ theme }}">
     <div class="widget-container">
         <div class="header">
-            <span class="city-name">{{ sehir }}</span>
+            <div class="header-left">
+                <span class="city-name">{{ display_name }}</span>
+                <span id="next-prayer-countdown" class="next-prayer-countdown"></span>
+            </div>
             <a href="https://namazvakitleri.yigitgulyurt.com/sehir/{{ sehir }}" target="_blank" class="logo-link">namazvakitleri</a>
         </div>
         <div class="times-grid">
-            <div class="time-item">
-                <span class="time-label">İmsak</span>
-                <span class="time-value">{{ vakitler['imsak'] }}</span>
+            {% for vakit_key, vakit_label in [('imsak', 'İmsak'), ('gunes', 'Güneş'), ('ogle', 'Öğle'), ('ikindi', 'İkindi'), ('aksam', 'Akşam'), ('yatsi', 'Yatsı')] %}
+            <div class="time-item" id="card-{{ vakit_key }}">
+                <span class="time-label">{{ vakit_label }}</span>
+                <span class="time-value">{{ vakitler[vakit_key] }}</span>
+                <span class="prayer-countdown" id="{{ vakit_key }}-countdown"></span>
             </div>
-            <div class="time-item">
-                <span class="time-label">Güneş</span>
-                <span class="time-value">{{ vakitler['gunes'] }}</span>
-            </div>
-            <div class="time-item">
-                <span class="time-label">Öğle</span>
-                <span class="time-value">{{ vakitler['ogle'] }}</span>
-            </div>
-            <div class="time-item">
-                <span class="time-label">İkindi</span>
-                <span class="time-value">{{ vakitler['ikindi'] }}</span>
-            </div>
-            <div class="time-item">
-                <span class="time-label">Akşam</span>
-                <span class="time-value">{{ vakitler['aksam'] }}</span>
-            </div>
-            <div class="time-item">
-                <span class="time-label">Yatsı</span>
-                <span class="time-value">{{ vakitler['yatsi'] }}</span>
-            </div>
+            {% endfor %}
         </div>
     </div>
+
+    <script>
+        const namazVakitleri = {{ vakitler | tojson }};
+        const displayCityName = "{{ display_name }}";
+
+        function updateCountdowns() {
+            if (!namazVakitleri) return;
+
+            const tz = namazVakitleri.timezone || 'Europe/Istanbul';
+            
+            // Yerel saati ve şehir saatini al
+            const now = new Date();
+            const cityNowStr = now.toLocaleString("en-US", {timeZone: tz});
+            const cityNow = new Date(cityNowStr);
+            
+            let nextVakitName = null;
+            let nextVakitTime = null;
+            let minDiff = Infinity;
+            
+            const vakitList = ['imsak', 'gunes', 'ogle', 'ikindi', 'aksam', 'yatsi'];
+
+            vakitList.forEach(vakit => {
+                const saat = namazVakitleri[vakit];
+                if (!saat || saat === "--:--" || saat.includes('skeleton')) return;
+                
+                const [hours, minutes] = saat.split(":").map(Number);
+                const vakitDate = new Date(cityNow);
+                vakitDate.setHours(hours, minutes, 0, 0);
+                
+                // Navbar için en yakın gelecek vakti bul
+                const diffForNavbar = vakitDate - cityNow;
+                if (diffForNavbar > 0 && diffForNavbar < minDiff) {
+                    minDiff = diffForNavbar;
+                    nextVakitName = vakit;
+                    nextVakitTime = saat;
+                }
+                
+                const countdownEl = document.getElementById(`${vakit}-countdown`);
+                const cardEl = document.getElementById(`card-${vakit}`);
+                
+                // Reset active class
+                if (cardEl) cardEl.classList.remove('active');
+
+                if (!countdownEl) return;
+
+                if (vakitDate < cityNow) {
+                     countdownEl.textContent = '';
+                     return;
+                }
+                
+                const timeDiff = vakitDate - cityNow;
+                const h = Math.floor(timeDiff / 3600000);
+                const m = Math.floor((timeDiff % 3600000) / 60000);
+                const s = Math.floor((timeDiff % 60000) / 1000);
+                
+                countdownEl.textContent = `-${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            });
+
+            // Eğer tüm vakitler geçtiyse (Yatsı sonrası), sonraki vakit yarın İmsak'tır
+            if (minDiff === Infinity) {
+                // Yatsı vakti geçtikten sonra İmsak kartını güncelle
+                 if (namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
+                     const nextImsakTime = namazVakitleri.yarin.imsak;
+                     const [hours, minutes] = nextImsakTime.split(":").map(Number);
+                     
+                     const vakitDate = new Date(cityNow);
+                     // Hedef: Yarınki İmsak
+                     // Eğer şu an 23:00 ise, yarın 05:00.
+                     // Eğer şu an 01:00 ise, bugün 05:00 (teknik olarak, ama gün değiştiği için "bugün" oluyor).
+                     // Ancak "yarin.imsak" API'den "yarınki" günün imsak vaktidir.
+                     // Yani bugün 21 Şubatsa, yarın 22 Şubat İmsak verisidir.
+                     
+                     // Eğer saat 23:00 (21 Şubat) ise, hedef 22 Şubat İmsak. (Doğru)
+                     // Eğer saat 01:00 (22 Şubat) ise, hedef 22 Şubat İmsak. (Bu durumda "bugün" imsak oluyor)
+                     // Ama API "yarin" verisini veriyor.
+                     
+                     // Eğer saat 01:00 ise, aslında biz "bugünün" imsak vaktini istiyoruz.
+                     // Ancak yatsıdan sonraki vakit her zaman bir sonraki imsaktır.
+                     
+                     // Basit çözüm:
+                     // Eğer Yatsı saati < cityNow < 24:00 ise, hedef = Yarın İmsak (Tarih + 1)
+                     // Eğer 00:00 < cityNow < İmsak ise, hedef = Bugün İmsak (Tarih + 0)
+                     
+                     // Ancak "namazVakitleri.yarin.imsak" her zaman bir sonraki günün imsak vaktidir.
+                     // Eğer saat 01:00 ise, namazVakitleri hala dünün verisi olabilir mi?
+                     // Hayır, sayfa yenilenince yeni veri gelir.
+                     // Eğer widget iframe içinde ise ve sayfa yenilenmediyse veri eski kalır.
+                     // Bu yüzden reload gerekebilir ama şimdilik basit tutalım.
+                     
+                     let targetDate = new Date(cityNow);
+                     targetDate.setHours(hours, minutes, 0, 0);
+                     
+                     if (targetDate < cityNow) {
+                         targetDate.setDate(targetDate.getDate() + 1);
+                     }
+                     
+                     minDiff = targetDate - cityNow;
+                     nextVakitName = 'imsak';
+                     
+                     // Header Countdown Update for Tomorrow Imsak
+                     const headerCountdown = document.getElementById('next-prayer-countdown');
+                     if (headerCountdown) {
+                        const h = Math.floor(minDiff / 3600000);
+                        const m = Math.floor((minDiff % 3600000) / 60000);
+                        const s = Math.floor((minDiff % 60000) / 1000);
+                        headerCountdown.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                        
+                        // Highlight Imsak Card
+                        const imsakCard = document.getElementById(`card-imsak`);
+                        if (imsakCard) imsakCard.classList.add('active');
+                     }
+                     return;
+                 }
+            }
+
+            // Update Header Countdown
+            const headerCountdown = document.getElementById('next-prayer-countdown');
+            if (headerCountdown && nextVakitName) {
+                const h = Math.floor(minDiff / 3600000);
+                const m = Math.floor((minDiff % 3600000) / 60000);
+                const s = Math.floor((minDiff % 60000) / 1000);
+                headerCountdown.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                
+                // Highlight next prayer card
+                const nextCard = document.getElementById(`card-${nextVakitName}`);
+                if (nextCard) nextCard.classList.add('active');
+            } else if (headerCountdown) {
+                headerCountdown.textContent = "";
+            }
+        }
+
+        setInterval(updateCountdowns, 1000);
+        updateCountdowns();
+    </script>
 </body>
 </html>

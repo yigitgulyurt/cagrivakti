@@ -3,7 +3,7 @@ from functools import wraps
 from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city, CITY_DISPLAY_NAME_MAPPING
 from app.models import NamazVakti, ContactMessage, DailyContent, Guide
 from app.extensions import cache, db, limiter
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import json
 import bleach
@@ -352,6 +352,16 @@ def embed_widget(sehir):
     # Bugünün vakitlerini getir
     try:
         vakitler = PrayerService.get_vakitler(sehir, country_code)
+        
+        # Yarının imsak vaktini ekle (Gece yarısı geçişi için)
+        try:
+            yarin = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+            yarin_vakitler = PrayerService.get_vakitler(sehir, country_code, yarin)
+            if yarin_vakitler:
+                vakitler['yarin'] = {'imsak': yarin_vakitler.get('imsak')}
+        except:
+            pass # Yarın verisi alınamazsa sorun değil, sadece countdown çalışmaz
+            
     except:
         return "Şehir bulunamadı", 404
 
@@ -360,8 +370,11 @@ def embed_widget(sehir):
     bg_color = request.args.get('bg', '')
     text_color = request.args.get('text', '')
     
+    display_name = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace("-", " ").title())
+
     response = make_response(render_template('embed/widget.html', 
                          sehir=sehir,
+                         display_name=display_name,
                          vakitler=vakitler,
                          theme=theme,
                          bg_color=bg_color,
