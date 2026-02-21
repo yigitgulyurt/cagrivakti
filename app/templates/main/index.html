@@ -7,14 +7,14 @@
 <div id="tutorialModal" class="tutorial-overlay" style="display: none;">
     <div class="tutorial-modal">
         <button class="tutorial-close" onclick="closeTutorialModal()">
-            <i class="fa-solid fa-xmark"></i>
+            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-xmark"></use></svg>
         </button>
         
         <div class="tutorial-content">
             <!-- Step 1: Welcome & Logo -->
             <div id="step-1" class="tutorial-step" style="display: block;">
                 <div class="tutorial-icon-box">
-                    <i class="fa-solid fa-mosque"></i>
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-mosque"></use></svg>
                 </div>
                 <h3>Hoş Geldiniz!</h3>
                 <p>Çağrı Vakti'ne hoş geldiniz. Sitenin sol üst köşesindeki logoya tıklayarak dilediğiniz zaman ana sayfaya dönebilirsiniz.</p>
@@ -23,7 +23,7 @@
             <!-- Step 2: Discover Time -->
             <div id="step-2" class="tutorial-step" style="display: none;">
                 <div class="tutorial-icon-box">
-                    <i class="fa-solid fa-city"></i>
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
                 </div>
                 <h3>Vakti Keşfet</h3>
                 <p>"Vakti Keşfet" butonunu kullanarak il ve ilçe seçimi yapabilir, namaz vakitlerine ve iftar/sahur saatlerine ulaşabilirsiniz.</p>
@@ -32,7 +32,7 @@
             <!-- Step 3: Find Location -->
             <div id="step-3" class="tutorial-step" style="display: none;">
                 <div class="tutorial-icon-box">
-                    <i class="fa-solid fa-location-dot"></i>
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-location-dot"></use></svg>
                 </div>
                 <h3>Konumumu Bul</h3>
                 <p>"Konumumu Bul" butonu ile tarayıcı konumunuzu kullanarak size en yakın merkezin vakitlerini otomatik olarak getirebilirsiniz.</p>
@@ -41,7 +41,7 @@
             <!-- Step 4: Menu -->
             <div id="step-4" class="tutorial-step" style="display: none;">
                 <div class="tutorial-icon-box">
-                    <i class="fa-solid fa-bars"></i>
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-bars"></use></svg>
                 </div>
                 <h3>Menü ve Araçlar</h3>
                 <p>Üst menüden İmsakiye, Kıble Pusulası, Ramazan Bilgileri ve Sitene Ekle gibi diğer faydalı araçlarımıza kolayca ulaşabilirsiniz.</p>
@@ -233,6 +233,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if the tour hasn't been shown yet
     if (!localStorage.getItem('tour_shown')) {
         openTutorialModal();
+    }
+    
+    // Close modal when clicking outside
+    const modal = document.getElementById('tutorialModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeTutorialModal();
+            }
+        });
     }
 });
 
