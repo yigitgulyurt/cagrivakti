@@ -607,8 +607,10 @@ body {
     user-select: none;
 }
 
-.national-identity i {
-    font-size: 1.3rem;
+.national-identity .icon {
+    height: 1.5rem;
+    width: auto;
+    fill: currentColor;
     filter: drop-shadow(0 0 5px rgba(227, 10, 23, 0.3));
     transform: rotate(-15deg);
 }
@@ -619,7 +621,7 @@ body {
     text-shadow: 0 0 15px rgba(227, 10, 23, 0.4);
 }
 
-.national-identity:hover i {
+.national-identity:hover .icon {
     animation: ay-yildiz-pulse 2s infinite ease-in-out;
 }
 
