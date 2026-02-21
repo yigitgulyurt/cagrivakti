@@ -88,8 +88,9 @@
         }
 
         /* FEATURE 1: Header Countdown Active */
-        /* Show only when width > 320 AND height > 160 */
-        @media (min-width: 320px) and (min-height: 160px) {
+        /* Show when width > 260 AND height > 160 */
+        /* Lowered from 320px to support standard 300px sidebars */
+        @media (min-width: 260px) and (min-height: 160px) {
             .next-prayer-countdown {
                 display: flex;
             }
@@ -161,8 +162,14 @@
         }
 
         /* FEATURE 2: Grid Detailed Countdowns Active */
-        /* Show only when width > 420 AND height > 280 */
-        @media (min-width: 420px) and (min-height: 280px) {
+        /* Enable if:
+           1. Wide & Tall (Main Content): W > 420 AND H > 280
+           2. Standard Sidebar Tall: W > 280 AND H > 500
+           3. Horizontal Banner Tall (Special): W > 600 AND H > 200
+        */
+        @media (min-width: 420px) and (min-height: 280px),
+               (min-width: 280px) and (min-height: 500px),
+               (min-width: 600px) and (min-height: 200px) {
             .prayer-countdown {
                 display: block;
             }
@@ -175,7 +182,8 @@
         
         /* Ratio Case 1: Portrait/Narrow -> 2 Columns */
         /* Trigger if Width < 300 OR (Height > Width * 1.5 - approx via min-height and max-width) */
-        @media (max-width: 300px), (min-height: 500px) and (max-width: 450px) {
+        /* EXCEPTION: If height is very tall (Sidebar Tall mode > 500px), stick to 2 columns but allow more content */
+        @media (max-width: 320px), (min-height: 500px) and (max-width: 450px) {
             .times-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
