@@ -82,6 +82,21 @@
             color: var(--gray);
             font-variant-numeric: tabular-nums;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes navbar-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(255, 193, 7, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        }
+        
+        @media (max-width: 350px) {
+            .next-prayer-countdown {
+                display: none;
+            }
         }
         
         .logo-link {
@@ -186,7 +201,7 @@
                 <span class="city-name">{{ display_name }}</span>
                 <span id="next-prayer-countdown" class="next-prayer-countdown"></span>
             </div>
-            <a href="https://namazvakitleri.yigitgulyurt.com/sehir/{{ sehir }}" target="_blank" class="logo-link">namazvakitleri</a>
+            <a href="https://cagrivakti.com.tr/sehir/{{ sehir }}" target="_blank" class="logo-link">Çağrı Vakti</a>
         </div>
         <div class="times-grid">
             {% for vakit_key, vakit_label in [('imsak', 'İmsak'), ('gunes', 'Güneş'), ('ogle', 'Öğle'), ('ikindi', 'İkindi'), ('aksam', 'Akşam'), ('yatsi', 'Yatsı')] %}
@@ -258,59 +273,44 @@
 
             // Eğer tüm vakitler geçtiyse (Yatsı sonrası), sonraki vakit yarın İmsak'tır
             if (minDiff === Infinity) {
-                // Yatsı vakti geçtikten sonra İmsak kartını güncelle
-                 if (namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
-                     const nextImsakTime = namazVakitleri.yarin.imsak;
+                let targetDate = null;
+                let nextImsakTime = null;
+
+                // 1. Öncelik: Yarın verisi varsa onu kullan
+                if (namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
+                     nextImsakTime = namazVakitleri.yarin.imsak;
                      const [hours, minutes] = nextImsakTime.split(":").map(Number);
-                     
-                     const vakitDate = new Date(cityNow);
-                     // Hedef: Yarınki İmsak
-                     // Eğer şu an 23:00 ise, yarın 05:00.
-                     // Eğer şu an 01:00 ise, bugün 05:00 (teknik olarak, ama gün değiştiği için "bugün" oluyor).
-                     // Ancak "yarin.imsak" API'den "yarınki" günün imsak vaktidir.
-                     // Yani bugün 21 Şubatsa, yarın 22 Şubat İmsak verisidir.
-                     
-                     // Eğer saat 23:00 (21 Şubat) ise, hedef 22 Şubat İmsak. (Doğru)
-                     // Eğer saat 01:00 (22 Şubat) ise, hedef 22 Şubat İmsak. (Bu durumda "bugün" imsak oluyor)
-                     // Ama API "yarin" verisini veriyor.
-                     
-                     // Eğer saat 01:00 ise, aslında biz "bugünün" imsak vaktini istiyoruz.
-                     // Ancak yatsıdan sonraki vakit her zaman bir sonraki imsaktır.
-                     
-                     // Basit çözüm:
-                     // Eğer Yatsı saati < cityNow < 24:00 ise, hedef = Yarın İmsak (Tarih + 1)
-                     // Eğer 00:00 < cityNow < İmsak ise, hedef = Bugün İmsak (Tarih + 0)
-                     
-                     // Ancak "namazVakitleri.yarin.imsak" her zaman bir sonraki günün imsak vaktidir.
-                     // Eğer saat 01:00 ise, namazVakitleri hala dünün verisi olabilir mi?
-                     // Hayır, sayfa yenilenince yeni veri gelir.
-                     // Eğer widget iframe içinde ise ve sayfa yenilenmediyse veri eski kalır.
-                     // Bu yüzden reload gerekebilir ama şimdilik basit tutalım.
-                     
-                     let targetDate = new Date(cityNow);
+                     targetDate = new Date(cityNow);
                      targetDate.setHours(hours, minutes, 0, 0);
                      
+                     // Eğer saat geçmişse (örneğin gece yarısından sonra), bir sonraki günü hedefle
                      if (targetDate < cityNow) {
                          targetDate.setDate(targetDate.getDate() + 1);
                      }
-                     
+                } 
+                // 2. Öncelik: Fallback (Yarın verisi yoksa bugünün imsak saatine 1 gün ekle)
+                else if (namazVakitleri.imsak) {
+                     nextImsakTime = namazVakitleri.imsak;
+                     const [hours, minutes] = nextImsakTime.split(":").map(Number);
+                     targetDate = new Date(cityNow);
+                     targetDate.setDate(targetDate.getDate() + 1); // Kesinlikle yarın
+                     targetDate.setHours(hours, minutes, 0, 0);
+                }
+
+                if (targetDate) {
                      minDiff = targetDate - cityNow;
                      nextVakitName = 'imsak';
-                     
-                     // Header Countdown Update for Tomorrow Imsak
-                     const headerCountdown = document.getElementById('next-prayer-countdown');
-                     if (headerCountdown) {
+                     nextVakitTime = nextImsakTime;
+
+                     // Update Imsak Countdown in grid
+                     const imsakCountdownEl = document.getElementById('imsak-countdown');
+                     if (imsakCountdownEl) {
                         const h = Math.floor(minDiff / 3600000);
                         const m = Math.floor((minDiff % 3600000) / 60000);
                         const s = Math.floor((minDiff % 60000) / 1000);
-                        headerCountdown.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                        
-                        // Highlight Imsak Card
-                        const imsakCard = document.getElementById(`card-imsak`);
-                        if (imsakCard) imsakCard.classList.add('active');
+                        imsakCountdownEl.textContent = `-${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                      }
-                     return;
-                 }
+                }
             }
 
             // Update Header Countdown
@@ -319,11 +319,25 @@
                 const h = Math.floor(minDiff / 3600000);
                 const m = Math.floor((minDiff % 3600000) / 60000);
                 const s = Math.floor((minDiff % 60000) / 1000);
-                headerCountdown.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                 
                 // Highlight next prayer card
                 const nextCard = document.getElementById(`card-${nextVakitName}`);
                 if (nextCard) nextCard.classList.add('active');
+
+                // Render matching city page design
+                const map = {'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': 'Öğle', 'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'};
+                const displayName = map[nextVakitName] || nextVakitName;
+
+                headerCountdown.innerHTML = `
+                    <div style="display: flex; flex-direction: column; line-height: 1; text-align: right; justify-content: center;">
+                        <span style="font-size: 0.9em; opacity: 1; font-weight: 700; color: #ffc107;">${displayName}</span>
+                        <span style="font-weight: 800; color: var(--text); font-size: 1em;">${nextVakitTime}</span>
+                    </div>
+                    <div style="background: rgba(255, 193, 7, 0.15); color: #ffc107; padding: 2px 6px; border-radius: 6px; font-family: monospace; font-weight: 800; font-size: 1.1em; line-height: 1.2; letter-spacing: 0.5px; border: 1px solid rgba(255, 193, 7, 0.4); animation: navbar-pulse 1s infinite ease-in-out; margin: 0 4px;">
+                        ${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}
+                    </div>
+                    <span style="font-size: 0.9em; opacity: 0.9; align-self: center; font-weight: 600; color: #ffc107;">kaldı</span>
+                `;
             } else if (headerCountdown) {
                 headerCountdown.textContent = "";
             }
