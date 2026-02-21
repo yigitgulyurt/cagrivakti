@@ -125,60 +125,234 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="landing-footer" style="padding: 60px 20px; background: var(--dark); text-align: center; border-top: 1px solid rgba(255,255,255,0.05); color: var(--gray);">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <svg class="icon"><use xlink:href="#fa-mosque"></use></svg>
-                <span>Çağrı Vakti</span>
-            </div>
-            <div class="footer-popular-cities" style="margin-bottom: 20px; font-size: 0.9em; display: flex; justify-content: center; flex-wrap: wrap; gap: 15px;">
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Istanbul', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">İstanbul</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Ankara', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Ankara</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Izmir', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">İzmir</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Bursa', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Bursa</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Antalya', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Antalya</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Adana', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Adana</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Konya', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Konya</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Gaziantep', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Gaziantep</a>
-            </div>
+    <footer class="landing-footer">
+        <div class="container">
             <div class="footer-grid">
-                <!-- Kategori 1: Hizmetler -->
-                <div class="footer-column">
-                    <h4>Hizmetler</h4>
-                    <a href="{{ url_for('views.sehir_secimi') }}">Namaz Vakitleri</a>
-                    <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye {{ current_year }}</a>
-                    <a href="{{ url_for('views.kible_pusulasi') }}">Kıble Pusulası</a>
-                    <a href="{{ url_for('views.sitene_ekle') }}">Sitene Ekle (Widget)</a>
+                <!-- 1. Sütun: Marka ve Açıklama -->
+                <div class="footer-col brand-col">
+                    <div class="footer-brand">
+                        <svg class="icon"><use xlink:href="#fa-mosque"></use></svg>
+                        <span>Çağrı Vakti</span>
+                    </div>
+                    <p class="footer-desc">
+                        En doğru namaz vakitleri, kıble yönü bulma ve Ramazan imsakiyesi. Sade ve kullanışlı arayüzü ile hizmetinizde.
+                    </p>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/yigitgulyurt/" target="_blank" rel="noopener noreferrer" title="Instagram">
+                            <svg class="icon"><use xlink:href="#fa-instagram"></use></svg>
+                        </a>
+                        <a href="mailto:iletisim@cagrivakti.com.tr" title="E-posta">
+                            <svg class="icon"><use xlink:href="#fa-envelope"></use></svg>
+                        </a>
+                    </div>
                 </div>
 
-                <!-- Kategori 2: Bilgi & Rehber -->
-                <div class="footer-column">
-                    <h4>Bilgi & Rehber</h4>
-                    <a href="{{ url_for('views.bilgi_kosesi_liste') }}">Bilgi Köşesi</a>
-                    <a href="{{ url_for('views.ramazan_nedir') }}">Ramazan Rehberi</a>
-                    <a href="{{ url_for('views.orucu_bozan_durumlar') }}">Oruç İlmihali</a>
-                    <a href="{{ url_for('views.ataturk') }}">Atatürk Köşesi</a>
+                <!-- 2. Sütun: Hızlı Erişim -->
+                <div class="footer-col">
+                    <h3>Hızlı Erişim</h3>
+                    <ul class="footer-menu">
+                        <li><a href="{{ url_for('views.sehir_secimi') }}">Şehir Seçimi</a></li>
+                        <li><a href="{{ url_for('views.kible_pusulasi') }}">Kıble Pusulası</a></li>
+                        <li><a href="{{ url_for('views.imsakiye_secimi') }}">{{ current_year }} İmsakiye</a></li>
+                        <li><a href="{{ url_for('views.sitene_ekle') }}">Sitene Ekle (Widget)</a></li>
+                        <li><a href="{{ url_for('views.indir') }}">Uygulamayı İndir</a></li>
+                    </ul>
                 </div>
 
-                <!-- Kategori 3: Kurumsal -->
-                <div class="footer-column">
-                    <h4>Kurumsal</h4>
-                    <a href="{{ url_for('views.neden_biz') }}">Neden Biz?</a>
-                    <a href="{{ url_for('views.ilkelerimiz') }}">İlkelerimiz</a>
-                    <a href="{{ url_for('views.iletisim') }}">İletişim</a>
-                    <a href="{{ url_for('views.indir') }}">Uygulamayı İndir</a>
-                    <a href="{{ url_for('views.api_dokuman') }}">Geliştirici API</a>
+                <!-- 3. Sütun: Bilgi Köşesi -->
+                <div class="footer-col">
+                    <h3>Bilgi ve Rehber</h3>
+                    <ul class="footer-menu">
+                        <li><a href="{{ url_for('views.bilgi_kosesi_liste') }}">Dini Bilgiler</a></li>
+                        <li><a href="{{ url_for('views.ramazan_nedir') }}">Ramazan Rehberi</a></li>
+                        <li><a href="{{ url_for('views.orucu_bozan_durumlar') }}">Oruç İlmihali</a></li>
+                        <li><a href="{{ url_for('views.ataturk') }}" style="color: #ff5252;">Mustafa Kemal Atatürk</a></li>
+                    </ul>
+                </div>
+
+                <!-- 4. Sütun: Kurumsal -->
+                <div class="footer-col">
+                    <h3>Kurumsal</h3>
+                    <ul class="footer-menu">
+                        <li><a href="{{ url_for('views.neden_biz') }}">Neden Biz?</a></li>
+                        <li><a href="{{ url_for('views.ilkelerimiz') }}">İlkelerimiz</a></li>
+                        <li><a href="{{ url_for('views.iletisim') }}">İletişim</a></li>
+                        <li><a href="{{ url_for('views.api_dokuman') }}">API Dokümantasyonu</a></li>
+                    </ul>
                 </div>
             </div>
-            <div class="footer-creator">
-                <a href="https://www.instagram.com/yigitgulyurt/" target="_blank" rel="noopener noreferrer" style="color: var(--text); font-weight: 600;">BİR YİĞİT GÜLYURT PROJESİ</a>
-            </div>
-            <div class="footer-copy" style="color: var(--gray);">
-                &copy; {{ current_year }} Çağrı Vakti. Bütün hakları saklıdır.
-                <br><small style="opacity: 0.8;">Sürüm {{ app_version }}</small>
+
+            <div class="footer-bottom">
+                <div class="copyright">
+                    &copy; {{ current_year }} Çağrı Vakti. Tüm hakları saklıdır.
+                    <span class="version">v{{ app_version }}</span>
+                </div>
+                <div class="creator">
+                    <a href="https://yigitgulyurt.com" target="_blank" rel="noopener noreferrer">
+                        Bir <span class="highlight">Yiğit Gülyurt</span> Projesidir
+                    </a>
+                </div>
             </div>
         </div>
     </footer>
+
+    <style>
+        .landing-footer {
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border);
+            padding: 60px 0 30px;
+            margin-top: auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-col h3 {
+            color: var(--text);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .footer-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+
+        .footer-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-menu li {
+            margin-bottom: 12px;
+        }
+
+        .footer-menu a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .footer-menu a:hover {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .copyright {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .version {
+            opacity: 0.5;
+            margin-left: 10px;
+            font-size: 0.8rem;
+        }
+
+        .creator a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .creator .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .creator a:hover {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 992px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .brand-col {
+                grid-column: span 2;
+                text-align: center;
+            }
+            .footer-desc {
+                margin: 0 auto 20px;
+            }
+            .social-links {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                text-align: center;
+            }
+            .brand-col {
+                grid-column: span 1;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
 
     {% block modals %}
     {% endblock %}
