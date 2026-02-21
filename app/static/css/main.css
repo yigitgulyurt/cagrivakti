@@ -505,6 +505,22 @@ body {
     text-align: center;
 }
 
+/* Footer Sütun Hizalamaları: 1. Sola, 2. Ortaya, 3. Sağa */
+.footer-col:nth-child(1) {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.footer-col:nth-child(2) {
+    align-items: center;
+    text-align: center;
+}
+
+.footer-col:nth-child(3) {
+    align-items: flex-end;
+    text-align: right;
+}
+
 .footer-col h3 {
     color: var(--text);
     font-size: 1.1rem;
