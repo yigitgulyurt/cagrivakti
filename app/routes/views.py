@@ -54,7 +54,10 @@ def sehir_sayfasi(sehir):
     if not is_latin_only(sehir):
         abort(400, description="Gecersiz karakter iceren sehir ismi.")
         
-    country_code = request.args.get('country', 'TR')
+    country_code = request.args.get('country')
+    if not country_code:
+        country_code = get_country_for_city(sehir) or 'TR'
+
     if not is_latin_only(country_code):
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
     
@@ -152,14 +155,14 @@ def serve_sitemap():
         country = get_country_for_city(sehir)
         
         pages.append({
-            "loc": url_for('views.sehir_sayfasi', sehir=sehir, country=country, _external=True),
+            "loc": url_for('views.sehir_sayfasi', sehir=sehir, _external=True),
             "lastmod": datetime.now().strftime("%Y-%m-%d"),
             "priority": "0.9"
         })
         # İmsakiye sayfaları (Sadece Türkiye şehirleri için)
         if country == 'TR':
             pages.append({
-                "loc": url_for('views.imsakiye_detay', sehir=sehir, country=country, _external=True),
+                "loc": url_for('views.imsakiye_detay', sehir=sehir, _external=True),
                 "lastmod": datetime.now().strftime("%Y-%m-%d"),
                 "priority": "0.7"
             })
@@ -300,7 +303,10 @@ def imsakiye_detay(sehir):
     if not is_latin_only(sehir):
         abort(400, description="Gecersiz karakter iceren sehir ismi.")
         
-    country_code = request.args.get('country', 'TR')
+    country_code = request.args.get('country')
+    if not country_code:
+        country_code = get_country_for_city(sehir) or 'TR'
+
     if not is_latin_only(country_code):
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
         
