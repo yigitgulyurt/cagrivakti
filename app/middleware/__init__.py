@@ -45,6 +45,7 @@ def setup_middleware(app):
         # Embed sayfaları için özel izinler
         if request.path.startswith('/embed/'):
             # Embed edilebilir sayfalar için frame-ancestors * (her yere izin ver)
+            # 'self' eklemek bazı tarayıcılarda (örn. Zen/Firefox) same-origin algılamasını iyileştirebilir
             csp = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net; "
@@ -52,13 +53,15 @@ def setup_middleware(app):
                 "font-src 'self' https://fonts.gstatic.com; "
                 "img-src 'self' data: https:; "
                 "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
-                "frame-ancestors *; "
+                "frame-ancestors 'self' *; "
                 "base-uri 'self'; "
                 "form-action 'self';"
             )
             response.headers['Content-Security-Policy'] = csp
             # X-Frame-Options header'ını kaldır (varsa)
             response.headers.pop('X-Frame-Options', None)
+            # Cross-origin erişim izni (CORS)
+            response.headers['Access-Control-Allow-Origin'] = '*'
             
         else:
             # Standart sayfalar için sıkı güvenlik

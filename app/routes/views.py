@@ -367,8 +367,9 @@ def embed_widget(sehir):
                          bg_color=bg_color,
                          text_color=text_color))
     
-    # Embed widget cache süresi (1 saat)
-    response.headers['Cache-Control'] = 'public, max-age=3600'
+    # Embed widget cache süresi (Test için kısa süreli, normalde 1 saat)
+    # Zen browser hatasını çözmek için cache'i devre dışı bırakıp headerların güncellenmesini sağlıyoruz
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
             
     return response
 
