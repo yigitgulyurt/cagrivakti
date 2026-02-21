@@ -90,6 +90,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Embed URL'ini oluştururken tam domain kullan
+        const baseUrl = window.location.origin;
         const citySelect = document.getElementById('city-select');
         const themeInputs = document.getElementsByName('theme');
         const widthInput = document.getElementById('width-input');
@@ -107,11 +109,10 @@
             const width = widthInput.value;
             const height = heightInput.value;
 
-            // Get base URL dynamically
-            const baseUrl = window.location.origin;
+            // Tam URL kullan, relative path değil
+            // Bu, 'self' origin kontrolünü kolaylaştırır
             const widgetUrl = `${baseUrl}/embed/${city}?theme=${theme}`;
 
-            // Update Preview
             previewFrame.src = widgetUrl;
             previewFrame.width = width;
             previewFrame.height = height;

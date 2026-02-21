@@ -80,6 +80,7 @@ def setup_middleware(app):
             )
             response.headers['Content-Security-Policy'] = csp
             # Clickjacking koruması (DENY yerine SAMEORIGIN yapıyoruz ki kendi sitemiz içinde iframe kullanımı gerekirse sorun olmasın)
+            # iframe'i kendi sitemizde göstermek için X-Frame-Options SAMEORIGIN olmalı
             response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         
         # MIME tipi koklamayı engelle
