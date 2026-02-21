@@ -82,21 +82,23 @@
             color: var(--gray);
             font-variant-numeric: tabular-nums;
             white-space: nowrap;
-            display: flex;
+            display: none; /* Default hidden */
             align-items: center;
             gap: 8px;
+        }
+
+        /* FEATURE 1: Header Countdown Active */
+        /* Show only when width > 320 AND height > 160 */
+        @media (min-width: 320px) and (min-height: 160px) {
+            .next-prayer-countdown {
+                display: flex;
+            }
         }
 
         @keyframes navbar-pulse {
             0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
             70% { box-shadow: 0 0 0 6px rgba(255, 193, 7, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
-        }
-        
-        @media (max-width: 350px) {
-            .next-prayer-countdown {
-                display: none;
-            }
         }
         
         .logo-link {
@@ -154,18 +156,33 @@
             font-size: 10px;
             color: var(--gray);
             margin-top: 2px;
-            display: none; /* Hidden by default */
+            display: none; /* Default hidden */
             font-variant-numeric: tabular-nums;
         }
 
-        /* Layout variations based on width */
-        @media (max-width: 250px) {
+        /* FEATURE 2: Grid Detailed Countdowns Active */
+        /* Show only when width > 420 AND height > 280 */
+        @media (min-width: 420px) and (min-height: 280px) {
+            .prayer-countdown {
+                display: block;
+            }
+            .time-item {
+                padding: 8px 4px;
+            }
+        }
+
+        /* LAYOUT RATIOS */
+        
+        /* Ratio Case 1: Portrait/Narrow -> 2 Columns */
+        /* Trigger if Width < 300 OR (Height > Width * 1.5 - approx via min-height and max-width) */
+        @media (max-width: 300px), (min-height: 500px) and (max-width: 450px) {
             .times-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
         
-        @media (max-width: 150px) {
+        /* Ratio Case 2: Very Narrow/Sidebar -> 1 Column (List View) */
+        @media (max-width: 160px) {
             .times-grid {
                 display: flex;
                 flex-direction: column;
@@ -178,18 +195,9 @@
             .time-label {
                 margin-bottom: 0;
             }
+            /* Force hide countdowns in list view to save space */
             .prayer-countdown {
                 display: none !important;
-            }
-        }
-
-        /* Show countdowns when enough space */
-        @media (min-width: 400px) and (min-height: 200px) {
-            .prayer-countdown {
-                display: block;
-            }
-            .time-item {
-                padding: 8px 4px;
             }
         }
     </style>
