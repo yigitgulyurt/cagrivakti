@@ -369,15 +369,6 @@ function prevStep() {
             
             <!-- Geri Sayım Kapsayıcı (Layout Shift'i önlemek için sabit alan) -->
             <div class="home-countdown-fixed-height" id="main-countdown-container" style="display: none;">
-                <!-- Geri Sayım Skeleton (Yüklenirken görünür) -->
-                <div id="countdown-skeleton" class="home-countdown-container">
-                    <div class="countdown-card skeleton-card">
-                        <div class="skeleton-line label"></div>
-                        <div class="skeleton-line time"></div>
-                        <div class="skeleton-line location"></div>
-                    </div>
-                </div>
-                
                 <!-- Canlı Geri Sayım Bölümü (Yüklendikten sonra görünür) -->
                 <div id="home-countdown-wrapper" class="home-countdown-container" style="display: none; opacity: 0;">
                     <div class="countdown-card">
@@ -828,20 +819,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (!data || !data.vakitler) {
-                const skeleton = document.getElementById('countdown-skeleton');
-                if (skeleton) skeleton.style.display = 'none';
                 return;
             }
             
             if (data && data.vakitler) {
-                const skeleton = document.getElementById('countdown-skeleton');
                 const wrapper = document.getElementById('home-countdown-wrapper');
                 const timerEl = document.getElementById('home-countdown-timer');
                 const labelEl = document.getElementById('next-vakit-name');
                 const cityEl = document.getElementById('active-city-name');
                 
-                if (skeleton) skeleton.style.display = 'none';
-                    if (wrapper) {
+                if (wrapper) {
                         wrapper.style.display = 'block';
                         setTimeout(() => {
                             wrapper.style.opacity = '1';
@@ -924,58 +911,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 }
 
-/* Skeleton Loader Styles */
-.skeleton-card {
-    pointer-events: none;
-    background: rgba(255, 255, 255, 0.03) !important;
-}
 
-.skeleton-line {
-    background: linear-gradient(90deg, 
-        rgba(255, 255, 255, 0.03) 25%, 
-        rgba(255, 255, 255, 0.08) 50%, 
-        rgba(255, 255, 255, 0.03) 75%
-    );
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
-    border-radius: 8px;
-    margin: 0 auto;
-}
-
-.skeleton-line.label {
-    width: 60%;
-    height: 1.2rem;
-    margin-bottom: 10px;
-}
-
-.skeleton-line.time {
-    width: 60%;
-    height: clamp(3rem, 12vw, 4.2rem);
-    margin-bottom: 10px;
-    border-radius: 12px;
-}
-
-.skeleton-line.location {
-    width: 40%;
-    height: 1.5rem;
-}
-
-@keyframes skeleton-loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-@media (min-width: 992px) {
-    .skeleton-line.label {
-        height: 1.5rem;
-        margin-bottom: 15px;
-    }
-
-    .skeleton-line.time {
-        width: 75%;
-        height: 6.6rem;
-    }
-}
 
 .home-countdown-container {
     margin: 0 auto;
