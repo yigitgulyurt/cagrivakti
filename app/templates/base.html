@@ -141,17 +141,34 @@
                 <a href="{{ url_for('views.sehir_sayfasi', sehir='Konya', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Konya</a>
                 <a href="{{ url_for('views.sehir_sayfasi', sehir='Gaziantep', country='TR') }}" style="color: var(--text); text-decoration: none; opacity: 0.9; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Gaziantep</a>
             </div>
-            <div class="footer-links">
-                <a href="{{ url_for('views.sehir_secimi') }}" style="color: var(--gray);">Vakitler</a>
-                <a href="{{ url_for('views.kible_pusulasi') }}" style="color: var(--gray);">Kıble Pusulası</a>
-                <a href="{{ url_for('views.imsakiye_secimi') }}" style="color: var(--gray);">İmsakiye {{ current_year }}</a>
-                <a href="{{ url_for('views.neden_biz') }}" style="color: var(--gray);">Neden Biz?</a>
-                <a href="{{ url_for('views.api_dokuman') }}" style="color: var(--gray);">API</a>
-                <a href="{{ url_for('views.ataturk') }}" style="color: var(--gray);">Atatürk</a>
-                <a href="{{ url_for('views.ilkelerimiz') }}" style="color: var(--gray);">İlkelerimiz</a>
-                <a href="{{ url_for('views.indir') }}" style="color: var(--gray);">Uygulamayı İndir</a>
-                <a href="{{ url_for('views.sitene_ekle') }}" style="color: var(--gray);">Sitene Ekle</a>
-                <a href="{{ url_for('views.iletisim') }}" style="color: var(--gray);">İletişim</a>
+            <div class="footer-grid">
+                <!-- Kategori 1: Hizmetler -->
+                <div class="footer-column">
+                    <h4>Hizmetler</h4>
+                    <a href="{{ url_for('views.sehir_secimi') }}">Namaz Vakitleri</a>
+                    <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye {{ current_year }}</a>
+                    <a href="{{ url_for('views.kible_pusulasi') }}">Kıble Pusulası</a>
+                    <a href="{{ url_for('views.sitene_ekle') }}">Sitene Ekle (Widget)</a>
+                </div>
+
+                <!-- Kategori 2: Bilgi & Rehber -->
+                <div class="footer-column">
+                    <h4>Bilgi & Rehber</h4>
+                    <a href="{{ url_for('views.bilgi_kosesi_liste') }}">Bilgi Köşesi</a>
+                    <a href="{{ url_for('views.ramazan_nedir') }}">Ramazan Rehberi</a>
+                    <a href="{{ url_for('views.orucu_bozan_durumlar') }}">Oruç İlmihali</a>
+                    <a href="{{ url_for('views.ataturk') }}">Atatürk Köşesi</a>
+                </div>
+
+                <!-- Kategori 3: Kurumsal -->
+                <div class="footer-column">
+                    <h4>Kurumsal</h4>
+                    <a href="{{ url_for('views.neden_biz') }}">Neden Biz?</a>
+                    <a href="{{ url_for('views.ilkelerimiz') }}">İlkelerimiz</a>
+                    <a href="{{ url_for('views.iletisim') }}">İletişim</a>
+                    <a href="{{ url_for('views.indir') }}">Uygulamayı İndir</a>
+                    <a href="{{ url_for('views.api_dokuman') }}">Geliştirici API</a>
+                </div>
             </div>
             <div class="footer-creator">
                 <a href="https://www.instagram.com/yigitgulyurt/" target="_blank" rel="noopener noreferrer" style="color: var(--text); font-weight: 600;">BİR YİĞİT GÜLYURT PROJESİ</a>
