@@ -484,6 +484,37 @@
         border-color: rgba(255, 193, 7, 0.4);
     }
 }
+
+/* En yakın vakit kartı için belirgeç stili */
+.active-vakit-card {
+    border: 2px solid var(--primary) !important;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Kartın köşesinde küçük bir işaret (badge) de ekleyebiliriz */
+.active-vakit-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 30px 30px 0;
+    border-color: transparent var(--primary) transparent transparent;
+}
+
+.active-vakit-card::after {
+    content: '★';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    color: #000;
+    font-size: 10px;
+    font-weight: bold;
+}
 </style>
 {% endblock %}
 
@@ -654,6 +685,11 @@
             }
             
             const countdownEl = document.getElementById(`${vakit}-countdown`);
+            const cardEl = document.getElementById(`card-${vakit}`);
+            
+            // Temizlik: Önce aktif sınıfı kaldır
+            if (cardEl) cardEl.classList.remove('active-vakit-card');
+
             if (!countdownEl) return;
 
             // Eğer vakit geçtiyse bir sonraki günün vaktini mi hesaplamalıyız? 
@@ -687,6 +723,10 @@
             // Yatsı vakti geçtikten sonra İmsak kartını güncelle
             const imsakEl = document.getElementById('imsak');
             const imsakCountdownEl = document.getElementById('imsak-countdown');
+            const imsakCardEl = document.getElementById('card-imsak');
+            
+            // Eğer Yatsı sonrası ise İmsak kartını aktif yap
+            if (imsakCardEl) imsakCardEl.classList.add('active-vakit-card');
             
             if (namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
                 const nextImsakTime = namazVakitleri.yarin.imsak;
@@ -790,6 +830,10 @@
         // Navbar Güncelleme
         const navEl = document.getElementById('navbar-vakit-countdown');
         if (navEl && nextVakitName) {
+            // Aktif kartı işaretle
+            const activeCard = document.getElementById(`card-${nextVakitName}`);
+            if (activeCard) activeCard.classList.add('active-vakit-card');
+
             const h = Math.floor(minDiff / 3600000);
             const m = Math.floor((minDiff % 3600000) / 60000);
             const s = Math.floor((minDiff % 60000) / 1000);
