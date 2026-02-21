@@ -200,16 +200,27 @@
                 display: none !important;
             }
         }
+
+        .city-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .city-link:hover .city-name {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body data-theme="{{ theme }}">
     <div class="widget-container">
         <div class="header">
             <div class="header-left">
-                <span class="city-name">{{ display_name }}</span>
+                <a href="https://cagrivakti.com.tr/sehir/{{ sehir }}" target="_blank" class="city-link">
+                    <span class="city-name">{{ display_name }}</span>
+                </a>
                 <span id="next-prayer-countdown" class="next-prayer-countdown"></span>
             </div>
-            <a href="https://cagrivakti.com.tr/sehir/{{ sehir }}" target="_blank" class="logo-link">Çağrı Vakti</a>
+            <a href="https://cagrivakti.com.tr" target="_blank" class="logo-link">Çağrı Vakti</a>
         </div>
         <div class="times-grid">
             {% for vakit_key, vakit_label in [('imsak', 'İmsak'), ('gunes', 'Güneş'), ('ogle', 'Öğle'), ('ikindi', 'İkindi'), ('aksam', 'Akşam'), ('yatsi', 'Yatsı')] %}
