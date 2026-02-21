@@ -7,56 +7,61 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Check if the tour hasn't been shown yet
     if (!localStorage.getItem('tour_shown')) {
-        const driver = window.driver.js.driver;
-        
-        const driverObj = driver({
-            showProgress: true,
-            allowClose: false,
-            nextBtnText: 'İleri',
-            prevBtnText: 'Geri',
-            doneBtnText: 'Anladım, Başla',
-            steps: [
-                { 
-                    element: '.nav-brand', 
-                    popover: { 
-                        title: 'Ana Sayfa', 
-                        description: 'Logoya tıklayarak dilediğiniz zaman ana sayfaya dönebilirsiniz.',
-                        side: "bottom",
-                        align: 'start'
-                    } 
-                },
-                { 
-                    element: '#btn-discover-time', 
-                    popover: { 
-                        title: 'Vakti Keşfet', 
-                        description: 'İlinizi listeden seçerek namaz vakitlerini, iftar/sahur saatlerini ve diğer bilgileri görüntüleyebilirsiniz.' 
-                    } 
-                },
-                { 
-                    element: '#location-button', 
-                    popover: { 
-                        title: 'Konumumu Bul', 
-                        description: 'Konumunuzu otomatik olarak algılayarak size en yakın merkezin namaz vakitlerini anında getirir.' 
-                    } 
-                },
-                { 
-                    element: window.innerWidth > 992 ? '.nav-links' : '#navToggle', 
-                    popover: { 
-                        title: 'Menü ve Araçlar', 
-                        description: 'İmsakiye, Kıble Pusulası, Ramazan Bilgileri, Bilgi Köşesi ve diğer tüm araçlara buradan ulaşabilirsiniz.' 
-                    } 
-                }
-            ],
-            onDestroyed: () => {
-                // Tour finished or skipped
-                localStorage.setItem('tour_shown', 'true');
-            }
-        });
-
-        // Start the tour
-        driverObj.drive();
+        startTour();
     }
 });
+
+function startTour() {
+    const driver = window.driver.js.driver;
+    
+    const driverObj = driver({
+        showProgress: true,
+        allowClose: false,
+        nextBtnText: 'İleri',
+        prevBtnText: 'Geri',
+        doneBtnText: 'Anladım, Başla',
+        popoverClass: 'driverjs-theme', // Add custom class
+        steps: [
+            { 
+                element: '.nav-brand', 
+                popover: { 
+                    title: 'Ana Sayfa', 
+                    description: 'Logoya tıklayarak dilediğiniz zaman ana sayfaya dönebilirsiniz.',
+                    side: "bottom",
+                    align: 'start'
+                } 
+            },
+            { 
+                element: '#btn-discover-time', 
+                popover: { 
+                    title: 'Vakti Keşfet', 
+                    description: 'İlinizi listeden seçerek namaz vakitlerini, iftar/sahur saatlerini ve diğer bilgileri görüntüleyebilirsiniz.' 
+                } 
+            },
+            { 
+                element: '#location-button', 
+                popover: { 
+                    title: 'Konumumu Bul', 
+                    description: 'Konumunuzu otomatik olarak algılayarak size en yakın merkezin namaz vakitlerini anında getirir.' 
+                } 
+            },
+            { 
+                element: window.innerWidth > 992 ? '.nav-links' : '#navToggle', 
+                popover: { 
+                    title: 'Menü ve Araçlar', 
+                    description: 'İmsakiye, Kıble Pusulası, Ramazan Bilgileri, Bilgi Köşesi ve diğer tüm araçlara buradan ulaşabilirsiniz.' 
+                } 
+            }
+        ],
+        onDestroyed: () => {
+            // Tour finished or skipped
+            localStorage.setItem('tour_shown', 'true');
+        }
+    });
+
+    // Start the tour
+    driverObj.drive();
+}
 </script>
 {% endblock %}
 {% block description %}{{ seo_description }}{% endblock %}
@@ -1600,6 +1605,73 @@ document.addEventListener('DOMContentLoaded', function() {
     .promo-icon {width:100px;height:100px;font-size:3rem}
     .promo-content h2 {font-size:1.5rem}
     .promo-content p {font-size:1rem}
+}
+/* Driver.js Dark Theme Customization */
+.driver-popover.driverjs-theme {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.driver-popover.driverjs-theme .driver-popover-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.driver-popover.driverjs-theme .driver-popover-description {
+    color: var(--gray);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.driver-popover.driverjs-theme button {
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.driver-popover.driverjs-theme .driver-popover-next-btn {
+    background-color: var(--primary);
+    color: #000;
+}
+
+.driver-popover.driverjs-theme .driver-popover-next-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.driver-popover.driverjs-theme .driver-popover-prev-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.driver-popover.driverjs-theme .driver-popover-prev-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.driver-popover.driverjs-theme .driver-popover-close-btn {
+    color: var(--gray);
+    transition: color 0.2s;
+}
+
+.driver-popover.driverjs-theme .driver-popover-close-btn:hover {
+    color: var(--text);
+}
+
+.driver-popover.driverjs-theme .driver-popover-progress-text {
+    color: var(--gray);
+    font-size: 0.8rem;
 }
 </style>
 {% endblock %}
