@@ -468,11 +468,27 @@
                 
                 // Highlight next prayer card
                 const nextCard = document.getElementById(`card-${nextVakitName}`);
-                if (nextCard) nextCard.classList.add('active');
+                if (nextCard) {
+                    nextCard.classList.add('active');
+                    
+                    // Yatsı vaktinden sonra yarının imsak vaktini göster
+                    if (nextVakitName === 'imsak' && namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
+                         const imsakValueEl = nextCard.querySelector('.time-value');
+                         const imsakLabelEl = nextCard.querySelector('.time-label');
+                         if (imsakValueEl && imsakLabelEl) {
+                             imsakValueEl.textContent = namazVakitleri.yarin.imsak;
+                             imsakLabelEl.textContent = 'Yarın İmsak';
+                         }
+                    }
+                }
 
                 // Render matching city page design
                 const map = {'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': 'Öğle', 'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'};
-                const displayName = map[nextVakitName] || nextVakitName;
+                let displayName = map[nextVakitName] || nextVakitName;
+
+                if (nextVakitName === 'imsak' && namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
+                    displayName = 'Yarın İmsak';
+                }
 
                 headerCountdown.innerHTML = `
                     <div style="display: flex; flex-direction: column; line-height: 1; text-align: right; justify-content: center;">
