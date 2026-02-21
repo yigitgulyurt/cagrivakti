@@ -139,7 +139,7 @@
                 height: 14px;
             }
             /* Add transitions for smooth hiding */
-            #features-section, #how-it-works-section, #telegram-section, #stats-section {
+            #features-section, #how-it-works-section, #telegram-section, #stats-section, #guides-section {
                 transition: opacity 0.3s ease;
             }
         </style>
@@ -239,7 +239,10 @@
         </div>
     </section>
 {% if guides %}
-    <section class="home-guides" id="guides-section">
+    <section class="home-guides" id="guides-section" style="position: relative;">
+        <button id="close-guides-section" class="close-intro-btn" aria-label="Bilgi Köşesini Gizle" title="Bu bölümü kalıcı olarak gizle">
+            <svg class="icon"><use xlink:href="#fa-xmark-custom"></use></svg>
+        </button>
         <div class="section-header">
             <h2>Bilgi Köşesi</h2>
             <p>Dini konular ve namaz kılavuzları hakkında derinlemesine bilgiler.</p>
@@ -325,7 +328,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (scrollBtn) scrollBtn.style.display = 'none';
     }
 
-    // Close button handler
+    // Check if guides section is hidden
+    if (localStorage.getItem('guidesSectionHidden') === 'true') {
+        const guidesSection = document.getElementById('guides-section');
+        if (guidesSection) guidesSection.style.display = 'none';
+    }
+
+    // Close button handler for intro sections
     const closeBtn = document.getElementById('close-intro-sections');
     if (closeBtn) {
         closeBtn.addEventListener('click', function() {
@@ -353,6 +362,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Save to localStorage
             localStorage.setItem('introSectionsHidden', 'true');
+        });
+    }
+
+    // Close button handler for guides section
+    const closeGuidesBtn = document.getElementById('close-guides-section');
+    if (closeGuidesBtn) {
+        closeGuidesBtn.addEventListener('click', function() {
+            const guidesSection = document.getElementById('guides-section');
+            if (guidesSection) {
+                guidesSection.style.opacity = '0';
+                setTimeout(() => {
+                    guidesSection.style.display = 'none';
+                }, 300);
+                
+                localStorage.setItem('guidesSectionHidden', 'true');
+            }
         });
     }
 
