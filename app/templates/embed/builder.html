@@ -371,10 +371,19 @@
     
     .showroom-grid {
         display: flex;
-        flex-wrap: wrap;
-        gap: 60px; /* Increased gap */
-        justify-content: center; /* Keep centered but spread out */
+        flex-direction: column;
+        gap: 60px;
         align-items: center;
+        width: 100%;
+    }
+
+    .showroom-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 60px;
+        justify-content: center;
+        align-items: flex-end; /* Align bottom to handle different heights nicely */
+        width: 100%;
     }
     
     .showroom-item {
@@ -561,45 +570,49 @@
         </div>
         
         <div class="showroom-grid">
-            <!-- Square -->
-            <div class="showroom-item">
-                <span class="showroom-label">Kare (300x250)</span>
-                <div class="showroom-frame-wrapper">
-                    <iframe class="showroom-frame" data-w="300" data-h="250" frameborder="0" scrolling="no"></iframe>
+            <!-- Top Row: Square, Vertical Detail, Full Feature, Skyscraper -->
+            <div class="showroom-row top-row">
+                <!-- Square -->
+                <div class="showroom-item">
+                    <span class="showroom-label">Kare (300x250)</span>
+                    <div class="showroom-frame-wrapper">
+                        <iframe class="showroom-frame" data-w="300" data-h="250" frameborder="0" scrolling="no"></iframe>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Skyscraper -->
-            <div class="showroom-item">
-                <span class="showroom-label">İnce Dikey (160x600)</span>
-                <div class="showroom-frame-wrapper">
-                    <iframe class="showroom-frame" data-w="160" data-h="600" frameborder="0" scrolling="no"></iframe>
+
+                <!-- Vertical Detail -->
+                <div class="showroom-item">
+                    <span class="showroom-label">Dikey Detay (400x500)</span>
+                    <div class="showroom-frame-wrapper">
+                        <iframe class="showroom-frame" data-w="400" data-h="500" frameborder="0" scrolling="no"></iframe>
+                    </div>
+                </div>
+
+                <!-- Full Feature -->
+                <div class="showroom-item">
+                    <span class="showroom-label">Tam Özellik (500x400)</span>
+                    <div class="showroom-frame-wrapper">
+                        <iframe class="showroom-frame" data-w="500" data-h="400" frameborder="0" scrolling="no"></iframe>
+                    </div>
+                </div>
+                
+                <!-- Skyscraper -->
+                <div class="showroom-item">
+                    <span class="showroom-label">İnce Dikey (160x600)</span>
+                    <div class="showroom-frame-wrapper">
+                        <iframe class="showroom-frame" data-w="160" data-h="600" frameborder="0" scrolling="no"></iframe>
+                    </div>
                 </div>
             </div>
 
-            <!-- Banner -->
-            <div class="showroom-item" style="flex-basis: 100%; display: flex; justify-content: center;">
-                 <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <!-- Bottom Row: Banner -->
+            <div class="showroom-row bottom-row">
+                <!-- Banner -->
+                <div class="showroom-item banner-item">
                     <span class="showroom-label">Banner (728x90)</span>
                     <div class="showroom-frame-wrapper">
                         <iframe class="showroom-frame" data-w="728" data-h="90" frameborder="0" scrolling="no"></iframe>
                     </div>
-                 </div>
-            </div>
-
-            <!-- Vertical Detail -->
-            <div class="showroom-item">
-                <span class="showroom-label">Dikey Detay (400x500)</span>
-                <div class="showroom-frame-wrapper">
-                    <iframe class="showroom-frame" data-w="400" data-h="500" frameborder="0" scrolling="no"></iframe>
-                </div>
-            </div>
-            
-             <!-- Full Feature -->
-            <div class="showroom-item">
-                <span class="showroom-label">Tam Özellik (500x400)</span>
-                <div class="showroom-frame-wrapper">
-                    <iframe class="showroom-frame" data-w="500" data-h="400" frameborder="0" scrolling="no"></iframe>
                 </div>
             </div>
         </div>
