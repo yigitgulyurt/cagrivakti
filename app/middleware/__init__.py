@@ -62,6 +62,7 @@ def setup_middleware(app):
             
         else:
             # Standart sayfalar için sıkı güvenlik
+z            # frame-src 'self' *: Kendi sitemizdeki iframe'lerin çalışmasına izin ver (Önizleme vb. için)
             csp = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net; "
@@ -69,13 +70,14 @@ def setup_middleware(app):
                 "font-src 'self' https://fonts.gstatic.com; "
                 "img-src 'self' data: https:; "
                 "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
+                "frame-src 'self' *; "
                 "frame-ancestors 'none'; "
                 "base-uri 'self'; "
                 "form-action 'self';"
             )
             response.headers['Content-Security-Policy'] = csp
-            # Clickjacking koruması
-            response.headers['X-Frame-Options'] = 'DENY'
+            # Clickjacking koruması (DENY yerine SAMEORIGIN yapıyoruz ki kendi sitemiz içinde iframe kullanımı gerekirse sorun olmasın)
+            response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         
         # MIME tipi koklamayı engelle
         response.headers['X-Content-Type-Options'] = 'nosniff'
