@@ -3,64 +3,305 @@
 {% block title %}{{ seo_title }}{% endblock %}
 
 {% block footer_js %}
+<!-- Tutorial Modal -->
+<div id="tutorialModal" class="tutorial-overlay" style="display: none;">
+    <div class="tutorial-modal">
+        <button class="tutorial-close" onclick="closeTutorialModal()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <div class="tutorial-content">
+            <!-- Step 1: Welcome & Logo -->
+            <div id="step-1" class="tutorial-step" style="display: block;">
+                <div class="tutorial-icon-box">
+                    <i class="fa-solid fa-mosque"></i>
+                </div>
+                <h3>Hoş Geldiniz!</h3>
+                <p>Çağrı Vakti'ne hoş geldiniz. Sitenin sol üst köşesindeki logoya tıklayarak dilediğiniz zaman ana sayfaya dönebilirsiniz.</p>
+            </div>
+
+            <!-- Step 2: Discover Time -->
+            <div id="step-2" class="tutorial-step" style="display: none;">
+                <div class="tutorial-icon-box">
+                    <i class="fa-solid fa-city"></i>
+                </div>
+                <h3>Vakti Keşfet</h3>
+                <p>"Vakti Keşfet" butonunu kullanarak il ve ilçe seçimi yapabilir, namaz vakitlerine ve iftar/sahur saatlerine ulaşabilirsiniz.</p>
+            </div>
+
+            <!-- Step 3: Find Location -->
+            <div id="step-3" class="tutorial-step" style="display: none;">
+                <div class="tutorial-icon-box">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <h3>Konumumu Bul</h3>
+                <p>"Konumumu Bul" butonu ile tarayıcı konumunuzu kullanarak size en yakın merkezin vakitlerini otomatik olarak getirebilirsiniz.</p>
+            </div>
+
+            <!-- Step 4: Menu -->
+            <div id="step-4" class="tutorial-step" style="display: none;">
+                <div class="tutorial-icon-box">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+                <h3>Menü ve Araçlar</h3>
+                <p>Üst menüden İmsakiye, Kıble Pusulası, Ramazan Bilgileri ve Sitene Ekle gibi diğer faydalı araçlarımıza kolayca ulaşabilirsiniz.</p>
+            </div>
+        </div>
+
+        <div class="tutorial-footer">
+            <div class="tutorial-dots">
+                <span class="step-dot active"></span>
+                <span class="step-dot"></span>
+                <span class="step-dot"></span>
+                <span class="step-dot"></span>
+            </div>
+            <div class="tutorial-actions">
+                <button id="tutorial-prev" class="btn-tutorial-sec" onclick="prevStep()">Geri</button>
+                <button id="tutorial-next" class="btn-tutorial-pri" onclick="nextStep()">İleri</button>
+                <button id="tutorial-finish" class="btn-tutorial-pri" onclick="closeTutorialModal()" style="display: none;">Başla</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Tutorial Modal Styles */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.tutorial-modal {
+    background: #1e1e1e;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 500px;
+    padding: 40px 30px 30px;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    animation: modalPop 0.3s ease-out;
+}
+
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.tutorial-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--gray);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.tutorial-close:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
+}
+
+.tutorial-icon-box {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    color: var(--primary);
+    font-size: 2rem;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.1);
+}
+
+.tutorial-content {
+    text-align: center;
+    margin-bottom: 30px;
+    min-height: 200px;
+}
+
+.tutorial-step h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--text);
+}
+
+.tutorial-step p {
+    font-size: 1.1rem;
+    color: var(--gray);
+    line-height: 1.6;
+}
+
+.tutorial-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.tutorial-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.step-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.3s;
+}
+
+.step-dot.active {
+    background: var(--primary);
+    width: 25px;
+    border-radius: 10px;
+}
+
+.tutorial-actions {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-tutorial-pri, .btn-tutorial-sec {
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+.btn-tutorial-pri {
+    background: var(--primary);
+    color: #000;
+    border: none;
+}
+
+.btn-tutorial-pri:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.btn-tutorial-sec {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+}
+
+.btn-tutorial-sec:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.2);
+}
+
+@media (max-width: 768px) {
+    .tutorial-modal {
+        padding: 30px 20px 20px;
+        max-width: 90%;
+    }
+    .tutorial-step h3 { font-size: 1.5rem; }
+    .tutorial-step p { font-size: 1rem; }
+    .tutorial-icon-box { width: 60px; height: 60px; font-size: 1.5rem; }
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Check if the tour hasn't been shown yet
     if (!localStorage.getItem('tour_shown')) {
-        startTour();
+        openTutorialModal();
     }
 });
 
-function startTour() {
-    const driver = window.driver.js.driver;
-    
-    const driverObj = driver({
-        showProgress: true,
-        allowClose: false,
-        nextBtnText: 'İleri',
-        prevBtnText: 'Geri',
-        doneBtnText: 'Anladım, Başla',
-        popoverClass: 'driverjs-theme', // Add custom class
-        steps: [
-            { 
-                element: '.nav-brand', 
-                popover: { 
-                    title: 'Ana Sayfa', 
-                    description: 'Logoya tıklayarak dilediğiniz zaman ana sayfaya dönebilirsiniz.',
-                    side: "bottom",
-                    align: 'start'
-                } 
-            },
-            { 
-                element: '#btn-discover-time', 
-                popover: { 
-                    title: 'Vakti Keşfet', 
-                    description: 'İlinizi listeden seçerek namaz vakitlerini, iftar/sahur saatlerini ve diğer bilgileri görüntüleyebilirsiniz.' 
-                } 
-            },
-            { 
-                element: '#location-button', 
-                popover: { 
-                    title: 'Konumumu Bul', 
-                    description: 'Konumunuzu otomatik olarak algılayarak size en yakın merkezin namaz vakitlerini anında getirir.' 
-                } 
-            },
-            { 
-                element: window.innerWidth > 992 ? '.nav-links' : '#navToggle', 
-                popover: { 
-                    title: 'Menü ve Araçlar', 
-                    description: 'İmsakiye, Kıble Pusulası, Ramazan Bilgileri, Bilgi Köşesi ve diğer tüm araçlara buradan ulaşabilirsiniz.' 
-                } 
-            }
-        ],
-        onDestroyed: () => {
-            // Tour finished or skipped
-            localStorage.setItem('tour_shown', 'true');
-        }
-    });
+function openTutorialModal() {
+    const modal = document.getElementById('tutorialModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        showStep(1);
+    }
+}
 
-    // Start the tour
-    driverObj.drive();
+function closeTutorialModal() {
+    const modal = document.getElementById('tutorialModal');
+    if (modal) {
+        modal.style.display = 'none';
+        localStorage.setItem('tour_shown', 'true');
+    }
+}
+
+let currentStep = 1;
+const totalSteps = 4;
+
+function showStep(step) {
+    // Hide all steps
+    document.querySelectorAll('.tutorial-step').forEach(el => el.style.display = 'none');
+    
+    // Show current step
+    const currentStepEl = document.getElementById(`step-${step}`);
+    if (currentStepEl) {
+        currentStepEl.style.display = 'block';
+        currentStep = step;
+        
+        // Update dots
+        document.querySelectorAll('.step-dot').forEach((dot, index) => {
+            if (index + 1 === step) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+
+        // Update buttons
+        const prevBtn = document.getElementById('tutorial-prev');
+        const nextBtn = document.getElementById('tutorial-next');
+        const finishBtn = document.getElementById('tutorial-finish');
+
+        if (step === 1) {
+            prevBtn.style.visibility = 'hidden';
+        } else {
+            prevBtn.style.visibility = 'visible';
+        }
+
+        if (step === totalSteps) {
+            nextBtn.style.display = 'none';
+            finishBtn.style.display = 'inline-block';
+        } else {
+            nextBtn.style.display = 'inline-block';
+            finishBtn.style.display = 'none';
+        }
+    }
+}
+
+function nextStep() {
+    if (currentStep < totalSteps) {
+        showStep(currentStep + 1);
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        showStep(currentStep - 1);
+    }
 }
 </script>
 {% endblock %}

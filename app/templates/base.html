@@ -91,8 +91,10 @@
             });
         }
     </script>
-    <!-- Driver.js CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
 </head>
 <body>
     <!-- SVG Sprite -->
@@ -154,7 +156,7 @@
                 <a href="{{ url_for('views.ilkelerimiz') }}" style="color: var(--gray);">İlkelerimiz</a>
                 <a href="{{ url_for('views.sitene_ekle') }}" style="color: var(--gray);">Sitene Ekle</a>
                 <a href="{{ url_for('views.api_dokuman') }}" style="color: var(--gray);">API</a>
-                <a href="#" onclick="startTour(); return false;" style="color: var(--gray);">Tanıtım Turu</a>
+                <a href="#" onclick="openTutorialModal(); return false;" style="color: var(--gray);">Tanıtım Turu</a>
             </div>
             <div class="footer-creator">
                 <a href="https://www.instagram.com/yigitgulyurt/" target="_blank" rel="noopener noreferrer" style="color: var(--text); font-weight: 600;">BİR YİĞİT GÜLYURT PROJESİ</a>
@@ -576,7 +578,13 @@
     </script>
 
     {% block footer_js %}{% endblock %}
-    <!-- Driver.js JS -->
-    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Check if dark mode preference exists
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
 </body>
 </html>
