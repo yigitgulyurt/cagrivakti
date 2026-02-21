@@ -237,6 +237,74 @@
         display: flex;
         gap: 15px;
     }
+    
+    /* Number Control */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .number-control {
+        position: relative;
+        display: flex;
+        align-items: stretch;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--input-bg);
+        overflow: hidden;
+        height: 46px; /* Match standard input height */
+    }
+
+    .number-control input {
+        border: none;
+        background: transparent;
+        text-align: center;
+        width: 100%;
+        padding: 0;
+        color: var(--text);
+        font-size: 1rem;
+        font-weight: 600;
+        z-index: 1;
+    }
+
+    .number-control input:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+    .number-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        background: rgba(255, 255, 255, 0.03);
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s;
+        z-index: 2;
+    }
+
+    .number-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--primary);
+    }
+
+    .number-btn:active {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .number-btn.minus {
+        border-right: 1px solid var(--border-color);
+    }
+
+    .number-btn.plus {
+        border-left: 1px solid var(--border-color);
+    }
 
     /* Preview Area */
     .preview-container {
@@ -525,12 +593,20 @@
                 <div class="size-inputs">
                     <div class="form-group" style="flex: 1; margin-bottom: 0;">
                         <label class="form-label">Genişlik (px)</label>
-                        <input type="number" id="width-input" value="300" min="150" max="1200" class="form-control">
+                        <div class="number-control">
+                            <button type="button" class="number-btn minus" data-target="width-input"><i class="fas fa-minus"></i></button>
+                            <input type="number" id="width-input" value="300" min="150" max="1200" class="form-control">
+                            <button type="button" class="number-btn plus" data-target="width-input"><i class="fas fa-plus"></i></button>
+                        </div>
                     </div>
                     
                     <div class="form-group" style="flex: 1; margin-bottom: 0;">
                         <label class="form-label">Yükseklik (px)</label>
-                        <input type="number" id="height-input" value="250" min="50" max="1200" class="form-control">
+                        <div class="number-control">
+                            <button type="button" class="number-btn minus" data-target="height-input"><i class="fas fa-minus"></i></button>
+                            <input type="number" id="height-input" value="250" min="50" max="1200" class="form-control">
+                            <button type="button" class="number-btn plus" data-target="height-input"><i class="fas fa-plus"></i></button>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -631,9 +707,46 @@
         const presetBtns = document.querySelectorAll('.preset-btn');
         const scaleBtns = document.querySelectorAll('.scale-btn');
         const showroomFrames = document.querySelectorAll('.showroom-frame');
+        const numberBtns = document.querySelectorAll('.number-btn');
         
         let currentBaseWidth = 300;
         let currentBaseHeight = 250;
+
+        // Number Buttons
+        numberBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const isPlus = this.classList.contains('plus');
+                const step = 10; // 10px increments
+                
+                let val = parseInt(input.value) || 0;
+                
+                if (isPlus) {
+                    val += step;
+                } else {
+                    val -= step;
+                }
+                
+                // Enforce min/max
+                const min = parseInt(input.getAttribute('min')) || 0;
+                const max = parseInt(input.getAttribute('max')) || 2000;
+                
+                if (val < min) val = min;
+                if (val > max) val = max;
+                
+                input.value = val;
+                
+                // If it's a size input, update base dimensions if 1x scale is active
+                // or just trigger update. But since we have scale logic...
+                // Let's assume manual input overrides scale logic for now or sets new base?
+                // Actually, if user manually changes size, we should probably reset scale to 1x 
+                // or update currentBaseWidth/Height based on current scale.
+                
+                // Simple approach: Just trigger updateWidget
+                updateWidget();
+            });
+        });
 
         function updateWidget() {
             const city = citySelect.value;
