@@ -190,7 +190,8 @@
         }
         
         /* Ratio Case 2: Very Narrow/Sidebar -> 1 Column (List View) */
-        @media (max-width: 160px) {
+        /* Applies to short/standard height widgets. Tall ones are handled by Skyscraper Mode below. */
+        @media (max-width: 160px) and (max-height: 399px) {
             .times-grid {
                 display: flex;
                 flex-direction: column;
