@@ -535,6 +535,14 @@ body {
     margin-top: auto;
 }
 
+.landing-footer a {
+    text-decoration: none !important;
+}
+
+.landing-footer a:hover {
+    text-decoration: none !important;
+}
+
 .footer-brand {
     display: flex;
     align-items: center;
