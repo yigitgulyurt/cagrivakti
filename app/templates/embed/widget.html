@@ -24,14 +24,7 @@
         }
 
         /* Custom Colors Override if provided */
-        {% if bg_color %}
-        body { background-color: {{ bg_color }} !important; }
-        .widget-container { background-color: {{ bg_color }} !important; }
-        {% endif %}
-        
-        {% if text_color %}
-        body, .city-name, .time-label, .time-value { color: {{ text_color }} !important; }
-        {% endif %}
+        /* JS handles this now to avoid CSS parser errors */
 
         body {
             margin: 0;
@@ -353,8 +346,23 @@
     </div>
 
     <script>
-        const namazVakitleri = {{ vakitler | tojson }};
+        const namazVakitleri = JSON.parse('{{ vakitler | tojson | safe }}');
         const displayCityName = "{{ display_name }}";
+        const bgColor = "{{ bg_color }}";
+        const textColor = "{{ text_color }}";
+
+        // Apply custom colors via JS to avoid CSS parser errors in IDE
+        if (bgColor) {
+            document.body.style.setProperty('background-color', bgColor, 'important');
+            const container = document.querySelector('.widget-container');
+            if (container) container.style.setProperty('background-color', bgColor, 'important');
+        }
+
+        if (textColor) {
+            document.body.style.setProperty('color', textColor, 'important');
+            const elements = document.querySelectorAll('.city-name, .time-label, .time-value');
+            elements.forEach(el => el.style.setProperty('color', textColor, 'important'));
+        }
 
         function updateCountdowns() {
             if (!namazVakitleri) return;

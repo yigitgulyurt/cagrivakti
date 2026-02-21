@@ -267,6 +267,7 @@ body {
     margin-bottom: 12px;
     background: linear-gradient(45deg, var(--primary), #fff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
 }
@@ -666,6 +667,7 @@ body {
     letter-spacing: -0.5px;
     background: linear-gradient(to right, #fff, #ccc);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
