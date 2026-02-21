@@ -45,106 +45,73 @@
         align-items: start;
     }
 
-    @media (max-width: 992px) {
-        .builder-grid {
-            grid-template-columns: 1fr;
-        }
+    /* Mobile Overlay Styles */
+    .mobile-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
     }
 
-    @media (max-width: 768px) {
-        .builder-container {
-            margin: 20px auto;
-            padding: 0 15px;
-        }
+    .overlay-content {
+        background: #1e1e1e;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+        max-width: 400px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
 
-        .page-header {
-            margin-bottom: 2rem;
-        }
+    .overlay-icon {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 20px;
+    }
 
-        .page-title {
-            font-size: 1.8rem;
-        }
+    .overlay-content h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #fff;
+        font-weight: 700;
+    }
 
-        .page-subtitle {
-            font-size: 1rem;
-        }
+    .overlay-content p {
+        color: #aaa;
+        margin-bottom: 25px;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
 
-        .card-header {
-            font-size: 1.1rem;
-        }
+    .close-overlay-btn {
+        background: var(--primary);
+        color: #000;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 1rem;
+    }
 
-        .builder-card {
-            padding: 20px;
-        }
+    .close-overlay-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+    }
 
-        .size-inputs {
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        /* Mobile Preview Scroll */
-        .preview-container {
-            padding: 20px;
-            min-height: 300px;
+    @media (max-width: 992px) {
+        .mobile-overlay {
             display: flex;
-            justify-content: center; /* Center initially */
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-        }
-        
-        #preview-frame {
-             /* Remove auto margin to allow centering with flexbox when smaller than container */
-             /* But if larger, flex-start behavior is needed to allow scroll to start from left */
-             margin: 0 auto; 
-             flex-shrink: 0; /* Prevent iframe from shrinking */
-        }
-
-        /* Showroom Mobile Improvements */
-        .showroom-container {
-            margin-top: 40px;
-            padding: 0 15px;
-        }
-
-        .showroom-header {
-            margin-bottom: 30px;
-        }
-
-        .showroom-title {
-            font-size: 1.8rem;
-        }
-
-        .showroom-row {
-            gap: 40px;
-        }
-
-        .showroom-frame-wrapper {
-            max-width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            display: flex;
-            justify-content: center; /* Center content */
-            padding-bottom: 10px; /* Space for scrollbar if needed */
-        }
-        
-        .showroom-frame {
-            flex-shrink: 0;
-        }
-        
-        .showroom-item {
-            width: 100%;
-        }
-
-        /* Form Elements Mobile Touch Targets */
-        .form-control, 
-        .theme-box,
-        .preset-btn,
-        .scale-btn,
-        .number-btn {
-            min-height: 48px; /* Better touch targets */
-        }
-
-        .preset-grid {
-             grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile instead of auto-fill small */
         }
     }
 
@@ -592,6 +559,16 @@
 
 </style>
 
+<!-- Mobile Overlay HTML -->
+<div id="mobile-overlay" class="mobile-overlay">
+    <div class="overlay-content">
+        <i class="fas fa-desktop overlay-icon"></i>
+        <h3>Masaüstü Önerilir</h3>
+        <p>Bu aracı en verimli şekilde kullanmak için bilgisayarınızdan erişmeniz önerilir.</p>
+        <button id="close-overlay-btn" class="close-overlay-btn">Anladım, Kapat</button>
+    </div>
+</div>
+
 <div class="builder-container">
     <div class="page-header">
         <h1 class="page-title">
@@ -802,6 +779,16 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Mobile Overlay Logic
+        const closeOverlayBtn = document.getElementById('close-overlay-btn');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+        
+        if (closeOverlayBtn && mobileOverlay) {
+            closeOverlayBtn.addEventListener('click', function() {
+                mobileOverlay.style.display = 'none';
+            });
+        }
+
         const baseUrl = window.location.origin;
         const citySelect = document.getElementById('city-select');
         const themeInputs = document.getElementsByName('theme');
