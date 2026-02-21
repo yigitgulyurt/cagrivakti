@@ -374,37 +374,90 @@
 }
 
 @media (max-width: 768px) {
-    .container { padding: 15px 10px; }
-    .header { padding: 20px; flex-direction: column; text-align: center; gap: 15px; }
-    .header h1 { font-size: 1.8rem; margin: 0; min-width: 0; width: 100%; }
-    .header-buttons { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .header-buttons .btn { justify-content: center; width: 100%; padding: 12px 10px; font-size: 0.9rem; }
-    .header-buttons .btn span { display: inline; } /* Keep text visible on tablets */
+    .container { padding: 10px; }
+    .header { 
+        padding: 15px; 
+        flex-direction: row; /* Yan yana kalsın */
+        flex-wrap: wrap; /* Sığmazsa alt satıra geçsin */
+        justify-content: space-between;
+        gap: 10px; 
+        margin-bottom: 15px;
+    }
+    .header h1 { 
+        font-size: 1.5rem; 
+        margin: 0; 
+        min-width: auto; 
+        width: auto; 
+        flex: 1;
+    }
+    .header-buttons { 
+        width: auto; 
+        display: flex; 
+        gap: 8px; 
+    }
+    .header-buttons .btn { 
+        justify-content: center; 
+        width: auto; 
+        padding: 8px 12px; 
+        font-size: 0.85rem; 
+        height: 36px;
+    }
+    .header-buttons .btn span { display: none; } /* Mobilde metni gizle */
+    .header-buttons .btn svg { margin: 0; font-size: 1.1rem; }
     
-    .qadr-night-alert { padding: 20px; flex-direction: column; text-align: center; gap: 15px; }
-    .qadr-icon { width: 60px; height: 60px; font-size: 2rem; }
-    .qadr-text h3 { font-size: 1.2rem; }
-    .qadr-text p { font-size: 0.95rem; }
+    .qadr-night-alert { padding: 15px; flex-direction: row; text-align: left; gap: 15px; margin-bottom: 15px; }
+    .qadr-icon { width: 50px; height: 50px; font-size: 1.5rem; }
+    .qadr-text h3 { font-size: 1.1rem; }
+    .qadr-text p { font-size: 0.85rem; }
 
-    .daily-content-card { padding: 20px; margin-bottom: 20px; }
-    .daily-text { font-size: 1.1rem; line-height: 1.5; }
-    .daily-type { font-size: 0.75rem; }
+    .daily-content-card { padding: 15px; margin-bottom: 15px; border-radius: 16px; }
+    .daily-text { font-size: 1rem; line-height: 1.4; margin-bottom: 10px; }
+    .daily-type { font-size: 0.7rem; margin-bottom: 5px; }
     
-    .vakitler-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .vakit-card { padding: 15px 10px; border-radius: 16px; }
-    .vakit-card h2 { font-size: 1.1rem; margin-bottom: 8px; }
-    .vakit-time { font-size: 1.6rem; margin-bottom: 10px; }
-    .vakit-countdown { font-size: 1rem; padding: 8px; border-radius: 10px; }
+    .vakitler-grid { 
+        grid-template-columns: repeat(3, 1fr); /* 3 kolonlu yapı */
+        gap: 8px; 
+    }
+    .vakit-card { 
+        padding: 10px 5px; 
+        border-radius: 12px; 
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 90px;
+    }
+    .vakit-card h2 { 
+        font-size: 0.85rem; 
+        margin-bottom: 4px; 
+        font-weight: 500;
+        opacity: 0.9;
+    }
+    .vakit-time { 
+        font-size: 1.3rem; 
+        margin-bottom: 4px; 
+        font-weight: 700;
+    }
+    .vakit-countdown { 
+        font-size: 0.75rem; 
+        padding: 4px 6px; 
+        border-radius: 6px; 
+        background: transparent;
+        color: var(--text);
+        opacity: 0.7;
+        margin-top: auto;
+    }
 
-    .prayer-warning-footer { padding: 15px; font-size: 0.75rem; margin-top: 20px; flex-direction: column; text-align: center; }
+    .prayer-warning-footer { padding: 10px; font-size: 0.7rem; margin-top: 15px; }
 }
 
 @media (max-width: 480px) {
-    .header h1 { font-size: 1.5rem; }
-    .header-buttons { grid-template-columns: 1fr; }
-    .vakitler-grid { grid-template-columns: 1fr; }
-    .vakit-time { font-size: 1.8rem; }
-    .vakit-countdown { font-size: 1.1rem; }
+    .vakitler-grid { 
+        grid-template-columns: repeat(2, 1fr); /* Çok küçük ekranlarda 2 kolon */
+        gap: 8px;
+    }
+    .vakit-card { padding: 12px 8px; min-height: auto; }
+    .vakit-time { font-size: 1.5rem; }
+    .header h1 { font-size: 1.3rem; }
 }
 
 @keyframes navbar-pulse {
