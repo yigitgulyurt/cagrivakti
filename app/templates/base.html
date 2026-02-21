@@ -270,7 +270,7 @@
         const closeBtn = document.getElementById('pwaCloseBtn');
 
         // Şehir eşleştirme ve normalizasyon fonksiyonları (Global Scope'da tanımlı olabilir, kontrol et)
-        const CITY_DISPLAY_MAPPING_GLOBAL = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else '{}' }};
+        const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
         const REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
             Object.entries(CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
         );

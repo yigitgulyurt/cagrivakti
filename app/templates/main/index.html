@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedCity = localStorage.getItem('user_city');
     const savedCountry = localStorage.getItem('user_country') || 'TR';
     
-    const CITY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else '{}' }};
+    const CITY_MAPPING = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
 
     function getDisplayName(city) {
         return CITY_MAPPING[city] || city;
