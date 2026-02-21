@@ -51,6 +51,77 @@
         }
     }
 
+    @media (max-width: 768px) {
+        .builder-container {
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+        }
+
+        .card-header {
+            font-size: 1.1rem;
+        }
+
+        .builder-card {
+            padding: 20px;
+        }
+
+        .size-inputs {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .preview-container {
+            padding: 20px;
+            min-height: 300px;
+            display: flex;
+            justify-content: flex-start; /* Start from left to allow scroll */
+            overflow-x: auto;
+        }
+        
+        #preview-frame {
+             margin: 0 auto;
+        }
+
+        .showroom-container {
+            margin-top: 40px;
+            padding: 0 15px;
+        }
+
+        .showroom-header {
+            margin-bottom: 30px;
+        }
+
+        .showroom-title {
+            font-size: 1.8rem;
+        }
+
+        .showroom-row {
+            gap: 40px;
+        }
+
+        .showroom-frame-wrapper {
+            max-width: 100%;
+            overflow-x: auto;
+            justify-content: flex-start; /* Allow scroll */
+        }
+        
+        .showroom-item {
+            width: 100%; /* Take full width to allow centering/scrolling */
+        }
+    }
+
     .builder-card {
         background: var(--card-bg-glass);
         backdrop-filter: blur(10px);
