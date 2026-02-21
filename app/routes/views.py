@@ -13,8 +13,6 @@ from threading import Thread
 import re
 import hashlib
 
-WIDGET_VERSION = "1.0"
-
 views_bp = Blueprint('views', __name__)
 
 def is_latin_only(text):
@@ -377,8 +375,9 @@ def embed_widget(sehir):
 
     # ETag Generation (Smart Caching)
     # ETag = Hash(Version + City + Date + Theme + Params)
+    widget_version = current_app.config.get('WIDGET_VERSION', '1.0')
     current_date = datetime.now().strftime('%Y-%m-%d')
-    version_string = f"{WIDGET_VERSION}-{sehir}-{current_date}-{theme}-{bg_color}-{text_color}"
+    version_string = f"{widget_version}-{sehir}-{current_date}-{theme}-{bg_color}-{text_color}"
     etag = hashlib.md5(version_string.encode('utf-8')).hexdigest()
 
     # Check if client has matching ETag (If-None-Match)
