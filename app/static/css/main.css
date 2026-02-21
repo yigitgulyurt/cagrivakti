@@ -501,6 +501,8 @@ body {
     flex-direction: column;
     flex: 1;
     min-width: 250px;
+    align-items: center;
+    text-align: center;
 }
 
 .footer-col h3 {
