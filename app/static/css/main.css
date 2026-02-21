@@ -560,10 +560,35 @@ body {
     color: var(--gray);
     text-decoration: none;
     transition: var(--transition);
+    position: relative;
+    padding-bottom: 2px;
+}
+
+.footer-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .footer-links a:hover {
     color: var(--primary);
+}
+
+.footer-links a:hover::after {
+    width: 100%;
+}
+
+.footer-link-ataturk:hover {
+    color: #ff5252 !important;
+}
+
+.footer-link-ataturk:hover::after {
+    background-color: #ff5252;
 }
 
 .footer-copy {
