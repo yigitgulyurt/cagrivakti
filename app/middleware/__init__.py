@@ -41,23 +41,41 @@ def setup_middleware(app):
     @app.after_request
     def set_security_headers(response):
         """Güvenlik başlıklarını (Security Headers) ekle."""
-        # XSS Saldırılarını önlemek için CSP
-        # Not: inline scriptler ve dış kütüphaneler (fontlar, ikonlar) için gerekli izinler
-        csp = (
-            "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net; "
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-            "font-src 'self' https://fonts.gstatic.com; "
-            "img-src 'self' data: https:; "
-            "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
-            "frame-ancestors 'none'; "
-            "base-uri 'self'; "
-            "form-action 'self';"
-        )
-        response.headers['Content-Security-Policy'] = csp
         
-        # Clickjacking koruması
-        response.headers['X-Frame-Options'] = 'DENY'
+        # Embed sayfaları için özel izinler
+        if request.path.startswith('/embed/'):
+            # Embed edilebilir sayfalar için frame-ancestors * (her yere izin ver)
+            csp = (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net; "
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+                "font-src 'self' https://fonts.gstatic.com; "
+                "img-src 'self' data: https:; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
+                "frame-ancestors *; "
+                "base-uri 'self'; "
+                "form-action 'self';"
+            )
+            response.headers['Content-Security-Policy'] = csp
+            # X-Frame-Options header'ını kaldır (varsa)
+            response.headers.pop('X-Frame-Options', None)
+            
+        else:
+            # Standart sayfalar için sıkı güvenlik
+            csp = (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net; "
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+                "font-src 'self' https://fonts.gstatic.com; "
+                "img-src 'self' data: https:; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
+                "frame-ancestors 'none'; "
+                "base-uri 'self'; "
+                "form-action 'self';"
+            )
+            response.headers['Content-Security-Policy'] = csp
+            # Clickjacking koruması
+            response.headers['X-Frame-Options'] = 'DENY'
         
         # MIME tipi koklamayı engelle
         response.headers['X-Content-Type-Options'] = 'nosniff'

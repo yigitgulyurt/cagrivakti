@@ -369,11 +369,7 @@ def embed_widget(sehir):
     
     # Embed widget cache süresi (1 saat)
     response.headers['Cache-Control'] = 'public, max-age=3600'
-    
-    # İframe izni (varsayılan kısıtlamayı kaldır)
-    if 'X-Frame-Options' in response.headers:
-        response.headers.remove('X-Frame-Options')
-        
+            
     return response
 
 @views_bp.route('/konum-bul')
