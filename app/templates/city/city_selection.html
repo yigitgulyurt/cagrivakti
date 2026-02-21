@@ -411,7 +411,7 @@
                 const sehir = typeof item === 'object' ? item.sehir : item;
                 const itemCountryCode = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
                 
-                const CACHE_KEY = `vakitler_${sehir}_${itemCountryCode}`;
+                const CACHE_KEY = `vakitler_v2_${sehir}_${itemCountryCode}`;
                 const TODAY = new Date().toISOString().split('T')[0];
                 const cached = localStorage.getItem(CACHE_KEY);
                 let cachedData = null;
@@ -446,14 +446,35 @@
                 const IS_RAMADAN = {{ 'true' if ramadan_info.is_ramadan else 'false' }};
                 const aksamLabel = IS_RAMADAN ? 'İftar' : 'Akşam';
 
-                if (cachedData) {
-                    card.addClass('content-loaded');
-                    cityName.text(getDisplayName(sehir));
-                    if (cachedData.imsak !== "--:--") {
-                        vakitBilgisi.html(`İmsak: ${cachedData.imsak}<br>${aksamLabel}: ${cachedData.aksam}`);
+                function updateUI(vakitler) {
+                    card.removeClass('skeleton-card').addClass('content-loaded');
+                    cityName.empty().text(getDisplayName(sehir));
+                    
+                    if (vakitler && vakitler.imsak !== "--:--") {
+                        let displayImsak = vakitler.imsak;
+                        let displayImsakLabel = 'İmsak';
+
+                        // Yatsı sonrası yarının imsak vaktini göster
+                        if (vakitler.yatsi) {
+                            const now = new Date();
+                            const [h, m] = vakitler.yatsi.split(':').map(Number);
+                            const yatsiTime = new Date();
+                            yatsiTime.setHours(h, m, 0, 0);
+                            
+                            if (now > yatsiTime && vakitler.yarin && vakitler.yarin.imsak) {
+                                displayImsak = vakitler.yarin.imsak;
+                                displayImsakLabel = 'Yarın İmsak';
+                            }
+                        }
+                        
+                        vakitBilgisi.html(`${displayImsakLabel}: ${displayImsak}<br>${aksamLabel}: ${vakitler.aksam}`);
                     } else {
                         vakitBilgisi.text('Vakit bulunamadı');
                     }
+                }
+
+                if (cachedData) {
+                    updateUI(cachedData);
                 } else {
                     card.addClass('skeleton-card');
                     cityName.append($('<div>').addClass('skeleton skeleton-text').css({width: '70%', margin: '0 auto'}));
@@ -463,16 +484,6 @@
 
                 card.append(cityName).append(vakitBilgisi);
                 grid.append(card);
-                
-                function updateUI(vakitler) {
-                    card.removeClass('skeleton-card').addClass('content-loaded');
-                    cityName.empty().text(getDisplayName(sehir));
-                    if (vakitler && vakitler.imsak !== "--:--") {
-                        vakitBilgisi.html(`İmsak: ${vakitler.imsak}<br>${aksamLabel}: ${vakitler.aksam}`);
-                    } else {
-                        vakitBilgisi.text('Vakit bulunamadı');
-                    }
-                }
 
                 if (cachedData) return;
 
@@ -480,6 +491,11 @@
                 const url = `https://api.cagrivakti.com.tr/namaz_vakitleri?sehir=${sehir}&country=${itemCountryCode}`;
                 const callback = function(data) {
                     if (data.vakitler) {
+                        // Yarın verisini de ekle
+                        if (data.yarin) {
+                            data.vakitler.yarin = data.yarin;
+                        }
+
                         localStorage.setItem(CACHE_KEY, JSON.stringify({
                             tarih: TODAY,
                             data: data.vakitler
