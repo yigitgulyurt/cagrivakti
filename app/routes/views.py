@@ -370,6 +370,8 @@ def embed_widget(sehir):
     # Embed widget cache süresi (Test için kısa süreli, normalde 1 saat)
     # Zen browser hatasını çözmek için cache'i devre dışı bırakıp headerların güncellenmesini sağlıyoruz
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
             
     return response
 
