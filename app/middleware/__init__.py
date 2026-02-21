@@ -62,7 +62,7 @@ def setup_middleware(app):
             
         else:
             # Standart sayfalar için sıkı güvenlik
-z            # frame-src 'self' *: Kendi sitemizdeki iframe'lerin çalışmasına izin ver (Önizleme vb. için)
+            # frame-src 'self' *: Kendi sitemizdeki iframe'lerin çalışmasına izin ver (Önizleme vb. için)
             csp = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net; "
