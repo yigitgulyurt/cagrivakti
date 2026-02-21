@@ -82,18 +82,24 @@
             gap: 15px;
         }
         
+        /* Mobile Preview Scroll */
         .preview-container {
             padding: 20px;
             min-height: 300px;
             display: flex;
-            justify-content: flex-start; /* Start from left to allow scroll */
+            justify-content: center; /* Center initially */
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
         }
         
         #preview-frame {
-             margin: 0 auto;
+             /* Remove auto margin to allow centering with flexbox when smaller than container */
+             /* But if larger, flex-start behavior is needed to allow scroll to start from left */
+             margin: 0 auto; 
+             flex-shrink: 0; /* Prevent iframe from shrinking */
         }
 
+        /* Showroom Mobile Improvements */
         .showroom-container {
             margin-top: 40px;
             padding: 0 15px;
@@ -114,11 +120,31 @@
         .showroom-frame-wrapper {
             max-width: 100%;
             overflow-x: auto;
-            justify-content: flex-start; /* Allow scroll */
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            justify-content: center; /* Center content */
+            padding-bottom: 10px; /* Space for scrollbar if needed */
+        }
+        
+        .showroom-frame {
+            flex-shrink: 0;
         }
         
         .showroom-item {
-            width: 100%; /* Take full width to allow centering/scrolling */
+            width: 100%;
+        }
+
+        /* Form Elements Mobile Touch Targets */
+        .form-control, 
+        .theme-box,
+        .preset-btn,
+        .scale-btn,
+        .number-btn {
+            min-height: 48px; /* Better touch targets */
+        }
+
+        .preset-grid {
+             grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile instead of auto-fill small */
         }
     }
 
