@@ -784,8 +784,23 @@
         const mobileOverlay = document.getElementById('mobile-overlay');
         
         if (closeOverlayBtn && mobileOverlay) {
+            // Check if overlay is visible on load
+            if (getComputedStyle(mobileOverlay).display !== 'none') {
+                document.body.style.overflow = 'hidden';
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (getComputedStyle(mobileOverlay).display !== 'none') {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+
             closeOverlayBtn.addEventListener('click', function() {
                 mobileOverlay.style.display = 'none';
+                document.body.style.overflow = '';
             });
         }
 
