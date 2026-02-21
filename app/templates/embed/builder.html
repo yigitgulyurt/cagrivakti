@@ -335,6 +335,74 @@
         gap: 6px;
     }
 
+    /* Showroom Section */
+    .showroom-container {
+        margin-top: 60px;
+        margin-bottom: 40px;
+    }
+    
+    .showroom-header {
+        text-align: center;
+        margin-bottom: 40px;
+        position: relative;
+    }
+    
+    .showroom-header::after {
+        content: "";
+        display: block;
+        width: 60px;
+        height: 3px;
+        background: var(--primary);
+        margin: 15px auto 0;
+        border-radius: 2px;
+    }
+    
+    .showroom-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+    
+    .showroom-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        justify-content: center;
+        align-items: flex-start;
+    }
+    
+    .showroom-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .showroom-label {
+        font-size: 1rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .showroom-frame-wrapper {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid var(--border-color);
+        background: #1a1a1a;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .showroom-frame-wrapper:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        border-color: var(--primary);
+    }
+
 </style>
 
 <div class="builder-container">
@@ -472,6 +540,57 @@
             </div>
         </div>
     </div>
+    
+    <!-- Showroom Section -->
+    <div class="showroom-container">
+        <div class="showroom-header">
+            <h2 class="showroom-title">Örnek Görünümler</h2>
+        </div>
+        
+        <div class="showroom-grid">
+            <!-- Square -->
+            <div class="showroom-item">
+                <span class="showroom-label">Kare (300x250)</span>
+                <div class="showroom-frame-wrapper">
+                    <iframe class="showroom-frame" data-w="300" data-h="250" frameborder="0" scrolling="no"></iframe>
+                </div>
+            </div>
+            
+            <!-- Skyscraper -->
+            <div class="showroom-item">
+                <span class="showroom-label">İnce Dikey (160x600)</span>
+                <div class="showroom-frame-wrapper">
+                    <iframe class="showroom-frame" data-w="160" data-h="600" frameborder="0" scrolling="no"></iframe>
+                </div>
+            </div>
+
+            <!-- Banner -->
+            <div class="showroom-item" style="flex-basis: 100%; display: flex; justify-content: center;">
+                 <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                    <span class="showroom-label">Banner (728x90)</span>
+                    <div class="showroom-frame-wrapper">
+                        <iframe class="showroom-frame" data-w="728" data-h="90" frameborder="0" scrolling="no"></iframe>
+                    </div>
+                 </div>
+            </div>
+
+            <!-- Vertical Detail -->
+            <div class="showroom-item">
+                <span class="showroom-label">Dikey Detay (400x500)</span>
+                <div class="showroom-frame-wrapper">
+                    <iframe class="showroom-frame" data-w="400" data-h="500" frameborder="0" scrolling="no"></iframe>
+                </div>
+            </div>
+            
+             <!-- Full Feature -->
+            <div class="showroom-item">
+                <span class="showroom-label">Tam Özellik (500x400)</span>
+                <div class="showroom-frame-wrapper">
+                    <iframe class="showroom-frame" data-w="500" data-h="400" frameborder="0" scrolling="no"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -486,6 +605,7 @@
         const copyBtn = document.getElementById('copy-btn');
         const presetBtns = document.querySelectorAll('.preset-btn');
         const scaleBtns = document.querySelectorAll('.scale-btn');
+        const showroomFrames = document.querySelectorAll('.showroom-frame');
         
         let currentBaseWidth = 300;
         let currentBaseHeight = 250;
@@ -508,6 +628,25 @@
             // Update Code
             const code = `<iframe src="${widgetUrl}" width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>`;
             embedCode.value = code;
+            
+            // Update Showroom
+            updateShowroom(city, theme);
+        }
+        
+        function updateShowroom(city, theme) {
+            showroomFrames.forEach(frame => {
+                const w = frame.getAttribute('data-w');
+                const h = frame.getAttribute('data-h');
+                const url = `${baseUrl}/embed/${city}?theme=${theme}`;
+                
+                // Only update src if changed to avoid flicker
+                if (frame.src !== url) {
+                    frame.src = url;
+                }
+                
+                frame.width = w;
+                frame.height = h;
+            });
         }
 
         // Preset Button Logic
