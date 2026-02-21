@@ -46,41 +46,43 @@
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; color: var(--gray);">Hazır Boyutlar ve Özellikler</label>
+                        <label style="display: block; margin-bottom: 8px; color: var(--gray);">Hazır Boyutlar</label>
                         <div class="preset-buttons" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            <!-- Compact Presets -->
-                            <button type="button" class="preset-btn" data-w="200" data-h="200" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">
-                                <i class="fas fa-compress-arrows-alt"></i> Mini (200x200)
+                            <!-- Standard Presets -->
+                            <button type="button" class="preset-btn" data-w="300" data-h="250" style="background: var(--primary); color: var(--dark); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
+                                <i class="fas fa-square" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
+                                Kare<br><span style="font-size: 0.75rem; opacity: 0.8;">300x250</span>
                             </button>
-                            <button type="button" class="preset-btn" data-w="300" data-h="250" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">
-                                <i class="fas fa-square"></i> Standart Kare (300x250)
+
+                            <button type="button" class="preset-btn" data-w="300" data-h="600" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
+                                <i class="fas fa-columns" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
+                                Dikey Detay<br><span style="font-size: 0.75rem; opacity: 0.8;">300x600</span>
+                            </button>
+
+                            <button type="button" class="preset-btn" data-w="160" data-h="600" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
+                                <i class="fas fa-arrows-alt-v" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
+                                İnce Dikey<br><span style="font-size: 0.75rem; opacity: 0.8;">160x600</span>
+                            </button>
+
+                            <button type="button" class="preset-btn" data-w="728" data-h="90" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
+                                <i class="fas fa-arrows-alt-h" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
+                                Banner<br><span style="font-size: 0.75rem; opacity: 0.8;">728x90</span>
                             </button>
                             
-                            <!-- Header Countdown Presets -->
-                            <button type="button" class="preset-btn" data-w="300" data-h="280" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">
-                                <i class="fas fa-clock"></i> Kare + Sayaç (300x280)
+                            <button type="button" class="preset-btn" data-w="500" data-h="400" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; flex: 1; min-width: 120px; text-align: center;">
+                                <i class="fas fa-layer-group" style="display: block; font-size: 1.2rem; margin-bottom: 4px;"></i>
+                                Tam Özellik<br><span style="font-size: 0.75rem; opacity: 0.8;">500x400</span>
                             </button>
-                            <button type="button" class="preset-btn" data-w="336" data-h="280" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">
-                                <i class="fas fa-clock"></i> Geniş Kare + Sayaç (336x280)
-                            </button>
+                        </div>
 
-                            <!-- Full Feature Presets -->
-                            <button type="button" class="preset-btn" data-w="500" data-h="400" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">
-                                <i class="fas fa-layer-group"></i> Tam Özellikli (500x400)
-                            </button>
-
-                            <!-- Vertical/Sidebar Presets -->
-                            <button type="button" class="preset-btn" data-w="300" data-h="600" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">
-                                <i class="fas fa-columns"></i> Sidebar + Detay (300x600)
-                            </button>
-                            <button type="button" class="preset-btn" data-w="160" data-h="600" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">
-                                <i class="fas fa-arrows-alt-v"></i> İnce Dikey (160x600)
-                            </button>
-
-                            <!-- Horizontal Presets -->
-                            <button type="button" class="preset-btn" data-w="728" data-h="90" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">
-                                <i class="fas fa-arrows-alt-h"></i> Banner (728x90)
-                            </button>
+                        <!-- Scale Controls -->
+                        <div class="scale-control" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--gray); font-size: 0.9rem;">Boyut Oranı (Scale)</label>
+                            <div class="scale-buttons" style="display: flex; gap: 10px;">
+                                <button type="button" class="scale-btn active" data-scale="1" style="flex: 1; background: var(--primary); color: var(--dark); border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;">1x</button>
+                                <button type="button" class="scale-btn" data-scale="1.5" style="flex: 1; background: rgba(255,255,255,0.1); color: var(--text); border: none; padding: 8px; border-radius: 4px; cursor: pointer;">1.5x</button>
+                                <button type="button" class="scale-btn" data-scale="2" style="flex: 1; background: rgba(255,255,255,0.1); color: var(--text); border: none; padding: 8px; border-radius: 4px; cursor: pointer;">2x</button>
+                            </div>
                         </div>
                     </div>
 
@@ -139,6 +141,10 @@
         const embedCode = document.getElementById('embed-code');
         const copyBtn = document.getElementById('copy-btn');
         const presetBtns = document.querySelectorAll('.preset-btn');
+        const scaleBtns = document.querySelectorAll('.scale-btn');
+        
+        let currentBaseWidth = 300;
+        let currentBaseHeight = 250;
 
         function updateWidget() {
             const city = citySelect.value;
@@ -165,14 +171,50 @@
         // Preset Button Logic
         presetBtns.forEach(btn => {
             btn.addEventListener('click', function() {
-                const w = this.getAttribute('data-w');
-                const h = this.getAttribute('data-h');
+                const w = parseInt(this.getAttribute('data-w'));
+                const h = parseInt(this.getAttribute('data-h'));
+                
+                currentBaseWidth = w;
+                currentBaseHeight = h;
                 
                 widthInput.value = w;
                 heightInput.value = h;
                 
                 // Highlight active preset
-                presetBtns.forEach(b => b.style.background = 'rgba(255,255,255,0.05)');
+                presetBtns.forEach(b => {
+                    b.style.background = 'rgba(255,255,255,0.05)';
+                    b.style.color = 'var(--text)';
+                });
+                this.style.background = 'var(--primary)';
+                this.style.color = 'var(--dark)';
+                
+                // Reset Scale to 1x
+                scaleBtns.forEach(b => {
+                    b.style.background = 'rgba(255,255,255,0.1)';
+                    b.style.color = 'var(--text)';
+                    if (b.getAttribute('data-scale') === '1') {
+                        b.style.background = 'var(--primary)';
+                        b.style.color = 'var(--dark)';
+                    }
+                });
+
+                updateWidget();
+            });
+        });
+
+        // Scale Button Logic
+        scaleBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const scale = parseFloat(this.getAttribute('data-scale'));
+                
+                widthInput.value = Math.round(currentBaseWidth * scale);
+                heightInput.value = Math.round(currentBaseHeight * scale);
+                
+                // Highlight Scale
+                scaleBtns.forEach(b => {
+                    b.style.background = 'rgba(255,255,255,0.1)';
+                    b.style.color = 'var(--text)';
+                });
                 this.style.background = 'var(--primary)';
                 this.style.color = 'var(--dark)';
                 
@@ -188,6 +230,17 @@
                  b.style.background = 'rgba(255,255,255,0.05)';
                  b.style.color = 'var(--text)';
              });
+             // Reset scale highlight
+             scaleBtns.forEach(b => {
+                 b.style.background = 'rgba(255,255,255,0.1)';
+                 b.style.color = 'var(--text)';
+             });
+             
+             // Update base to current manual input so scaling works from this point
+             currentBaseWidth = parseInt(this.value) || 300;
+             // currentBaseHeight is tricky if they only changed width. 
+             // Ideally we just detach scaling logic or treat current as 1x base.
+             
              updateWidget();
         });
         heightInput.addEventListener('input', function() {
@@ -196,6 +249,14 @@
                  b.style.background = 'rgba(255,255,255,0.05)';
                  b.style.color = 'var(--text)';
              });
+             // Reset scale highlight
+             scaleBtns.forEach(b => {
+                 b.style.background = 'rgba(255,255,255,0.1)';
+                 b.style.color = 'var(--text)';
+             });
+             
+             currentBaseHeight = parseInt(this.value) || 250;
+             
              updateWidget();
         });
         themeInputs.forEach(input => input.addEventListener('change', updateWidget));
