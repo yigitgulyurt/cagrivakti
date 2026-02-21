@@ -209,6 +209,111 @@
         .city-link:hover .city-name {
             text-decoration: underline;
         }
+        /* FEATURE 3: Horizontal Banner Mode (e.g. 728x90) */
+        /* Trigger if Height < 120px AND Width > 500px */
+        @media (max-height: 120px) and (min-width: 500px) {
+            .widget-container {
+                flex-direction: row;
+                align-items: center;
+                padding: 0 10px;
+                gap: 15px;
+            }
+            
+            .header {
+                flex-direction: row;
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+                margin-right: 10px;
+                border-right: 1px solid rgba(128, 128, 128, 0.2);
+                padding-right: 15px;
+                min-width: fit-content;
+            }
+            
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+            }
+
+            .times-grid {
+                display: flex;
+                flex-direction: row;
+                gap: 5px;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .time-item {
+                flex-direction: column;
+                padding: 2px 4px;
+                flex: 1;
+            }
+            
+            .time-label {
+                font-size: 9px;
+            }
+            
+            .time-value {
+                font-size: 12px;
+            }
+            
+            .logo-link {
+                display: none; /* Hide logo in very short banners to save space */
+            }
+
+            /* Adjust header countdown for banner */
+            .next-prayer-countdown {
+                font-size: 10px;
+            }
+        }
+
+        /* FEATURE 4: Skyscraper Mode (e.g. 160x600) */
+        /* Trigger if Width <= 180px AND Height > 400px */
+        @media (max-width: 180px) and (min-height: 400px) {
+            .widget-container {
+                padding: 15px 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .header-left {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .city-name {
+                font-size: 16px;
+                margin-bottom: 5px;
+            }
+
+            .times-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .time-item {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 10px;
+                border-bottom: 1px solid rgba(128,128,128,0.1);
+            }
+            
+            .time-label {
+                font-size: 12px;
+            }
+            
+            .time-value {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body data-theme="{{ theme }}">

@@ -45,15 +45,26 @@
                         </div>
                     </div>
 
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; color: var(--gray);">Hazır Boyutlar (Presets)</label>
+                        <div class="preset-buttons" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <button type="button" class="preset-btn" data-w="300" data-h="250" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">Kare (300x250)</button>
+                            <button type="button" class="preset-btn" data-w="250" data-h="250" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">Küçük (250x250)</button>
+                            <button type="button" class="preset-btn" data-w="728" data-h="90" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">Banner (728x90)</button>
+                            <button type="button" class="preset-btn" data-w="300" data-h="600" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">Dikey (300x600)</button>
+                            <button type="button" class="preset-btn" data-w="160" data-h="600" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">İnce Dikey (160x600)</button>
+                        </div>
+                    </div>
+
                     <div class="row" style="display: flex; gap: 20px;">
                         <div class="form-group" style="margin-bottom: 20px; flex: 1;">
                             <label style="display: block; margin-bottom: 8px; color: var(--gray);">Genişlik (px)</label>
-                            <input type="number" id="width-input" value="300" min="200" max="800" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
+                            <input type="number" id="width-input" value="300" min="150" max="1200" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
                         </div>
                         
                         <div class="form-group" style="margin-bottom: 20px; flex: 1;">
                             <label style="display: block; margin-bottom: 8px; color: var(--gray);">Yükseklik (px)</label>
-                            <input type="number" id="height-input" value="220" min="150" max="600" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
+                            <input type="number" id="height-input" value="250" min="50" max="1200" class="form-control" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);">
                         </div>
                     </div>
                 </form>
@@ -99,6 +110,7 @@
         const previewFrame = document.getElementById('preview-frame');
         const embedCode = document.getElementById('embed-code');
         const copyBtn = document.getElementById('copy-btn');
+        const presetBtns = document.querySelectorAll('.preset-btn');
 
         function updateWidget() {
             const city = citySelect.value;
@@ -122,10 +134,42 @@
             embedCode.value = code;
         }
 
+        // Preset Button Logic
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const w = this.getAttribute('data-w');
+                const h = this.getAttribute('data-h');
+                
+                widthInput.value = w;
+                heightInput.value = h;
+                
+                // Highlight active preset
+                presetBtns.forEach(b => b.style.background = 'rgba(255,255,255,0.05)');
+                this.style.background = 'var(--primary)';
+                this.style.color = 'var(--dark)';
+                
+                updateWidget();
+            });
+        });
+
         // Event Listeners
         citySelect.addEventListener('change', updateWidget);
-        widthInput.addEventListener('input', updateWidget);
-        heightInput.addEventListener('input', updateWidget);
+        widthInput.addEventListener('input', function() {
+             // Clear preset highlight on manual input
+             presetBtns.forEach(b => {
+                 b.style.background = 'rgba(255,255,255,0.05)';
+                 b.style.color = 'var(--text)';
+             });
+             updateWidget();
+        });
+        heightInput.addEventListener('input', function() {
+             // Clear preset highlight on manual input
+             presetBtns.forEach(b => {
+                 b.style.background = 'rgba(255,255,255,0.05)';
+                 b.style.color = 'var(--text)';
+             });
+             updateWidget();
+        });
         themeInputs.forEach(input => input.addEventListener('change', updateWidget));
 
         // Copy Function
