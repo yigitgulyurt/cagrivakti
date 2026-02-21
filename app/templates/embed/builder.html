@@ -337,70 +337,82 @@
 
     /* Showroom Section */
     .showroom-container {
-        margin-top: 60px;
-        margin-bottom: 40px;
+        margin-top: 80px;
+        margin-bottom: 60px;
+        max-width: 95vw; /* Use almost full width */
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 20px;
     }
     
     .showroom-header {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 50px;
         position: relative;
     }
     
     .showroom-header::after {
         content: "";
         display: block;
-        width: 60px;
-        height: 3px;
+        width: 80px;
+        height: 4px;
         background: var(--primary);
-        margin: 15px auto 0;
+        margin: 20px auto 0;
         border-radius: 2px;
+        opacity: 0.8;
     }
     
     .showroom-title {
-        font-size: 2rem;
-        font-weight: 700;
+        font-size: 2.5rem;
+        font-weight: 800;
         color: var(--text);
+        letter-spacing: -0.5px;
     }
     
     .showroom-grid {
         display: flex;
         flex-wrap: wrap;
-        gap: 40px;
-        justify-content: center;
-        align-items: flex-start;
+        gap: 60px; /* Increased gap */
+        justify-content: center; /* Keep centered but spread out */
+        align-items: center;
     }
     
     .showroom-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
+        gap: 20px;
+        transition: transform 0.3s ease;
+    }
+    
+    .showroom-item:hover {
+        transform: translateY(-5px);
     }
     
     .showroom-label {
-        font-size: 1rem;
+        font-size: 1.1rem;
         color: var(--text-muted);
-        font-weight: 500;
+        font-weight: 600;
         background: rgba(255, 255, 255, 0.05);
-        padding: 5px 12px;
+        padding: 8px 16px;
         border-radius: 20px;
         border: 1px solid var(--border-color);
+        letter-spacing: 0.5px;
     }
     
     .showroom-frame-wrapper {
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         border: 1px solid var(--border-color);
         background: #1a1a1a;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     
     .showroom-frame-wrapper:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         border-color: var(--primary);
+        transform: scale(1.02);
     }
 
 </style>
@@ -540,7 +552,8 @@
             </div>
         </div>
     </div>
-    
+</div>
+
     <!-- Showroom Section -->
     <div class="showroom-container">
         <div class="showroom-header">
@@ -591,7 +604,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
