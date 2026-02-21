@@ -156,12 +156,13 @@ def serve_sitemap():
             "lastmod": datetime.now().strftime("%Y-%m-%d"),
             "priority": "0.9"
         })
-        # İmsakiye sayfaları
-        pages.append({
-            "loc": url_for('views.imsakiye_detay', sehir=sehir, country=country, _external=True),
-            "lastmod": datetime.now().strftime("%Y-%m-%d"),
-            "priority": "0.7"
-        })
+        # İmsakiye sayfaları (Sadece Türkiye şehirleri için)
+        if country == 'TR':
+            pages.append({
+                "loc": url_for('views.imsakiye_detay', sehir=sehir, country=country, _external=True),
+                "lastmod": datetime.now().strftime("%Y-%m-%d"),
+                "priority": "0.7"
+            })
         
     # Bilgi Köşesi sayfaları
     guides = get_guides()
