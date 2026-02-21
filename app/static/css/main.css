@@ -479,6 +479,10 @@ body {
     width: 100%;
 }
 
+.nav-link-ataturk:hover::after {
+    background-color: #ff5252;
+}
+
 .nav-toggle {
     display: none;
     background: none;
