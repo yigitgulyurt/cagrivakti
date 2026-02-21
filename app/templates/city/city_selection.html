@@ -352,7 +352,7 @@
 <script src="{{ url_for('static', filename='js/city-data.js') }}" defer></script>
 <script>
     $(document).ready(function() {
-        const CITY_MAPPING = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
+        const CITY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }};
 
         function getDisplayName(city) {
             return CITY_MAPPING[city] || city;
@@ -443,7 +443,7 @@
                 const cityName = $('<div>').addClass('city-name');
                 const vakitBilgisi = $('<div>').addClass('vakit-bilgisi');
                 
-                const IS_RAMADAN = JSON.parse('{{ "true" if ramadan_info.is_ramadan else "false" }}');
+                const IS_RAMADAN = {{ "true" if ramadan_info.is_ramadan else "false" }};
                 const aksamLabel = IS_RAMADAN ? 'İftar' : 'Akşam';
 
                 function updateUI(vakitler) {

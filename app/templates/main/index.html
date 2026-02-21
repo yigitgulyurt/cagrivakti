@@ -108,7 +108,44 @@
         </button>
     </section>
 
-    <section class="features" id="features-section">
+    <section class="features" id="features-section" style="position: relative;">
+        <style>
+            .close-intro-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(255, 255, 255, 0.9);
+                border: none;
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                transition: all 0.3s ease;
+                z-index: 10;
+                color: #666;
+            }
+            .close-intro-btn:hover {
+                background: #fff;
+                transform: rotate(90deg);
+                color: #e74c3c;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            }
+            .close-intro-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            /* Add transitions for smooth hiding */
+            #features-section, #how-it-works-section, #telegram-section, #stats-section {
+                transition: opacity 0.3s ease;
+            }
+        </style>
+        <button id="close-intro-sections" class="close-intro-btn" aria-label="Tanıtımı Gizle" title="Bu bölümleri kalıcı olarak gizle">
+            <svg class="icon"><use xlink:href="#fa-times"></use></svg>
+        </button>
         <div class="section-header">
             <h2>Neden Çağrı Vakti?</h2>
             <p>En doğru veriye en hızlı şekilde ulaşmanız için tasarlandı.</p>
@@ -229,7 +266,7 @@
         </div>
     </section>
 {% endif %}
-    <section class="telegram-bot-promo">
+    <section class="telegram-bot-promo" id="telegram-section">
         <div class="promo-container">
             <div class="promo-icon">
                 <svg class="icon"><use xlink:href="#fa-paper-plane"></use></svg>
@@ -269,6 +306,56 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if sections are hidden
+    if (localStorage.getItem('introSectionsHidden') === 'true') {
+        const sectionsToHide = [
+            'features-section',
+            'how-it-works-section',
+            'telegram-section',
+            'stats-section'
+        ];
+        
+        sectionsToHide.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+        
+        // Remove scroll button if sections are hidden
+        const scrollBtn = document.getElementById('scroll-to-features');
+        if (scrollBtn) scrollBtn.style.display = 'none';
+    }
+
+    // Close button handler
+    const closeBtn = document.getElementById('close-intro-sections');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            const sectionsToHide = [
+                'features-section',
+                'how-it-works-section',
+                'telegram-section',
+                'stats-section'
+            ];
+            
+            // Animate hiding
+            sectionsToHide.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.opacity = '0';
+                    setTimeout(() => {
+                        el.style.display = 'none';
+                    }, 300); // Wait for transition
+                }
+            });
+            
+            // Hide scroll button
+            const scrollBtn = document.getElementById('scroll-to-features');
+            if (scrollBtn) scrollBtn.style.display = 'none';
+
+            // Save to localStorage
+            localStorage.setItem('introSectionsHidden', 'true');
+        });
+    }
+
     const locationDesc = document.getElementById('location-desc');
     const savedCity = localStorage.getItem('user_city');
     const savedCountry = localStorage.getItem('user_country') || 'TR';
