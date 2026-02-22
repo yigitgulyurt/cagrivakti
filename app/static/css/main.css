@@ -643,7 +643,6 @@ body {
 @media (max-width: 768px) {
     .landing-footer {
         padding: 40px 20px;
-        user-select: none;
     }
 
     .footer-links {
