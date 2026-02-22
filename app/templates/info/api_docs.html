@@ -22,6 +22,7 @@
         max-width: 1100px;
         margin: 0 auto;
         padding: 60px 20px;
+        user-select: none;
     }
 
     .api-hero {
@@ -128,6 +129,7 @@
         align-items: center;
         margin-bottom: 30px;
         overflow-x: auto;
+        user-select: text;
     }
 
     .param-table {
@@ -278,6 +280,7 @@
         word-break: break-all;
         margin: 20px 0;
         border: 1px dashed var(--api-primary);
+        user-select: text;
     }
 
     /* Code Blocks */
@@ -323,10 +326,12 @@
 
     .tab-content {
         display: none;
+        user-select: text;
     }
 
     .tab-content.active {
         display: block;
+        user-select: text;
     }
 
     .response-preview {
