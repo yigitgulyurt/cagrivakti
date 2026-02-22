@@ -607,23 +607,23 @@ body {
     user-select: none;
 }
 
-.national-identity .icon {
+/* .national-identity .icon {
     height: 1.5rem;
     width: auto;
     fill: currentColor;
     /* filter: drop-shadow(0 0 5px rgba(227, 10, 23, 0.3));
     transform: rotate(-15deg); */
-}
+} */
 
-.national-identity:hover {
+/* .national-identity:hover {
     opacity: 1;
     transform: scale(1.05);
     text-shadow: 0 0 15px rgba(227, 10, 23, 0.4);
-}
+} */
 
-.national-identity:hover .icon {
+/* .national-identity:hover .icon {
     animation: ay-yildiz-pulse 2s infinite ease-in-out;
-}
+} */
 
 /* @keyframes ay-yildiz-pulse {
     0% { transform: rotate(-15deg) scale(1); filter: drop-shadow(0 0 5px rgba(227, 10, 23, 0.3)); }
