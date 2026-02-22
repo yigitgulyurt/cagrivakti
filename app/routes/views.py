@@ -68,7 +68,8 @@ def sehir_sayfasi(sehir):
     vakitler = PrayerService.get_vakitler(sehir, country_code)
     
     # Dinamik SEO
-    title = f"{sehir} Namaz Vakitleri {datetime.now().strftime('%d.%m.%Y')} - Ezan Saatleri"
+    current_year = datetime.now().year
+    title = f"{sehir} Namaz Vakitleri {current_year} - Ezan Saatleri"
     description = f"{sehir} ezan vakitleri: İmsak {vakitler['imsak']}, Öğle {vakitler['ogle']}, Akşam {vakitler['aksam']}. {sehir} günlük namaz vakitleri ve aylık imsakiye."
     
     response = make_response(render_template('city/city_page.html', 
