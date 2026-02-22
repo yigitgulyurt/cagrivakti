@@ -32,6 +32,18 @@ def parse_date(date_str):
         print(f"Tarih parse hatası ({date_str}): {e}")
         return None
 
+def normalize_sehir_name(name):
+    translation_table = str.maketrans({
+        'Ç': 'C', 'ç': 'c',
+        'Ğ': 'G', 'ğ': 'g',
+        'İ': 'I', 'I': 'I', 'ı': 'i',
+        'Ö': 'O', 'ö': 'o',
+        'Ş': 'S', 'ş': 's',
+        'Ü': 'U', 'ü': 'u',
+    })
+    normalized = name.translate(translation_table)
+    return normalized
+
 def import_excel_files():
     folder_path = os.path.join(os.path.dirname(__file__), '2026')
     if not os.path.exists(folder_path):
@@ -74,8 +86,9 @@ def import_excel_files():
             file_path = os.path.join(folder_path, file_name)
             
             # Dosya adından şehir adını çıkar (Örn: "Adana Namaz Vakitleri...")
-            sehir = file_name.split(' Namaz Vakitleri')[0].strip()
-            print(f"İşleniyor: {sehir} ({file_name})")
+            raw_sehir = file_name.split(' Namaz Vakitleri')[0].strip()
+            sehir = normalize_sehir_name(raw_sehir)
+            print(f"İşleniyor: {raw_sehir} -> {sehir} ({file_name})")
 
             try:
                 # Excel'i oku (Header 3. satırda olabilir, Miladi Tarih yazan satırı bulalım)
