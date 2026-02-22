@@ -609,27 +609,27 @@ body {
 
 .national-identity .icon {
     height: 2em;
-    /* width: auto; */
+    width: 2em;
     fill: currentColor;
     /* filter: drop-shadow(0 0 5px rgba(227, 10, 23, 0.3));
     transform: rotate(-15deg); */
 }
 
-/* .national-identity:hover {
+.national-identity:hover {
     opacity: 1;
     transform: scale(1.05);
     text-shadow: 0 0 15px rgba(227, 10, 23, 0.4);
-} */
+}
 
-/* .national-identity:hover .icon {
+.national-identity:hover .icon {
     animation: ay-yildiz-pulse 2s infinite ease-in-out;
-} */
+}
 
-/* @keyframes ay-yildiz-pulse {
+@keyframes ay-yildiz-pulse {
     0% { transform: rotate(-15deg) scale(1); filter: drop-shadow(0 0 5px rgba(227, 10, 23, 0.3)); }
     50% { transform: rotate(-15deg) scale(1.2); filter: drop-shadow(0 0 15px rgba(227, 10, 23, 0.6)); }
     100% { transform: rotate(-15deg) scale(1); filter: drop-shadow(0 0 5px rgba(227, 10, 23, 0.3)); }
-} */
+}
 
 .footer-copy {
     color: rgba(255, 255, 255, 0.3);
