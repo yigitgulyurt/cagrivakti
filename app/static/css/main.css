@@ -604,7 +604,6 @@ body {
     opacity: 0.9;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: default;
-    user-select: none;
 }
 
 .national-identity .icon {
@@ -924,6 +923,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 40px;
+    user-select: none;
 }
 
 .footer-brand {
