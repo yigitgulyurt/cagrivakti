@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app, abort
 from app.services import UserService, PrayerService, get_daily_content
-from app.extensions import cache, limiter
+from app.extensions import cache, limiter, db
+from app.models import ApiUsage
 from flask_limiter.util import get_remote_address
 from datetime import datetime, date, timedelta
 import re
@@ -133,6 +134,28 @@ def public_api_vakitler():
     if not is_latin_only(sehir) or not is_latin_only(country_code) or (tarih and not is_latin_only(tarih)) or (ay and not is_latin_only(str(ay))) or (yil and not is_latin_only(str(yil))) or (tip_param and not is_latin_only(tip_param)):
         return jsonify({'durum': 'hata', 'mesaj': 'Gecersiz karakter iceren parametre.'}), 400
 
+    api_key = request.headers.get('X-API-Key')
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    path = request.full_path
+
+    def track_usage(status_code):
+        if not api_key:
+            return
+        try:
+            is_vip = api_key in current_app.config.get('VIP_API_KEYS', [])
+            usage = ApiUsage.query.filter_by(api_key=api_key).first()
+            if not usage:
+                usage = ApiUsage(api_key=api_key, is_vip=is_vip)
+                db.session.add(usage)
+            usage.is_vip = is_vip
+            usage.total_requests = (usage.total_requests or 0) + 1
+            usage.last_ip = client_ip
+            usage.last_path = path
+            usage.last_status = status_code
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
     try:
         # Timezone bilgisini al
         from app.services import get_timezone_for_city
@@ -193,7 +216,7 @@ def public_api_vakitler():
             
             if found and start_date and end_date:
                 vakitler_list = PrayerService.get_vakitler_range(sehir, country_code, start_date, end_date)
-                return jsonify({
+                response = jsonify({
                     'durum': 'basarili', 
                     'tip': 'ramazan', 
                     'data': {
@@ -206,6 +229,10 @@ def public_api_vakitler():
                         'end_date': end_date.strftime("%Y-%m-%d")
                     }
                 })
+                track_usage(200)
+                return response
+                track_usage(200)
+                return response
             else:
                 return jsonify({'durum': 'hata', 'mesaj': f'{yil} yılı için Ramazan tarihleri bulunamadı.'}), 404
 
@@ -215,7 +242,7 @@ def public_api_vakitler():
             start_date = date(yil, ay, 1)
             end_date = (date(yil + 1, 1, 1) if ay == 12 else date(yil, ay + 1, 1)) - timedelta(days=1)
             vakitler_list = PrayerService.get_vakitler_range(sehir, country_code, start_date, end_date)
-            return jsonify({
+            response = jsonify({
                 'durum': 'basarili', 
                 'tip': 'aylik', 
                 'data': {
@@ -268,6 +295,10 @@ def public_api_vakitler():
                     'timezone': tz_info
                 }
             })
+            track_usage(200)
+            return response
+        track_usage(404)
         return jsonify({'durum': 'hata', 'mesaj': 'Vakit bulunamadı.'}), 404
     except Exception as e:
+        track_usage(500)
         return jsonify({'durum': 'hata', 'mesaj': str(e)}), 500

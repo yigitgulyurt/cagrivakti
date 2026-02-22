@@ -84,3 +84,13 @@ class Guide(db.Model):
             "image_url": self.image_url,
             "last_updated": self.updated_at.strftime("%Y-%m-%d") if self.updated_at else None
         }
+
+class ApiUsage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    api_key = db.Column(db.String(255), index=True, nullable=False)
+    is_vip = db.Column(db.Boolean, default=False, index=True)
+    total_requests = db.Column(db.Integer, default=0)
+    last_ip = db.Column(db.String(45))
+    last_path = db.Column(db.String(255))
+    last_status = db.Column(db.Integer)
+    last_used_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
