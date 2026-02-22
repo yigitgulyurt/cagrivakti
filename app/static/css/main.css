@@ -607,13 +607,13 @@ body {
     user-select: none;
 }
 
-/* .national-identity .icon {
+.national-identity .icon {
     height: 1.5rem;
-    width: auto;
+    /* width: auto; */
     fill: currentColor;
     /* filter: drop-shadow(0 0 5px rgba(227, 10, 23, 0.3));
     transform: rotate(-15deg); */
-} */
+}
 
 /* .national-identity:hover {
     opacity: 1;
