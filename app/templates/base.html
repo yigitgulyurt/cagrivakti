@@ -144,7 +144,7 @@
                 <a href="{{ url_for('views.sehir_sayfasi', sehir='Diyarbakir', country='TR') }}">Diyarbakır</a>
             </div>
             <div class="footer-links">
-                <a href="{{ url_for('views.ataturk') }}" class="footer-link-ataturk" style="color: var(--gray);">Atatürk</a>
+                <a href="{{ url_for('views.ataturk') }}" class="footer-link-ataturk">Atatürk</a>
                 <a href="{{ url_for('views.sehir_secimi') }}">Vakitler</a>
                 <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye {{ current_year }}</a>
                 <a href="{{ url_for('views.kible_pusulasi') }}">Kıble</a>
@@ -168,9 +168,7 @@
 
             <div class="footer-copy" style="color: var(--gray);">
                 &copy; {{ current_year }} Çağrı Vakti. Bütün hakları saklıdır.
-                <br>
-                <svg class="icon" aria-hidden="true"><use xlink:href="#icon-turk-bayragi"></use></svg><small style="opacity: 0.8;"> Sürüm {{ app_version }}</small>
-                <svg class="icon" aria-hidden="true"><use xlink:href="#icon-turk-bayragi"></use></svg>
+                <br><small style="opacity: 0.8;">Sürüm {{ app_version }}</small>
             </div>
         </div>
     </footer>

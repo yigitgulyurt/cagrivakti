@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app, abort
 from app.services import UserService, PrayerService, get_daily_content
 from app.extensions import cache, limiter
+from flask_limiter.util import get_remote_address
 from datetime import datetime, date, timedelta
 import re
 
@@ -113,6 +114,10 @@ def daily_content():
 
 # Public API v1
 @api_bp.route('/vakitler')
+@limiter.limit(
+    lambda: current_app.config.get('PUBLIC_API_RATE_LIMIT', '100 per hour'),
+    key_func=lambda: request.headers.get('X-API-Key') or get_remote_address()
+)
 def public_api_vakitler():
     sehir = request.args.get('sehir')
     country_code = request.args.get('ulke', 'TR').upper()
