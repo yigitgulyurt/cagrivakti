@@ -425,21 +425,7 @@
 
                 <div style="background: rgba(33, 150, 243, 0.1); border-left: 4px solid var(--api-secondary); padding: 20px; border-radius: 12px;">
                     <h4 style="margin: 0 0 10px 0; color: var(--api-secondary);">Rate Limit (Hız Sınırı)</h4>
-                    <p style="margin: 0; font-size: 0.95rem;">
-                        Standart kullanımda saatlik <strong>100 istek</strong> hakkınız bulunmaktadır. API anahtarı olmadan yapılan çağrılar IP bazlı sınırlandırılır, <code>X-API-Key</code> başlığı ile yapılan çağrılar ise anahtar bazlı olarak izlenir. Daha yüksek trafik için VIP anahtar talep edebilirsiniz.
-                    </p>
-                </div>
-                
-                <div style="margin-top: 20px; padding: 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06);">
-                    <h4 style="margin: 0 0 10px 0; color: var(--api-primary);">Kimlik Doğrulama (API Key)</h4>
-                    <p style="margin: 0 0 10px 0; font-size: 0.95rem;">
-                        3. parti entegrasyonlar için size özel bir API anahtarı tanımlanır. Tüm taleplerde aşağıdaki gibi <code>X-API-Key</code> başlığı ile bu anahtarı göndermeniz gerekir:
-                    </p>
-                    <pre style="margin: 0; font-size: 0.85rem; background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto;"><code>curl "https://api.cagrivakti.com.tr/vakitler?sehir=Istanbul&amp;ulke=TR" \
-  -H "X-API-Key: SANA_TANIMLANAN_API_KEY"</code></pre>
-                    <p style="margin: 10px 0 0 0; font-size: 0.9rem; color: var(--api-text-muted);">
-                        VIP olarak işaretlenen anahtarlar rate limitten muaftır, ancak tüm kullanım hareketleri güvenlik ve kapasite planlaması amacıyla kayıt altına alınır.
-                    </p>
+                    <p style="margin: 0; font-size: 0.95rem;">Standart kullanımda saatlik <strong>100 istek</strong> hakkınız bulunmaktadır. Daha fazlası için VIP anahtar talep edebilirsiniz.</p>
                 </div>
             </section>
 

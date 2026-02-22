@@ -40,8 +40,6 @@ class Config:
 
     # API Settings
     VIP_API_KEYS = os.environ.get('VIP_API_KEYS', 'cagrivakti_admin_key_2026').split(',')
-    PUBLIC_API_RATE_LIMIT = os.environ.get('PUBLIC_API_RATE_LIMIT', '100 per hour')
-    RATELIMIT_ENABLED = os.environ.get('RATELIMIT_ENABLED', 'true').lower() == 'true'
     
     # Admin Authentication
     ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')

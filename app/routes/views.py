@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, make_response, send_from_directory, current_app, abort, flash, jsonify
 from functools import wraps
 from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city, CITY_DISPLAY_NAME_MAPPING
-from app.models import NamazVakti, ContactMessage, DailyContent, Guide, ApiUsage
+from app.models import NamazVakti, ContactMessage, DailyContent, Guide
 from app.extensions import cache, db, limiter
 from datetime import datetime, timedelta
 import os
@@ -743,9 +743,3 @@ def admin_logs():
                          api_logs=api_logs,
                          bot_logs=bot_logs,
                          stats=stats)
-
-@views_bp.route('/admin/api-kullanim')
-@admin_required
-def admin_api_usage():
-    usages = ApiUsage.query.order_by(ApiUsage.total_requests.desc().nullslast()).all()
-    return render_template('admin/api_usage.html', usages=usages)
