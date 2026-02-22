@@ -94,7 +94,6 @@ body {
     line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
-    user-select: none;
 }
 
 ::selection {
@@ -435,6 +434,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
+    user-select: none;
 }
 
 .nav-brand {
@@ -915,6 +915,7 @@ body {
     text-align: center;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     color: var(--gray);
+    user-select: none;
 }
 
 .footer-content {
