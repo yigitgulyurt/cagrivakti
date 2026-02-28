@@ -743,3 +743,7 @@ def admin_logs():
                          api_logs=api_logs,
                          bot_logs=bot_logs,
                          stats=stats)
+                         
+@views_bp.route('/asal-sayi')
+def prime_number():
+    return render_template('prime-number.html')
