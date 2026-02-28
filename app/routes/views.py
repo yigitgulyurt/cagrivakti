@@ -138,7 +138,6 @@ def serve_sitemap():
         'views.ramazan_nedir', 'views.orucu_bozan_durumlar', 
         'views.neden_biz', 'views.indir', 'views.konum_bul', 
         'views.iletisim', 'views.ilkelerimiz',
-        # 'views.api_dokuman',
         'views.bilgi_kosesi_liste'
     ]
     
@@ -744,3 +743,7 @@ def admin_logs():
                          api_logs=api_logs,
                          bot_logs=bot_logs,
                          stats=stats)
+
+@views_bp.route('asal-sayi')
+def prime_number():
+    return render_template('prime-number.html')
