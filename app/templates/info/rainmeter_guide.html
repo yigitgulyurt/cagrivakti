@@ -33,7 +33,7 @@
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 24px;
         padding: 35px;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
         position: relative;
         overflow: hidden;
         box-shadow: var(--card-shadow);
@@ -53,7 +53,7 @@
     .step-card h2 {
         color: var(--primary);
         font-size: 1.6rem;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         display: flex;
         align-items: center;
         gap: 15px;
@@ -70,13 +70,13 @@
         font-size: 1.05rem;
     }
 
-    .step-content ul {
-        margin-top: 15px;
-        padding-left: 20px;
-    }
-
-    .step-content li {
-        margin-bottom: 10px;
+    .guide-image {
+        width: 100%;
+        max-width: 600px;
+        border-radius: 12px;
+        margin: 20px 0;
+        border: 2px solid rgba(255, 193, 7, 0.2);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
     .alert-box {
@@ -96,11 +96,6 @@
         margin-top: 3px;
     }
 
-    .download-section {
-        text-align: center;
-        margin: 40px 0;
-    }
-
     .btn-download-large {
         display: inline-flex;
         align-items: center;
@@ -114,6 +109,7 @@
         text-decoration: none;
         transition: var(--transition);
         box-shadow: 0 10px 25px rgba(255, 193, 7, 0.2);
+        margin: 20px 0;
     }
 
     .btn-download-large:hover {
@@ -122,21 +118,13 @@
         background: #ffca28;
     }
 
-    .code-snippet {
-        background: rgba(0, 0, 0, 0.3);
-        padding: 15px;
-        border-radius: 12px;
+    .config-path {
+        background: rgba(0,0,0,0.2);
+        padding: 4px 8px;
+        border-radius: 6px;
+        color: var(--primary);
         font-family: 'Fira Code', monospace;
         font-size: 0.9rem;
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        margin: 15px 0;
-        display: block;
-        color: #00ffe0;
-    }
-
-    .config-path {
-        color: var(--primary);
-        font-weight: 600;
     }
 
     @media (max-width: 768px) {
@@ -154,34 +142,16 @@
         <p>Namaz vakitlerini Rainmeter ile doğrudan Windows masaüstünüze taşıyın.</p>
     </div>
 
-    <!-- Adım 1: Rainmeter Kurulumu -->
+    <!-- Adım 1: Hazırlık -->
     <div class="step-card">
         <div class="step-number">01</div>
         <h2>
             <svg class="icon"><use xlink:href="#fa-download"></use></svg>
-            Rainmeter'ı Hazırlayın
+            Dosyaları Hazırlayın
         </h2>
         <div class="step-content">
-            <p>Widget'ın çalışması için bilgisayarınızda Rainmeter uygulamasının kurulu olması gerekir. Eğer kurulu değilse resmi sitesinden indirebilirsiniz:</p>
-            <div style="margin-top: 15px;">
-                <a href="https://www.rainmeter.net/" target="_blank" class="btn-copy" style="display: inline-flex; padding: 10px 20px;">
-                    <svg class="icon" style="width: 16px; height: 16px;"><use xlink:href="#fa-external-link-alt"></use></svg>
-                    <span>Rainmeter.net'e Git</span>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Adım 2: Skin İndirme -->
-    <div class="step-card">
-        <div class="step-number">02</div>
-        <h2>
-            <svg class="icon"><use xlink:href="#fa-file-archive"></use></svg>
-            Çağrı Vakti Skinini İndirin
-        </h2>
-        <div class="step-content">
-            <p>Masaüstü widget'ımızı içeren özel paketi aşağıdaki butona tıklayarak bilgisayarınıza indirin.</p>
-            <div class="download-section">
+            <p>Öncelikle bilgisayarınızda <strong>Rainmeter</strong> kurulu olmalıdır. Ardından aşağıdaki butona tıklayarak widget paketimizi indirin:</p>
+            <div style="text-align: center;">
                 <a href="/download-widget" class="btn-download-large">
                     <svg class="icon" style="width: 24px; height: 24px;"><use xlink:href="#fa-file-download"></use></svg>
                     <span>cagrivakti-widget.rmskin İndir</span>
@@ -190,25 +160,37 @@
         </div>
     </div>
 
-    <!-- Adım 3: Kurulum ve İzinler -->
+    <!-- Adım 2: Kurulum ve Plugin -->
+    <div class="step-card">
+        <div class="step-number">02</div>
+        <h2>
+            <svg class="icon"><use xlink:href="#fa-shield-check"></use></svg>
+            Kurulum ve Eklenti İzni
+        </h2>
+        <div class="step-content">
+            <p>İndirdiğiniz <code>cagrivakti-widget.rmskin</code> dosyasına çift tıklayın. Açılan pencerede dikkat etmeniz gereken çok önemli bir adım var:</p>
+            <p>Aşağıdaki görselde gösterildiği gibi, <strong>WebView.dll</strong> eklentisinin yanındaki kutucuğun <strong>işaretli</strong> olduğundan emin olun ve ardından <strong>"Install"</strong> butonuna basın.</p>
+            
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 25px 0;">
+                <p style="font-size: 0.9rem; color: #ff5252;">❌ Yanlış (Eklenti kapalı):</p>
+                <img src="{{ url_for('static', filename='image/rainmeter/plugin-disabled.png') }}" class="guide-image" alt="Eklenti Kapalı">
+                
+                <p style="font-size: 0.9rem; color: #4caf50;">✅ Doğru (Eklenti açık olmalı):</p>
+                <img src="{{ url_for('static', filename='image/rainmeter/plugin-enabled.png') }}" class="guide-image" alt="Eklenti Açık">
+            </div>
+        </div>
+    </div>
+
+    <!-- Adım 3: Klasörü Açma -->
     <div class="step-card">
         <div class="step-number">03</div>
         <h2>
-            <svg class="icon"><use xlink:href="#fa-shield-check"></use></svg>
-            Kurulum ve Güvenlik İzinleri
+            <svg class="icon"><use xlink:href="#fa-folder-open"></use></svg>
+            Ayarlar Klasörüne Erişin
         </h2>
         <div class="step-content">
-            <p>İndirdiğiniz <code>cagrivakti-widget.rmskin</code> dosyasına çift tıklayın. Kurulum ekranında şu adımlara dikkat edin:</p>
-            <ul>
-                <li><strong>"Install"</strong> butonuna basın.</li>
-                <li>Eğer bir plugin (eklenti) yükleme izni istenirse, <strong>"Evet/İzin Ver"</strong> seçeneğini işaretleyin. Bu, widget'ın internetten canlı veri çekebilmesi için gereklidir.</li>
-            </ul>
-            <div class="alert-box">
-                <svg class="icon" style="width: 24px; height: 24px;"><use xlink:href="#fa-exclamation-triangle"></use></svg>
-                <div>
-                    <strong>Önemli:</strong> Rainmeter pluginleri, widget'ın API ile iletişim kurmasını sağlar. Güvenliğiniz için sadece resmi sitemizden indirdiğiniz dosyaları kullanın.
-                </div>
-            </div>
+            <p>Rainmeter uygulamasını açın. Sol taraftaki listeden <code>cagrivakti</code> klasörüne sağ tıklayıp <strong>"Dizini aç"</strong> seçeneğine tıklayın.</p>
+            <img src="{{ url_for('static', filename='image/rainmeter/open-skin-folder.png') }}" class="guide-image" alt="Dizini Aç">
         </div>
     </div>
 
@@ -217,32 +199,45 @@
         <div class="step-number">04</div>
         <h2>
             <svg class="icon"><use xlink:href="#fa-edit"></use></svg>
-            Şehir Ayarlarını Yapın
+            Şehir Bilgisini Güncelleyin
         </h2>
         <div class="step-content">
-            <p>Widget masaüstüne geldikten sonra kendi şehrinizi ayarlamak için şu adımları izleyin:</p>
-            <ol style="padding-left: 20px; margin-top: 15px;">
-                <li style="margin-bottom: 10px;">Belgeler klasörünüzdeki şu yola gidin: <br>
-                    <span class="config-path">Belgeler\Rainmeter\Skins\CagriVakti\@Resources\Variables.inc</span>
-                </li>
-                <li style="margin-bottom: 10px;"><code>Variables.inc</code> dosyasını Not Defteri ile açın.</li>
-                <li style="margin-bottom: 10px;">İçindeki <code>Sehir=...</code> satırını kendi şehrinizle (Latin karakterlerle, örn: Istanbul) değiştirin.</li>
-                <li style="margin-bottom: 10px;">Dosyayı kaydedin ve masaüstündeki widget'a sağ tıklayıp <strong>"Skin'i Yenile" (Refresh Skin)</strong> deyin.</li>
-            </ol>
-            <div class="alert-box" style="border-left-color: #00ffe0; background: rgba(0, 255, 224, 0.05);">
-                <svg class="icon" style="width: 24px; height: 24px; color: #00ffe0;"><use xlink:href="#fa-info-circle"></use></svg>
+            <p>Açılan klasör içerisinde şu yolu izleyin:</p>
+            <p><span class="config-path">@Resources</span> &rarr; <span class="config-path">Variables.inc</span></p>
+            <p><code>Variables.inc</code> dosyasını Not Defteri veya benzeri bir metin düzenleyici ile açın. <strong>Sehir=...</strong> yazan kısmı istediğiniz şehirle değiştirin.</p>
+            
+            <div class="alert-box">
+                <svg class="icon" style="width: 24px; height: 24px;"><use xlink:href="#fa-info-circle"></use></svg>
                 <div>
-                    Şehir adını yazarken Türkçe karakter kullanmamaya özen gösterin (Örn: Şanlıurfa yerine Sanliurfa).
+                    <strong>Dikkat:</strong> Şehir ismini yazarken <strong>Türkçe karakterlere</strong> ve <strong>ilk harfinin büyük</strong> olmasına dikkat edin (Örn: Istanbul, Sanliurfa).
                 </div>
             </div>
+
+            <img src="{{ url_for('static', filename='image/rainmeter/change-sehir-variable.png') }}" class="guide-image" alt="Şehir Ayarı">
+        </div>
+    </div>
+
+    <!-- Adım 5: Yenileme -->
+    <div class="step-card">
+        <div class="step-number">05</div>
+        <h2>
+            <svg class="icon"><use xlink:href="#fa-sync"></use></svg>
+            Ayarları Uygulayın
+        </h2>
+        <div class="step-content">
+            <p>Dosyayı kaydedip kapattıktan sonra tekrar Rainmeter penceresine dönün. Sol alt köşede bulunan <strong>"Tamamını yenile"</strong> butonuna basın.</p>
+            <p>Artık widget belirlediğiniz şehrin vakitlerini gösterecektir.</p>
         </div>
     </div>
 
     <div class="guide-header" style="margin-top: 60px;">
-        <h3>Her şey hazır!</h3>
-        <p>Masaüstünüzde namaz vakitlerini takip etmenin keyfini çıkarın.</p>
+        <h3>Destek ve İletişim</h3>
+        <p>Herhangi bir sorun yaşarsanız veya yardıma ihtiyacınız olursa bana ulaşmaktan çekinmeyin.</p>
         <div style="margin-top: 30px;">
-            <a href="/" class="btn-copy" style="padding: 12px 25px;">Ana Sayfaya Dön</a>
+            <a href="{{ url_for('views.iletisim') }}" class="btn-download-large" style="background: transparent; border: 2px solid var(--primary); color: var(--primary);">
+                <svg class="icon"><use xlink:href="#fa-envelope"></use></svg>
+                <span>İletişime Geç</span>
+            </a>
         </div>
     </div>
 </div>
