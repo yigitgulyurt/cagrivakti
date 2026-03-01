@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Rainmeter Masaüstü Widget Rehberi | Çağrı Vakti{% endblock %}
+
+{% block extra_css %}
+<style>
+    .guide-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    .guide-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .guide-header h1 {
+        font-size: 2.8rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+        font-weight: 800;
+    }
+
+    .guide-header p {
+        font-size: 1.2rem;
+        color: var(--gray);
+    }
+
+    .step-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        padding: 35px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+    }
+
+    .step-number {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        font-size: 8rem;
+        font-weight: 900;
+        color: rgba(255, 193, 7, 0.03);
+        line-height: 1;
+        pointer-events: none;
+    }
+
+    .step-card h2 {
+        color: var(--primary);
+        font-size: 1.6rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .step-card h2 .icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .step-content {
+        color: var(--text);
+        line-height: 1.7;
+        font-size: 1.05rem;
+    }
+
+    .step-content ul {
+        margin-top: 15px;
+        padding-left: 20px;
+    }
+
+    .step-content li {
+        margin-bottom: 10px;
+    }
+
+    .alert-box {
+        background: rgba(255, 193, 7, 0.05);
+        border-left: 4px solid var(--primary);
+        padding: 20px;
+        border-radius: 0 12px 12px 0;
+        margin: 20px 0;
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .alert-box .icon {
+        color: var(--primary);
+        flex-shrink: 0;
+        margin-top: 3px;
+    }
+
+    .download-section {
+        text-align: center;
+        margin: 40px 0;
+    }
+
+    .btn-download-large {
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        background: var(--primary);
+        color: var(--dark);
+        padding: 18px 35px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        text-decoration: none;
+        transition: var(--transition);
+        box-shadow: 0 10px 25px rgba(255, 193, 7, 0.2);
+    }
+
+    .btn-download-large:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(255, 193, 7, 0.3);
+        background: #ffca28;
+    }
+
+    .code-snippet {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 12px;
+        font-family: 'Fira Code', monospace;
+        font-size: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        margin: 15px 0;
+        display: block;
+        color: #00ffe0;
+    }
+
+    .config-path {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .guide-header h1 { font-size: 2rem; }
+        .step-card { padding: 25px; }
+        .step-number { font-size: 5rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="guide-container">
+    <div class="guide-header">
+        <h1>Masaüstü Widget Rehberi</h1>
+        <p>Namaz vakitlerini Rainmeter ile doğrudan Windows masaüstünüze taşıyın.</p>
+    </div>
+
+    <!-- Adım 1: Rainmeter Kurulumu -->
+    <div class="step-card">
+        <div class="step-number">01</div>
+        <h2>
+            <svg class="icon"><use xlink:href="#fa-download"></use></svg>
+            Rainmeter'ı Hazırlayın
+        </h2>
+        <div class="step-content">
+            <p>Widget'ın çalışması için bilgisayarınızda Rainmeter uygulamasının kurulu olması gerekir. Eğer kurulu değilse resmi sitesinden indirebilirsiniz:</p>
+            <div style="margin-top: 15px;">
+                <a href="https://www.rainmeter.net/" target="_blank" class="btn-copy" style="display: inline-flex; padding: 10px 20px;">
+                    <svg class="icon" style="width: 16px; height: 16px;"><use xlink:href="#fa-external-link-alt"></use></svg>
+                    <span>Rainmeter.net'e Git</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adım 2: Skin İndirme -->
+    <div class="step-card">
+        <div class="step-number">02</div>
+        <h2>
+            <svg class="icon"><use xlink:href="#fa-file-archive"></use></svg>
+            Çağrı Vakti Skinini İndirin
+        </h2>
+        <div class="step-content">
+            <p>Masaüstü widget'ımızı içeren özel paketi aşağıdaki butona tıklayarak bilgisayarınıza indirin.</p>
+            <div class="download-section">
+                <a href="/download-widget" class="btn-download-large">
+                    <svg class="icon" style="width: 24px; height: 24px;"><use xlink:href="#fa-file-download"></use></svg>
+                    <span>cagrivakti-widget.rmskin İndir</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adım 3: Kurulum ve İzinler -->
+    <div class="step-card">
+        <div class="step-number">03</div>
+        <h2>
+            <svg class="icon"><use xlink:href="#fa-shield-check"></use></svg>
+            Kurulum ve Güvenlik İzinleri
+        </h2>
+        <div class="step-content">
+            <p>İndirdiğiniz <code>cagrivakti-widget.rmskin</code> dosyasına çift tıklayın. Kurulum ekranında şu adımlara dikkat edin:</p>
+            <ul>
+                <li><strong>"Install"</strong> butonuna basın.</li>
+                <li>Eğer bir plugin (eklenti) yükleme izni istenirse, <strong>"Evet/İzin Ver"</strong> seçeneğini işaretleyin. Bu, widget'ın internetten canlı veri çekebilmesi için gereklidir.</li>
+            </ul>
+            <div class="alert-box">
+                <svg class="icon" style="width: 24px; height: 24px;"><use xlink:href="#fa-exclamation-triangle"></use></svg>
+                <div>
+                    <strong>Önemli:</strong> Rainmeter pluginleri, widget'ın API ile iletişim kurmasını sağlar. Güvenliğiniz için sadece resmi sitemizden indirdiğiniz dosyaları kullanın.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adım 4: Şehir Ayarı -->
+    <div class="step-card">
+        <div class="step-number">04</div>
+        <h2>
+            <svg class="icon"><use xlink:href="#fa-edit"></use></svg>
+            Şehir Ayarlarını Yapın
+        </h2>
+        <div class="step-content">
+            <p>Widget masaüstüne geldikten sonra kendi şehrinizi ayarlamak için şu adımları izleyin:</p>
+            <ol style="padding-left: 20px; margin-top: 15px;">
+                <li style="margin-bottom: 10px;">Belgeler klasörünüzdeki şu yola gidin: <br>
+                    <span class="config-path">Belgeler\Rainmeter\Skins\CagriVakti\@Resources\Variables.inc</span>
+                </li>
+                <li style="margin-bottom: 10px;"><code>Variables.inc</code> dosyasını Not Defteri ile açın.</li>
+                <li style="margin-bottom: 10px;">İçindeki <code>Sehir=...</code> satırını kendi şehrinizle (Latin karakterlerle, örn: Istanbul) değiştirin.</li>
+                <li style="margin-bottom: 10px;">Dosyayı kaydedin ve masaüstündeki widget'a sağ tıklayıp <strong>"Skin'i Yenile" (Refresh Skin)</strong> deyin.</li>
+            </ol>
+            <div class="alert-box" style="border-left-color: #00ffe0; background: rgba(0, 255, 224, 0.05);">
+                <svg class="icon" style="width: 24px; height: 24px; color: #00ffe0;"><use xlink:href="#fa-info-circle"></use></svg>
+                <div>
+                    Şehir adını yazarken Türkçe karakter kullanmamaya özen gösterin (Örn: Şanlıurfa yerine Sanliurfa).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="guide-header" style="margin-top: 60px;">
+        <h3>Her şey hazır!</h3>
+        <p>Masaüstünüzde namaz vakitlerini takip etmenin keyfini çıkarın.</p>
+        <div style="margin-top: 30px;">
+            <a href="/" class="btn-copy" style="padding: 12px 25px;">Ana Sayfaya Dön</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

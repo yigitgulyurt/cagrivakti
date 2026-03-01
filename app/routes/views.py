@@ -747,3 +747,13 @@ def admin_logs():
 @views_bp.route('/asal-sayi')
 def prime_number():
     return render_template('prime-number.html')
+
+@views_bp.route('/rainmeter-rehber')
+def rainmeter_guide():
+    return render_template('info/rainmeter_guide.html')
+
+@views_bp.route('/download-widget')
+def download_widget():
+    """Rainmeter widget dosyasını indir."""
+    directory = os.path.dirname(current_app.root_path)
+    return send_from_directory(directory, 'cagrivakti-widget.rmskin', as_attachment=True)
