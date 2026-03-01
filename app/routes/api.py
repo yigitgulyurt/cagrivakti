@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, current_app, abort
 from app.services import UserService, PrayerService, get_daily_content
 from app.extensions import cache, limiter
 from datetime import datetime, date, timedelta
+from functools import wraps
 import re
 
 api_bp = Blueprint('api', __name__, subdomain='api')
@@ -12,7 +13,44 @@ def is_latin_only(text):
         return True
     return bool(re.match(r'^[A-Za-z0-9\-\_\s\.]+$', text))
 
+def restrict_to_main_domain(f):
+    """
+    API isteklerini sadece cagrivakti.com.tr üzerinden gelenlerle kısıtlar.
+    Geliştirme ortamında (localhost) ve VIP API anahtarı ile gelen isteklere izin verir.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # 1. VIP API Anahtarı Kontrolü
+        api_key = request.headers.get('X-API-Key') or request.args.get('key')
+        vip_keys = current_app.config.get('VIP_API_KEYS', [])
+        if api_key and api_key in vip_keys:
+            return f(*args, **kwargs)
+
+        # 2. Geliştirme Ortamı Kontrolü
+        if current_app.debug or request.host.startswith('localhost') or request.host.startswith('127.0.0.1'):
+            return f(*args, **kwargs)
+
+        # 3. Referer / Origin Kontrolü
+        referer = request.headers.get('Referer', '')
+        origin = request.headers.get('Origin', '')
+        
+        allowed_domains = ['cagrivakti.com.tr', 'www.cagrivakti.com.tr']
+        
+        def is_allowed(url):
+            if not url: return False
+            return any(domain in url for domain in allowed_domains)
+
+        if is_allowed(referer) or is_allowed(origin):
+            return f(*args, **kwargs)
+            
+        # Eğer hiçbir şart sağlanmazsa erişimi engelle
+        current_app.logger.warning(f"Yetkisiz API isteği engellendi! IP: {request.remote_addr}, Referer: {referer}, Origin: {origin}")
+        return jsonify({"error": "Unauthorized access. This API is restricted to cagrivakti.com.tr"}), 403
+        
+    return decorated_function
+
 @api_bp.route('/sehirler')
+@restrict_to_main_domain
 @cache.cached(timeout=86400, query_string=True)
 def sehirleri_getir():
     country_code = request.args.get('country', 'TR')
@@ -21,6 +59,7 @@ def sehirleri_getir():
     return jsonify(UserService.get_sehirler(country_code))
 
 @api_bp.route('/sehir_kaydet', methods=['POST'])
+@restrict_to_main_domain
 def sehir_kaydet():
     data = request.get_json()
     sehir = data.get('sehir')
@@ -36,6 +75,7 @@ def sehir_kaydet():
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
 
 @api_bp.route('/namaz_vakitleri')
+@restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
 def namaz_vakitlerini_al_api():
     sehir = request.args.get('sehir')
@@ -82,6 +122,7 @@ def namaz_vakitlerini_al_api():
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/sonraki_vakit')
+@restrict_to_main_domain
 def sonraki_vakti_getir():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
@@ -93,6 +134,7 @@ def sonraki_vakti_getir():
     return jsonify(result)
 
 @api_bp.route('/update_city', methods=['POST'])
+@restrict_to_main_domain
 def update_city():
     try:
         data = request.get_json()
@@ -107,12 +149,14 @@ def update_city():
         return jsonify({"success": False, "error": str(e)})
 
 @api_bp.route('/daily_content')
+@restrict_to_main_domain
 @cache.cached(timeout=86400)
 def daily_content():
     return jsonify(get_daily_content())
 
 # Public API v1
 @api_bp.route('/vakitler')
+@restrict_to_main_domain
 def public_api_vakitler():
     sehir = request.args.get('sehir')
     country_code = request.args.get('ulke', 'TR').upper()

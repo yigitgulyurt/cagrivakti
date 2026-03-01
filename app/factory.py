@@ -30,7 +30,11 @@ def create_app(config_class=Config):
     app.json.sort_keys = False
 
     # Extensions
-    CORS(app)
+    # CORS ayarlarını özelleştiriyoruz: Sadece ana domain ve subdomainlerine izin ver
+    CORS(app, resources={
+        r"/api/*": {"origins": ["https://cagrivakti.com.tr", "https://www.cagrivakti.com.tr", "http://localhost:*", "http://127.0.0.1:*"]},
+        r"/vakitler*": {"origins": ["https://cagrivakti.com.tr", "https://www.cagrivakti.com.tr"]}
+    })
     Compress(app)
     db.init_app(app)
     migrate.init_app(app, db)
