@@ -452,7 +452,7 @@ function prevStep() {
                 height: 14px;
             }
             /* Add transitions for smooth hiding */
-            #features-section, #how-it-works-section, #telegram-section, #stats-section, #guides-section {
+            #features-section, #how-it-works-section, #rainmeter-section, #telegram-section, #stats-section, #guides-section {
                 transition: opacity 0.3s ease;
             }
         </style>
@@ -582,6 +582,45 @@ function prevStep() {
         </div>
     </section>
 {% endif %}
+    <section class="telegram-bot-promo rainmeter-promo" id="rainmeter-section">
+        <div class="promo-container">
+            <div class="promo-icon">
+                <svg class="icon"><use xlink:href="#fa-tools"></use></svg>
+            </div>
+            <div class="promo-content">
+                <div class="guide-category" style="margin-bottom: 10px;">YENİ</div>
+                <h2>Masaüstü Widget'ımız Yayında!</h2>
+                <p>Namaz vakitlerini Rainmeter ile doğrudan Windows masaüstünüzde takip edin. Şık tasarımı, otomatik güncellemeleri ve düşük sistem kullanımıyla her an gözünüzün önünde.</p>
+                
+                <ul style="list-style: none; padding: 0; margin-bottom: 25px; color: var(--gray); display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" style="width: 16px; height: 16px; color: var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                        Şık Tasarım
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" style="width: 16px; height: 16px; color: var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                        Otomatik Güncelleme
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" style="width: 16px; height: 16px; color: var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                        Düşük Kaynak Kullanımı
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" style="width: 16px; height: 16px; color: var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                        Ücretsiz
+                    </li>
+                </ul>
+
+                <div class="promo-actions">
+                    <a href="{{ url_for('views.rainmeter_guide') }}" class="btn btn-primary promo-btn">
+                        <svg class="icon"><use xlink:href="#fa-circle-info-solid-full"></use></svg>
+                        Kurulum Rehberini Gör
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="telegram-bot-promo" id="telegram-section">
         <div class="promo-container">
             <div class="promo-icon">
@@ -627,6 +666,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const sectionsToHide = [
             'features-section',
             'how-it-works-section',
+            'rainmeter-section',
             'telegram-section',
             'stats-section'
         ];
@@ -654,6 +694,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const sectionsToHide = [
                 'features-section',
                 'how-it-works-section',
+                'rainmeter-section',
                 'telegram-section',
                 'stats-section'
             ];
