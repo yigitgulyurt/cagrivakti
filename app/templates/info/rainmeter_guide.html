@@ -79,6 +79,26 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
+    .image-comparison {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 25px 0;
+    }
+
+    .image-comparison-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .image-comparison-item img {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
+
     .alert-box {
         background: rgba(255, 193, 7, 0.05);
         border-left: 4px solid var(--primary);
@@ -171,12 +191,16 @@
             <p>İndirdiğiniz <code>cagrivakti-widget.rmskin</code> dosyasına çift tıklayın. Açılan pencerede dikkat etmeniz gereken çok önemli bir adım var:</p>
             <p>Aşağıdaki görselde gösterildiği gibi, <strong>WebView.dll</strong> eklentisinin yanındaki kutucuğun <strong>işaretli</strong> olduğundan emin olun ve ardından <strong>"Install"</strong> butonuna basın.</p>
             
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 25px 0;">
-                <p style="font-size: 0.9rem; color: #ff5252;">❌ Yanlış (Eklenti kapalı):</p>
-                <img src="{{ url_for('static', filename='image/rainmeter/plugin-disabled.png') }}" class="guide-image" alt="Eklenti Kapalı">
+            <div class="image-comparison">
+                <div class="image-comparison-item">
+                    <p style="font-size: 0.9rem; color: #ff5252;">❌ Yanlış (Eklenti kapalı):</p>
+                    <img src="{{ url_for('static', filename='image/rainmeter/plugin-disabled.png') }}" class="guide-image" alt="Eklenti Kapalı">
+                </div>
                 
-                <p style="font-size: 0.9rem; color: #4caf50;">✅ Doğru (Eklenti açık olmalı):</p>
-                <img src="{{ url_for('static', filename='image/rainmeter/plugin-enabled.png') }}" class="guide-image" alt="Eklenti Açık">
+                <div class="image-comparison-item">
+                    <p style="font-size: 0.9rem; color: #4caf50;">✅ Doğru (Eklenti açık olmalı):</p>
+                    <img src="{{ url_for('static', filename='image/rainmeter/plugin-enabled.png') }}" class="guide-image" alt="Eklenti Açık">
+                </div>
             </div>
         </div>
     </div>
