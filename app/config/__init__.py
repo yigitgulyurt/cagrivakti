@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    APP_VERSION = "2.9"
-    STATIC_VERSION = "2.9" # Statik dosyalar için versiyon (Değiştirildiğinde cache yenilenir)
-    WIDGET_VERSION = "2.9" # Widget için özel versiyon (Embed cache kontrolü için)
+    APP_VERSION = "2.10"
+    STATIC_VERSION = "2.10" # Statik dosyalar için versiyon (Değiştirildiğinde cache yenilenir)
+    WIDGET_VERSION = "2.10" # Widget için özel versiyon (Embed cache kontrolü için)
     SEND_FILE_MAX_AGE_DEFAULT = 31536000 # Flask static dosya cache süresi (1 Yıl)
     SERVER_NAME = os.environ.get('SERVER_NAME')
     # Subdomainler arası session paylaşımı için
