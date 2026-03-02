@@ -32,8 +32,49 @@ def create_app(config_class=Config):
     # Extensions
     # CORS ayarlarını özelleştiriyoruz: Sadece ana domain ve subdomainlerine izin ver
     CORS(app, resources={
-        r"/api/*": {"origins": ["https://cagrivakti.com.tr", "https://www.cagrivakti.com.tr", "http://localhost:*", "http://127.0.0.1:*"]},
-        r"/vakitler*": {"origins": ["https://cagrivakti.com.tr", "https://www.cagrivakti.com.tr"]}
+        # Ana domain altındaki klasik API dokümanı ve eski uçlar
+        r"/api/*": {
+            "origins": [
+                "https://cagrivakti.com.tr",
+                "https://www.cagrivakti.com.tr",
+                "http://localhost:*",
+                "http://127.0.0.1:*",
+            ]
+        },
+        # Public API v1 (ana domainde yayınlanan uç)
+        r"/vakitler*": {
+            "origins": [
+                "https://cagrivakti.com.tr",
+                "https://www.cagrivakti.com.tr",
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+            ]
+        },
+        # Subdomain: api.cagrivakti.com.tr altında çalışan modern uçlar
+        r"/namaz_vakitleriv2": {
+            "origins": [
+                "https://cagrivakti.com.tr",
+                "https://www.cagrivakti.com.tr",
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+            ]
+        },
+        r"/sonraki_vakit": {
+            "origins": [
+                "https://cagrivakti.com.tr",
+                "https://www.cagrivakti.com.tr",
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+            ]
+        },
+        r"/daily_content": {
+            "origins": [
+                "https://cagrivakti.com.tr",
+                "https://www.cagrivakti.com.tr",
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+            ]
+        }
     })
     Compress(app)
     db.init_app(app)
