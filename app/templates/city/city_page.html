@@ -608,7 +608,7 @@
         }
 
         try {
-            const response = await fetch(`https://api.cagrivakti.com.tr/namaz_vakitleriv2?sehir=${mevcutSehir}&country=${mevcutUlke}`);
+            const response = await fetch(`https://api.cagrivakti.com.tr/namaz_vakitleriv2.11?sehir=${mevcutSehir}&country=${mevcutUlke}`);
             const data = await response.json();
             
             if (data.vakitler) {
