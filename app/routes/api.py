@@ -155,7 +155,7 @@ def daily_content():
     return jsonify(get_daily_content())
 
 # Public API v1
-@api_bp.route('/vakitler')
+@api_bp.route('/vakitlerv2')
 # @restrict_to_main_domain
 def public_api_vakitler():
     sehir = request.args.get('sehir')
