@@ -117,7 +117,7 @@ body {
 } */
 
 .fade-in-opacity {
-    animation: smoothFadeIn 0.8s ease-out forwards;
+    animation: smoothFadeIn 0.4s ease-in forwards;
 }
 
 @keyframes smoothFadeIn {
