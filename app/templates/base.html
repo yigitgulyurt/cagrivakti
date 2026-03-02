@@ -99,23 +99,33 @@
 </head>
 <body>
     <script>
-        // Korunacak key'ler
-        const keysToKeep = ['guidesSectionHidden', 'introSectionsHidden', 'tour_shown'];
-            
-        // Şimdiki değerlerini al
-        const backup = {};
-        keysToKeep.forEach(key => {
-            const val = localStorage.getItem(key);
-            if (val !== null) backup[key] = val;
-        });
-        
-        // Tüm localStorage'ı temizle
-        localStorage.clear();
-        
-        // Korunacak key'leri geri koy
-        Object.entries(backup).forEach(([key, val]) => {
-            localStorage.setItem(key, val);
-        });
+        (function(){
+            var v = "{{ app_version }}";
+            try {
+                var s = localStorage.getItem('APP_VERSION');
+                if (!s || s !== v) {
+                    // Korunacak key'ler
+                    var keysToKeep = ['guidesSectionHidden', 'introSectionsHidden', 'tour_shown'];
+                    var backup = {};
+                    
+                    keysToKeep.forEach(function(key){
+                        var val = localStorage.getItem(key);
+                        if (val !== null) backup[key] = val;
+                    });
+                
+                    // Tüm storage'ı temizle
+                    localStorage.clear();
+                
+                    // Korunacak key'leri geri koy
+                    Object.keys(backup).forEach(function(key){
+                        localStorage.setItem(key, backup[key]);
+                    });
+                
+                    // APP_VERSION'ı güncelle
+                    localStorage.setItem('APP_VERSION', v);
+                }
+            } catch (e) {}
+        })();
     </script>
     <!-- SVG Sprite -->
     <div style="display: none;">
