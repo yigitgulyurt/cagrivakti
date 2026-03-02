@@ -116,6 +116,27 @@ body {
     animation: fadeInOpacity 0.5s ease-in;
 }
 
+@keyframes fadeInOpacity {
+from {
+    opacity: 0;
+}
+to {
+    opacity: 1;
+}
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media (max-width: 768px) {
     .fade-in-opacity {
         animation: fadeInOpacity 0.5s ease-in;
@@ -136,7 +157,7 @@ body {
             opacity: 0;
             transform: translateY(10px);
         }
-    
+
         to {
             opacity: 1;
             transform: translateY(0);

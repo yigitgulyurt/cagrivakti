@@ -6,7 +6,7 @@ load_dotenv()
 
 class Config:
     APP_VERSION = "2.11"
-    STATIC_VERSION = "2.11" # Statik dosyalar için versiyon (Değiştirildiğinde cache yenilenir)
+    STATIC_VERSION = "2.12" # Statik dosyalar için versiyon (Değiştirildiğinde cache yenilenir)
     WIDGET_VERSION = "2.11" # Widget için özel versiyon (Embed cache kontrolü için)
     SEND_FILE_MAX_AGE_DEFAULT = 31536000 # Flask static dosya cache süresi (1 Yıl)
     SERVER_NAME = os.environ.get('SERVER_NAME')
