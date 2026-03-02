@@ -6,8 +6,8 @@ load_dotenv()
 
 class Config:
     APP_VERSION = "2.11"
-    STATIC_VERSION = "2.12" # Statik dosyalar için versiyon (Değiştirildiğinde cache yenilenir)
-    WIDGET_VERSION = "2.11" # Widget için özel versiyon (Embed cache kontrolü için)
+    # Tek versiyon kaynağı: APP_VERSION
+    # Tüm statik dosya cache-busting, widget ve API sürümlemeleri APP_VERSION üzerinden yönetilir.
     SEND_FILE_MAX_AGE_DEFAULT = 31536000 # Flask static dosya cache süresi (1 Yıl)
     SERVER_NAME = os.environ.get('SERVER_NAME')
     # Subdomainler arası session paylaşımı için

@@ -74,7 +74,8 @@ def sehir_kaydet():
     UserService.save_user_preferences(sehir, country_code)
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
 
-@api_bp.route('/namaz_vakitleriv2.11')
+from app.config import Config
+@api_bp.route(f'/namaz_vakitleri-V{Config.APP_VERSION}')
 @restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
 def namaz_vakitlerini_al_api():

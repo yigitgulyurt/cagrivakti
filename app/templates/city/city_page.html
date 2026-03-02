@@ -513,7 +513,7 @@
 
     // LocalStorage Önbellek Yönetimi
     // Versiyon kontrolü: Eski cache'leri temizlemek için suffix ekledik
-    const CACHE_VERSION = 'v2.11';
+    const CACHE_VERSION = 'V{{ app_version }}';
     const CACHE_KEY = `vakitler_${mevcutSehir}_${mevcutUlke}_${CACHE_VERSION}`;
     const DAILY_CONTENT_CACHE_KEY = `daily_content_cache_${CACHE_VERSION}`;
 
@@ -615,7 +615,7 @@
         }
 
         try {
-            const response = await fetch(`https://api.cagrivakti.com.tr/namaz_vakitleriv2.11?sehir=${mevcutSehir}&country=${mevcutUlke}`);
+            const response = await fetch(`https://api.cagrivakti.com.tr/namaz_vakitleri-V{{ app_version }}?sehir=${mevcutSehir}&country=${mevcutUlke}`);
             const data = await response.json();
             
             if (data.vakitler) {

@@ -382,7 +382,7 @@ def embed_widget(sehir):
 
     # ETag Generation (Smart Caching)
     # ETag = Hash(Version + City + Date + Theme + Params)
-    widget_version = current_app.config.get('WIDGET_VERSION', '1.0')
+    widget_version = current_app.config.get('APP_VERSION', '1.0')
     current_date = datetime.now().strftime('%Y-%m-%d')
     version_string = f"{widget_version}-{sehir}-{current_date}-{theme}-{bg_color}-{text_color}"
     etag = hashlib.md5(version_string.encode('utf-8')).hexdigest()

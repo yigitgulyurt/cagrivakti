@@ -51,7 +51,7 @@ def create_app(config_class=Config):
             ]
         },
         # Subdomain: api.cagrivakti.com.tr altında çalışan modern uçlar
-        r"/namaz_vakitleriv2.11": {
+        r"/namaz_vakitleriv2*": {
             "origins": [
                 "https://cagrivakti.com.tr",
                 "https://www.cagrivakti.com.tr",
@@ -135,9 +135,8 @@ def create_app(config_class=Config):
             filename = values.get('filename')
             if filename:
                 if '.' in filename:
-                    # Global versiyon numarasını kullan
-                    # Config'den STATIC_VERSION'ı al, yoksa APP_VERSION, o da yoksa 1.0
-                    version = app.config.get('STATIC_VERSION') or app.config.get('APP_VERSION') or '1.0'
+                    # Global versiyon numarası: Tek kaynak APP_VERSION
+                    version = app.config.get('APP_VERSION') or '1.0'
                     
                     param_name = 'v'
                     while param_name in values:
