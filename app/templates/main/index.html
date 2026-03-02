@@ -421,7 +421,7 @@ function prevStep() {
         </button>
     </section>
 
-    <section class="features" id="features-section" style="position: relative;">
+    <section class="features fade-in-opacity" id="features-section" style="position: relative;">
         <style>
             .close-intro-btn {
                 position: absolute;
@@ -519,7 +519,7 @@ function prevStep() {
         </div>
     </section>
 
-    <section class="how-it-works" id="how-it-works-section">
+    <section class="how-it-works fade-in-opacity" id="how-it-works-section">
         <div class="section-header">
             <h2>Nasıl Çalışır?</h2>
             <p>Sadece 3 adımda huzura odaklanın.</p>
@@ -554,13 +554,14 @@ function prevStep() {
         </div>
     </section>
 {% if guides %}
-    <section class="home-guides" id="guides-section" style="position: relative;">
-        <button id="close-guides-section" class="close-intro-btn" aria-label="Bilgi Köşesini Gizle" title="Bu bölümü kalıcı olarak gizle">
-            <svg class="icon"><use xlink:href="#fa-xmark-custom"></use></svg>
-        </button>
+    <section class="home-guides fade-in-opacity" id="guides-section" style="position: relative;">
+
         <div class="section-header">
             <h2>Bilgi Köşesi</h2>
             <p>Dini konular ve namaz kılavuzları hakkında derinlemesine bilgiler.</p>
+            <button id="close-guides-section" class="close-intro-btn" aria-label="Bilgi Köşesini Gizle" title="Bu bölümü kalıcı olarak gizle">
+            <svg class="icon"><use xlink:href="#fa-xmark-custom"></use></svg>
+            </button>
         </div>
         <div class="guides-preview-grid">
             {% for guide in guides %}
