@@ -412,7 +412,7 @@
                 const sehir = typeof item === 'object' ? item.sehir : item;
                 const itemCountryCode = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
                 
-                const CACHE_KEY = `vakitler_v2.10_${sehir}_${itemCountryCode}`;
+                const CACHE_KEY = `vakitler_v2.11_${sehir}_${itemCountryCode}`;
                 const TODAY = new Date().toISOString().split('T')[0];
                 const cached = localStorage.getItem(CACHE_KEY);
                 let cachedData = null;
