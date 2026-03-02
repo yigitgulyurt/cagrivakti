@@ -57,7 +57,6 @@ def create_app(config_class=Config):
                 "https://www.cagrivakti.com.tr",
                 "http://localhost:*",
                 "http://127.0.0.1:*",
-                "http://217.131.117.158:*"
             ]
         },
         r"/sonraki_vakit": {
