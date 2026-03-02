@@ -643,8 +643,8 @@ body {
 }
 
 .footer-creator a:hover {
-    color: var(--primary);
-    opacity: 1;
+    color: rgb(255, 0, 17);
+    text-shadow: 0 0 10px rgba(227, 10, 23, 0.4);
 }
 
 @media (max-width: 768px) {
