@@ -72,13 +72,13 @@ html {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--primary) !important;
+    background: var(--primary);
 }
 
 
 /* Custom Focus Outline */
 :focus-visible {
-    outline: 2px solid var(--primary) !important;
+    outline: 2px solid var(--primary);
     outline-offset: 4px;
     border-radius: 4px;
 }
@@ -98,7 +98,7 @@ body {
 }
 
 ::selection {
-    background-color: var(--primary) !important;
+    background-color: var(--primary);
     color: var(--dark);
 }
 
