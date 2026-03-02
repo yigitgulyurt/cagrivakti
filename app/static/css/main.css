@@ -117,7 +117,7 @@ body {
 } */
 
 .fade-in-opacity {
-    animation: smoothFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: smoothFadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes smoothFadeIn {
