@@ -600,39 +600,85 @@ body {
 }
 
 .national-identity {
-    background: linear-gradient(135deg, rgba(227,10,23,0.08), rgba(227,10,23,0.02));
-    padding: 14px 24px;
+    margin: 40px 0;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    color: #ffffff;
+    background: linear-gradient(135deg, #8B0000, #E30A17);
     border-radius: 14px;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+
+    box-shadow:
+        0 10px 30px rgba(227, 10, 23, 0.35),
+        inset 0 0 20px rgba(255, 255, 255, 0.08);
+
     position: relative;
     overflow: hidden;
+
+    transition: all 0.35s ease;
+    cursor: default;
 }
 
+/* Cam parlaması efekti */
 .national-identity::before {
     content: "";
     position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.25), transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
+    top: -50%;
+    left: -30%;
+    width: 160%;
+    height: 200%;
+    background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0.15),
+        rgba(255,255,255,0.05),
+        transparent
+    );
+    transform: rotate(15deg);
+    pointer-events: none;
 }
 
+/* Hover’da hafif yükselme */
 .national-identity:hover {
-    transform: translateY(-3px);
-    opacity: 1;
-    box-shadow: 0 10px 25px rgba(227,10,23,0.25);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow:
+        0 15px 40px rgba(227, 10, 23, 0.55),
+        inset 0 0 25px rgba(255, 255, 255, 0.12);
 }
 
-.national-identity:hover::before {
-    opacity: 1;
+/* Yazı glow efekti */
+.national-identity .text {
+    position: relative;
+    z-index: 1;
+    text-shadow:
+        0 0 6px rgba(255,255,255,0.4),
+        0 0 18px rgba(255,255,255,0.25);
 }
 
+/* İkon ayar */
 .national-identity .icon {
+    height: 2.4em;
+    width: 2.4em;
+    fill: #ffffff;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.5));
     transition: transform 0.4s ease;
+    z-index: 1;
 }
 
-.national-identity:hover .icon {
-    transform: scale(1.15) rotate(5deg);
+/* Hover’da ikonlar hafif dönsün */
+.national-identity:hover .left {
+    transform: rotate(-8deg) scale(1.1);
+}
+
+.national-identity:hover .right {
+    transform: rotate(8deg) scale(1.1);
 }
 
 .footer-copy {
