@@ -74,7 +74,7 @@ def sehir_kaydet():
     UserService.save_user_preferences(sehir, country_code)
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
 
-@api_bp.route('/namaz_vakitleri')
+@api_bp.route('/namaz_vakitleriv2')
 # @restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
 def namaz_vakitlerini_al_api():
@@ -155,7 +155,7 @@ def daily_content():
     return jsonify(get_daily_content())
 
 # Public API v1
-@api_bp.route('/vakitlerv2')
+@api_bp.route('/vakitler')
 # @restrict_to_main_domain
 def public_api_vakitler():
     sehir = request.args.get('sehir')
