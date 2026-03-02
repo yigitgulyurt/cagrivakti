@@ -138,6 +138,10 @@ to {
 }
 
 @media (max-width: 768px) {
+    .fade-in {
+    animation: fadeIn 0.5s ease-in;
+    }
+    
     .fade-in-opacity {
         animation: fadeInOpacity 0.5s ease-in;
     }
