@@ -98,6 +98,18 @@
     <!-- Custom CSS -->
 </head>
 <body>
+    <script>
+        (function(){
+            var v = "{{ app_version }}";
+            try {
+                var s = localStorage.getItem('APP_VERSION');
+                if (!s || s !== v) {
+                    localStorage.clear();
+                    localStorage.setItem('APP_VERSION', v);
+                }
+            } catch (e) {}
+        })();
+    </script>
     <!-- SVG Sprite -->
     <div style="display: none;">
         {% include 'img/icons.svg' %}
