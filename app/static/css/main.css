@@ -624,24 +624,43 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Hover’da yumuşak vurgu */
+.national-identity {
+    margin: 24px 0;
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+
+    color: #E30A17; /* Türk bayrağı kırmızısı */
+    
+    cursor: default;
+    transition: all 0.3s ease;
+}
+
+/* Hover’da hafif parlaklık ve yükselme efekti */
 .national-identity:hover {
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
-    border-color: rgba(227, 10, 23, 0.35);
-    transform: translateY(-2px);
+    color: #FF2A2A;
+    transform: translateY(-1px);
 }
 
 /* İkon */
 .national-identity .icon {
-    height: 1.5em;
-    width: 1.5em;
+    height: 1.4em;
+    width: 1.4em;
     fill: currentColor;
     opacity: 0.9;
     transition: transform 0.3s ease;
 }
 
 .national-identity:hover .icon {
-    transform: scale(1.05);
+    transform: scale(1.1);
 }
 
 .footer-copy {
