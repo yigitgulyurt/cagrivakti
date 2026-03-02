@@ -600,24 +600,39 @@ body {
 }
 
 .national-identity {
-    margin: 20px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #E30A17; /* Türk Bayrağı Kırmızısı */
-    letter-spacing: 1.5px;
-    opacity: 0.9;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: default;
+    background: linear-gradient(135deg, rgba(227,10,23,0.08), rgba(227,10,23,0.02));
+    padding: 14px 24px;
+    border-radius: 14px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.national-identity::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.25), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.national-identity:hover {
+    transform: translateY(-3px);
+    opacity: 1;
+    box-shadow: 0 10px 25px rgba(227,10,23,0.25);
+}
+
+.national-identity:hover::before {
+    opacity: 1;
 }
 
 .national-identity .icon {
-    height: 2em;
-    width: 2em;
-    fill: currentColor;
+    transition: transform 0.4s ease;
+}
+
+.national-identity:hover .icon {
+    transform: scale(1.15) rotate(5deg);
 }
 
 .footer-copy {
