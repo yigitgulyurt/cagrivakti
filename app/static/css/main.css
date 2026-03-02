@@ -112,8 +112,24 @@ body {
     animation: fadeIn 0.5s ease-in;
 }
 
-.fade-in-opacity {
+/* .fade-in-opacity {
     animation: fadeInOpacity 0.5s ease-in;
+} */
+
+.fade-in-opacity {
+    animation: smoothFadeIn 0.8s ease-out forwards;
+}
+
+@keyframes smoothFadeIn {
+    0% {
+        opacity: 0;
+    }
+    40% {
+        opacity: 0.4;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 @keyframes fadeInOpacity {
