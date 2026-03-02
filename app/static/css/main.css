@@ -637,13 +637,12 @@ body {
 }
 
 .footer-creator a {
-    color: inherit;
     text-decoration: none;
     transition: var(--transition);
 }
 
 .footer-creator a:hover {
-    color: rgb(255, 0, 17) !important;
+    color: var(--primary) !important;
     text-shadow: 0 0 10px rgba(227, 10, 23, 0.4);
 }
 
