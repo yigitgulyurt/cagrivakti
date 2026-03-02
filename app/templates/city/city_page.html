@@ -129,7 +129,7 @@
     </div>
     {% endif %}
 
-    <section class="daily-content-card fade-in-opacity" id="daily-content" title="Günün Dini İçeriği">
+    <section class="daily-content-card fade-in" id="daily-content" title="Günün Dini İçeriği">
         {% if ramadan_info.is_ramadan %}
         <div class="daily-icon">
             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-moon"></use></svg>
@@ -149,7 +149,7 @@
         {% endif %}
     </section>
 
-    <main class="vakitler-container fade-in-opacity">
+    <main class="vakitler-container fade-in">
         <div class="vakitler-grid">
             {% set vakit_list = [
                 ('imsak', 'İmsak'),
