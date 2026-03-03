@@ -389,14 +389,15 @@
                 const aksamLabel = IS_RAMADAN ? 'İftar' : 'Akşam';
 
                 if (cachedData) {
-                    card.addClass('content-loaded');
-                    cityName.text(getDisplayName(sehir));
-                    if (cachedData.imsak !== "--:--") {
-                        vakitBilgisi.html(`İmsak: ${cachedData.imsak}<br>${aksamLabel}: ${cachedData.aksam}`);
-                    } else {
-                        vakitBilgisi.text('Vakit bulunamadı');
-                    }
-                } else {
+                    //card.addClass('content-loaded');
+                    //cityName.text(getDisplayName(sehir));
+                    //if (cachedData.imsak !== "--:--") {
+                    //    vakitBilgisi.html(`İmsak: ${cachedData.imsak}<br>${aksamLabel}: ${cachedData.aksam}`);
+                    //} else {
+                    //    vakitBilgisi.text('Vakit bulunamadı');
+                    //}
+                } 
+                else {
                     card.addClass('skeleton-card');
                     cityName.append($('<div>').addClass('skeleton skeleton-text').css({width: '70%', margin: '0 auto'}));
                     vakitBilgisi.append($('<div>').addClass('skeleton skeleton-text').css({width: '40%', margin: '0 auto 5px'}));
