@@ -276,6 +276,21 @@
 
     <!-- Global Scripts -->
     <script src="{{ url_for('static', filename='js/global-cagrivakti.js') }}"></script>
-    
+
+    <script>window.addEventListener('DOMContentLoaded', () => {
+    const userCityMatch = document.cookie.match(/user_city=([^;]+)/);
+    if (userCityMatch && userCityMatch[1]) {
+        const city = userCityMatch[1];
+        const manifestLink = document.querySelector('link[rel="manifest"]');
+        if (manifestLink) {
+            const url = new URL(manifestLink.href, window.location.origin);
+            url.searchParams.set('city', city);
+            // Tarayıcının cache'ini zorlamak için versiyon ekle
+            // url.searchParams.set('v', '2.11'); 
+            manifestLink.href = url.toString();
+            // console.log('Manifest updated for:', city);
+        }
+    }
+});</script>
 </body>
 </html>

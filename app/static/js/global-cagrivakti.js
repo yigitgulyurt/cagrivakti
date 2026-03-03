@@ -8,29 +8,14 @@ function updateOnlineStatus() {
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 // Manifest URL'ini kullanıcı şehrine göre güncelle (Cache busting ve Parametre)
-window.addEventListener('DOMContentLoaded', () => {
-    const userCityMatch = document.cookie.match(/user_city=([^;]+)/);
-    if (userCityMatch && userCityMatch[1]) {
-        const city = userCityMatch[1];
-        const manifestLink = document.querySelector('link[rel="manifest"]');
-        if (manifestLink) {
-            const url = new URL(manifestLink.href, window.location.origin);
-            url.searchParams.set('city', city);
-            // Tarayıcının cache'ini zorlamak için versiyon ekle
-            // url.searchParams.set('v', '2.11'); 
-            manifestLink.href = url.toString();
-            // console.log('Manifest updated for:', city);
-        }
-    }
-});
+
 // PWA Kurulum Mantığı
 window.deferredPrompt = null;
 const pwaBanner = document.getElementById('pwaInstallBanner');
 const installBtn = document.getElementById('pwaInstallBtn');
 const closeBtn = document.getElementById('pwaCloseBtn');
 // Şehir eşleştirme ve normalizasyon fonksiyonları (Global Scope'da tanımlı olabilir, kontrol et)
-//const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
-const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | default('{}') | safe }}');
+const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
 const REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
     Object.entries(CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
 );
