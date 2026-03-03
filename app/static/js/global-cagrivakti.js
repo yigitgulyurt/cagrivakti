@@ -29,7 +29,16 @@ const pwaBanner = document.getElementById('pwaInstallBanner');
 const installBtn = document.getElementById('pwaInstallBtn');
 const closeBtn = document.getElementById('pwaCloseBtn');
 // Şehir eşleştirme ve normalizasyon fonksiyonları (Global Scope'da tanımlı olabilir, kontrol et)
-const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
+// Safe initialization with fallback to empty object
+const CITY_DISPLAY_MAPPING_GLOBAL = (() => {
+    try {
+        const raw = '{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}';
+        return JSON.parse(raw);
+    } catch (e) {
+        console.warn('Failed to parse CITY_DISPLAY_NAME_MAPPING, using empty object', e);
+        return {};
+    }
+})();
 const REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
     Object.entries(CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
 );
