@@ -33,7 +33,12 @@ const closeBtn = document.getElementById('pwaCloseBtn');
 const CITY_DISPLAY_MAPPING_GLOBAL = (() => {
     try {
         const raw = '{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}';
-        return JSON.parse(raw);
+        // Remove any leading/trailing whitespace and ensure it's valid JSON
+        const cleaned = raw.trim();
+        if (!cleaned || cleaned === '' || cleaned === 'null') {
+            return {};
+        }
+        return JSON.parse(cleaned);
     } catch (e) {
         console.warn('Failed to parse CITY_DISPLAY_NAME_MAPPING, using empty object', e);
         return {};
