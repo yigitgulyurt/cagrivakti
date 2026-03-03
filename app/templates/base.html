@@ -298,29 +298,20 @@
 
     if (!isAndroid || !isInApp) return;
 
-    if (sessionStorage.getItem('chrome_intent_attempted')) return;
-    sessionStorage.setItem('chrome_intent_attempted', '1');
-
     const url = window.location.href.replace(/^https?:\/\//, '');
     const intentUrl = `intent://${url}#Intent;scheme=https;package=com.android.chrome;end`;
 
     let redirected = false;
 
-    // Eğer gerçekten Chrome açılırsa sayfa hidden olur
     document.addEventListener("visibilitychange", function () {
-        if (document.hidden) {
-            redirected = true;
-        }
+        if (document.hidden) redirected = true;
     });
 
-    // Intent dene
     window.location.href = intentUrl;
 
-    // 900ms sonra hâlâ buradaysak modal göster
-    setTimeout(function () {
-        if (!redirected) {
-            showOpenInBrowserModal();
-        }
+    // 900ms sonra eğer Chrome açılmadıysa modal göster
+    setTimeout(() => {
+        if (!redirected) showOpenInBrowserModal();
     }, 900);
 
 
@@ -332,25 +323,23 @@
             <div class="ob-overlay">
                 <div class="ob-box">
                     <h3>Tarayıcıda Açın</h3>
-                    <p>Instagram içi tarayıcı bazı özellikleri kısıtlıyor. 
-                    Daha hızlı ve sorunsuz deneyim için Chrome'da açın.</p>
-                    <button id="copyLinkBtn">Bağlantıyı Kopyala</button>
+                    <p>Instagram içi tarayıcı bazı özellikleri kısıtlıyor. Daha hızlı ve sorunsuz deneyim için Chrome'da açın.</p>
+                    <button id="closeModalBtn">Kapat</button>
                 </div>
             </div>
         `;
 
         document.body.appendChild(modal);
 
-        document.getElementById("copyLinkBtn").addEventListener("click", function () {
-            navigator.clipboard.writeText(window.location.href);
-            this.innerText = "Kopyalandı ✓";
+        // Sadece kapatma
+        document.getElementById("closeModalBtn").addEventListener("click", () => {
+            modal.remove();
         });
 
         injectModalStyle();
     }
 
     function injectModalStyle() {
-
         if (document.getElementById("ob-style")) return;
 
         const style = document.createElement("style");
