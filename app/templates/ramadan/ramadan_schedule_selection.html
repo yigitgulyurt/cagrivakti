@@ -29,7 +29,7 @@
             {% for i in range(12) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
                 </div>
             </div>
             {% endfor %}
@@ -40,7 +40,7 @@
             {% for i in range(8) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
                 </div>
             </div>
             {% endfor %}
@@ -51,7 +51,7 @@
             {% for i in range(8) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
                 </div>
             </div>
             {% endfor %}
@@ -62,7 +62,7 @@
             {% for i in range(13) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
                 </div>
             </div>
             {% endfor %}
@@ -73,7 +73,7 @@
             {% for i in range(17) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
                 </div>
             </div>
             {% endfor %}
@@ -84,7 +84,7 @@
             {% for i in range(14) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
                 </div>
             </div>
             {% endfor %}
@@ -95,7 +95,7 @@
             {% for i in range(7) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
                 </div>
             </div>
             {% endfor %}
@@ -107,7 +107,7 @@
             {% for i in range(61) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
                 </div>
             </div>
             {% endfor %}
@@ -268,12 +268,6 @@
     border-left: 4px solid var(--primary);
 }
 
-/*.vakit-bilgisi {
-    font-size: 0.9em;
-    color: var(--gray);
-    line-height: 1.4;
-}*/
-
 @media (max-width: 768px) {
     .container { padding: 10px; }
     .header { padding: 20px; margin-bottom: 20px; }
@@ -289,7 +283,6 @@
     .city-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 5px; }
     .city-card { padding: 15px 10px; min-height: 100px; }
     .city-name { font-size: 0.95rem; }
-    /*.vakit-bilgisi { font-size: 0.85rem; }*/
     
     .region-title { font-size: 1.2rem; margin: 20px 0 10px; }
 }
@@ -381,7 +374,6 @@
                     });
 
                 const cityName = $('<div>').addClass('city-name');
-                //const vakitBilgisi = $('<div>').addClass('vakit-bilgisi');
                 
                 const IS_RAMADAN = JSON.parse('{{ "true" if ramadan_info.is_ramadan else "false" }}');
                 const aksamLabel = IS_RAMADAN ? 'İftar' : 'Akşam';
@@ -389,17 +381,10 @@
                 if (cachedData) {
                     card.addClass('content-loaded');
                     cityName.text(getDisplayName(sehir));
-                    //if (cachedData.imsak !== "--:--") {
-                    //    vakitBilgisi.html(`İmsak: ${cachedData.imsak}<br>${aksamLabel}: ${cachedData.aksam}`);
-                    //} else {
-                    //    vakitBilgisi.text('Vakit bulunamadı');
-                    //}
                 } 
                 else {
                     card.addClass('skeleton-card');
-                    cityName.append($('<div>').addClass('skeleton skeleton-text').css({width: '30%', margin: '0 auto'}));
-                    //vakitBilgisi.append($('<div>').addClass('skeleton skeleton-text').css({width: '40%', margin: '0 auto 5px'}));
-                    //vakitBilgisi.append($('<div>').addClass('skeleton skeleton-text').css({width: '40%', margin: '0 auto'}));
+                    cityName.append($('<div>').addClass('skeleton skeleton-text').css({width: '50%', margin: '0 auto'}));
                 }
 
                 card.append(cityName);
@@ -408,11 +393,6 @@
                 function updateUI(vakitler) {
                     card.removeClass('skeleton-card').addClass('content-loaded');
                     cityName.empty().text(getDisplayName(sehir));
-                    //if (vakitler && vakitler.imsak !== "--:--") {
-                    //    vakitBilgisi.html(`İmsak: ${vakitler.imsak}<br>${aksamLabel}: ${vakitler.aksam}`);
-                    //} else {
-                    //    vakitBilgisi.text('Vakit bulunamadı');
-                    //}
                 }
 
                 if (cachedData) return;
