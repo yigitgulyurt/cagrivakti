@@ -338,18 +338,27 @@
 }
 
 .vakit-card {
-    background-color: var(--card-bg);
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    transition: var(--transition);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+	background-color: var(--card-bg);
+	padding: 30px;
+	border-radius: 20px;
+	text-align: center;
+	transition: var(--transition);
+	border: 2px solid rgba(255, 255, 255, 0.05);
+	box-shadow: 0 0 15px var(--card-bg);
 }
 
 .vakit-card:hover {
     transform: translateY(-5px);
     background-color: var(--hover-color);
     border-color: var(--primary);
+}
+
+/* En yakın vakit kartı için belirgeç stili */
+.active-vakit-card {
+    border: 2px solid var(--primary) !important;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+    position: relative;
+    overflow: hidden;
 }
 
 .skeleton-card {
@@ -493,14 +502,6 @@
         transform: scale(1);
         border-color: rgba(255, 193, 7, 0.4);
     }
-}
-
-/* En yakın vakit kartı için belirgeç stili */
-.active-vakit-card {
-    border: 2px solid var(--primary) !important;
-    box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
-    position: relative;
-    overflow: hidden;
 }
 </style>
 {% endblock %}
