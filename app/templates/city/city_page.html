@@ -519,6 +519,7 @@
     const CACHE_VERSION = 'V{{ app_version }}';
     const CACHE_KEY = `vakitler_${mevcutSehir}_${mevcutUlke}_${CACHE_VERSION}`;
     const DAILY_CONTENT_CACHE_KEY = `daily_content_cache_${CACHE_VERSION}`;
+    const DATE_TRACK_KEY = `date_track_${mevcutSehir}_${mevcutUlke}`;
 
     // Eski cache'leri temizle (v1 veya versiyonsuz)
     try {
@@ -911,6 +912,32 @@
             const cached = getCachedVakitler();
             if (!cached) namazVakitleriniYukle();
         }, 1800000);
+        try {
+            const tz = (namazVakitleri && namazVakitleri.timezone) || 'Europe/Istanbul';
+            function getCityDateStr(tz) {
+                const now = new Date();
+                const s = now.toLocaleString("en-US", { timeZone: tz });
+                const d = new Date(s);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+            }
+            if (!sessionStorage.getItem(DATE_TRACK_KEY)) {
+                sessionStorage.setItem(DATE_TRACK_KEY, getCityDateStr(tz));
+            }
+            setInterval(() => {
+                const cur = getCityDateStr(tz);
+                const prev = sessionStorage.getItem(DATE_TRACK_KEY);
+                if (prev && cur !== prev) {
+                    sessionStorage.setItem(DATE_TRACK_KEY, cur);
+                    try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
+                    try { localStorage.removeItem(DAILY_CONTENT_CACHE_KEY); } catch(e) {}
+                    namazVakitleriniYukle();
+                    dailyContentYukle();
+                }
+            }, 60000);
+        } catch(e) {}
     });
 </script>
 {% endblock %}

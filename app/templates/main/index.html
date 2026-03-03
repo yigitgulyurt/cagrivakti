@@ -804,6 +804,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Versiyon kontrolü: Eski cache'leri temizlemek için suffix ekledik
             const CACHE_VERSION = 'V{{ app_version }}';
             const CACHE_KEY = `vakitler_${city}_${country}_${CACHE_VERSION}`;
+            const DATE_TRACK_KEY = `home_date_track_${city}_${country}`;
             
             // Eski cache'i temizle
             try {
@@ -840,7 +841,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (!data) {
-                const response = await fetch(`https://api.cagrivakti.com.tr/namaz_vakitleri?sehir=${city}&country=${country}`);
+                const response = await fetch(`https://api.cagrivakti.com.tr/namaz_vakitleri-V{{ app_version }}?sehir=${city}&country=${country}`);
                 const responseData = await response.json();
                 
                 if (responseData.vakitler) {
@@ -928,6 +929,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 update();
                 setInterval(update, 1000);
+                
+                try {
+                    function getCityDateStr(tz) {
+                        const now = new Date();
+                        const s = now.toLocaleString("en-US", { timeZone: tz });
+                        const d = new Date(s);
+                        const y = d.getFullYear();
+                        const m = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        return `${y}-${m}-${day}`;
+                    }
+                    if (!sessionStorage.getItem(DATE_TRACK_KEY)) {
+                        sessionStorage.setItem(DATE_TRACK_KEY, getCityDateStr(tz));
+                    }
+                    setInterval(() => {
+                        const cur = getCityDateStr(tz);
+                        const prev = sessionStorage.getItem(DATE_TRACK_KEY);
+                        if (prev && cur !== prev) {
+                            sessionStorage.setItem(DATE_TRACK_KEY, cur);
+                            try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
+                            initHomeCountdown(city, country);
+                        }
+                    }, 60000);
+                } catch(e) {}
             }
         } catch (e) {
             console.error("Home countdown error:", e);
