@@ -27,7 +27,10 @@
     <meta name="twitter:title" content="Çağrı Vakti" />
     <meta name="twitter:description" content="Namaz Vakitlerine anında eriş " />
     <meta name="twitter:image" content="https://cagrivakti.com.tr/static/icons/og-image.png" />
-    
+
+    <!-- Global Scripts -->
+    <script src="{{ url_for('static', filename='js/global-cagrivakti.js') }}"></script>
+
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {% block json_ld %}
@@ -274,8 +277,7 @@
 
     <script src="{{ url_for('static', filename='js/inappredirect-cagrivakti.js') }}" defer></script>
 
-    <!-- Global Scripts -->
-    <script src="{{ url_for('static', filename='js/global-cagrivakti.js') }}"></script>
-
+    <!-- footer_js bloğu: Sayfanın en altına özel JavaScript kodlarını eklemek için kullanılır -->
+    {% block footer_js %}{% endblock %}
 </body>
 </html>
