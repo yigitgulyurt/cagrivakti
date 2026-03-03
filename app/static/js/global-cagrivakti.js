@@ -23,6 +23,36 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+// PWA Kurulum Mantığı
+window.deferredPrompt = null;
+const pwaBanner = document.getElementById('pwaInstallBanner');
+const installBtn = document.getElementById('pwaInstallBtn');
+const closeBtn = document.getElementById('pwaCloseBtn');
+// Şehir eşleştirme ve normalizasyon fonksiyonları (Global Scope'da tanımlı olabilir, kontrol et)
+const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
+const REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
+    Object.entries(CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
+);
+function getLatinNameGlobal(turkishName) {
+     if (REVERSE_CITY_MAPPING_GLOBAL[turkishName]) {
+         return REVERSE_CITY_MAPPING_GLOBAL[turkishName];
+     }
+     const charMap = {
+         'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G', 'ı': 'i', 'İ': 'I',
+         'ö': 'o', 'Ö': 'O', 'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U'
+     };
+     let normalized = turkishName.split('').map(char => charMap[char] || char).join('');
+     return normalized.replace(/\s+/g, '-').replace(/[^A-Za-z0-9\-]/g, '');
+}
+// Banner'ı kapatma fonksiyonu
+function closePwaBanner() {
+    if (pwaBanner) {
+        pwaBanner.classList.remove('active');
+        pwaBanner.classList.remove('ready');
+        // Bu oturumda tekrar gösterme
+        sessionStorage.setItem('pwaBannerDismissed', 'true');
+    }
+}
 window.addEventListener('beforeinstallprompt', (e) => {
     // Masaüstü cihazlarda PWA kurulumunu tamamen engelle
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
