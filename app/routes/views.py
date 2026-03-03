@@ -198,9 +198,32 @@ def serve_robots():
 
 @views_bp.route('/sw.js')
 def serve_sw():
-    response = make_response(send_from_directory(os.path.join(current_app.root_path, 'static', 'js'), 'sw.js'))
-    response.headers['Cache-Control'] = 'no-cache' # Service Worker her zaman güncel kontrol edilmeli
-    return response
+    version = current_app.config.get('APP_VERSION', '1.0')
+    sw_path = os.path.join(current_app.root_path, 'static', 'js', 'sw.js')
+    try:
+        with open(sw_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        # CACHE_NAME ve API_CACHE_NAME satırlarını dinamik sürüme göre güncelle
+        content = re.sub(
+            r'^const\s+CACHE_NAME\s*=\s*.*?;$',
+            f"const CACHE_NAME = `namaz-vakitleri-V{version}`;",
+            content,
+            flags=re.MULTILINE
+        )
+        content = re.sub(
+            r'^const\s+API_CACHE_NAME\s*=\s*.*?;$',
+            f"const API_CACHE_NAME = `api-cache-V{version}`;",
+            content,
+            flags=re.MULTILINE
+        )
+        resp = make_response(content)
+        resp.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+        resp.headers['Cache-Control'] = 'no-cache'
+        return resp
+    except Exception:
+        response = make_response(send_from_directory(os.path.join(current_app.root_path, 'static', 'js'), 'sw.js'))
+        response.headers['Cache-Control'] = 'no-cache'
+        return response
 
 @views_bp.route('/manifest.json')
 def serve_manifest():
