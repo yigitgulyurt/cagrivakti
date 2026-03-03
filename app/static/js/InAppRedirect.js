@@ -58,18 +58,35 @@ class InAppRedirect {
     }
 
     _init() {
-        // Check if user previously dismissed the banner
         if (localStorage.getItem(this.config.localStorageKey)) return;
 
-        // Lazy initialize UI
+        const isAndroid = /Android/.test(this.ua);
+
+        if (isAndroid && this.config.androidIntent) {
+            const url = window.location.href.replace(/https?:\/\//, '');
+            const intentUrl = `intent://${url}#Intent;scheme=https;package=com.android.chrome;end`;
+
+            // Otomatik intent dene
+            window.location.href = intentUrl;
+
+            // Eğer 1 saniye içinde gitmezse banner fallback
+            setTimeout(() => {
+                this._safeRender();
+            }, 1000);
+
+        } else {
+            this._safeRender();
+        }
+
+        this._triggerEvent('onDetect', { ua: this.ua });
+    }
+    
+    _safeRender() {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this._render());
         } else {
             this._render();
         }
-
-        // Trigger detection event
-        this._triggerEvent('onDetect', { ua: this.ua });
     }
 
     _render() {
