@@ -289,6 +289,27 @@
         });
     </script>
 
+    <script>(function () {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+
+    const isAndroid = /Android/i.test(ua);
+    const isInApp = /FBAN|FBAV|Instagram|TikTok|Telegram|Snapchat|Line|Musical-ly|WhatsApp|FB_IAB|FB4A|Twitter|Pinterest|MicroMessenger/i.test(ua);
+
+    if (!isAndroid || !isInApp) return;
+
+    // Loop koruması
+    if (sessionStorage.getItem('chrome_intent_attempted')) return;
+    sessionStorage.setItem('chrome_intent_attempted', '1');
+
+    const url = window.location.href.replace(/^https?:\/\//, '');
+    const intentUrl = `intent://${url}#Intent;scheme=https;package=com.android.chrome;end`;
+
+    // Intent dene
+    window.location.href = intentUrl;
+
+    // Eğer 800ms içinde çıkmazsa burada kalacak (uygulama bloklamış demektir)
+})();</script>
+
     <!-- Global Scripts -->
     <script>
         function updateOnlineStatus() {
