@@ -410,11 +410,11 @@
                 function updateUI(vakitler) {
                     card.removeClass('skeleton-card').addClass('content-loaded');
                     cityName.empty().text(getDisplayName(sehir));
-                    if (vakitler && vakitler.imsak !== "--:--") {
-                        vakitBilgisi.html(`İmsak: ${vakitler.imsak}<br>${aksamLabel}: ${vakitler.aksam}`);
-                    } else {
-                        vakitBilgisi.text('Vakit bulunamadı');
-                    }
+                    //if (vakitler && vakitler.imsak !== "--:--") {
+                    //    vakitBilgisi.html(`İmsak: ${vakitler.imsak}<br>${aksamLabel}: ${vakitler.aksam}`);
+                    //} else {
+                    //    vakitBilgisi.text('Vakit bulunamadı');
+                    //}
                 }
 
                 if (cachedData) return;
