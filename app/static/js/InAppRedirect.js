@@ -85,22 +85,35 @@ class InAppRedirect {
         banner.innerHTML = `
             <div class="pwa-content">
                 <div class="pwa-icon">
-                    <span style="font-size: 32px;">🚀</span>
+                    <div class="pwa-icon-bg">
+                        <span class="pwa-rocket">🚀</span>
+                    </div>
                 </div>
                 <div class="pwa-text">
                     <h3>${this.config.appName}</h3>
-                    <p>Daha iyi deneyim için tarayıcıda açın.</p>
+                    <p>Instagram içi tarayıcı yerine gerçek tarayıcıda daha hızlı ve stabil deneyim.</p>
                 </div>
             </div>
+            
             <div class="pwa-actions">
-                <button id="iar-action-btn" class="btn btn-primary btn-sm">Aç</button>
+                <button id="iar-action-btn" class="btn btn-primary btn-sm">
+                    <span class="btn-text">Tarayıcıda Aç</span>
+                </button>
                 <button id="iar-close-btn" class="btn-close-pwa">
-                    <svg class="icon" aria-hidden="true" style="width:14px;height:14px;"><use xlink:href="#fa-xmark"></use></svg>
+                    <svg class="icon" aria-hidden="true" style="width:16px;height:16px;">
+                        <use xlink:href="#fa-xmark"></use>
+                    </svg>
                 </button>
             </div>
+            
             ${isIOS && this.config.iosSafariTip ? `
                 <div class="ios-tip-overlay">
-                    <span>💡 Safari'de açmak için sağ alttaki <b>Paylaş</b> ikonuna basıp <b>Safari'de Aç</b> seçeneğini seçin.</span>
+                    <div class="ios-tip-box">
+                        <span class="ios-tip-icon">💡</span>
+                        <span>
+                            Sağ alttaki <b>Paylaş</b> ikonuna basıp <b>Safari'de Aç</b> seçeneğini seçin.
+                        </span>
+                    </div>
                 </div>
             ` : ''}
         `;
@@ -147,113 +160,60 @@ class InAppRedirect {
         if (document.getElementById('iar-styles')) return;
 
         const styles = `
-            #in-app-redirect-banner {
-                position: fixed;
-                bottom: 20px;
-                left: 20px;
-                right: 20px;
-                background: var(--card-bg);
-                border: 1px solid rgba(255, 193, 7, 0.2);
-                border-radius: 16px;
-                padding: 16px;
-                display: flex;
-                flex-direction: column;
-                z-index: 10001;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-                transform: translateY(150%);
-                transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-                max-width: 500px;
-                margin: 0 auto;
-            }
-
-            #in-app-redirect-banner.active {
-                transform: translateY(0);
-            }
-
-            .pwa-content {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                width: 100%;
-                justify-content: space-between;
-                margin-bottom: 0;
-            }
-
-            #in-app-redirect-banner .pwa-content {
-                justify-content: flex-start;
-            }
-
-            .pwa-icon {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .pwa-text h3 {
-                font-size: 1rem;
-                margin: 0;
-                color: var(--text);
-                font-weight: 700;
-            }
-
-            .pwa-text p {
-                font-size: 0.85rem;
-                color: var(--gray);
-                margin: 0;
-            }
-
-            .pwa-actions {
-                position: absolute;
-                right: 16px;
-                top: 50%;
-                transform: translateY(-50%);
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .btn-primary {
-                background: var(--primary);
-                color: #000 !important;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 8px;
-                font-size: 0.9rem;
-                font-weight: 600;
-                cursor: pointer;
-            }
-
-            .btn-close-pwa {
-                background: transparent;
-                border: none;
-                color: var(--gray);
-                cursor: pointer;
-                padding: 8px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .ios-tip-overlay {
-                margin-top: 12px;
-                padding-top: 12px;
-                border-top: 1px solid rgba(255, 255, 255, 0.05);
-                font-size: 11px;
-                color: var(--gray);
-                line-height: 1.4;
-            }
-
-            @media (max-width: 480px) {
+                .pwa-icon-bg {
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 14px;
+                    background: linear-gradient(135deg, var(--primary), rgba(255,193,7,0.6));
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 6px 20px rgba(255,193,7,0.35);
+                }
+                    
+                .pwa-rocket {
+                    font-size: 22px;
+                    transform: translateY(-1px);
+                }
+                    
                 #in-app-redirect-banner {
-                    bottom: 10px;
-                    left: 10px;
-                    right: 10px;
-                    padding: 12px;
+                    backdrop-filter: blur(14px);
+                    background: rgba(20, 20, 20, 0.85);
+                    border: 1px solid rgba(255, 193, 7, 0.25);
                 }
-                .pwa-text p {
-                    display: none;
+                    
+                .btn-primary {
+                    transition: all 0.25s ease;
                 }
-            }
+                    
+                .btn-primary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(255,193,7,0.4);
+                }
+                    
+                .btn-primary:active {
+                    transform: scale(0.97);
+                }
+                    
+                .btn-close-pwa:hover {
+                    opacity: 0.7;
+                    transform: rotate(90deg);
+                    transition: 0.25s ease;
+                }
+                    
+                .ios-tip-box {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
+                    background: rgba(255,255,255,0.04);
+                    padding: 8px 10px;
+                    border-radius: 8px;
+                }
+                    
+                .ios-tip-icon {
+                    font-size: 14px;
+                    margin-top: 1px;
+                }
         `;
 
         const styleSheet = document.createElement('style');
