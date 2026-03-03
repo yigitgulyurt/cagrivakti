@@ -102,27 +102,37 @@
         (function(){
             var v = "{{ app_version }}";
             try {
+                var now = new Date();
+                var cur = now.toLocaleDateString('en-CA');
+                var prevDate = localStorage.getItem('LAST_VISIT_DATE');
+                if (prevDate && prevDate !== cur) {
+                    var keep = ['user_city','tour_shown','introSectionsHidden','guidesSectionHidden','APP_VERSION'];
+                    var backup = {};
+                    for (var i = 0; i < keep.length; i++) {
+                        var k = keep[i];
+                        var val = localStorage.getItem(k);
+                        if (val !== null) backup[k] = val;
+                    }
+                    localStorage.clear();
+                    for (var key in backup) {
+                        localStorage.setItem(key, backup[key]);
+                    }
+                }
+                localStorage.setItem('LAST_VISIT_DATE', cur);
                 var s = localStorage.getItem('APP_VERSION');
                 if (!s || s !== v) {
-                    // Korunacak key'ler
-                    var keysToKeep = ['guidesSectionHidden', 'introSectionsHidden', 'tour_shown'];
-                    var backup = {};
-                    
+                    var keysToKeep = ['guidesSectionHidden', 'introSectionsHidden', 'tour_shown', 'user_city','APP_VERSION' ];
+                    var backup2 = {};
                     keysToKeep.forEach(function(key){
-                        var val = localStorage.getItem(key);
-                        if (val !== null) backup[key] = val;
+                        var val2 = localStorage.getItem(key);
+                        if (val2 !== null) backup2[key] = val2;
                     });
-                
-                    // Tüm storage'ı temizle
                     localStorage.clear();
-                
-                    // Korunacak key'leri geri koy
-                    Object.keys(backup).forEach(function(key){
-                        localStorage.setItem(key, backup[key]);
+                    Object.keys(backup2).forEach(function(key){
+                        localStorage.setItem(key, backup2[key]);
                     });
-                
-                    // APP_VERSION'ı güncelle
                     localStorage.setItem('APP_VERSION', v);
+                    localStorage.setItem('LAST_VISIT_DATE', cur);
                 }
             } catch (e) {}
         })();
