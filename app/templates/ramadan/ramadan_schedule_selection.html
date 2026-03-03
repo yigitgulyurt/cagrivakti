@@ -29,12 +29,8 @@
             {% for i in range(12) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
                 </div>
-                <!-- <div class="vakit-bilgisi">
-                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto 5px;"></div>
-                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto;"></div>
-                </div> -->
             </div>
             {% endfor %}
         </div>
@@ -44,12 +40,8 @@
             {% for i in range(8) %}
             <div class="city-card skeleton-card">
                 <div class="city-name">
-                    <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto;"></div>
+                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
                 </div>
-                <!-- <div class="vakit-bilgisi">
-                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto 5px;"></div>
-                    <div class="skeleton skeleton-text" style="width: 40%; margin: 0 auto;"></div>
-                </div> -->
             </div>
             {% endfor %}
         </div>
@@ -57,50 +49,55 @@
         <h2 class="region-title" data-region="akdeniz">Akdeniz Bölgesi</h2>
         <div class="city-grid" id="Akdeniz">
             {% for i in range(8) %}
-            <!-- <div class="city-card skeleton-card">
-                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
-                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
-            </div> -->
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                </div>
+            </div>
             {% endfor %}
         </div>
 
         <h2 class="region-title" data-region="icanadolu">İç Anadolu Bölgesi</h2>
         <div class="city-grid" id="IcAnadolu">
             {% for i in range(13) %}
-            <!-- <div class="city-card skeleton-card">
-                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
-                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
-            </div> -->
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                </div>
+            </div>
             {% endfor %}
         </div>
 
         <h2 class="region-title" data-region="karadeniz">Karadeniz Bölgesi</h2>
         <div class="city-grid" id="Karadeniz">
             {% for i in range(17) %}
-            <!-- <div class="city-card skeleton-card">
-                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
-                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
-            </div> -->
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                </div>
+            </div>
             {% endfor %}
         </div>
 
         <h2 class="region-title" data-region="doguanadolu">Doğu Anadolu Bölgesi</h2>
         <div class="city-grid" id="DoguAnadolu">
             {% for i in range(14) %}
-            <!-- <div class="city-card skeleton-card">
-                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
-                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
-            </div> -->
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                </div>
+            </div>
             {% endfor %}
         </div>
 
         <h2 class="region-title" data-region="guneydoguanadolu">Güneydoğu Anadolu Bölgesi</h2>
         <div class="city-grid" id="GuneydoguAnadolu">
             {% for i in range(7) %}
-            <!-- <div class="city-card skeleton-card">
-                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
-                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
-            </div> -->
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                </div>
+            </div>
             {% endfor %}
         </div>
     </section>
@@ -108,10 +105,11 @@
     <section class="category-content" id="countries">
         <div class="city-grid" id="countries-grid">
             {% for i in range(61) %}
-            <!-- <div class="city-card skeleton-card">
-                <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto 10px;"></div>
-                <div class="skeleton skeleton-text" style="width: 50%; margin: 0 auto;"></div>
-            </div> -->
+            <div class="city-card skeleton-card">
+                <div class="city-name">
+                    <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto;"></div>
+                </div>
+            </div>
             {% endfor %}
         </div>
     </section>
@@ -399,7 +397,7 @@
                 } 
                 else {
                     card.addClass('skeleton-card');
-                    cityName.append($('<div>').addClass('skeleton skeleton-text').css({width: '10%', margin: '0 auto'}));
+                    cityName.append($('<div>').addClass('skeleton skeleton-text').css({width: '30%', margin: '0 auto'}));
                     //vakitBilgisi.append($('<div>').addClass('skeleton skeleton-text').css({width: '40%', margin: '0 auto 5px'}));
                     //vakitBilgisi.append($('<div>').addClass('skeleton skeleton-text').css({width: '40%', margin: '0 auto'}));
                 }
