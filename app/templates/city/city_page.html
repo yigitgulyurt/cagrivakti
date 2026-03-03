@@ -385,7 +385,7 @@
     background-color: rgba(255, 193, 7, 0.1);
     color: var(--primary);
     box-shadow: 0 0 50px #000;
-    border: .009px solid var(--primary);
+    border: 1px solid var(--primary);
     padding: 10px;
     border-radius: 12px;
     font-weight: 700;
@@ -690,6 +690,7 @@
                     countdownEl.textContent = 'Vakit geldi';
                     countdownEl.style.color = '#10b981';
                     countdownEl.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                    countdownEl.style.border = '1px solid #10b981';
                 } else {
                     countdownEl.textContent = 'Vakit geçti';
                     countdownEl.style.color = '';
