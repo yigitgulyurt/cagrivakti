@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    APP_VERSION = "2.14"
+    APP_VERSION = "2.15"
     # Tek versiyon kaynağı: APP_VERSION
     # Tüm statik dosya cache-busting, widget ve API sürümlemeleri APP_VERSION üzerinden yönetilir.
     SEND_FILE_MAX_AGE_DEFAULT = 31536000 # Flask static dosya cache süresi (1 Yıl)
