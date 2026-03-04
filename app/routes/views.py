@@ -286,7 +286,7 @@ def serve_manifest():
 def ilkelerimiz():
     return render_template('info/policies.html')
 
-@views_bp.route('/MUSTAFA-KEMAL-ATATÜRK')
+@views_bp.route('/Mustafa-Kemal-Ataturk')
 @cache.cached(timeout=86400)
 def ataturk():
     return render_template('main/ataturk.html')

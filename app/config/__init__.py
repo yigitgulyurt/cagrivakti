@@ -28,7 +28,7 @@ class Config:
         '/sehir/',
         '/ulke/',
         '/ilkelerimiz',
-        '/MUSTAFA-KEMAL-ATATÜRK',
+        '/Mustafa-Kemal-Ataturk',
         '/api-dokuman'
     }
     

@@ -17,7 +17,7 @@ const PRECACHE_ASSETS = [
     '/konum-bul',
     '/iletisim',
     '/ilkelerimiz',
-    '/MUSTAFA-KEMAL-ATATÜRK',
+    '/Mustafa-Kemal-Ataturk',
     '/static/js/jquery-cagrivakti.js',
     '/static/js/city-data.js',
     '/static/icons/favicon.ico',
