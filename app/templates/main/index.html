@@ -26,7 +26,7 @@
                     <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
                 </div>
                 <h3>Vakitleri Keşfedin</h3>
-                <p>"Vakti Keşfet" özelliğini kullanarak dilediğiniz şehri seçebilir, tüm namaz ve iftar vakitlerine anında ulaşabilirsiniz.</p>
+                <p>"Vakti Keşfet" özelliğini kullanarak dilediğiniz şehri seçebilir, tüm ezan ve iftar vakitlerine anında ulaşabilirsiniz.</p>
             </div>
 
             <!-- Step 3: Find Location -->
@@ -841,7 +841,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (!data) {
-                const response = await fetch(`https://api.cagrivakti.com.tr/namaz_vakitleri-V{{ app_version }}?sehir=${city}&country=${country}`);
+                const response = await fetch(`https://api.cagrivakti.com.tr/ezan_vakitleri-V{{ app_version }}?sehir=${city}&country=${country}`);
                 const responseData = await response.json();
                 
                 if (responseData.vakitler) {

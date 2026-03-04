@@ -75,10 +75,10 @@ def sehir_kaydet():
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
 
 from app.config import Config
-@api_bp.route(f'/namaz_vakitleri-V{Config.APP_VERSION}')
+@api_bp.route(f'/ezan_vakitleri-V{Config.APP_VERSION}')
 @restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
-def namaz_vakitlerini_al_api():
+def ezan_vakitlerini_al_api():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
     tarih = request.args.get('date')

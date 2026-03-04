@@ -348,7 +348,7 @@
     </div>
 
     <script>
-        const namazVakitleri = JSON.parse('{{ vakitler | tojson | safe }}');
+        const ezanVakitleri = JSON.parse('{{ vakitler | tojson | safe }}');
         const displayCityName = "{{ display_name }}";
         const bgColor = "{{ bg_color }}";
         const textColor = "{{ text_color }}";
@@ -367,9 +367,9 @@
         }
 
         function updateCountdowns() {
-            if (!namazVakitleri) return;
+            if (!ezanVakitleri) return;
 
-            const tz = namazVakitleri.timezone || 'Europe/Istanbul';
+            const tz = ezanVakitleri.timezone || 'Europe/Istanbul';
             
             // Yerel saati ve şehir saatini al
             const now = new Date();
@@ -383,7 +383,7 @@
             const vakitList = ['imsak', 'gunes', 'ogle', 'ikindi', 'aksam', 'yatsi'];
 
             vakitList.forEach(vakit => {
-                const saat = namazVakitleri[vakit];
+                const saat = ezanVakitleri[vakit];
                 if (!saat || saat === "--:--" || saat.includes('skeleton')) return;
                 
                 const [hours, minutes] = saat.split(":").map(Number);
@@ -425,8 +425,8 @@
                 let nextImsakTime = null;
 
                 // 1. Öncelik: Yarın verisi varsa onu kullan
-                if (namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
-                     nextImsakTime = namazVakitleri.yarin.imsak;
+                if (ezanVakitleri.yarin && ezanVakitleri.yarin.imsak) {
+                     nextImsakTime = ezanVakitleri.yarin.imsak;
                      const [hours, minutes] = nextImsakTime.split(":").map(Number);
                      targetDate = new Date(cityNow);
                      targetDate.setHours(hours, minutes, 0, 0);
@@ -437,8 +437,8 @@
                      }
                 } 
                 // 2. Öncelik: Fallback (Yarın verisi yoksa bugünün imsak saatine 1 gün ekle)
-                else if (namazVakitleri.imsak) {
-                     nextImsakTime = namazVakitleri.imsak;
+                else if (ezanVakitleri.imsak) {
+                     nextImsakTime = ezanVakitleri.imsak;
                      const [hours, minutes] = nextImsakTime.split(":").map(Number);
                      targetDate = new Date(cityNow);
                      targetDate.setDate(targetDate.getDate() + 1); // Kesinlikle yarın
@@ -474,11 +474,11 @@
                     nextCard.classList.add('active');
                     
                     // Yatsı vaktinden sonra yarının imsak vaktini göster
-                    if (nextVakitName === 'imsak' && namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
+                    if (nextVakitName === 'imsak' && ezanVakitleri.yarin && ezanVakitleri.yarin.imsak) {
                          const imsakValueEl = nextCard.querySelector('.time-value');
                          const imsakLabelEl = nextCard.querySelector('.time-label');
                          if (imsakValueEl && imsakLabelEl) {
-                             imsakValueEl.textContent = namazVakitleri.yarin.imsak;
+                             imsakValueEl.textContent = ezanVakitleri.yarin.imsak;
                              imsakLabelEl.textContent = 'Yarın İmsak';
                          }
                     }
@@ -488,7 +488,7 @@
                 const map = {'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': 'Öğle', 'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'};
                 let displayName = map[nextVakitName] || nextVakitName;
 
-                if (nextVakitName === 'imsak' && namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
+                if (nextVakitName === 'imsak' && ezanVakitleri.yarin && ezanVakitleri.yarin.imsak) {
                     displayName = 'Yarın İmsak';
                 }
 

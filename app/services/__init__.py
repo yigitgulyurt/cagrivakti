@@ -377,7 +377,7 @@ class PrayerService:
     @staticmethod
     def get_next_vakit(sehir, country_code=DEFAULT_COUNTRY, simdi=None):
         """
-        Bir sonraki namaz vaktini ve kalan süreyi hesaplar.
+        Bir sonraki ezan vaktini ve kalan süreyi hesaplar.
         Gece yarısı ve timezone farklarını gözetir.
         """
         timezone_str = get_timezone_for_city(sehir, country_code)
@@ -465,11 +465,11 @@ class PrayerService:
             
         try:
             # Varsa eskiyi sil (Upsert)
-            db_session.query(NamazVakti).filter_by(
+            db_session.query(EzanVakti).filter_by(
                 sehir=sehir, country_code=country_code, tarih=tarih_date
             ).delete()
 
-            yeni_vakit = NamazVakti(
+            yeni_vakit = EzanVakti(
                 sehir=sehir, country_code=country_code, timezone=timezone_str, tarih=tarih_date,
                 imsak=vakitler['imsak'], gunes=vakitler['gunes'],
                 ogle=vakitler['ogle'], ikindi=vakitler['ikindi'],

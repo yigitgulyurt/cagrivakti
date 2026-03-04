@@ -521,7 +521,7 @@ class NamazBot:
         kible_text = (
             "🧭 <b>Kıble Yönü Nasıl Bulunur?</b>\n\n"
             "Bulunduğunuz konumdan kıble yönünü en doğru şekilde bulmak için sitemizdeki kıble bulucu aracını kullanabilirsiniz:\n\n"
-            "🔗 <a href='https://namazvakitleri.yigitgulyurt.com/kible'>namazvakitleri.yigitgulyurt.com/kible</a>\n\n"
+            "🔗 <a href='https://cagrivakti.com.tr/kible-pusulasi'>cagrivakti.com.tr/kible-pusulasi</a>\n\n"
             "<i>Sitemiz üzerinden konum izni vererek tam yönünüzü görebilirsiniz.</i>"
         )
         
@@ -682,7 +682,7 @@ class NamazBot:
             else:
                 logger.warning(f"Geçersiz şehir seçimi denemesi: {city}")
                 await update.message.reply_text("⚠️ <b>Hata:</b> Geçersiz bir şehir seçildi. Lütfen listeden tekrar seçin.", parse_mode='HTML')
-        elif text == "Namaz Vakitleri 🕒":
+        elif text == "Ezan Vakti 🕒":
             await self.handle_vakitler(update, context)
         else:
             # Anlaşılmayan mesajlar için yönlendirme

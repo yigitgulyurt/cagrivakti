@@ -206,7 +206,7 @@ def serve_sw():
         # CACHE_NAME ve API_CACHE_NAME satırlarını dinamik sürüme göre güncelle
         content = re.sub(
             r'^const\s+CACHE_NAME\s*=\s*.*?;$',
-            f"const CACHE_NAME = `namaz-vakitleri-V{version}`;",
+            f"const CACHE_NAME = `ezan-vakitleri-V{version}`;",
             content,
             flags=re.MULTILINE
         )

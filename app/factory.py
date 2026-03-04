@@ -51,7 +51,7 @@ def create_app(config_class=Config):
             ]
         },
         # Subdomain: api.cagrivakti.com.tr altında çalışan modern uçlar
-        r"/namaz_vakitleri-V2*": {
+        r"/ezan_vakitleri-V2*": {
             "origins": [
                 "https://cagrivakti.com.tr",
                 "https://www.cagrivakti.com.tr",

@@ -512,7 +512,7 @@
 <script>
     let mevcutSehir = "{{ sehir }}";
     let mevcutUlke = "{{ country_code }}";
-    let namazVakitleri = JSON.parse('{{ vakitler|tojson|safe }}');
+    let ezanVakitleri = JSON.parse('{{ vakitler|tojson|safe }}');
 
     // LocalStorage Önbellek Yönetimi
     // Versiyon kontrolü: Eski cache'leri temizlemek için suffix ekledik
@@ -535,7 +535,7 @@
     
     // TODAY hesaplaması: Şehrin yerel saatine göre yapılmalı
     const _now = new Date();
-    const _tz = namazVakitleri.timezone || 'Europe/Istanbul';
+    const _tz = ezanVakitleri.timezone || 'Europe/Istanbul';
     const _cityNowStr = _now.toLocaleString("en-US", {timeZone: _tz});
     const _cityNow = new Date(_cityNowStr);
     const _year = _cityNow.getFullYear();
@@ -608,31 +608,31 @@
         });
     }
 
-    async function namazVakitleriniYukle() {
+    async function ezanVakitleriniYukle() {
         // 1. Önce cache'e bak
         const cached = getCachedVakitler();
         if (cached) {
-            namazVakitleri = cached;
-            renderVakitler(namazVakitleri);
+            ezanVakitleri = cached;
+            renderVakitler(ezanVakitleri);
             updateCountdowns();
             return; // Önbellek varsa API'ye gitme
         }
 
         try {
-            const response = await fetch(`https://api.cagrivakti.com.tr/namaz_vakitleri-V{{ app_version }}?sehir=${mevcutSehir}&country=${mevcutUlke}`);
+            const response = await fetch(`https://api.cagrivakti.com.tr/ezan_vakitleri-V{{ app_version }}?sehir=${mevcutSehir}&country=${mevcutUlke}`);
             const data = await response.json();
             
             if (data.vakitler) {
-                // Timezone bilgisini namazVakitleri objesine ekle
-                namazVakitleri = {
+                // Timezone bilgisini ezanVakitleri objesine ekle
+                ezanVakitleri = {
                     ...data.vakitler,
                     timezone: data.timezone || 'Europe/Istanbul',
                     yarin: data.yarin || null,
-                    is_ramadan: (typeof namazVakitleri.is_ramadan !== 'undefined') ? namazVakitleri.is_ramadan : false
+                    is_ramadan: (typeof ezanVakitleri.is_ramadan !== 'undefined') ? ezanVakitleri.is_ramadan : false
                 };
                 
-                setCachedVakitler(namazVakitleri);
-                renderVakitler(namazVakitleri);
+                setCachedVakitler(ezanVakitleri);
+                renderVakitler(ezanVakitleri);
                 
                 updateCountdowns();
             }
@@ -642,9 +642,9 @@
     }
 
     function updateCountdowns() {
-        if (!namazVakitleri) return;
+        if (!ezanVakitleri) return;
 
-        const tz = namazVakitleri.timezone || 'Europe/Istanbul';
+        const tz = ezanVakitleri.timezone || 'Europe/Istanbul';
         
         // Yerel saati ve şehir saatini al
         const now = new Date();
@@ -660,7 +660,7 @@
         // Ancak geri sayım için cityNow yeterlidir.
         
         ['imsak', 'gunes', 'ogle', 'ikindi', 'aksam', 'yatsi'].forEach(vakit => {
-            const saat = namazVakitleri[vakit];
+            const saat = ezanVakitleri[vakit];
             if (!saat || saat === "--:--" || saat.includes('skeleton')) return;
             
             const [hours, minutes] = saat.split(":").map(Number);
@@ -720,21 +720,21 @@
             // Eğer Yatsı sonrası ise İmsak kartını aktif yap
             if (imsakCardEl) imsakCardEl.classList.add('active-vakit-card');
             
-            if (namazVakitleri.yarin && namazVakitleri.yarin.imsak) {
-                const nextImsakTime = namazVakitleri.yarin.imsak;
+            if (ezanVakitleri.yarin && ezanVakitleri.yarin.imsak) {
+                const nextImsakTime = ezanVakitleri.yarin.imsak;
                 const [hours, minutes] = nextImsakTime.split(":").map(Number);
                 
                 const vakitDate = new Date(cityNow);
                 // Eğer saat 23:59 ise yarınki imsak için 1 gün ekle
                 // Eğer gece yarısı (00:01) ise zaten gün değiştiği için bugünün imsak'ı olacak
-                // ANCAK: Gece yarısı geçince namazVakitleri yenilenmediyse hala dünün verisi var demektir.
+                // ANCAK: Gece yarısı geçince ezanVakitleri yenilenmediyse hala dünün verisi var demektir.
                 // Bu durumda hala dünün tarihi + 1 gün yapmalıyız.
                 // Basit mantık: Yatsı'dan sonra her zaman bir sonraki İmsak hedeflenir.
                 // Yatsı saati < Şu an < Gece Yarısı: Tarih = Yarın
                 // Gece Yarısı < Şu an < İmsak: Tarih = Bugün
                 
                 // Yatsı saatini kontrol et
-                const yatsiSaat = namazVakitleri['yatsi'];
+                const yatsiSaat = ezanVakitleri['yatsi'];
                 const [yH, yM] = yatsiSaat.split(":").map(Number);
                 const yatsiDate = new Date(cityNow);
                 yatsiDate.setHours(yH, yM, 0, 0);
@@ -742,15 +742,15 @@
                 if (cityNow > yatsiDate) {
                      // Gece yarısı kontrolü (00:00 - İmsak arası mı?)
                      // Eğer cityNow saat 00:00 ile İmsak arası ise, gün zaten değişmiştir.
-                     // Ancak namazVakitleri objesi eski (dünün) verisi olabilir.
-                     // Eğer namazVakitleri.tarih != cityNow.toISOString().split('T')[0] ise veri eskidir.
+                     // Ancak ezanVakitleri objesi eski (dünün) verisi olabilir.
+                     // Eğer ezanVakitleri.tarih != cityNow.toISOString().split('T')[0] ise veri eskidir.
                      
                      // Basit çözüm: Yatsı geçtikten sonra hedef her zaman YARINKİ imsak saatidir.
                      // Eğer saat 23:00 ise (Yatsı 20:00), hedef Yarın 05:00
                      // Eğer saat 01:00 ise (Yatsı dün 20:00), hedef Bugün 05:00
                      
                      // Bu karmaşayı çözmek için:
-                     // 1. namazVakitleri.yarin.imsak'ı al.
+                     // 1. ezanVakitleri.yarin.imsak'ı al.
                      // 2. Bu saati bugünün tarihiyle oluştur.
                      // 3. Eğer oluşan tarih < cityNow ise (yani saat 01:00, imsak 05:00 ise tarih > cityNow olur, sorun yok. Ama saat 06:00 ise tarih < cityNow olur)
                      // Durum: Yatsı sonrası (23:00). İmsak 05:00. Hedef: Yarın 05:00.
@@ -780,9 +780,9 @@
                         imsakCountdownEl.style.backgroundColor = '';
                      }
                 }
-            } else if (namazVakitleri['imsak']) {
+            } else if (ezanVakitleri['imsak']) {
                 // Fallback (Yarın verisi yoksa eski mantık)
-                const saat = namazVakitleri['imsak'];
+                const saat = ezanVakitleri['imsak'];
                 const [hours, minutes] = saat.split(":").map(Number);
                 
                 const vakitDate = new Date(cityNow);
@@ -796,7 +796,7 @@
         }
 
         // Gün değişimi kontrolü (Gece yarısı tetikleyicisi)
-        const currentDataDate = namazVakitleri.tarih; // API'den gelen tarih (YYYY-MM-DD)
+        const currentDataDate = ezanVakitleri.tarih; // API'den gelen tarih (YYYY-MM-DD)
         
         // cityNow objesi hedef şehrin saatini "yerel saat" gibi tutuyor.
         // Bu yüzden toISOString() yerine doğrudan get metodlarını kullanmalıyız.
@@ -816,7 +816,7 @@
         
         if (currentDataDate && currentDataDate !== todayStr) {
             console.log("Gün değişti, veriler yenileniyor...");
-            namazVakitleriniYukle(); // Bu asenkron çalışır, bir sonraki intervalda güncel veriler gelir.
+            ezanVakitleriniYukle(); // Bu asenkron çalışır, bir sonraki intervalda güncel veriler gelir.
         }
 
         // Navbar Güncelleme
@@ -862,7 +862,7 @@
         const dailyCard = document.getElementById('daily-content');
         if (dailyCard && data && data.text) {
             let contentHtml = '';
-            if (namazVakitleri.is_ramadan) {
+            if (ezanVakitleri.is_ramadan) {
                 contentHtml = `
                     <div class="daily-icon">
                         <svg class="icon"><use xlink:href="#fa-moon"></use></svg>
@@ -903,17 +903,17 @@
     }
 
     document.addEventListener('DOMContentLoaded', async function() {
-        await namazVakitleriniYukle();
+        await ezanVakitleriniYukle();
         await dailyContentYukle();
         updateCountdowns();
         setInterval(updateCountdowns, 1000);
         // Sayfa açıkken 30 dakikada bir kontrol et (eskiden 1 dakikaydı)
         setInterval(() => {
             const cached = getCachedVakitler();
-            if (!cached) namazVakitleriniYukle();
+            if (!cached) ezanVakitleriniYukle();
         }, 1800000);
         try {
-            const tz = (namazVakitleri && namazVakitleri.timezone) || 'Europe/Istanbul';
+            const tz = (ezanVakitleri && ezanVakitleri.timezone) || 'Europe/Istanbul';
             function getCityDateStr(tz) {
                 const now = new Date();
                 const s = now.toLocaleString("en-US", { timeZone: tz });
@@ -933,7 +933,7 @@
                     sessionStorage.setItem(DATE_TRACK_KEY, cur);
                     try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
                     try { localStorage.removeItem(DAILY_CONTENT_CACHE_KEY); } catch(e) {}
-                    namazVakitleriniYukle();
+                    ezanVakitleriniYukle(); 
                     dailyContentYukle();
                 }
             }, 60000);
