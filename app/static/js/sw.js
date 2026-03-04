@@ -1,8 +1,8 @@
 // Service Worker - Ezan Vakitleri
-const CACHE_NAME = `ezan-vakitleri-V${current_app.config.get('APP_VERSION', '1.0')}`;
+const CACHE_NAME = `ezan-vakitleri-VX.xx`;
 
 // API istekleri için Cache-First, sonra Network (Offline için)
-const API_CACHE_NAME = `api-cache-V${current_app.config.get('APP_VERSION', '1.0')}`;
+const API_CACHE_NAME = `api-cache-VX.xx`;
 
 // Önbelleğe alınacak statik dosyalar ve sayfalar
 const PRECACHE_ASSETS = [
