@@ -69,7 +69,7 @@
     {% assets "css_main" %}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
     {% endassets %}
-        
+
     <!-- API Preconnect -->
     <link rel="preconnect" href="https://api.cagrivakti.com.tr">
 
@@ -268,9 +268,9 @@
     {% block extra_js %}{% endblock %}
     
     <!-- Scripts -->
-    <script src="{{ url_for('static', filename='js/jquery-cagrivakti.js') }}"></script>
-
-    <script src="{{ url_for('static', filename='js/inappredirect-cagrivakti.js') }}" defer></script>
+    {% assets "js_main" %}
+    <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 
     <!-- Global Scripts -->
     <script>

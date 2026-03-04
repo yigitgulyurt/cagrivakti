@@ -83,6 +83,15 @@ def create_app(config_class=Config):
 
     css_bundle = Bundle('css/main.css', filters='cssmin', output='css/main.min.css')
     assets.register('css_main', css_bundle)
+
+    js_bundle = Bundle(
+        'js/jquery-cagrivakti.js',
+        'js/inappredirect-cagrivakti.js',
+        filters='jsmin',
+        output='js/main.min.js'
+    )
+    assets.register('js_main', js_bundle)
+
     # Jinja2'ye webassets ekleme
     app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
     app.jinja_env.assets_environment = assets                          
