@@ -5,7 +5,7 @@ import requests
 from datetime import datetime, timedelta
 import pytz
 from app.extensions import db, cache
-from app.models import NamazVakti, DailyContent, Guide
+from app.models import EzanVakti, DailyContent, Guide
 from flask import request, session
 from .ramadan_service import RamadanService
 
@@ -330,7 +330,7 @@ class PrayerService:
         
         # 2. DB Kontrolü
         try:
-            vakit = db_session.query(NamazVakti).filter_by(
+            vakit = db_session.query(EzanVakti).filter_by(
                 sehir=sehir, country_code=country_code, tarih=tarih_dt.date()
             ).first()
             if vakit:
@@ -441,12 +441,12 @@ class PrayerService:
             db_session = db.session
             
         try:
-            vakitler = db_session.query(NamazVakti).filter(
-                NamazVakti.sehir == sehir,
-                NamazVakti.country_code == country_code,
-                NamazVakti.tarih >= start_date,
-                NamazVakti.tarih <= end_date
-            ).order_by(NamazVakti.tarih).all()
+            vakitler = db_session.query(EzanVakti).filter(
+                EzanVakti.sehir == sehir,
+                EzanVakti.country_code == country_code,
+                EzanVakti.tarih >= start_date,
+                EzanVakti.tarih <= end_date
+            ).order_by(EzanVakti.tarih).all()
             
             return [{
                 "tarih": v.tarih.strftime("%Y-%m-%d"),

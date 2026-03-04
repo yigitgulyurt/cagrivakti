@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.factory import create_app
 from app.extensions import db
-from app.models import NamazVakti
+from app.models import EzanVakti
 
 app = create_app()
 import re
@@ -62,10 +62,10 @@ def import_excel_files():
         try:
             # Sütunların varlığını kontrol etmeden tek tek deniyoruz
             alter_commands = [
-                "ALTER TABLE namaz_vakti ADD COLUMN country_code VARCHAR(5) DEFAULT 'TR'",
-                "ALTER TABLE namaz_vakti ADD COLUMN timezone VARCHAR(50) DEFAULT 'Europe/Istanbul'",
-                "ALTER TABLE namaz_vakti ADD COLUMN kaynak VARCHAR(20) DEFAULT 'diyanet'",
-                "ALTER TABLE namaz_vakti ADD COLUMN guncelleme_tarihi DATETIME"
+                "ALTER TABLE ezan_vakti ADD COLUMN country_code VARCHAR(5) DEFAULT 'TR'",
+                "ALTER TABLE ezan_vakti ADD COLUMN timezone VARCHAR(50) DEFAULT 'Europe/Istanbul'",
+                "ALTER TABLE ezan_vakti ADD COLUMN kaynak VARCHAR(20) DEFAULT 'diyanet'",
+                "ALTER TABLE ezan_vakti ADD COLUMN guncelleme_tarihi DATETIME"  
             ]
             for cmd in alter_commands:
                 try:
@@ -124,7 +124,7 @@ def import_excel_files():
                         continue
 
                     # Mevcut kaydı kontrol et
-                    existing = NamazVakti.query.filter_by(
+                    existing = EzanVakti.query.filter_by(
                         sehir=sehir, 
                         tarih=tarih, 
                         country_code='TR'
@@ -146,7 +146,7 @@ def import_excel_files():
                         for key, value in vakit_data.items():
                             setattr(existing, key, value)
                     else:
-                        new_vakit = NamazVakti(
+                        new_vakit = EzanVakti(
                             sehir=sehir,
                             tarih=tarih,
                             **vakit_data

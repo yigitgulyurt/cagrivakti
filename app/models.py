@@ -1,7 +1,9 @@
 from app.extensions import db
 from datetime import datetime
 
-class NamazVakti(db.Model):
+
+class EzanVakti(db.Model):
+    __tablename__ = 'ezan_vakti'    
     id = db.Column(db.Integer, primary_key=True)
     sehir = db.Column(db.String(50), nullable=False)
     country_code = db.Column(db.String(5), default='TR')
