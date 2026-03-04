@@ -66,8 +66,10 @@
     <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}">
 
     <!-- CSS Dosyaları -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    
+    {% assets "css_main" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
+        
     <!-- API Preconnect -->
     <link rel="preconnect" href="https://api.cagrivakti.com.tr">
 

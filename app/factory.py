@@ -11,7 +11,7 @@ import pytz
 from datetime import datetime
 from dotenv import load_dotenv
 
-from app.extensions import db, migrate, cache, csrf, limiter
+from app.extensions import db, migrate, cache, csrf, limiter, assets
 from app.config import Config
 from app.error_handlers import register_error_handlers
 from app.middleware import setup_middleware
@@ -78,6 +78,11 @@ def create_app(config_class=Config):
         }
     })
     
+    assets.init_app(app)
+
+    css_bundle = Bundle('css/main.css', filters='cssmin', output='css/main.min.css')
+    assets.register('css_main', css_bundle)
+
     # Compress(app)
     db.init_app(app)
     migrate.init_app(app, db)
