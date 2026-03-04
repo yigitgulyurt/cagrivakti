@@ -35,7 +35,7 @@ def index():
     
     # Dinamik SEO
     current_year = datetime.now().year
-    title = f"Namaz Vakitleri {current_year} - Ezan Saatleri, İftar ve Sahur Vakitleri"
+    title = f"Çağrı Vakti - Ezan Vakitleri {current_year}"
     description = f"{sehir} için bugün imsak: {vakitler['imsak']}, akşam: {vakitler['aksam']}. En doğru ve güncel {sehir} namaz vakitleri, ezan saatleri ve imsakiye."
     
     return render_template('main/index.html', 
@@ -68,7 +68,7 @@ def sehir_sayfasi(sehir):
     vakitler = PrayerService.get_vakitler(sehir, country_code)
     
     # Dinamik SEO
-    title = f"{sehir} Namaz Vakitleri - Ezan Saatleri"
+    title = f"Çağrı Vakti - {sehir} Namaz Vakitleri"
     description = f"{sehir} ezan vakitleri: İmsak {vakitler['imsak']}, Öğle {vakitler['ogle']}, Akşam {vakitler['aksam']}. {sehir} günlük namaz vakitleri ve aylık imsakiye."
     
     response = make_response(render_template('city/city_page.html', 
@@ -113,7 +113,7 @@ def sehir_secimi():
 @cache.cached(timeout=86400)
 def kible_pusulasi():
     """Kıble pusulası sayfasını gösterir."""
-    title = "Kıble Pusulası - Online Kıble Yönü Bulma"
+    title = "Çağrı Vakti - Kıble Pusulası"
     description = "Pusula ve harita yardımıyla online kıble yönünü bulun. Telefonunuzun sensörlerini kullanarak en doğru kıble açısını hesaplayın."
     return render_template('utils/qibla_compass.html',
                          seo_title=title,
@@ -364,7 +364,7 @@ def sitene_ekle():
     all_cities = UserService.get_sehirler('ALL')
     all_cities.sort()
     
-    title = "Namaz Vakitleri Widget - Sitenize Ekleyin"
+    title = "Çağrı Vakti - Sitenize Ekleyin"
     description = "Web siteniz için ücretsiz namaz vakitleri widget'ı. Renkleri özelleştirin, şehrinizi seçin ve kodu sitenize ekleyin."
     
     return render_template('embed/builder.html', 
