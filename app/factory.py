@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_cors import CORS
-from flask_compress import Compress
+# from flask_compress import Compress
 from flask_minify import Minify
 import logging
 from logging.handlers import RotatingFileHandler, TimedRotatingFileHandler
@@ -78,7 +78,7 @@ def create_app(config_class=Config):
         }
     })
     
-    Compress(app)
+    # Compress(app)
     db.init_app(app)
     migrate.init_app(app, db)
     cache.init_app(app)
