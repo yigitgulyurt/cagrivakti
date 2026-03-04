@@ -87,7 +87,7 @@ def create_app(config_class=Config):
     js_bundle = Bundle(
         'js/jquery-cagrivakti.js',
         'js/inappredirect-cagrivakti.js',
-        filters='jsmin',
+        filters='rjsmin',
         output='js/main.min.js'
     )
     assets.register('js_main', js_bundle)
