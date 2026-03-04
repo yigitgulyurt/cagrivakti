@@ -10,6 +10,7 @@ import shutil
 import pytz
 from datetime import datetime
 from dotenv import load_dotenv
+from flask_assets import Bundle
 
 from app.extensions import db, migrate, cache, csrf, limiter, assets
 from app.config import Config
