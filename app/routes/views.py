@@ -199,7 +199,7 @@ def serve_robots():
 @views_bp.route('/favicon.ico')
 def favicon():
     return send_from_directory(
-        os.path.join(app.root_path, 'static', 'icons'),
+        os.path.join(current_app.root_path, 'static', 'icons'),
         'favicon.ico',
         mimetype='image/vnd.microsoft.icon'
     )
@@ -233,7 +233,7 @@ def serve_sw():
         response.headers['Cache-Control'] = 'no-cache'
         return response
 
-@views_bp.route('/manifest.json')
+@views_bp.route('/manifest.json')   
 def serve_manifest():
     # manifest_base.json dosyasını kullan (önceden manifest.json idi, isim değişikliği yapıldı)
     manifest_path = os.path.join(current_app.root_path, 'static', 'manifest_base.json')
