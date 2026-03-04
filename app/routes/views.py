@@ -196,6 +196,14 @@ def serve_robots():
     response.headers["Content-Type"] = "text/plain"
     return response
 
+@views_bp.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static', 'icons'),
+        'favicon.ico',
+        mimetype='image/vnd.microsoft.icon'
+    )
+
 @views_bp.route('/sw.js')
 def serve_sw():
     version = current_app.config.get('APP_VERSION', '1.0')
