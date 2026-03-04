@@ -36,7 +36,7 @@ def index():
     # Dinamik SEO
     current_year = datetime.now().year
     title = f"Çağrı Vakti - Ezan Vakitleri {current_year}"
-    description = f"{sehir} için bugün imsak: {vakitler['imsak']}, akşam: {vakitler['aksam']}. En doğru ve güncel {sehir} namaz vakitleri, ezan saatleri ve imsakiye."
+    description = f"{sehir} için bugün imsak: {vakitler['imsak']}, akşam: {vakitler['aksam']}. En doğru ve güncel {sehir} ezan vakitleri ve imsakiye."
     
     return render_template('main/index.html', 
                          sehir=sehir, 
@@ -68,10 +68,10 @@ def sehir_sayfasi(sehir):
     vakitler = PrayerService.get_vakitler(sehir, country_code)
     
     # Dinamik SEO
-    title = f"Çağrı Vakti - {sehir} Namaz Vakitleri"
-    description = f"{sehir} ezan vakitleri: İmsak {vakitler['imsak']}, Öğle {vakitler['ogle']}, Akşam {vakitler['aksam']}. {sehir} günlük namaz vakitleri ve aylık imsakiye."
+    title = f"Çağrı Vakti - {sehir} Ezan Vakitleri"
+    description = f"{sehir} ezan vakitleri: İmsak {vakitler['imsak']}, Öğle {vakitler['ogle']}, Akşam {vakitler['aksam']}. {sehir} günlük ezan vakitleri ve aylık imsakiye."
     
-    response = make_response(render_template('city/city_page.html', 
+    response = make_response(render_template('city/city_page.html',     
                          sehir=sehir, 
                          country_code=country_code,
                          vakitler=vakitler,
@@ -365,7 +365,7 @@ def sitene_ekle():
     all_cities.sort()
     
     title = "Çağrı Vakti - Sitenize Ekleyin"
-    description = "Web siteniz için ücretsiz namaz vakitleri widget'ı. Renkleri özelleştirin, şehrinizi seçin ve kodu sitenize ekleyin."
+    description = "Web siteniz için ücretsiz ezan vakitleri widget'ı. Renkleri özelleştirin, şehrinizi seçin ve kodu sitenize ekleyin."
     
     return render_template('embed/builder.html', 
                          cities=all_cities,

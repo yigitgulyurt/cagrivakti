@@ -3,7 +3,7 @@
   "short_name": "Çağrı",
   "id": "/",
   "version": "2.8",
-  "description": "Dünya genelinde namaz vakitleri, dini bilgi köşesi ve güncel içerikler. Çağrı Vakti ile modern, hızlı ve doğru bilgilere ulaşın.",
+  "description": "Dünya genelinde ezan vakitleri, dini bilgi köşesi ve güncel içerikler. Çağrı Vakti ile modern, hızlı ve doğru bilgilere ulaşın.",
   "start_url": "/konum-bul",
   "display": "standalone",
   "background_color": "#121212",

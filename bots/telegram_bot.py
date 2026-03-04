@@ -225,7 +225,7 @@ class NamazBot:
         
         welcome_msg = (
             "✨ <b>Namaz Vakitleri Botuna Hoş Geldiniz!</b>\n\n"
-            "Bu bot ile dünya genelindeki namaz vakitlerini anlık takip edebilir ve "
+            "Bu bot ile dünya genelindeki ezan vakitlerini anlık takip edebilir ve "
             "vakitlerden önce hatırlatıcılar kurabilirsiniz.\n\n"
             "🚀 <b>Hızlı Başlangıç:</b>\n"
             "Aşağıdaki menüden vakitleri görebilir veya ⚙️ <b>Ayarlar</b> kısmından şehrinizi belirleyebilirsiniz.\n\n"
@@ -557,8 +557,8 @@ class NamazBot:
 
     async def handle_aciklama(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         aciklama = (
-            "📖 <b>Namaz Vakti Botu Nedir?</b>\n\n"
-            "Bu bot, dünya genelindeki namaz vakitlerini anlık olarak takip etmenizi ve "
+            "📖 <b>Ezan Vakti Botu Nedir?</b>\n\n"
+            "Bu bot, dünya genelindeki ezan vakitlerini anlık olarak takip etmenizi ve "
             "vakitlerden önce bildirim almanızı sağlar.\n\n"
             "✨ <b>Özellikler:</b>\n"
             "• 81 il ve dünya şehirleri desteği\n"
@@ -599,8 +599,8 @@ class NamazBot:
         import urllib.parse
         
         share_text_plain = (
-            "🕌 Namaz Vakitleri Botu\n\n"
-            "Namaz vakitlerini takip etmek ve bildirim almak için bu botu kullanabilirsin!\n\n"
+            "🕌 Ezan Vakti Botu\n\n"
+            "Ezan vakitlerini takip etmek ve bildirim almak için bu botu kullanabilirsin!\n\n"
             "👉 t.me/namaz_vaktibot"
         )
         

@@ -167,7 +167,7 @@ async def sehir_sec(interaction: nextcord.Interaction, sehir: str):
     bot.db.add_or_update_user(interaction.user.id, sehir)
     await interaction.send(f"✅ Şehriniz başarıyla kaydedildi: {sehir}", ephemeral=True)
 
-@bot.slash_command(description="Kayıtlı şehrin için bugünkü namaz vakitlerini gösterir.")
+@bot.slash_command(description="Kayıtlı şehrin için bugünkü ezan vakitlerini gösterir.")
 async def vakitler(interaction: nextcord.Interaction):
     user = bot.db.get_user(interaction.user.id)
     if not user or not user["sehir"]:
@@ -183,7 +183,7 @@ async def vakitler(interaction: nextcord.Interaction):
     msg += f"🌅 İmsak: {v['imsak']}\n🌞 Güneş: {v['gunes']}\n🌆 Öğle: {v['ogle']}\n🌅 İkindi: {v['ikindi']}\n🌆 Akşam: {v['aksam']}\n🌙 Yatsı: {v['yatsi']}"
     await interaction.send(msg, ephemeral=True)
 
-@bot.slash_command(description="Namaz vakti bildirimi açar.")
+@bot.slash_command(description="Ezan vakti bildirimi açar.")
 async def bildirim(interaction: nextcord.Interaction):
     user = bot.db.get_user(interaction.user.id)
     if not user or not user["sehir"]:
