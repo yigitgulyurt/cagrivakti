@@ -78,10 +78,10 @@ def create_app(config_class=Config):
         }
     })
     
-    assets.init_app(app)
+    # assets.init_app(app)
 
-    css_bundle = Bundle('css/main.css', filters='cssmin', output='css/main.min.css')
-    assets.register('css_main', css_bundle)
+    # css_bundle = Bundle('css/main.css', filters='cssmin', output='css/main.min.css')
+    # assets.register('css_main', css_bundle)
 
     # Compress(app)
     db.init_app(app)
