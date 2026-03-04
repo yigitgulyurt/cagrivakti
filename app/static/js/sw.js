@@ -1,8 +1,8 @@
 // Service Worker - Ezan Vakitleri
-const CACHE_NAME = `ezan-vakitleri-VX.xx`;
+const CACHE_NAME = `ezan-vakitleri-V${current_app.config.get('APP_VERSION', '1.0')}`;
 
 // API istekleri için Cache-First, sonra Network (Offline için)
-const API_CACHE_NAME = `api-cache-VX.xx`;
+const API_CACHE_NAME = `api-cache-V${current_app.config.get('APP_VERSION', '1.0')}`;
 
 // Önbelleğe alınacak statik dosyalar ve sayfalar
 const PRECACHE_ASSETS = [
@@ -75,6 +75,7 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 })
                 .catch(async () => {
+                    // Cache'den önce tam URL ile bak (Query params dahil)
                     const cachedResponse = await caches.match(event.request);
                     if (cachedResponse) return cachedResponse;
                     
