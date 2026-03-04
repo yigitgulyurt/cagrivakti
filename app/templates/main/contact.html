@@ -45,16 +45,22 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="subject">Konu</label>
-                    <select id="subject" name="subject" required>
-                        <option value="" disabled selected>Bir konu seçin</option>
-                        <option value="tavsiye">Tavsiye</option>
-                        <option value="sikayet">Şikayet</option>
-                        <option value="gorus">Görüş/Öneri</option>
-                        <option value="rwidget">Rainmeter</option>
-                        <option value="diger">Diğer</option>
-                        <!-- <option value="vip">VIP Anahtar Talebi</option> -->
-                    </select>
+                    <label>Konu</label>
+                    <div class="custom-select" id="customSelect">
+                        <div class="custom-select__trigger">
+                            <span id="selectDisplay">Bir konu seçin</span>
+                            <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="custom-select__options">
+                            <div class="custom-option" data-value="tavsiye">Tavsiye</div>
+                            <div class="custom-option" data-value="sikayet">Şikayet</div>
+                            <div class="custom-option" data-value="gorus">Görüş/Öneri</div>
+                            <div class="custom-option" data-value="rwidget">Rainmeter</div>
+                            <div class="custom-option" data-value="diger">Diğer</div>
+                        </div>
+                    </div>
+                    <!-- Form submit için gizli input -->
+                    <input type="hidden" name="subject" id="subjectValue" required>
                 </div>
 
                 <div class="form-group">
@@ -82,6 +88,84 @@
 
 {% block extra_css %}
 <style>
+
+.custom-select {
+    position: relative;
+    user-select: none;
+}
+
+.custom-select__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 16px;
+    border-radius: 12px;
+    color: var(--gray);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.custom-select__trigger:hover,
+.custom-select.open .custom-select__trigger {
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.custom-select__trigger svg {
+    transition: transform 0.2s ease;
+    color: var(--gray);
+    flex-shrink: 0;
+}
+
+.custom-select.open .custom-select__trigger svg {
+    transform: rotate(180deg);
+}
+
+.custom-select__trigger.selected {
+    color: var(--text);
+}
+
+.custom-select__options {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0; right: 0;
+    background: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.custom-select.open .custom-select__options {
+    display: block;
+}
+
+.custom-option {
+    padding: 12px 16px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 1rem;
+    transition: background 0.15s;
+}
+
+.custom-option:hover {
+    background: rgba(var(--primary-rgb), 0.1);
+    color: var(--primary);
+}
+
+.custom-option.selected {
+    background: rgba(var(--primary-rgb), 0.15);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+
+
 .contact-footer {
     margin-top: 40px;
     text-align: center;
@@ -254,4 +338,32 @@
     }
 }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const sel = document.getElementById('customSelect');
+const display = document.getElementById('selectDisplay');
+const hidden = document.getElementById('subjectValue');
+
+sel.querySelector('.custom-select__trigger').addEventListener('click', () => {
+    sel.classList.toggle('open');
+});
+
+sel.querySelectorAll('.custom-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+        display.textContent = opt.textContent;
+        hidden.value = opt.dataset.value;
+        sel.querySelector('.custom-select__trigger').classList.add('selected');
+        sel.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        sel.classList.remove('open');
+    });
+});
+
+// Dışarı tıklayınca kapat
+document.addEventListener('click', e => {
+    if (!sel.contains(e.target)) sel.classList.remove('open');
+});
+</script>
 {% endblock %}
