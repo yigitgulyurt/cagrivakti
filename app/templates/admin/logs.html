@@ -189,6 +189,11 @@
     </div>
 
     <div class="log-section">
+        <h2><svg class="icon"><use xlink:href="#fa-shield-alt"></use></svg> Güvenlik Olayları</h2>
+        <div id="security_logs" class="log-viewer">{{ security_logs if security_logs else 'Güvenlik log verisi bulunamadı.' }}</div>
+    </div>
+
+    <div class="log-section">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
             <h2 style="margin-bottom: 0;"><svg class="icon"><use xlink:href="#fa-chart-bar"></use></svg> Ziyaretçi İstatistikleri (Günlük Tüm Kayıtlar)</h2>
             

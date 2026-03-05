@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, current_app, abort
+import logging
 from app.services import UserService, PrayerService, get_daily_content
 from app.extensions import cache, limiter
 from datetime import datetime, date, timedelta
@@ -44,7 +45,8 @@ def restrict_to_main_domain(f):
             return f(*args, **kwargs)
             
         # Eğer hiçbir şart sağlanmazsa erişimi engelle
-        current_app.logger.warning(f"Yetkisiz API isteği engellendi! IP: {request.remote_addr}, Referer: {referer}, Origin: {origin}")
+        sec = logging.getLogger('security_logger')
+        sec.warning(f"Unauthorized API access blocked | ip={request.remote_addr} path={request.full_path} referer={referer} origin={origin}")
         return jsonify({"error": "Unauthorized access. This API is restricted to cagrivakti.com.tr"}), 403
         
     return decorated_function

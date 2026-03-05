@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, g, current_app
 from flask_cors import CORS
 # from flask_compress import Compress
 from flask_minify import Minify
@@ -11,6 +11,9 @@ import pytz
 from datetime import datetime
 from dotenv import load_dotenv
 from flask_assets import Bundle
+import json
+import time
+import uuid
 
 from app.extensions import db, migrate, cache, csrf, limiter, assets
 from app.config import Config
@@ -121,6 +124,8 @@ def create_app(config_class=Config):
 
     # API Kullanım Loglaması
     setup_api_logging(app)
+    # Güvenlik Loglaması
+    setup_security_logging(app)
     
     # Statik Dosyalar İçin Cache-Control (1 Yıl)
     @app.after_request
@@ -222,7 +227,8 @@ def setup_logging(app):
     app.logger.handlers = []
     
     # Log seviyesini ayarla
-    app.logger.setLevel(logging.INFO)
+    level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
+    app.logger.setLevel(getattr(logging, level_name, logging.INFO))
     
     # Formatter oluştur
     default_formatter = IstanbulFormatter(
@@ -249,6 +255,17 @@ def setup_logging(app):
     file_handler.rotator = compress_rotator
     # Sıkıştırılmış dosya isimlendirmesi (log.2023-01-01.gz gibi olması için namer gerekebilir ama varsayılan + .gz yeterli)
     
+    # Request context filter (request_id)
+    class RequestContextFilter(logging.Filter):
+        def filter(self, record):
+            try:
+                record.request_id = getattr(g, 'request_id', '-')
+            except Exception:
+                record.request_id = '-'
+            return True
+
+    ctx_filter = RequestContextFilter()
+    file_handler.addFilter(ctx_filter)
     app.logger.addHandler(file_handler)
     
     # Hata log dosyası (Sadece ERROR)
@@ -257,6 +274,7 @@ def setup_logging(app):
         error_log_file, maxBytes=10*1024*1024, backupCount=10, encoding='utf-8'
     )
     error_handler.setFormatter(default_formatter)
+    error_handler.addFilter(ctx_filter)
     error_handler.setLevel(logging.ERROR)
     app.logger.addHandler(error_handler)
     
@@ -274,33 +292,115 @@ def setup_api_logging(app):
     
     # API logger oluştur
     api_logger = logging.getLogger('api_logger')
-    api_logger.setLevel(logging.INFO)
+    level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
+    api_logger.setLevel(getattr(logging, level_name, logging.INFO))
     api_logger.propagate = False  # Ana loga düşmesini engelle
     
     formatter = IstanbulFormatter(
-        '[%(asctime)s] %(remote_addr)s - %(method)s %(path)s',
+        '[%(asctime)s] %(remote_addr)s - %(method)s %(path)s %(status)s %(duration_ms)sms rid=%(request_id)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     
     # API Logları da günlük rotasyonlu olsun
     handler = TimedRotatingFileHandler(
-        api_log_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
+        api_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
     )
     handler.rotator = compress_rotator
     handler.setFormatter(formatter)
+    # Aynı context filter'ı ekle
+    class RequestContextFilter(logging.Filter):
+        def filter(self, record):
+            try:
+                record.request_id = getattr(g, 'request_id', '-')
+            except Exception:
+                record.request_id = '-'
+            # Optional fields defaults
+            if not hasattr(record, 'status'):
+                record.status = '-'
+            if not hasattr(record, 'duration_ms'):
+                record.duration_ms = 0
+            return True
+    handler.addFilter(RequestContextFilter())
     api_logger.addHandler(handler)
     
+    # JSON satırları için ayrı handler (opsiyonel)
+    if app.config.get('API_LOG_JSON', True):
+        json_file = api_log_file.replace('.log', '.jsonl')
+        json_handler = TimedRotatingFileHandler(
+            json_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
+        )
+        json_handler.rotator = compress_rotator
+        json_handler.setLevel(getattr(logging, level_name, logging.INFO))
+        api_logger.addHandler(json_handler)
+        json_handler.addFilter(RequestContextFilter())
+        # format not used; we will emit pre-formatted JSON strings
+        json_handler.setFormatter(logging.Formatter('%(message)s'))
+
     @app.before_request
-    def log_api_request():
-        if request.blueprint == 'api' or (request.host and request.host.startswith('api.')):
-            # IP adresini al
-            if request.headers.get('X-Forwarded-For'):
-                ip = request.headers.get('X-Forwarded-For').split(',')[0]
-            else:
-                ip = request.remote_addr
-                
-            api_logger.info('', extra={
-                'remote_addr': ip,
-                'method': request.method,
-                'path': request.full_path
-            })
+    def _api_log_start():
+        g._log_start = time.time()
+        g.request_id = uuid.uuid4().hex[:12]
+
+    @app.after_request
+    def _api_log_end(response):
+        try:
+            if request.blueprint == 'api' or (request.host and request.host.startswith('api.')):
+                if request.headers.get('X-Forwarded-For'):
+                    ip = request.headers.get('X-Forwarded-For').split(',')[0]
+                else:
+                    ip = request.remote_addr
+                duration_ms = int((time.time() - getattr(g, '_log_start', time.time())) * 1000)
+                ua = request.headers.get('User-Agent', '')[:200]
+                referer = request.headers.get('Referer', '')[:200]
+                path = request.full_path
+                status = response.status_code
+                extra = {
+                    'remote_addr': ip,
+                    'method': request.method,
+                    'path': path,
+                    'status': status,
+                    'duration_ms': duration_ms
+                }
+                api_logger.info('', extra=extra)
+                if app.config.get('API_LOG_JSON', True):
+                    payload = {
+                        'ts': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                        'rid': getattr(g, 'request_id', '-'),
+                        'ip': ip,
+                        'method': request.method,
+                        'path': path,
+                        'status': status,
+                        'duration_ms': duration_ms,
+                        'ua': ua,
+                        'referer': referer
+                    }
+                    # Emit JSON to the json handler by logging the message as JSON string
+                    api_logger.handle(logging.LogRecord(
+                        name='api_logger',
+                        level=getattr(logging, level_name, logging.INFO),
+                        pathname=__file__,
+                        lineno=0,
+                        msg=json.dumps(payload, ensure_ascii=False),
+                        args=(),
+                        exc_info=None
+                    ))
+        except Exception:
+            pass
+        return response
+
+def setup_security_logging(app):
+    """
+    Güvenlik olayları/logları için ayrı logger (örn. engellenen istekler).
+    """
+    sec_log_file = app.config.get('SECURITY_LOG_FILE')
+    os.makedirs(os.path.dirname(sec_log_file), exist_ok=True)
+    logger = logging.getLogger('security_logger')
+    level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
+    logger.setLevel(getattr(logging, level_name, logging.INFO))
+    logger.propagate = False
+    handler = TimedRotatingFileHandler(
+        sec_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
+    )
+    handler.rotator = compress_rotator
+    handler.setFormatter(IstanbulFormatter('[%(asctime)s] %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+    logger.addHandler(handler)

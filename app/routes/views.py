@@ -698,10 +698,12 @@ def admin_logs():
     log_file = current_app.config.get('LOG_FILE')
     api_log_file = current_app.config.get('API_LOG_FILE')
     bot_log_file = current_app.config.get('TELEGRAM_LOG_FILE')
+    security_log_file = current_app.config.get('SECURITY_LOG_FILE')
     
     web_logs = ""
     api_logs = ""
     bot_logs = ""
+    security_logs = ""
     
     # Log Analizi (Görselleştirme için)
     import re
@@ -752,20 +754,35 @@ def admin_logs():
             current_app.logger.error(f"Log analiz hatası: {e}")
             
     if os.path.exists(api_log_file):
-        with open(api_log_file, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-            api_logs = "".join(lines[-200:])
+        try:
+            with open(api_log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                api_logs = "".join(lines[-200:])
+        except Exception as e:
+            current_app.logger.error(f"API log okuma hatası: {e}")
 
     if bot_log_file and os.path.exists(bot_log_file):
-        with open(bot_log_file, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-            bot_logs = "".join(lines[-200:])
+        try:
+            with open(bot_log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                bot_logs = "".join(lines[-200:])
+        except Exception as e:
+            current_app.logger.error(f"Bot log okuma hatası: {e}")
+            
+    if security_log_file and os.path.exists(security_log_file):
+        try:
+            with open(security_log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                security_logs = "".join(lines[-200:])
+        except Exception as e:
+            current_app.logger.error(f"Güvenlik log okuma hatası: {e}")
             
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return jsonify({
             'web_logs': web_logs if web_logs else 'Log verisi bulunamadı.',
             'api_logs': api_logs if api_logs else 'API log verisi bulunamadı.',
             'bot_logs': bot_logs if bot_logs else 'Bot log verisi bulunamadı.',
+            'security_logs': security_logs if security_logs else 'Güvenlik log verisi bulunamadı.',
             'stats': stats
         })
 
@@ -773,6 +790,7 @@ def admin_logs():
                          web_logs=web_logs, 
                          api_logs=api_logs,
                          bot_logs=bot_logs,
+                         security_logs=security_logs,
                          stats=stats)
                          
 @views_bp.route('/asal-sayi')

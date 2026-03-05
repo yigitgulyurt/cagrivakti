@@ -7,7 +7,6 @@ load_dotenv()
 class Config:
     APP_VERSION = "2.19"
     # Tek versiyon kaynağı: APP_VERSION
-    # Tüm statik dosya cache-busting, widget ve API sürümlemeleri APP_VERSION üzerinden yönetilir.
     SEND_FILE_MAX_AGE_DEFAULT = 31536000 # Flask static dosya cache süresi (1 Yıl)
     SERVER_NAME = os.environ.get('SERVER_NAME')
     # Subdomainler arası session paylaşımı için
@@ -22,6 +21,10 @@ class Config:
     LOG_FILE = os.path.join(LOG_DIR, 'cagrivakti-web.log')
     API_LOG_FILE = os.path.join(LOG_DIR, 'cagrivakti-api.log')
     TELEGRAM_LOG_FILE = os.path.join(LOG_DIR, 'cagrivakti-bot.log')
+    SECURITY_LOG_FILE = os.path.join(LOG_DIR, 'security.log')
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+    API_LOG_JSON = os.environ.get('API_LOG_JSON', 'true').lower() in ('1', 'true', 'yes')
+    LOG_RETENTION_DAYS = int(os.environ.get('LOG_RETENTION_DAYS', '30'))
     
     LOGGED_PAGES = {
         '/sehir',
