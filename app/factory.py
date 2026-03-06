@@ -329,7 +329,11 @@ def setup_api_logging(app):
             json_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
         )
         json_handler.setLevel(getattr(logging, level_name, logging.INFO))
-        api_logger.addHandler(json_handler)
+        # Ayrı bir JSON logger kullan (text handler'a düşmesin)
+        json_logger = logging.getLogger('api_logger.json')
+        json_logger.setLevel(getattr(logging, level_name, logging.INFO))
+        json_logger.propagate = False
+        json_logger.addHandler(json_handler)
         json_handler.addFilter(RequestContextFilter())
         # format not used; we will emit pre-formatted JSON strings
         json_handler.setFormatter(logging.Formatter('%(message)s'))
@@ -374,16 +378,8 @@ def setup_api_logging(app):
                         'ua': ua,
                         'referer': referer
                     }
-                    # Emit JSON to the json handler by logging the message as JSON string
-                    api_logger.handle(logging.LogRecord(
-                        name='api_logger',
-                        level=getattr(logging, level_name, logging.INFO),
-                        pathname=__file__,
-                        lineno=0,
-                        msg=json.dumps(payload, ensure_ascii=False),
-                        args=(),
-                        exc_info=None
-                    ))
+                    # Emit JSON to the dedicated json logger
+                    logging.getLogger('api_logger.json').info(json.dumps(payload, ensure_ascii=False))
         except Exception:
             pass
         return response
