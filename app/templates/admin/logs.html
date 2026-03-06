@@ -421,10 +421,22 @@ document.getElementById('refreshLogs').addEventListener('click', async function(
         }
 
         // Yardımcı: içerik renklendirici ve satır kırıcı
+        function normalizeRaw(raw) {
+            if (!raw) return '';
+            let txt = raw;
+            // Sıkışmış kayıtları ayır: "] [" ve ardışık tarihler "[YYYY-.."
+            txt = txt.replace(/\]\s+\[/g, ']\n[');
+            txt = txt.replace(/(?=\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}(?:,\d{3})?\])/g, '\n');
+            // Birden fazla boş satırı sadeleştir
+            txt = txt.replace(/\n{2,}/g, '\n');
+            return txt.trim();
+        }
+
         function renderLog(raw) {
             if (!raw) return 'Log verisi bulunamadı.';
+            const normalized = normalizeRaw(raw);
             const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            return raw.split('\n').map(line => {
+            return normalized.split('\n').map(line => {
                 let l = esc(line);
                 l = l.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:,\d{3})?)/, '<span class="log-timestamp">$1</span>');
                 l = l.replace(/\b(ERROR|CRITICAL)\b/g, '<span class="log-level-error">$1</span>');
@@ -438,8 +450,8 @@ document.getElementById('refreshLogs').addEventListener('click', async function(
         Object.keys(viewers).forEach(key => {
             const viewer = viewers[key];
             const content = data[key + '_logs'] || '';
-            // ham içeriği dataset'e koy (filtre bu metin üzerinden çalışacak)
-            viewer.dataset.raw = content;
+            // Ham içeriği element üzerinde JS alanı olarak sakla (attribute değil!)
+            viewer._raw = content;
             // HTML olarak renklendir + satır kır
             viewer.innerHTML = renderLog(content);
             viewer.scrollTop = viewer.scrollHeight;
@@ -489,25 +501,14 @@ window.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById(inputId);
         const viewer = document.getElementById(viewerId);
         if (!input || !viewer) return;
-        // İlk yükte mevcut metni ham veri olarak kabul et
-        if (!viewer.dataset.raw) viewer.dataset.raw = viewer.textContent;
-        const renderLog = (raw) => {
-            if (!raw) return 'Log verisi bulunamadı.';
-            const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            return raw.split('\n').map(line => {
-                let l = esc(line);
-                l = l.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:,\d{3})?)/, '<span class="log-timestamp">$1</span>');
-                l = l.replace(/\b(ERROR|CRITICAL)\b/g, '<span class="log-level-error">$1</span>');
-                l = l.replace(/\b(WARNING|WARN)\b/g, '<span class="log-level-warn">$1</span>');
-                l = l.replace(/\b(INFO)\b/g, '<span class="log-level-info">$1</span>');
-                return l;
-            }).join('<br>');
-        };
+        // İlk yükte, JS alanı yoksa mevcut metni normalize ederek ata
+        if (!viewer._raw) viewer._raw = viewer.textContent || '';
         input.addEventListener('input', () => {
             const q = input.value.trim().toLowerCase();
-            const base = viewer.dataset.raw || '';
+            const base = viewer._raw || '';
             if (!q) { viewer.innerHTML = renderLog(base); return; }
-            const filtered = base.split('\n').filter(l => l.toLowerCase().includes(q)).join('\n');
+            const normalized = normalizeRaw(base);
+            const filtered = normalized.split('\n').filter(l => l.toLowerCase().includes(q)).join('\n');
             viewer.innerHTML = renderLog(filtered);
         });
     }
@@ -515,6 +516,12 @@ window.addEventListener('DOMContentLoaded', () => {
     attachFilter('api_filter', 'api_logs');
     attachFilter('bot_filter', 'bot_logs');
     attachFilter('sec_filter', 'security_logs');
+    
+    // Sayfa açılışında bir kez yenile tetikle ki _raw alanları dolsun
+    const autoBtn = document.getElementById('refreshLogs');
+    if (autoBtn) {
+        setTimeout(() => autoBtn.click(), 100);
+    }
 });
 </script>
 {% endblock %}
