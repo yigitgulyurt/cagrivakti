@@ -109,6 +109,19 @@ def create_app(config_class=Config):
     # Logging
     setup_logging(app)
 
+    # Kullanıcı UID'si (cookie) - middleware'den önce kaydet
+    @app.before_request
+    def ensure_uid():
+        try:
+            uid = request.cookies.get('cv_uid')
+            if not uid:
+                uid = uuid.uuid4().hex[:16]
+                # after_request'te set edebilmek için işaret bırak
+                g._set_uid_cookie = uid
+            g.user_uid = uid
+        except Exception:
+            g.user_uid = '-'
+
     # Middleware
     setup_middleware(app)
 
@@ -130,6 +143,12 @@ def create_app(config_class=Config):
     # Statik Dosyalar İçin Cache-Control (1 Yıl)
     @app.after_request
     def add_header(response):
+        # Yeni UID üretildiyse cookie olarak ekle
+        try:
+            if getattr(g, '_set_uid_cookie', None):
+                response.set_cookie('cv_uid', g._set_uid_cookie, max_age=60*60*24*365, samesite='Lax', path='/')
+        except Exception:
+            pass
         # Statik dosyalar için uzun süreli cache (Daima overwrite)
         # request.endpoint == 'static' kontrolü Flask'ın kendi static handler'ını yakalar
         if request.endpoint == 'static' or request.path.startswith('/static/'):
