@@ -175,21 +175,25 @@
 
     <div class="log-section">
         <h2><svg class="icon"><use xlink:href="#fa-globe"></use></svg> Web Uygulama Raporu</h2>
+        <input id="web_filter" type="text" placeholder="Metin/UID filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
         <div id="web_logs" class="log-viewer">{{ web_logs if web_logs else 'Log verisi bulunamadı.' }}</div>
     </div>
 
     <div class="log-section">
         <h2><svg class="icon"><use xlink:href="#fa-code"></use></svg> API Kullanım Raporu</h2>
+        <input id="api_filter" type="text" placeholder="Metin/UID/Status filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
         <div id="api_logs" class="log-viewer">{{ api_logs if api_logs else 'API log verisi bulunamadı.' }}</div>
     </div>
 
     <div class="log-section">
         <h2><svg class="icon"><use xlink:href="#fa-robot"></use></svg> Bot Aktivite Raporu</h2>
+        <input id="bot_filter" type="text" placeholder="Metin filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
         <div id="bot_logs" class="log-viewer">{{ bot_logs if bot_logs else 'Bot log verisi bulunamadı.' }}</div>
     </div>
 
     <div class="log-section">
         <h2><svg class="icon"><use xlink:href="#fa-shield-alt"></use></svg> Güvenlik Olayları</h2>
+        <input id="sec_filter" type="text" placeholder="Metin/UID filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
         <div id="security_logs" class="log-viewer">{{ security_logs if security_logs else 'Güvenlik log verisi bulunamadı.' }}</div>
     </div>
 
@@ -478,6 +482,28 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('no-data-message').textContent = 'Grafik yüklenirken hata oluştu: ' + e.message;
         document.getElementById('no-data-message').style.display = 'block';
     }
+    
+    // Basit metin filtreleri
+    function attachFilter(inputId, viewerId) {
+        const input = document.getElementById(inputId);
+        const viewer = document.getElementById(viewerId);
+        if (!input || !viewer) return;
+        const original = viewer.textContent;
+        input.addEventListener('input', () => {
+            const q = input.value.trim().toLowerCase();
+            if (!q) {
+                viewer.textContent = original;
+                return;
+            }
+            const lines = original.split('\n');
+            const filtered = lines.filter(l => l.toLowerCase().includes(q));
+            viewer.textContent = filtered.join('\n');
+        });
+    }
+    attachFilter('web_filter', 'web_logs');
+    attachFilter('api_filter', 'api_logs');
+    attachFilter('bot_filter', 'bot_logs');
+    attachFilter('sec_filter', 'security_logs');
 });
 </script>
 {% endblock %}

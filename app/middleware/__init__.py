@@ -27,7 +27,12 @@ def setup_middleware(app):
                 ip = request.remote_addr
             
             # Her isteği kaydet (Deduplication kaldırıldı)
-            app.logger.info(f'{ip} ziyaret: {path}')
+            try:
+                from flask import g
+                uid = getattr(g, 'user_uid', '-')
+            except Exception:
+                uid = '-'
+            app.logger.info(f'{ip} ziyaret: {path} uid={uid}')
                     
         except Exception as e:
             app.logger.error(f"Loglama hatası: {str(e)}")

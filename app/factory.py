@@ -251,8 +251,7 @@ def setup_logging(app):
     file_handler.setFormatter(clean_formatter)
     file_handler.setLevel(logging.INFO)
     
-    # Sıkıştırma fonksiyonunu ata
-    file_handler.rotator = compress_rotator
+    # Günlük rotasyonda otomatik sıkıştırma kaldırıldı
     # Sıkıştırılmış dosya isimlendirmesi (log.2023-01-01.gz gibi olması için namer gerekebilir ama varsayılan + .gz yeterli)
     
     # Request context filter (request_id)
@@ -297,7 +296,7 @@ def setup_api_logging(app):
     api_logger.propagate = False  # Ana loga düşmesini engelle
     
     formatter = IstanbulFormatter(
-        '[%(asctime)s] %(remote_addr)s - %(method)s %(path)s %(status)s %(duration_ms)sms rid=%(request_id)s',
+        '[%(asctime)s] %(remote_addr)s - %(method)s %(path)s %(status)s %(duration_ms)sms rid=%(request_id)s uid=%(user_id)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     
@@ -305,7 +304,6 @@ def setup_api_logging(app):
     handler = TimedRotatingFileHandler(
         api_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
     )
-    handler.rotator = compress_rotator
     handler.setFormatter(formatter)
     # Aynı context filter'ı ekle
     class RequestContextFilter(logging.Filter):
@@ -314,6 +312,7 @@ def setup_api_logging(app):
                 record.request_id = getattr(g, 'request_id', '-')
             except Exception:
                 record.request_id = '-'
+                record.user_id = '-'
             # Optional fields defaults
             if not hasattr(record, 'status'):
                 record.status = '-'
@@ -329,7 +328,6 @@ def setup_api_logging(app):
         json_handler = TimedRotatingFileHandler(
             json_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
         )
-        json_handler.rotator = compress_rotator
         json_handler.setLevel(getattr(logging, level_name, logging.INFO))
         api_logger.addHandler(json_handler)
         json_handler.addFilter(RequestContextFilter())
@@ -359,13 +357,15 @@ def setup_api_logging(app):
                     'method': request.method,
                     'path': path,
                     'status': status,
-                    'duration_ms': duration_ms
+                    'duration_ms': duration_ms,
+                    'user_id': getattr(g, 'user_uid', '-')
                 }
                 api_logger.info('', extra=extra)
                 if app.config.get('API_LOG_JSON', True):
                     payload = {
                         'ts': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
                         'rid': getattr(g, 'request_id', '-'),
+                        'uid': getattr(g, 'user_uid', '-'),
                         'ip': ip,
                         'method': request.method,
                         'path': path,
@@ -401,6 +401,5 @@ def setup_security_logging(app):
     handler = TimedRotatingFileHandler(
         sec_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
     )
-    handler.rotator = compress_rotator
     handler.setFormatter(IstanbulFormatter('[%(asctime)s] %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
     logger.addHandler(handler)
