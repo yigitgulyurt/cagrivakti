@@ -420,29 +420,29 @@ document.getElementById('refreshLogs').addEventListener('click', async function(
             initCharts(data.stats);
         }
 
-        // Logları güncelle ve renklendir (basit bir regex ile)
+        // Yardımcı: içerik renklendirici ve satır kırıcı
+        function renderLog(raw) {
+            if (!raw) return 'Log verisi bulunamadı.';
+            const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return raw.split('\n').map(line => {
+                let l = esc(line);
+                l = l.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:,\d{3})?)/, '<span class="log-timestamp">$1</span>');
+                l = l.replace(/\b(ERROR|CRITICAL)\b/g, '<span class="log-level-error">$1</span>');
+                l = l.replace(/\b(WARNING|WARN)\b/g, '<span class="log-level-warn">$1</span>');
+                l = l.replace(/\b(INFO)\b/g, '<span class="log-level-info">$1</span>');
+                return l;
+            }).join('<br>');
+        }
+
+        // Logları güncelle ve renklendir
         Object.keys(viewers).forEach(key => {
-            let content = data[key + '_logs'];
-            
-            // Satır bazlı işlem
-            if (content && content !== 'Log verisi bulunamadı.') {
-                const lines = content.split('\n');
-                const processedLines = lines.map(line => {
-                    // Tarihleri soluklaştır
-                    line = line.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})/, '<span class="log-timestamp">$1</span>');
-                    // Hata seviyelerini renklendir
-                    line = line.replace(/(ERROR|CRITICAL)/g, '<span class="log-level-error">$1</span>');
-                    line = line.replace(/(WARNING|WARN)/g, '<span class="log-level-warn">$1</span>');
-                    line = line.replace(/(INFO)/g, '<span class="log-level-info">$1</span>');
-                    return line;
-                });
-                viewers[key].innerHTML = processedLines.join('\n');
-            } else {
-                viewers[key].textContent = content;
-            }
-            
-            // En alta kaydır
-            viewers[key].scrollTop = viewers[key].scrollHeight;
+            const viewer = viewers[key];
+            const content = data[key + '_logs'] || '';
+            // ham içeriği dataset'e koy (filtre bu metin üzerinden çalışacak)
+            viewer.dataset.raw = content;
+            // HTML olarak renklendir + satır kır
+            viewer.innerHTML = renderLog(content);
+            viewer.scrollTop = viewer.scrollHeight;
         });
 
     } catch (error) {
@@ -489,16 +489,26 @@ window.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById(inputId);
         const viewer = document.getElementById(viewerId);
         if (!input || !viewer) return;
-        const original = viewer.textContent;
+        // İlk yükte mevcut metni ham veri olarak kabul et
+        if (!viewer.dataset.raw) viewer.dataset.raw = viewer.textContent;
+        const renderLog = (raw) => {
+            if (!raw) return 'Log verisi bulunamadı.';
+            const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return raw.split('\n').map(line => {
+                let l = esc(line);
+                l = l.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:,\d{3})?)/, '<span class="log-timestamp">$1</span>');
+                l = l.replace(/\b(ERROR|CRITICAL)\b/g, '<span class="log-level-error">$1</span>');
+                l = l.replace(/\b(WARNING|WARN)\b/g, '<span class="log-level-warn">$1</span>');
+                l = l.replace(/\b(INFO)\b/g, '<span class="log-level-info">$1</span>');
+                return l;
+            }).join('<br>');
+        };
         input.addEventListener('input', () => {
             const q = input.value.trim().toLowerCase();
-            if (!q) {
-                viewer.textContent = original;
-                return;
-            }
-            const lines = original.split('\n');
-            const filtered = lines.filter(l => l.toLowerCase().includes(q));
-            viewer.textContent = filtered.join('\n');
+            const base = viewer.dataset.raw || '';
+            if (!q) { viewer.innerHTML = renderLog(base); return; }
+            const filtered = base.split('\n').filter(l => l.toLowerCase().includes(q)).join('\n');
+            viewer.innerHTML = renderLog(filtered);
         });
     }
     attachFilter('web_filter', 'web_logs');
