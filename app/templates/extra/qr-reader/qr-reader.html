@@ -111,6 +111,10 @@ button {
     box-shadow: var(--card-shadow);
 }
 
+.btn-primary {
+    min-width: 100px !important;
+}
+
 button:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.35);
@@ -141,8 +145,8 @@ button:hover {
     <div id="result">📸 Kamera başlatılıyor...</div>
 
     <div id="result-actions" style="display:none;">
-        <button id="openUrlBtn" class="btn-primary" style="min-width: 100px !important;">🔗 URL'yi Aç</button>
-        <button id="shareUrlBtn" class="btn-primary" style="min-width: 100px !important;">📤 Paylaş</button>
+        <button id="openUrlBtn" class="btn-primary">🔗 URL'yi Aç</button>
+        <button id="shareUrlBtn" class="btn-primary">📤 Paylaş</button>
     </div>
 
     <button id="scanAgainBtn" class="btn-primary" style="display:none;">🔄 Yeni Tarama</button>
