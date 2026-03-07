@@ -80,8 +80,7 @@
     transition: var(--transition);
 }
 
-#history {
-    text-align: left;
+.history {
     font-size: 14px;
     max-height: 150px;
     overflow-y: auto;
@@ -106,8 +105,6 @@ button {
     cursor: pointer;
     font-size: 1rem;
     transition: var(--transition);
-    color: var(--text);
-    background: var(--primary);
     box-shadow: var(--card-shadow);
 }
 
@@ -155,7 +152,7 @@ button:hover {
 </div>
 <div id="history-container">
     <button id="clearHistoryBtn" class="btn-secondary">🗑️ Geçmişi Temizle</button>
-    <div id="history"></div>
+    <div id="history" class="history"></div>
 </div>
 {% endblock %}
 
