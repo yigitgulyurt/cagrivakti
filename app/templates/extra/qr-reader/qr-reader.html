@@ -199,7 +199,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const renderHistory = () => {
         historyDiv.innerHTML = history.length === 0
             ? "<b>📜 Geçmiş yok</b>"
-            : "<b class='history-read' >📜 Okunan QR Geçmişi:</b><br>" + history.map(q => `<div class="history-content">${q}</div>`).join("");
+            : "<b class='history-read'>📜 Okunan QR Geçmişi:</b><div class='history-list'>" 
+              + history.map(q => `<div class="history-content">${q}</div>`).join("") 
+              + "</div>";
     };
 
     const startScanning = () => {
