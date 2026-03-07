@@ -811,6 +811,6 @@ def download_widget():
 def newtab():
     return render_template('extra/newtab/newtab.html')
 
-@views.route('/qr-okuyucu')
+@views_bp.route('/qr-okuyucu')
 def qr_okuyucu():
     return render_template('extra/qr_reader/qr_reader.html')
