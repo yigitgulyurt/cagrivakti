@@ -3,181 +3,693 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QRyi - QR Kod Okuyucu</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>QR Kod Okuyucu | Çağrı Vakti</title>
 
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#1a2a6c" />
+  <!-- SEO -->
+  <meta name="description" content="Çağrı Vakti QR Kod Okuyucu - Kameranızla QR kodlarını anında okuyun. Ücretsiz, hızlı ve güvenli.">
+  <meta name="keywords" content="qr kod okuyucu, qr tarayıcı, qr scanner, çağrı vakti">
+  <meta name="author" content="Çağrı Vakti">
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#121212">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="icon-192.png">
 
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- html5-qrcode -->
   <script src="https://unpkg.com/html5-qrcode" defer></script>
 
   <style>
-    * { box-sizing: border-box; }
+    /* ===== CSS VARIABLES (cagrivakti theme) ===== */
+    :root {
+      --primary: #ffc107;
+      --primary-hover: #ffd54f;
+      --dark: #121212;
+      --card-bg: #1e1e1e;
+      --text: #ffffff;
+      --gray: #94a3b8;
+      --hover-color: #2d2d2d;
+      --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: #333 #1a1a1a; }
     body {
-      margin: 0;
-      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+      font-family: "Inter", sans-serif;
+      background-color: var(--dark);
+      color: var(--text);
+      line-height: 1.6;
       min-height: 100vh;
-      padding: 20px;
+      overflow-x: hidden;
     }
-    h1 {
-      margin: 0 0 20px;
-      font-size: 28px;
-      text-align: center;
-      font-weight: 700;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    a { color: inherit; text-decoration: none; }
+    ::selection { background-color: var(--primary); color: var(--dark); }
+
+    /* ===== ICON ===== */
+    .icon {
+      display: inline-block; width: 1em; height: 1em;
+      stroke-width: 0; stroke: currentColor; fill: currentColor;
+      vertical-align: middle; margin-top: -2px;
     }
-    #reader-container {
-      width: 80vmin;
-      max-width: 400px;
-      aspect-ratio: 1 / 1;
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      padding: 0.5rem 2rem;
+      background-color: var(--card-bg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      user-select: none;
+    }
+    .nav-brand {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-decoration: none;
+      z-index: 1001;
+    }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-link {
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: var(--transition);
       position: relative;
+      padding: 5px 0;
+    }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 2px; background-color: var(--primary);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-link:hover { color: var(--primary); }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link.active { color: var(--primary); }
+    .nav-link.active::after { width: 100%; }
+    .nav-toggle {
+      display: none; background: none; border: none;
+      color: var(--text); font-size: 1.5rem; cursor: pointer;
+      z-index: 1001; padding: 5px;
+    }
+    @media (max-width: 768px) {
+      .navbar { padding: 0.5rem 1rem; }
+      .nav-toggle { display: block; }
+      .nav-links {
+        position: fixed; top: 0; right: -100%; width: 85%; height: 100vh;
+        background: var(--card-bg); flex-direction: column;
+        justify-content: flex-start;
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        z-index: 1000; padding: 4rem 2rem 2rem 2rem;
+        gap: 0.5rem; overflow-y: auto;
+      }
+      .nav-links.active { right: 0; }
+      .nav-link { font-size: 1.1rem; width: 100%; text-align: center; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+      .nav-link:last-child { border-bottom: none; }
+    }
+
+    /* ===== BREADCRUMB ===== */
+    .breadcrumb-nav { padding: 12px 0 0; }
+    .breadcrumb-list {
+      display: flex; flex-wrap: wrap; list-style: none;
+      font-size: 0.85rem; color: var(--gray);
+    }
+    .breadcrumb-item + .breadcrumb-item::before { content: "/"; padding: 0 10px; opacity: 0.5; }
+    .breadcrumb-item a { color: var(--gray); transition: var(--transition); }
+    .breadcrumb-item a:hover { color: var(--primary); }
+    .breadcrumb-item.active { color: var(--text); font-weight: 600; }
+
+    /* ===== MAIN CONTENT ===== */
+    main { min-height: calc(100vh - 120px); }
+
+    .page-wrapper {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-header-icon {
+      width: 56px; height: 56px;
+      background: rgba(255,193,7,0.1);
+      border: 1px solid rgba(255,193,7,0.2);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 1.6rem;
+      color: var(--primary);
+    }
+    .page-header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .page-header p {
+      color: var(--gray);
+      font-size: 0.95rem;
+    }
+
+    /* ===== SCANNER CARD ===== */
+    .scanner-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.07);
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-      background: rgba(0, 0, 0, 0.15);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      margin-bottom: 16px;
     }
-    #reader { width: 100%; height: 100%; background: #000; }
-    #result, #history {
-      width: 90%;
-      max-width: 400px;
-      margin: 16px auto;
-      padding: 16px;
+
+    .scanner-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #000;
+      overflow: hidden;
+    }
+
+    #reader {
+      width: 100% !important;
+      height: 100% !important;
+      background: #000;
+    }
+
+    /* hide default html5-qrcode UI elements */
+    #reader > img,
+    #reader__header_message,
+    #reader__status_span,
+    #reader__filescan_input,
+    #html5-qrcode-button-camera-start,
+    #html5-qrcode-button-camera-stop,
+    #html5-qrcode-button-camera-permission,
+    #html5-qrcode-anchor-scan-type-change {
+      display: none !important;
+    }
+    #reader__scan_region { width: 100% !important; height: 100% !important; }
+    #reader__scan_region video { width: 100% !important; height: 100% !important; object-fit: cover; }
+    #reader__scan_region img { display: none !important; }
+    #reader__dashboard { display: none !important; }
+
+    /* Scan overlay corners */
+    .scan-overlay {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .scan-corner {
+      position: absolute;
+      width: 32px; height: 32px;
+      border-color: var(--primary);
+      border-style: solid;
+      border-width: 0;
+    }
+    .scan-corner.tl { top: 20%; left: 15%; border-top-width: 3px; border-left-width: 3px; border-radius: 4px 0 0 0; }
+    .scan-corner.tr { top: 20%; right: 15%; border-top-width: 3px; border-right-width: 3px; border-radius: 0 4px 0 0; }
+    .scan-corner.bl { bottom: 20%; left: 15%; border-bottom-width: 3px; border-left-width: 3px; border-radius: 0 0 0 4px; }
+    .scan-corner.br { bottom: 20%; right: 15%; border-bottom-width: 3px; border-right-width: 3px; border-radius: 0 0 4px 0; }
+
+    /* Scan line animation */
+    .scan-line {
+      position: absolute;
+      left: 15%; right: 15%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      animation: scan-sweep 2.5s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(255,193,7,0.6);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .scan-line.active { opacity: 1; }
+    @keyframes scan-sweep {
+      0% { top: 20%; }
+      50% { top: 78%; }
+      100% { top: 20%; }
+    }
+
+    /* ===== STATUS BAR ===== */
+    .scanner-status {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.9rem;
+      color: var(--gray);
+      min-height: 52px;
+      transition: var(--transition);
+    }
+    .scanner-status .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gray);
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+    .scanner-status.scanning .status-dot {
+      background: var(--primary);
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+    .scanner-status.success .status-dot { background: #4caf50; }
+    .scanner-status.error .status-dot { background: #f44336; }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    /* ===== RESULT CARD ===== */
+    .result-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.07);
       border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 12px;
+      display: none;
+      animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    .result-card.visible { display: block; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .result-text {
+      font-size: 0.95rem;
+      word-break: break-all;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ===== ACTION BUTTONS ===== */
+    .action-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 20px; border: none; border-radius: 12px;
+      font-weight: 600; cursor: pointer;
+      transition: var(--transition); font-size: 0.9rem;
+      text-decoration: none; font-family: inherit;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--dark);
+      box-shadow: 0 4px 14px rgba(255,193,7,0.25);
+    }
+    .btn-primary:hover { background-color: var(--primary-hover); box-shadow: 0 6px 18px rgba(255,193,7,0.35); }
+    .btn-secondary {
+      background-color: var(--hover-color);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .btn-secondary:hover { background-color: #383838; }
+    .btn-danger {
+      background: rgba(244,67,54,0.12);
+      color: #f44336;
+      border: 1px solid rgba(244,67,54,0.2);
+    }
+    .btn-danger:hover { background: rgba(244,67,54,0.2); }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ===== HISTORY ===== */
+    .history-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .history-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gray);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .history-list {
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .history-item {
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.875rem;
+      color: var(--gray);
+      word-break: break-all;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-item:hover { background: var(--hover-color); color: var(--text); }
+    .history-item-icon { flex-shrink: 0; opacity: 0.5; font-size: 0.9rem; }
+    .history-empty {
+      padding: 24px;
       text-align: center;
-      word-break: break-word;
-      font-size: 16px;
-      min-height: 2em;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      background: rgba(255, 255, 255, 0.08);
+      color: var(--gray);
+      font-size: 0.875rem;
+      opacity: 0.6;
     }
-    #history { text-align: left; font-size: 14px; max-height: 150px; overflow-y: auto; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.05);}
-    #result-actions { width: 90%; max-width: 400px; margin: 16px auto; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-    button {
-      padding: 12px 20px; border: none; border-radius: 50px;
-      color: #fff; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2); min-width: 140px;
+
+    /* ===== FOOTER ===== */
+    .landing-footer {
+      padding: 50px 20px;
+      background: var(--dark);
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      color: var(--gray);
+      user-select: none;
     }
-    button:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
-    #scanAgainBtn { background: linear-gradient(135deg, #ff9a00, #ff6a00); }
-    #scanAgainBtn:hover { background: linear-gradient(135deg, #ff7c00, #e55d00); }
-    #openUrlBtn { background: linear-gradient(135deg, #4cc9f0, #4361ee); }
-    #openUrlBtn:hover { background: linear-gradient(135deg, #3ab0d0, #3a56d4); }
-    #shareUrlBtn { background: linear-gradient(135deg, #72efdd, #4895ef); color: white; }
-    #shareUrlBtn:hover { background: linear-gradient(135deg, #5cded0, #3a87e0); }
-    #clearHistoryBtn { background: linear-gradient(135deg, #f72585, #b5179e); width: 90%; max-width: 400px; }
-    #clearHistoryBtn:hover { background: linear-gradient(135deg, #e51c78, #9d148c); }
+    .footer-content {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; flex-direction: column; align-items: center; gap: 30px;
+    }
+    .footer-brand {
+      font-size: 1.3rem; font-weight: 700; color: var(--primary);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .footer-links {
+      display: flex; justify-content: center; gap: 24px;
+      flex-wrap: wrap; font-size: 0.9rem;
+    }
+    .footer-links a {
+      color: var(--gray); transition: var(--transition); position: relative; padding-bottom: 2px;
+    }
+    .footer-links a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 2px; background-color: var(--primary);
+      transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .footer-links a:hover { color: var(--primary); }
+    .footer-links a:hover::after { width: 100%; }
+    .footer-copy { font-size: 0.85rem; color: rgba(255,255,255,0.25); }
+    .national-identity {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      font-size: 1rem; font-weight: 800; color: #E30A17;
+      letter-spacing: 1.5px; cursor: default;
+    }
+    .national-identity .ni-flag { font-size: 1.4rem; }
+    @keyframes shimmer {
+      0% { filter: brightness(1); }
+      50% { filter: brightness(1.4); }
+      100% { filter: brightness(1); }
+    }
+    .national-identity span { animation: shimmer 2.5s infinite ease-in-out; }
+
+    /* ===== FADE IN ===== */
+    .fade-in { animation: fadeInOpacity 0.5s ease-in; }
+    @keyframes fadeInOpacity { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
 
-<h1>QRyi<br>QR Kod Okuyucu</h1>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="/" class="nav-brand">ÇAĞRI</a>
+  <button class="nav-toggle" id="navToggle" aria-label="Menüyü Aç/Kapat">☰</button>
+  <div class="nav-links" id="navLinks">
+    <a href="/sehir-secimi" class="nav-link">İl Seçimi</a>
+    <a href="/imsakiye" class="nav-link">İmsakiye</a>
+    <a href="/kible" class="nav-link">Kıble</a>
+    <a href="/qr-okuyucu" class="nav-link active">QR Okuyucu</a>
+    <a href="/bilgi-kosesi" class="nav-link">Bilgi Köşesi</a>
+    <a href="/iletisim" class="nav-link">İletişim</a>
+  </div>
+</nav>
 
-<div id="reader-container"><div id="reader"></div></div>
-<div id="result">📸 Kamera başlatılıyor...</div>
+<main id="main-content">
+  <div class="page-wrapper fade-in">
 
-<div id="result-actions" style="display: none;">
-  <button id="openUrlBtn">🔗 URL'yi Aç</button>
-  <button id="shareUrlBtn">📤 Paylaş</button>
-</div>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav" aria-label="Gezinti">
+      <ol class="breadcrumb-list">
+        <li class="breadcrumb-item"><a href="/">Ana Sayfa</a></li>
+        <li class="breadcrumb-item active">QR Kod Okuyucu</li>
+      </ol>
+    </nav>
 
-<button id="scanAgainBtn" style="display: none;">🔄 Yeni Tarama</button>
-<button id="clearHistoryBtn">🗑️ Geçmişi Temizle</button>
-<div id="history"></div>
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-icon">📷</div>
+      <h1>QR Kod Okuyucu</h1>
+      <p>QR kodu kamera alanına getirin, otomatik okunacak.</p>
+    </div>
+
+    <!-- Scanner Card -->
+    <div class="scanner-card">
+      <div class="scanner-viewport">
+        <div id="reader"></div>
+        <!-- Overlay corners -->
+        <div class="scan-overlay">
+          <div class="scan-corner tl"></div>
+          <div class="scan-corner tr"></div>
+          <div class="scan-corner bl"></div>
+          <div class="scan-corner br"></div>
+          <div class="scan-line" id="scanLine"></div>
+        </div>
+      </div>
+      <!-- Status bar -->
+      <div class="scanner-status" id="statusBar">
+        <div class="status-dot"></div>
+        <span id="statusText">Kamera başlatılıyor...</span>
+      </div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="result-card" id="resultCard">
+      <div class="result-label">📋 Okunan İçerik</div>
+      <div class="result-text" id="resultText"></div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-group" id="urlActions" style="display:none;">
+      <button class="btn btn-primary" id="openUrlBtn">🔗 URL'yi Aç</button>
+      <button class="btn btn-secondary" id="shareUrlBtn">📤 Paylaş</button>
+    </div>
+    <div class="action-group" id="scanAgainGroup" style="display:none;">
+      <button class="btn btn-secondary btn-full" id="scanAgainBtn">🔄 Yeni Tarama Başlat</button>
+    </div>
+
+    <!-- History Card -->
+    <div class="history-card" style="margin-top: 20px;">
+      <div class="history-header">
+        <span class="history-title">📜 Geçmiş</span>
+        <button class="btn btn-danger" id="clearHistoryBtn" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px;">Temizle</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">Henüz okuma yapılmadı.</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="landing-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      🕌 Çağrı Vakti
+    </div>
+    <div class="footer-links">
+      <a href="/sehir-secimi">Vakitler</a>
+      <a href="/imsakiye">İmsakiye</a>
+      <a href="/kible">Kıble</a>
+      <a href="/indir">Uygulamayı İndir</a>
+      <a href="/iletisim">İletişim</a>
+      <a href="/neden-biz">Neden Biz?</a>
+      <a href="/ilkelerimiz">İlkelerimiz</a>
+    </div>
+    <div class="national-identity">
+      <span class="ni-flag">🇹🇷</span>
+      <span>NE MUTLU TÜRKÜM DİYENE</span>
+      <span class="ni-flag">🇹🇷</span>
+    </div>
+    <div class="footer-copy">&copy; 2025 Çağrı Vakti. Bütün hakları saklıdır.</div>
+  </div>
+</footer>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const resultDiv = document.getElementById("result");
-  const historyDiv = document.getElementById("history");
-  const resultActionsDiv = document.getElementById("result-actions");
-  const openUrlBtn = document.getElementById("openUrlBtn");
-  const shareUrlBtn = document.getElementById("shareUrlBtn");
-  const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+  const statusBar    = document.getElementById("statusBar");
+  const statusText   = document.getElementById("statusText");
+  const scanLine     = document.getElementById("scanLine");
+  const resultCard   = document.getElementById("resultCard");
+  const resultText   = document.getElementById("resultText");
+  const urlActions   = document.getElementById("urlActions");
+  const scanAgainGroup = document.getElementById("scanAgainGroup");
+  const openUrlBtn   = document.getElementById("openUrlBtn");
+  const shareUrlBtn  = document.getElementById("shareUrlBtn");
   const scanAgainBtn = document.getElementById("scanAgainBtn");
+  const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+  const historyList  = document.getElementById("historyList");
 
-  const html5QrCode = new Html5Qrcode("reader");
   let history = JSON.parse(localStorage.getItem("qr_history") || "[]");
   let currentResultText = "";
   let isScanning = false;
+  let html5QrCode = null;
 
-  const config = {
-    fps: 10,
-    qrbox: (viewfinderWidth, viewfinderHeight) => {
-      let boxHeight = Math.min(400, viewfinderHeight * 1);
-      let boxWidth = (3 / 4) * boxHeight;
-      return { width: Math.floor(boxWidth), height: Math.floor(boxHeight) };
-    }
-  };
-  const cameraFacingMode = { facingMode: "environment" };
+  const isValidUrl = (s) => { try { new URL(s); return true; } catch { return false; } };
 
-  const isValidUrl = (string) => {
-    try { new URL(string); return true; } catch { return false; }
+  const setStatus = (msg, state = "") => {
+    statusText.textContent = msg;
+    statusBar.className = "scanner-status" + (state ? " " + state : "");
   };
 
   const renderHistory = () => {
-    historyDiv.innerHTML = history.length === 0
-      ? "<b>📜 Geçmiş yok</b>"
-      : "<b>📜 Okunan QR Geçmişi:</b><br>" + history.map(q => `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.1);">${q}</div>`).join("");
+    if (history.length === 0) {
+      historyList.innerHTML = '<div class="history-empty">Henüz okuma yapılmadı.</div>';
+      return;
+    }
+    historyList.innerHTML = history.map(q => {
+      const icon = isValidUrl(q) ? "🔗" : "📄";
+      return `<div class="history-item" data-value="${encodeURIComponent(q)}">
+        <span class="history-item-icon">${icon}</span>
+        <span>${q}</span>
+      </div>`;
+    }).join("");
+
+    historyList.querySelectorAll(".history-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const val = decodeURIComponent(item.dataset.value);
+        showResult(val);
+      });
+    });
+  };
+
+  const showResult = (text) => {
+    currentResultText = text;
+    resultText.textContent = text;
+    resultCard.classList.add("visible");
+    urlActions.style.display = isValidUrl(text) ? "flex" : "none";
+    scanAgainGroup.style.display = "flex";
+    setStatus("✅ QR kod okundu!", "success");
+    scanLine.classList.remove("active");
   };
 
   const startScanning = () => {
     if (isScanning) return;
-    resultDiv.innerHTML = "🔍 QR kodunu tarama alanına getirin...";
-    scanAgainBtn.style.display = "none";
-    resultActionsDiv.style.display = "none";
+    resultCard.classList.remove("visible");
+    urlActions.style.display = "none";
+    scanAgainGroup.style.display = "none";
+    setStatus("🔍 QR kodunu kamera alanına getirin...", "scanning");
+    scanLine.classList.add("active");
 
-    html5QrCode.start(cameraFacingMode, config, handleResult, console.warn)
-      .then(() => isScanning = true)
+    if (!html5QrCode) {
+      html5QrCode = new Html5Qrcode("reader");
+    }
+
+    const config = {
+      fps: 10,
+      qrbox: (w, h) => {
+        const size = Math.floor(Math.min(w, h) * 0.65);
+        return { width: size, height: size };
+      }
+    };
+
+    html5QrCode.start({ facingMode: "environment" }, config, handleResult, () => {})
+      .then(() => { isScanning = true; })
       .catch(err => {
         isScanning = false;
-        resultDiv.textContent = String(err).includes("Permission denied") 
-          ? "⚠️ Kamera izni reddedildi. Lütfen izin verin."
-          : "❌ Kamera başlatılamadı.";
-        scanAgainBtn.style.display = "inline-block";
+        scanLine.classList.remove("active");
+        const msg = String(err).includes("Permission") || String(err).includes("permission")
+          ? "⚠️ Kamera izni reddedildi. Lütfen tarayıcı ayarlarından izin verin."
+          : "❌ Kamera başlatılamadı. Sayfayı yenileyip tekrar deneyin.";
+        setStatus(msg, "error");
+        scanAgainGroup.style.display = "flex";
       });
   };
 
   const handleResult = (text) => {
+    if (!isScanning) return;
     html5QrCode.stop().then(() => {
       isScanning = false;
-      scanAgainBtn.style.display = "inline-block";
-      currentResultText = text;
-      resultDiv.textContent = text;
-      resultActionsDiv.style.display = isValidUrl(text) ? "flex" : "none";
+      showResult(text);
+
       if (!history.includes(text)) {
         history.unshift(text);
         if (history.length > 10) history.pop();
         localStorage.setItem("qr_history", JSON.stringify(history));
         renderHistory();
       }
+    }).catch(() => {
+      isScanning = false;
+      showResult(text);
     });
   };
 
-  scanAgainBtn?.addEventListener("click", startScanning);
-  openUrlBtn?.addEventListener("click", () => isValidUrl(currentResultText) && window.open(currentResultText, '_blank'));
-  shareUrlBtn?.addEventListener("click", () => navigator.share && isValidUrl(currentResultText) && navigator.share({title:'Taranan QR Kod', text:'Bu QR kod içeriğini paylaşıyorum:', url:currentResultText}));
-  clearHistoryBtn?.addEventListener("click", () => { if(confirm("Geçmişi silmek istediğinizden emin misiniz?")) { history=[]; localStorage.removeItem("qr_history"); renderHistory(); } });
+  scanAgainBtn.addEventListener("click", startScanning);
 
-  startScanning();
+  openUrlBtn.addEventListener("click", () => {
+    if (isValidUrl(currentResultText)) window.open(currentResultText, "_blank");
+  });
+
+  shareUrlBtn.addEventListener("click", () => {
+    if (navigator.share && isValidUrl(currentResultText)) {
+      navigator.share({ title: "Taranan QR Kod", url: currentResultText });
+    }
+  });
+
+  clearHistoryBtn.addEventListener("click", () => {
+    if (confirm("Geçmiş silinsin mi?")) {
+      history = [];
+      localStorage.removeItem("qr_history");
+      renderHistory();
+    }
+  });
+
+  // Navbar toggle
+  const navToggle = document.getElementById("navToggle");
+  const navLinks  = document.getElementById("navLinks");
+  navToggle.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+    navToggle.textContent = navLinks.classList.contains("active") ? "✕" : "☰";
+    document.body.style.overflow = navLinks.classList.contains("active") ? "hidden" : "";
+  });
+  navLinks.querySelectorAll(".nav-link").forEach(l => l.addEventListener("click", () => {
+    navLinks.classList.remove("active");
+    navToggle.textContent = "☰";
+    document.body.style.overflow = "";
+  }));
+
   renderHistory();
-
-  // PWA Service Worker Kayıt
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(() => console.log('Service Worker kaydedildi.'));
-  }
+  startScanning();
 });
 </script>
 
