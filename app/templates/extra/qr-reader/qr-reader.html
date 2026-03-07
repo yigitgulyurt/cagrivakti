@@ -42,7 +42,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-   /* background: linear-gradient(135deg, #121212, #1e1e1e);*/
     color: var(--text);
     font-family: "Inter", sans-serif;
 }
@@ -148,10 +147,11 @@ button:hover {
 
     <button id="scanAgainBtn" class="btn-primary" style="display:none;">🔄 Yeni Tarama</button>
 
-    </div>
-        <button id="clearHistoryBtn" class="btn-secondary">🗑️ Geçmişi Temizle</button>
+</div>
+<div>
+    <button id="clearHistoryBtn" class="btn-secondary">🗑️ Geçmişi Temizle</button>
     <div id="history"></div>
-</div></div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
