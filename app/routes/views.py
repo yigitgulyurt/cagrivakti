@@ -813,4 +813,4 @@ def newtab():
 
 @views_bp.route('/qr-okuyucu')
 def qr_okuyucu():
-    return render_template('extra/qr_reader/qr_reader.html')
+    return render_template('extra/qr-reader/qr-reader.html')
