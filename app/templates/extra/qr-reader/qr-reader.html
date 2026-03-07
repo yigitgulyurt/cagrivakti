@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block extra_css %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js" defer></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
     /* ── Page Layout ── */
     .qr-page {
@@ -453,7 +453,25 @@
     }
     .btn-full { width: 100%; justify-content: center; }
 
-    /* ── QR Toast (separate from base process-toast) ── */
+    /* ── html5-qrcode override ── */
+    #qrReader {
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+        background: #000;
+    }
+    /* Kütüphanenin kendi UI elemanlarını gizle */
+    #qrReader__header_message,
+    #qrReader__status_span,
+    #qrReader__dashboard,
+    #qrReader__filescan_input { display: none !important; }
+    #qrReader video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+    /* Kütüphanenin çizdiği scan box'ı gizle, bizimkini kullanıyoruz */
+    #qrReader canvas { opacity: 0 !important; pointer-events: none !important; }
     .qr-toast {
         position: fixed;
         bottom: 40px;
@@ -523,10 +541,10 @@
             <div class="qr-card-body">
 
                 <div class="camera-container" id="cameraContainer">
-                    <video id="qrVideo" autoplay playsinline muted></video>
-                    <canvas id="qrCanvas"></canvas>
+                    <!-- html5-qrcode buraya render eder -->
+                    <div id="qrReader"></div>
 
-                    <!-- Scan frame overlay -->
+                    <!-- Scan frame overlay (kamera aktifken gösterilir) -->
                     <div class="scan-overlay" id="scanOverlay" style="display:none;" aria-hidden="true">
                         <div class="scan-frame">
                             <div class="scan-corner-br"></div>
@@ -687,15 +705,17 @@
     'use strict';
 
     /* ── State ── */
-    let _stream      = null;
-    let _scanLoop    = null;
-    let _scanning    = true;
-    let _facingMode  = 'environment';
-    let _camResult   = '';
-    let _upResult    = '';
-    let _history     = [];
+    let _html5Qr  = null;   // Html5Qrcode instance
+    let _scanning = false;
+    let _facingMode = Html5QrcodeScanType ? undefined : undefined; // resolved below
+    let _camResult  = '';
+    let _upResult   = '';
+    let _history    = [];
 
-    /* Load history – reuse base.html's daily-clear logic already ran */
+    const FACING_ENV  = { facingMode: 'environment' };
+    const FACING_USER = { facingMode: 'user' };
+    let   _currentFacing = FACING_ENV;
+
     try { _history = JSON.parse(localStorage.getItem('qrScanHistory') || '[]'); } catch (e) {}
 
     /* ── Tabs ── */
@@ -706,84 +726,114 @@
         document.getElementById('tabUpload').setAttribute('aria-selected', tab === 'upload');
         document.getElementById('panelCamera').style.display = tab === 'camera' ? '' : 'none';
         document.getElementById('panelUpload').style.display = tab === 'upload' ? '' : 'none';
+
+        /* Kamera paneline geçilince aktif taramayı durdurma */
+        if (tab !== 'camera' && _scanning) qrStopCamera();
     };
 
-    /* ── Camera ── */
-    window.qrStartCamera = async function () {
+    /* ── Camera – html5-qrcode ── */
+    window.qrStartCamera = function () {
         _hideError('camera');
-        try {
-            if (_stream) qrStopCamera();
-            _stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: _facingMode, width: { ideal: 1280 }, height: { ideal: 1280 } }
-            });
-            const video = document.getElementById('qrVideo');
-            video.srcObject = _stream;
-            await video.play();
+        document.getElementById('cameraResult').classList.remove('visible');
 
-            document.getElementById('cameraPlaceholder').style.display = 'none';
-            document.getElementById('scanOverlay').style.display      = 'flex';
-            document.getElementById('scanningBadge').classList.add('active');
-            document.getElementById('btnStartCamera').style.display   = 'none';
-            document.getElementById('btnStopCamera').style.display    = '';
-            document.getElementById('btnFlipCamera').style.display    = '';
-            document.getElementById('cameraResult').classList.remove('visible');
-            _scanning = true;
-            _startScanLoop();
-        } catch (e) {
-            _showError('camera', 'Kamera erişimi reddedildi. Lütfen tarayıcı izinlerini kontrol edin.');
+        if (!_html5Qr) {
+            _html5Qr = new Html5Qrcode('qrReader');
         }
+
+        const config = {
+            fps: 10,
+            qrbox: function (w, h) {
+                const side = Math.floor(Math.min(w, h) * 0.65);
+                return { width: side, height: side };
+            },
+            aspectRatio: 1.0
+        };
+
+        _html5Qr.start(
+            _currentFacing,
+            config,
+            /* onSuccess */ function (decodedText) {
+                _html5Qr.stop().then(function () {
+                    _scanning = false;
+                    _onCameraResult(decodedText);
+                }).catch(function () {
+                    _scanning = false;
+                    _onCameraResult(decodedText);
+                });
+            },
+            /* onError  */ function () { /* sessiz – her frame hata verebilir */ }
+        ).then(function () {
+            _scanning = true;
+            document.getElementById('cameraPlaceholder').style.display = 'none';
+            document.getElementById('scanOverlay').style.display       = 'flex';
+            document.getElementById('scanningBadge').classList.add('active');
+            document.getElementById('btnStartCamera').style.display    = 'none';
+            document.getElementById('btnStopCamera').style.display     = '';
+            document.getElementById('btnFlipCamera').style.display     = '';
+        }).catch(function (err) {
+            _scanning = false;
+            const msg = String(err).toLowerCase();
+            if (msg.includes('permission') || msg.includes('notallowed')) {
+                _showError('camera', 'Kamera izni reddedildi. Lütfen tarayıcı ayarlarından izin verin.');
+            } else {
+                _showError('camera', 'Kamera başlatılamadı. Başka bir uygulama kamerayı kullanıyor olabilir.');
+            }
+        });
     };
 
     window.qrStopCamera = function () {
-        if (_stream) { _stream.getTracks().forEach(t => t.stop()); _stream = null; }
-        if (_scanLoop) { clearInterval(_scanLoop); _scanLoop = null; }
+        if (_html5Qr && _scanning) {
+            _html5Qr.stop().catch(function () {}).finally(function () {
+                _scanning = false;
+                _resetCameraUI();
+            });
+        } else {
+            _scanning = false;
+            _resetCameraUI();
+        }
+    };
+
+    window.qrFlipCamera = function () {
+        _currentFacing = (_currentFacing === FACING_ENV) ? FACING_USER : FACING_ENV;
+        if (_scanning) {
+            _html5Qr.stop().catch(function(){}).finally(function () {
+                _scanning = false;
+                qrStartCamera();
+            });
+        } else {
+            qrStartCamera();
+        }
+    };
+
+    function _resetCameraUI() {
         document.getElementById('cameraPlaceholder').style.display = 'flex';
         document.getElementById('scanOverlay').style.display       = 'none';
         document.getElementById('scanningBadge').classList.remove('active');
         document.getElementById('btnStartCamera').style.display    = '';
         document.getElementById('btnStopCamera').style.display     = 'none';
         document.getElementById('btnFlipCamera').style.display     = 'none';
-    };
+    }
 
-    window.qrFlipCamera = function () {
-        _facingMode = _facingMode === 'environment' ? 'user' : 'environment';
-        qrStartCamera();
-    };
-
-    function _startScanLoop() {
-        if (_scanLoop) clearInterval(_scanLoop);
-        _scanLoop = setInterval(() => {
-            if (!_scanning) return;
-            const video  = document.getElementById('qrVideo');
-            const canvas = document.getElementById('qrCanvas');
-            if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
-            canvas.width  = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx  = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const code    = jsQR(imgData.data, imgData.width, imgData.height,
-                                 { inversionAttempts: 'dontInvert' });
-            if (code) {
-                _scanning = false;
-                document.getElementById('scanningBadge').classList.remove('active');
-                _showResult('camera', code.data);
-                _addToHistory(code.data);
-            }
-        }, 200);
+    function _onCameraResult(data) {
+        document.getElementById('scanningBadge').classList.remove('active');
+        _showResult('camera', data);
+        _addToHistory(data);
+        /* Butonları güncelle: durdur gizle, tekrar tara göster */
+        document.getElementById('btnStopCamera').style.display  = 'none';
+        document.getElementById('btnFlipCamera').style.display  = 'none';
+        document.getElementById('btnStartCamera').style.display = '';
     }
 
     window.qrScanAgain = function () {
-        _scanning = true;
         document.getElementById('cameraResult').classList.remove('visible');
-        if (_stream) document.getElementById('scanningBadge').classList.add('active');
+        qrStartCamera();
     };
 
-    /* ── Upload ── */
+    /* ── Upload – html5-qrcode file API ── */
     const _zone = document.getElementById('qrUploadZone');
-    _zone.addEventListener('dragover',  e => { e.preventDefault(); _zone.classList.add('drag-over'); });
-    _zone.addEventListener('dragleave', ()  => _zone.classList.remove('drag-over'));
-    _zone.addEventListener('drop', e => {
+    _zone.addEventListener('dragover',  function(e) { e.preventDefault(); _zone.classList.add('drag-over'); });
+    _zone.addEventListener('dragleave', function()  { _zone.classList.remove('drag-over'); });
+    _zone.addEventListener('drop', function(e) {
         e.preventDefault();
         _zone.classList.remove('drag-over');
         const file = e.dataTransfer.files[0];
@@ -798,32 +848,27 @@
     function _processFile(file) {
         _hideError('upload');
         document.getElementById('uploadResult').classList.remove('visible');
+
+        /* Önizlemeyi göster */
         const reader = new FileReader();
-        reader.onload = evt => {
-            const src = evt.target.result;
-            document.getElementById('qrPreviewImg').src   = src;
+        reader.onload = function(evt) {
+            document.getElementById('qrPreviewImg').src              = evt.target.result;
             document.getElementById('qrUploadPreview').style.display = 'block';
             document.getElementById('qrUploadZone').style.display    = 'none';
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width  = img.width;
-                canvas.height = img.height;
-                const ctx     = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const code    = jsQR(imgData.data, imgData.width, imgData.height,
-                                     { inversionAttempts: 'attemptBoth' });
-                if (code) {
-                    _showResult('upload', code.data);
-                    _addToHistory(code.data);
-                } else {
-                    _showError('upload', 'Bu görselde QR kod bulunamadı. Farklı bir görsel deneyin.');
-                }
-            };
-            img.src = src;
         };
         reader.readAsDataURL(file);
+
+        /* html5-qrcode ile dosyadan oku */
+        if (!_html5Qr) _html5Qr = new Html5Qrcode('qrReader');
+
+        Html5Qrcode.scanFile(file, /* showImage */ false)
+            .then(function (decodedText) {
+                _showResult('upload', decodedText);
+                _addToHistory(decodedText);
+            })
+            .catch(function () {
+                _showError('upload', 'Bu görselde QR kod bulunamadı. Daha net bir görsel deneyin.');
+            });
     }
 
     window.qrRemoveUpload = function () {
@@ -843,14 +888,14 @@
         const isWifi  = /^WIFI:/i.test(data);
 
         let badge = 'METİN';
-        if (isUrl)   badge = 'URL';
+        if (isUrl)        badge = 'URL';
         else if (isEmail) badge = 'E-POSTA';
         else if (isPhone) badge = 'TELEFON';
         else if (isSms)   badge = 'SMS';
         else if (isWifi)  badge = 'Wi-Fi';
 
-        document.getElementById(`${type}ResultType`).textContent = badge;
-        document.getElementById(`${type}ResultText`).textContent = data;
+        document.getElementById(type + 'ResultType').textContent = badge;
+        document.getElementById(type + 'ResultText').textContent = data;
 
         const openBtn = document.getElementById(type === 'camera' ? 'btnOpenCamera' : 'btnOpenUpload');
         openBtn.style.display = (isUrl || isEmail || isPhone || isSms) ? '' : 'none';
@@ -858,7 +903,7 @@
         if (type === 'camera') _camResult = data;
         else                   _upResult  = data;
 
-        document.getElementById(`${type}Result`).classList.add('visible');
+        document.getElementById(type + 'Result').classList.add('visible');
     }
 
     window.qrOpenResult = function (type) {
@@ -868,12 +913,12 @@
 
     window.qrCopyResult = function (type) {
         const d = type === 'camera' ? _camResult : _upResult;
-        if (d) navigator.clipboard.writeText(d).then(() => _showQrToast('Panoya kopyalandı!'));
+        if (d) navigator.clipboard.writeText(d).then(function() { _showQrToast('Panoya kopyalandı!'); });
     };
 
     /* ── History ── */
     function _addToHistory(data) {
-        _history.unshift({ data, time: new Date().toLocaleString('tr-TR') });
+        _history.unshift({ data: data, time: new Date().toLocaleString('tr-TR') });
         if (_history.length > 20) _history = _history.slice(0, 20);
         try { localStorage.setItem('qrScanHistory', JSON.stringify(_history)); } catch (e) {}
         _renderHistory();
@@ -889,29 +934,27 @@
             return;
         }
         empty.style.display = 'none';
-        list.innerHTML = _history.map((h, i) => {
-            const isUrl = /^https?:\/\//i.test(h.data);
+        list.innerHTML = _history.map(function(h, i) {
+            const isUrl  = /^https?:\/\//i.test(h.data);
             const iconId = isUrl ? '#fa-link' : '#fa-qrcode';
-            return `<div class="history-item" onclick="qrCopyHistoryItem(${i})">
-                <div class="history-item-icon">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="${iconId}"></use></svg>
-                </div>
-                <div class="history-item-content">
-                    <div class="history-item-text">${_esc(h.data)}</div>
-                    <div class="history-item-time">${h.time}</div>
-                </div>
-                <button class="history-item-copy" title="Kopyala"
-                        onclick="event.stopPropagation();qrCopyHistoryItem(${i})"
-                        aria-label="Kopyala">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-copy"></use></svg>
-                </button>
-            </div>`;
+            return '<div class="history-item" onclick="qrCopyHistoryItem(' + i + ')">'
+                 + '<div class="history-item-icon">'
+                 + '<svg class="icon" aria-hidden="true"><use xlink:href="' + iconId + '"></use></svg>'
+                 + '</div>'
+                 + '<div class="history-item-content">'
+                 + '<div class="history-item-text">' + _esc(h.data) + '</div>'
+                 + '<div class="history-item-time">' + h.time + '</div>'
+                 + '</div>'
+                 + '<button class="history-item-copy" title="Kopyala" aria-label="Kopyala"'
+                 + ' onclick="event.stopPropagation();qrCopyHistoryItem(' + i + ')">'
+                 + '<svg class="icon" aria-hidden="true"><use xlink:href="#fa-copy"></use></svg>'
+                 + '</button></div>';
         }).join('');
     }
 
     window.qrCopyHistoryItem = function (i) {
         navigator.clipboard.writeText(_history[i].data)
-            .then(() => _showQrToast('Panoya kopyalandı!'));
+            .then(function() { _showQrToast('Panoya kopyalandı!'); });
     };
 
     window.qrClearHistory = function () {
@@ -922,11 +965,11 @@
 
     /* ── Error helpers ── */
     function _showError(type, msg) {
-        document.getElementById(`${type}ErrorText`).textContent = msg;
-        document.getElementById(`${type}Error`).classList.add('visible');
+        document.getElementById(type + 'ErrorText').textContent = msg;
+        document.getElementById(type + 'Error').classList.add('visible');
     }
     function _hideError(type) {
-        document.getElementById(`${type}Error`).classList.remove('visible');
+        document.getElementById(type + 'Error').classList.remove('visible');
     }
 
     /* ── Toast ── */
@@ -935,7 +978,7 @@
         document.getElementById('qrToastMsg').textContent = msg;
         toast.classList.add('active', 'success');
         clearTimeout(toast._t);
-        toast._t = setTimeout(() => toast.classList.remove('active'), 2500);
+        toast._t = setTimeout(function() { toast.classList.remove('active'); }, 2500);
     }
 
     /* ── Escape HTML ── */
