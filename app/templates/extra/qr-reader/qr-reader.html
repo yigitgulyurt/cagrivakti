@@ -125,9 +125,16 @@ button:hover {
 
 {% block content %}
 <div id="qr-page">
-
-    <h1>QRyi<br>QR Kod Okuyucu</h1>
-
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+        <ol class="breadcrumb-list">
+            <li class="breadcrumb-item"><a href="{{ url_for('views.index') }}">Ana Sayfa</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('views.sehir_secimi') }}">Şehirler</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ get_display_name(sehir) }}</li>
+        </ol>
+    </nav>
+    <h1>QR | Çağrı Vakti</h1>
+    
     <div id="reader-container">
         <div id="reader"></div>
     </div>
