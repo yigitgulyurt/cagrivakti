@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}QR | Çağrı Vakti{% endblock %}
+{% block title %}QR Okuyucu | Çağrı Vakti{% endblock %}
 
-{% block brand_text %}QR{% endblock %}
+{% block brand_text %}QR OKUYUCU{% endblock %}
 
 {% block breadcrumb_json_ld %}
 <script type="application/ld+json">
@@ -239,7 +239,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     scanAgainBtn?.addEventListener("click", startScanning);
     openUrlBtn?.addEventListener("click",()=>isValidUrl(currentResultText)&&window.open(currentResultText,'_blank'));
-    shareUrlBtn?.addEventListener("click",()=>navigator.share&&isValidUrl(currentResultText)&&navigator.share({title:'Taranan QR Kod',text:'Bu QR kod içeriğini paylaşıyorum:',url:currentResultText}));
+    shareUrlBtn?.addEventListener("click", () => {
+      if (!navigator.share) return;
+    
+      const shareData = isValidUrl(currentResultText)
+        ? { title: 'Taranan QR Kod', url: currentResultText }
+        : { title: 'Taranan QR Kod', text: currentResultText };
+    
+      navigator.share(shareData);
+    });
     clearHistoryBtn?.addEventListener("click",()=>{if(confirm("Geçmişi silmek istediğinizden emin misiniz?")){history=[];localStorage.removeItem("qr_history");renderHistory();}});
 
     startScanning();
