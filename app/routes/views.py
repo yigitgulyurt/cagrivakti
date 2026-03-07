@@ -806,3 +806,7 @@ def download_widget():
     """Rainmeter widget dosyasını indir."""
     directory = os.path.dirname(current_app.root_path)
     return send_from_directory(directory, 'cagrivakti-widget.rmskin', as_attachment=True)
+
+@views_bp.route('/newtab')
+def newtab():
+    return render_template('newtab.html')

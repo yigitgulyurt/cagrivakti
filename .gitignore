@@ -7,7 +7,7 @@ venv/
 ENV/
 env/
 .python-version
-
+app/namazvakitleri.yigitgulyurt.com.code-workspace
 # Database
 *.db
 *.sqlite3
