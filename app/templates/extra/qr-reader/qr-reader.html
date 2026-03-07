@@ -89,6 +89,7 @@
 .history-content {
     padding:10px 0;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    user-select: all;
 }
 .history-content:first-child {
     border-top: 1px solid rgba(255,255,255,0.1);
@@ -100,6 +101,7 @@
     top: 0px;
     background-color: var(--card-bg);
     position: sticky;
+    user-select: none;
 }
 
 /* Butonlar */
@@ -163,7 +165,7 @@ button:hover {
         <div id="reader" class="reader"></div>
     </div>
 
-    <div id="result" class="result">📸 Kamera başlatılıyor...</div>
+    <div id="result" class="result" style="user-select: all;">📸 Kamera başlatılıyor...</div>
 
     <div id="result-actions" class="btn-result-actions btn-qr" style="display:none;">
         <button id="openUrlBtn" class="btn-primary btn-qr">🔗 URL'yi Aç</button>
