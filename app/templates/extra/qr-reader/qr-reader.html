@@ -26,10 +26,6 @@
 
 {% block extra_css %}
 <style>
-* {
-    scrollbar-width: thin;
-    scrollbar-color: #333 #1a1a1a;
-}
 .container {
     max-width: 1000px;
     margin: 0 auto;
@@ -82,6 +78,7 @@
     border: 1px solid rgba(255,255,255,0.05);
     box-shadow: var(--card-shadow);
     transition: var(--transition);
+    scrollbar-width: none;
 }
 
 .history {
