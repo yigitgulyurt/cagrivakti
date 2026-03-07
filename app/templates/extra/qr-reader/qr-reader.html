@@ -37,7 +37,7 @@
     .container { padding: 10px; }
 }
 /* QR Sayfası Konteyneri */
-#qr-page {
+.qr-page {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -47,7 +47,7 @@
 }
 
 /* QR Okuyucu Kartı */
-#reader-container {
+.reader-container {
     width: 80vmin;
     max-width: 400px;
     aspect-ratio: 1 / 1;
@@ -61,10 +61,10 @@
     justify-content: center;
 }
 
-#reader { width: 100%; height: 100%; background: #000; }
+.reader { width: 100%; height: 100%; background: #000; }
 
 /* Sonuç ve Geçmiş */
-#result, #history {
+.result, .history {
     width: 90%;
     max-width: 400px;
     margin: 16px auto;
@@ -127,8 +127,8 @@ button:hover {
 
 /* Responsive Küçük Ekran */
 @media (max-width: 480px) {
-    #reader-container { width: 90vmin; }
-    #result, #history, #result-actions { width: 95%; }
+    .reader-container { width: 90vmin; }
+    .result, .history, .result-actions { width: 95%; }
 }
 </style>
 {% endblock %}
@@ -142,12 +142,12 @@ button:hover {
             <li class="breadcrumb-item active"><a href="{{ url_for('views.qr_okuyucu') }}">QR Okuyucu</a></li>
         </ol>
     </nav>
-<div id="qr-page">
-    <div id="reader-container">
-        <div id="reader"></div>
+<div id="qr-page" class="qr-page">
+    <div id="reader-container" class="reader-container">
+        <div id="reader" class="reader"></div>
     </div>
 
-    <div id="result">📸 Kamera başlatılıyor...</div>
+    <div id="result" class="result">📸 Kamera başlatılıyor...</div>
 
     <div id="result-actions" class="btn-result-actions btn-qr" style="display:none;">
         <button id="openUrlBtn" class="btn-primary btn-qr">🔗 URL'yi Aç</button>
