@@ -243,8 +243,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!navigator.share) return;
     
       const shareData = isValidUrl(currentResultText)
-        ? { title: 'Taranan QR Kod', url: currentResultText }
-        : { title: 'Taranan QR Kod', text: currentResultText };
+        ? { title: 'Taranan QR Kod', text: currentResultText }
+        : { title: 'Taranan QR Kod', url: currentResultText };
     
       navigator.share(shareData);
     });
