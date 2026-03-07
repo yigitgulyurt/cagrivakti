@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}QR Kod Okuyucu | Çağrı Vakti{% endblock %}
+{% block description %}Tarayıcınızdan hızlı QR kod okuma aracı.{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.qr-container{
+    max-width:420px;
+    margin:40px auto;
+    text-align:center;
+}
+
+.qr-title{
+    font-size:1.8rem;
+    font-weight:700;
+    margin-bottom:25px;
+}
+
+.qr-card{
+    background:var(--card-bg);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:var(--card-shadow);
+}
+
+#reader-container{
+    width:100%;
+    aspect-ratio:1/1;
+    border-radius:16px;
+    overflow:hidden;
+    background:#000;
+}
+
+#reader{
+    width:100%;
+    height:100%;
+}
+
+.qr-result{
+    margin-top:15px;
+    padding:14px;
+    border-radius:12px;
+    background:var(--hover-color);
+    font-size:0.95rem;
+    word-break:break-word;
+}
+
+.qr-actions{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.qr-history{
+    margin-top:20px;
+    padding:14px;
+    background:var(--hover-color);
+    border-radius:12px;
+    font-size:0.85rem;
+    text-align:left;
+    max-height:150px;
+    overflow:auto;
+}
+
+.qr-history-item{
+    padding:4px 0;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.qr-history-item:last-child{
+    border-bottom:none;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="qr-container fade-in">
+
+    <h1 class="qr-title">QR Kod Okuyucu</h1>
+
+    <div class="qr-card">
+
+        <div id="reader-container">
+            <div id="reader"></div>
+        </div>
+
+        <div id="result" class="qr-result">
+            Kamera başlatılıyor...
+        </div>
+
+        <div id="result-actions" class="qr-actions hidden">
+            <button id="openUrlBtn" class="btn btn-primary">URL Aç</button>
+            <button id="shareUrlBtn" class="btn btn-secondary">Paylaş</button>
+        </div>
+
+        <div class="qr-actions">
+            <button id="scanAgainBtn" class="btn btn-primary hidden">Tekrar Tara</button>
+            <button id="clearHistoryBtn" class="btn btn-secondary">Geçmişi Temizle</button>
+        </div>
+
+        <div id="history" class="qr-history"></div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+const resultDiv = document.getElementById("result");
+const historyDiv = document.getElementById("history");
+
+const resultActionsDiv = document.getElementById("result-actions");
+
+const openUrlBtn = document.getElementById("openUrlBtn");
+const shareUrlBtn = document.getElementById("shareUrlBtn");
+
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+const scanAgainBtn = document.getElementById("scanAgainBtn");
+
+const html5QrCode = new Html5Qrcode("reader");
+
+let history = JSON.parse(localStorage.getItem("qr_history") || "[]");
+let currentResultText = "";
+let isScanning = false;
+
+const config = {
+fps:10,
+qrbox:{width:250,height:250}
+};
+
+const cameraFacingMode={facingMode:"environment"};
+
+const isValidUrl=(str)=>{
+try{new URL(str);return true;}catch{return false;}
+};
+
+function renderHistory(){
+
+historyDiv.innerHTML = history.length === 0
+? "QR geçmişi yok"
+: history.map(q => `<div class="qr-history-item">${q}</div>`).join("");
+
+}
+
+function startScanning(){
+
+if(isScanning) return;
+
+resultDiv.innerHTML="QR kodu kameraya gösterin";
+
+scanAgainBtn.classList.add("hidden");
+resultActionsDiv.classList.add("hidden");
+
+html5QrCode.start(
+cameraFacingMode,
+config,
+handleResult
+).then(()=>{
+
+isScanning=true;
+
+}).catch(()=>{
+
+resultDiv.textContent="Kamera başlatılamadı";
+
+scanAgainBtn.classList.remove("hidden");
+
+});
+
+}
+
+function handleResult(text){
+
+html5QrCode.stop().then(()=>{
+
+isScanning=false;
+
+scanAgainBtn.classList.remove("hidden");
+
+currentResultText=text;
+
+resultDiv.textContent=text;
+
+if(isValidUrl(text))
+resultActionsDiv.classList.remove("hidden");
+
+if(!history.includes(text)){
+
+history.unshift(text);
+
+if(history.length>10) history.pop();
+
+localStorage.setItem("qr_history",JSON.stringify(history));
+
+renderHistory();
+
+}
+
+});
+
+}
+
+scanAgainBtn.addEventListener("click",startScanning);
+
+openUrlBtn.addEventListener("click",()=>{
+if(isValidUrl(currentResultText))
+window.open(currentResultText,'_blank');
+});
+
+shareUrlBtn.addEventListener("click",()=>{
+if(navigator.share && isValidUrl(currentResultText))
+navigator.share({
+title:"QR Kod",
+url:currentResultText
+});
+});
+
+clearHistoryBtn.addEventListener("click",()=>{
+
+if(confirm("Geçmiş silinsin mi")){
+
+history=[];
+
+localStorage.removeItem("qr_history");
+
+renderHistory();
+
+}
+
+});
+
+renderHistory();
+startScanning();
+
+});
+
+</script>
+
+{% endblock %}
