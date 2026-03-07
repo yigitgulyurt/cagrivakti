@@ -20,6 +20,7 @@ const PRECACHE_ASSETS = [
     '/Mustafa-Kemal-Ataturk',
     '/static/js/jquery-cagrivakti.js',
     '/static/js/city-data.js',
+    '/static/js/html5-qrcode.min.js',
     '/static/icons/favicon.ico',
     '/static/icons/android/android-launchericon-192-192.png',
     '/static/icons/android/android-launchericon-512-512.png',

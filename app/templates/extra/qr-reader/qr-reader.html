@@ -131,7 +131,7 @@ button:hover {
 
 {% block extra_js %}
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
