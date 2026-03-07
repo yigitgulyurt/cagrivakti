@@ -1,0 +1,951 @@
+{% extends "base.html" %}
+
+{% block title %}QR Kod Okuyucu | Çağrı Vakti{% endblock %}
+{% block description %}Ücretsiz online QR kod okuyucu. Kamera ile tarayın veya görsel yükleyerek QR kodunuzu anında okutun. Kayıt gerekmez.{% endblock %}
+{% block keywords %}qr kod okuyucu, qr tarayıcı, qr code reader, online qr okuma, kamera qr{% endblock %}
+{% block canonical %}https://cagrivakti.com.tr/qr-okuyucu{% endblock %}
+
+{% block breadcrumb_json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Ana Sayfa",
+      "item": "https://cagrivakti.com.tr/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "QR Kod Okuyucu",
+      "item": "https://cagrivakti.com.tr/qr-okuyucu"
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js" defer></script>
+<style>
+    /* ── Page Layout ── */
+    .qr-page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 40px 20px 60px;
+    }
+
+    /* ── Page Header ── */
+    .qr-page-header {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInOpacity 0.5s ease-in;
+    }
+    .qr-header-icon {
+        width: 72px;
+        height: 72px;
+        background: rgba(255, 193, 7, 0.08);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: var(--primary);
+        font-size: 2rem;
+        border: 1px solid rgba(255, 193, 7, 0.15);
+        box-shadow: 0 0 30px rgba(255, 193, 7, 0.07);
+    }
+    .qr-header-icon .icon {
+        width: 2rem;
+        height: 2rem;
+    }
+    .qr-page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #fff 40%, #94a3b8);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .qr-page-subtitle {
+        color: var(--gray);
+        font-size: 1rem;
+    }
+
+    /* ── Tab Switcher ── */
+    .tab-switcher {
+        display: flex;
+        background: var(--card-bg);
+        border-radius: 14px;
+        padding: 5px;
+        gap: 4px;
+        margin-bottom: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .tab-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        background: transparent;
+        color: var(--gray);
+        font-family: inherit;
+        font-size: 0.92rem;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .tab-btn .icon { width: 1rem; height: 1rem; }
+    .tab-btn:hover { color: var(--text); background: var(--hover-color); }
+    .tab-btn.active { background: var(--primary); color: var(--dark); }
+
+    /* ── Card ── */
+    .qr-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+    }
+    .qr-card-body { padding: 28px; }
+
+    /* ── Camera ── */
+    .camera-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1;
+        max-height: 420px;
+        background: #0a0a0a;
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    #qrVideo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    #qrCanvas { display: none; }
+
+    /* Scan Frame */
+    .scan-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+    .scan-frame {
+        width: 65%;
+        aspect-ratio: 1;
+        position: relative;
+    }
+    .scan-frame::before, .scan-frame::after,
+    .scan-corner-br, .scan-corner-bl {
+        content: '';
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        border-color: var(--primary);
+        border-style: solid;
+    }
+    .scan-frame::before { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+    .scan-frame::after  { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+    .scan-corner-br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+    .scan-corner-bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+    .scan-line {
+        position: absolute;
+        left: 5%; right: 5%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        box-shadow: 0 0 8px var(--primary);
+        top: 0;
+        animation: qrScanMove 2.5s ease-in-out infinite;
+    }
+    @keyframes qrScanMove {
+        0%   { top: 5%;  opacity: 0; }
+        10%  { opacity: 1; }
+        90%  { opacity: 1; }
+        100% { top: 95%; opacity: 0; }
+    }
+
+    /* Camera Placeholder */
+    .camera-placeholder {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        color: var(--gray);
+        font-size: 0.95rem;
+        background: #0d0d0d;
+    }
+    .camera-placeholder .icon {
+        width: 3.5rem;
+        height: 3.5rem;
+        opacity: 0.3;
+    }
+
+    /* Scanning Badge */
+    .scanning-badge {
+        display: none;
+        position: absolute;
+        top: 12px; left: 12px;
+        background: rgba(0, 0, 0, 0.75);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        color: var(--primary);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        align-items: center;
+        gap: 6px;
+        backdrop-filter: blur(8px);
+    }
+    .scanning-badge.active { display: flex; }
+    .scanning-dot {
+        width: 7px; height: 7px;
+        background: var(--primary);
+        border-radius: 50%;
+        animation: qrPulse 1.2s infinite;
+    }
+    @keyframes qrPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    /* Camera Controls */
+    .camera-controls { display: flex; gap: 10px; }
+    .camera-controls .btn { flex: 1; justify-content: center; }
+
+    /* ── Upload ── */
+    .upload-zone {
+        border: 2px dashed rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 50px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        background: rgba(255, 255, 255, 0.01);
+        margin-bottom: 20px;
+    }
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+        border-color: var(--primary);
+        background: rgba(255, 193, 7, 0.04);
+    }
+    .upload-zone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%; height: 100%;
+    }
+    .upload-icon .icon { width: 3rem; height: 3rem; opacity: 0.5; margin-bottom: 16px; }
+    .upload-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+    .upload-sub   { color: var(--gray); font-size: 0.9rem; }
+
+    .upload-preview {
+        display: none;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #0a0a0a;
+        margin-bottom: 20px;
+    }
+    .upload-preview img {
+        width: 100%;
+        max-height: 320px;
+        object-fit: contain;
+        display: block;
+    }
+    .upload-preview-remove {
+        position: absolute;
+        top: 10px; right: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        border: none;
+        color: #fff;
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex; align-items: center; justify-content: center;
+        transition: var(--transition);
+    }
+    .upload-preview-remove:hover { background: rgba(239, 68, 68, 0.8); }
+
+    /* ── Result Area ── */
+    .result-area { margin-top: 24px; display: none; animation: fadeInOpacity 0.4s ease; }
+    .result-area.visible { display: block; }
+
+    .result-card {
+        background: linear-gradient(135deg, rgba(255,193,7,0.06), rgba(255,193,7,0.02));
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        border-radius: 16px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .result-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    }
+    .result-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--primary);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .result-label .icon { width: 0.875rem; height: 0.875rem; }
+    .result-badge {
+        background: rgba(255, 193, 7, 0.15);
+        color: var(--primary);
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+    }
+    .result-text {
+        font-size: 1rem;
+        color: var(--text);
+        word-break: break-all;
+        line-height: 1.7;
+        margin-bottom: 18px;
+        font-weight: 500;
+    }
+    .result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .result-actions .btn {
+        padding: 9px 18px;
+        font-size: 0.875rem;
+        border-radius: 10px;
+    }
+    .result-actions .btn .icon { width: 0.9rem; height: 0.9rem; }
+
+    /* ── Error Card ── */
+    .error-card {
+        background: rgba(239, 68, 68, 0.06);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 12px;
+        padding: 16px 20px;
+        color: #fca5a5;
+        font-size: 0.9rem;
+        align-items: center;
+        gap: 12px;
+        margin-top: 16px;
+        display: none;
+    }
+    .error-card.visible { display: flex; }
+    .error-card .icon { width: 1.1rem; height: 1.1rem; flex-shrink: 0; }
+
+    /* ── History ── */
+    .history-section { margin-top: 32px; }
+    .history-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+    .history-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .btn-clear-history {
+        background: transparent;
+        border: none;
+        color: var(--gray);
+        font-size: 0.8rem;
+        cursor: pointer;
+        font-family: inherit;
+        transition: var(--transition);
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+    .btn-clear-history:hover { color: #f87171; background: rgba(239, 68, 68, 0.1); }
+
+    .history-list { display: flex; flex-direction: column; gap: 10px; }
+    .history-item {
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        transition: var(--transition);
+        cursor: pointer;
+        animation: fadeInOpacity 0.3s ease;
+    }
+    .history-item:hover { background: var(--hover-color); border-color: rgba(255,193,7,0.15); }
+    .history-item-icon {
+        width: 36px; height: 36px;
+        background: rgba(255, 193, 7, 0.08);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--primary);
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    .history-item-icon .icon { width: 1rem; height: 1rem; }
+    .history-item-content { flex: 1; min-width: 0; }
+    .history-item-text {
+        font-size: 0.9rem;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+    .history-item-time { font-size: 0.75rem; color: var(--gray); }
+    .history-item-copy {
+        background: transparent;
+        border: none;
+        color: var(--gray);
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        transition: var(--transition);
+        display: flex; align-items: center; justify-content: center;
+    }
+    .history-item-copy:hover { color: var(--primary); background: rgba(255,193,7,0.1); }
+    .history-item-copy .icon { width: 0.875rem; height: 0.875rem; }
+
+    .history-empty {
+        text-align: center;
+        padding: 30px;
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+
+    /* ── Btn variants ── */
+    .btn-danger {
+        background-color: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .btn-danger:hover {
+        background-color: rgba(239, 68, 68, 0.25);
+        transform: translateY(-2px);
+    }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ── QR Toast (separate from base process-toast) ── */
+    .qr-toast {
+        position: fixed;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: #1a1a1a;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-left: 4px solid var(--primary);
+        color: var(--text);
+        padding: 14px 24px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 10002;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        font-size: 0.9rem;
+        font-weight: 500;
+        pointer-events: none;
+    }
+    .qr-toast .icon { width: 1rem; height: 1rem; }
+    .qr-toast.active { transform: translateX(-50%) translateY(0); }
+    .qr-toast.success { border-left-color: #4caf50; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="qr-page fade-in">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('views.index') }}">Ana Sayfa</a>
+            </li>
+            <li class="breadcrumb-item active">QR Kod Okuyucu</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="qr-page-header">
+        <div class="qr-header-icon">
+            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-qrcode"></use></svg>
+        </div>
+        <h1 class="qr-page-title">QR Kod Okuyucu</h1>
+        <p class="qr-page-subtitle">Kamera ile tarayın veya görsel yükleyerek QR kodunuzu okutun</p>
+    </div>
+
+    <!-- Tab Switcher -->
+    <div class="tab-switcher" role="tablist">
+        <button class="tab-btn active" id="tabCamera" role="tab" aria-selected="true"
+                aria-controls="panelCamera" onclick="qrSwitchTab('camera')">
+            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-camera"></use></svg>
+            Kamera ile Tara
+        </button>
+        <button class="tab-btn" id="tabUpload" role="tab" aria-selected="false"
+                aria-controls="panelUpload" onclick="qrSwitchTab('upload')">
+            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-upload"></use></svg>
+            Görsel Yükle
+        </button>
+    </div>
+
+    <!-- ═══════════════ CAMERA PANEL ═══════════════ -->
+    <div id="panelCamera" role="tabpanel" aria-labelledby="tabCamera">
+        <div class="qr-card">
+            <div class="qr-card-body">
+
+                <div class="camera-container" id="cameraContainer">
+                    <video id="qrVideo" autoplay playsinline muted></video>
+                    <canvas id="qrCanvas"></canvas>
+
+                    <!-- Scan frame overlay -->
+                    <div class="scan-overlay" id="scanOverlay" style="display:none;" aria-hidden="true">
+                        <div class="scan-frame">
+                            <div class="scan-corner-br"></div>
+                            <div class="scan-corner-bl"></div>
+                            <div class="scan-line"></div>
+                        </div>
+                    </div>
+
+                    <!-- Scanning badge -->
+                    <div class="scanning-badge" id="scanningBadge" aria-live="polite">
+                        <div class="scanning-dot"></div>
+                        Taranıyor...
+                    </div>
+
+                    <!-- Placeholder -->
+                    <div class="camera-placeholder" id="cameraPlaceholder">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-camera"></use></svg>
+                        <span>Kamerayı başlatmak için butona tıklayın</span>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="camera-controls">
+                    <button class="btn btn-primary" id="btnStartCamera" onclick="qrStartCamera()">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-play"></use></svg>
+                        Kamerayı Başlat
+                    </button>
+                    <button class="btn btn-danger" id="btnStopCamera" onclick="qrStopCamera()" style="display:none;">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-stop"></use></svg>
+                        Durdur
+                    </button>
+                    <button class="btn btn-secondary" id="btnFlipCamera" onclick="qrFlipCamera()" style="display:none;" title="Kamerayı Çevir">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-rotate"></use></svg>
+                    </button>
+                </div>
+
+                <!-- Error -->
+                <div class="error-card" id="cameraError" role="alert">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-circle-exclamation"></use></svg>
+                    <span id="cameraErrorText">Kamera erişimi sağlanamadı.</span>
+                </div>
+
+                <!-- Result -->
+                <div class="result-area" id="cameraResult" aria-live="polite">
+                    <div class="result-card">
+                        <div class="result-label">
+                            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-check"></use></svg>
+                            QR Kod Okundu
+                            <span class="result-badge" id="cameraResultType">URL</span>
+                        </div>
+                        <div class="result-text" id="cameraResultText"></div>
+                        <div class="result-actions">
+                            <button class="btn btn-primary" id="btnOpenCamera"
+                                    onclick="qrOpenResult('camera')" style="display:none;">
+                                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-arrow-up-right-from-square"></use></svg>
+                                Aç
+                            </button>
+                            <button class="btn btn-secondary" onclick="qrCopyResult('camera')">
+                                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-copy"></use></svg>
+                                Kopyala
+                            </button>
+                            <button class="btn btn-secondary" onclick="qrScanAgain()">
+                                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-rotate-right"></use></svg>
+                                Tekrar Tara
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div><!-- /panelCamera -->
+
+    <!-- ═══════════════ UPLOAD PANEL ═══════════════ -->
+    <div id="panelUpload" role="tabpanel" aria-labelledby="tabUpload" style="display:none;">
+        <div class="qr-card">
+            <div class="qr-card-body">
+
+                <!-- Drop Zone -->
+                <div class="upload-zone" id="qrUploadZone">
+                    <input type="file" id="qrFileInput" accept="image/*"
+                           onchange="qrHandleFileUpload(event)" aria-label="QR kod görseli seç">
+                    <div class="upload-icon">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-upload"></use></svg>
+                    </div>
+                    <div class="upload-title">Görsel sürükle &amp; bırak</div>
+                    <div class="upload-sub">veya seçmek için tıklayın · PNG, JPG, GIF, WEBP</div>
+                </div>
+
+                <!-- Preview -->
+                <div class="upload-preview" id="qrUploadPreview">
+                    <img id="qrPreviewImg" src="" alt="QR kod önizleme">
+                    <button class="upload-preview-remove" onclick="qrRemoveUpload()"
+                            aria-label="Görseli kaldır">✕</button>
+                </div>
+
+                <!-- Error -->
+                <div class="error-card" id="uploadError" role="alert">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-circle-exclamation"></use></svg>
+                    <span id="uploadErrorText">Bu görselde QR kod bulunamadı.</span>
+                </div>
+
+                <!-- Result -->
+                <div class="result-area" id="uploadResult" aria-live="polite">
+                    <div class="result-card">
+                        <div class="result-label">
+                            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-check"></use></svg>
+                            QR Kod Okundu
+                            <span class="result-badge" id="uploadResultType">URL</span>
+                        </div>
+                        <div class="result-text" id="uploadResultText"></div>
+                        <div class="result-actions">
+                            <button class="btn btn-primary" id="btnOpenUpload"
+                                    onclick="qrOpenResult('upload')" style="display:none;">
+                                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-arrow-up-right-from-square"></use></svg>
+                                Aç
+                            </button>
+                            <button class="btn btn-secondary" onclick="qrCopyResult('upload')">
+                                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-copy"></use></svg>
+                                Kopyala
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div><!-- /panelUpload -->
+
+    <!-- ═══════════════ HISTORY ═══════════════ -->
+    <section class="history-section" id="qrHistorySection" aria-label="QR Geçmişi">
+        <div class="history-header">
+            <span class="history-title">
+                <svg class="icon" aria-hidden="true" style="width:0.9rem;height:0.9rem;vertical-align:middle;margin-right:4px;">
+                    <use xlink:href="#fa-clock-rotate-left"></use>
+                </svg>
+                Geçmiş
+            </span>
+            <button class="btn-clear-history" onclick="qrClearHistory()">Temizle</button>
+        </div>
+        <div class="history-list" id="qrHistoryList">
+            <div class="history-empty" id="qrHistoryEmpty">Henüz okutulmuş QR kod yok.</div>
+        </div>
+    </section>
+
+</div><!-- /qr-page -->
+
+<!-- QR-specific Toast (z-index above base toast) -->
+<div class="qr-toast" id="qrToast" role="status" aria-live="polite">
+    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-check"></use></svg>
+    <span id="qrToastMsg">Panoya kopyalandı!</span>
+</div>
+{% endblock %}
+
+{% block footer_js %}
+<script>
+(function () {
+    'use strict';
+
+    /* ── State ── */
+    let _stream      = null;
+    let _scanLoop    = null;
+    let _scanning    = true;
+    let _facingMode  = 'environment';
+    let _camResult   = '';
+    let _upResult    = '';
+    let _history     = [];
+
+    /* Load history – reuse base.html's daily-clear logic already ran */
+    try { _history = JSON.parse(localStorage.getItem('qrScanHistory') || '[]'); } catch (e) {}
+
+    /* ── Tabs ── */
+    window.qrSwitchTab = function (tab) {
+        document.getElementById('tabCamera').classList.toggle('active', tab === 'camera');
+        document.getElementById('tabUpload').classList.toggle('active', tab === 'upload');
+        document.getElementById('tabCamera').setAttribute('aria-selected', tab === 'camera');
+        document.getElementById('tabUpload').setAttribute('aria-selected', tab === 'upload');
+        document.getElementById('panelCamera').style.display = tab === 'camera' ? '' : 'none';
+        document.getElementById('panelUpload').style.display = tab === 'upload' ? '' : 'none';
+    };
+
+    /* ── Camera ── */
+    window.qrStartCamera = async function () {
+        _hideError('camera');
+        try {
+            if (_stream) qrStopCamera();
+            _stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: _facingMode, width: { ideal: 1280 }, height: { ideal: 1280 } }
+            });
+            const video = document.getElementById('qrVideo');
+            video.srcObject = _stream;
+            await video.play();
+
+            document.getElementById('cameraPlaceholder').style.display = 'none';
+            document.getElementById('scanOverlay').style.display      = 'flex';
+            document.getElementById('scanningBadge').classList.add('active');
+            document.getElementById('btnStartCamera').style.display   = 'none';
+            document.getElementById('btnStopCamera').style.display    = '';
+            document.getElementById('btnFlipCamera').style.display    = '';
+            document.getElementById('cameraResult').classList.remove('visible');
+            _scanning = true;
+            _startScanLoop();
+        } catch (e) {
+            _showError('camera', 'Kamera erişimi reddedildi. Lütfen tarayıcı izinlerini kontrol edin.');
+        }
+    };
+
+    window.qrStopCamera = function () {
+        if (_stream) { _stream.getTracks().forEach(t => t.stop()); _stream = null; }
+        if (_scanLoop) { clearInterval(_scanLoop); _scanLoop = null; }
+        document.getElementById('cameraPlaceholder').style.display = 'flex';
+        document.getElementById('scanOverlay').style.display       = 'none';
+        document.getElementById('scanningBadge').classList.remove('active');
+        document.getElementById('btnStartCamera').style.display    = '';
+        document.getElementById('btnStopCamera').style.display     = 'none';
+        document.getElementById('btnFlipCamera').style.display     = 'none';
+    };
+
+    window.qrFlipCamera = function () {
+        _facingMode = _facingMode === 'environment' ? 'user' : 'environment';
+        qrStartCamera();
+    };
+
+    function _startScanLoop() {
+        if (_scanLoop) clearInterval(_scanLoop);
+        _scanLoop = setInterval(() => {
+            if (!_scanning) return;
+            const video  = document.getElementById('qrVideo');
+            const canvas = document.getElementById('qrCanvas');
+            if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+            canvas.width  = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx  = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code    = jsQR(imgData.data, imgData.width, imgData.height,
+                                 { inversionAttempts: 'dontInvert' });
+            if (code) {
+                _scanning = false;
+                document.getElementById('scanningBadge').classList.remove('active');
+                _showResult('camera', code.data);
+                _addToHistory(code.data);
+            }
+        }, 200);
+    }
+
+    window.qrScanAgain = function () {
+        _scanning = true;
+        document.getElementById('cameraResult').classList.remove('visible');
+        if (_stream) document.getElementById('scanningBadge').classList.add('active');
+    };
+
+    /* ── Upload ── */
+    const _zone = document.getElementById('qrUploadZone');
+    _zone.addEventListener('dragover',  e => { e.preventDefault(); _zone.classList.add('drag-over'); });
+    _zone.addEventListener('dragleave', ()  => _zone.classList.remove('drag-over'));
+    _zone.addEventListener('drop', e => {
+        e.preventDefault();
+        _zone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) _processFile(file);
+    });
+
+    window.qrHandleFileUpload = function (e) {
+        const file = e.target.files[0];
+        if (file) _processFile(file);
+    };
+
+    function _processFile(file) {
+        _hideError('upload');
+        document.getElementById('uploadResult').classList.remove('visible');
+        const reader = new FileReader();
+        reader.onload = evt => {
+            const src = evt.target.result;
+            document.getElementById('qrPreviewImg').src   = src;
+            document.getElementById('qrUploadPreview').style.display = 'block';
+            document.getElementById('qrUploadZone').style.display    = 'none';
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width  = img.width;
+                canvas.height = img.height;
+                const ctx     = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code    = jsQR(imgData.data, imgData.width, imgData.height,
+                                     { inversionAttempts: 'attemptBoth' });
+                if (code) {
+                    _showResult('upload', code.data);
+                    _addToHistory(code.data);
+                } else {
+                    _showError('upload', 'Bu görselde QR kod bulunamadı. Farklı bir görsel deneyin.');
+                }
+            };
+            img.src = src;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    window.qrRemoveUpload = function () {
+        document.getElementById('qrUploadPreview').style.display = 'none';
+        document.getElementById('qrUploadZone').style.display    = 'block';
+        document.getElementById('qrFileInput').value             = '';
+        document.getElementById('uploadResult').classList.remove('visible');
+        _hideError('upload');
+    };
+
+    /* ── Result helpers ── */
+    function _showResult(type, data) {
+        const isUrl   = /^https?:\/\//i.test(data);
+        const isEmail = /^mailto:/i.test(data);
+        const isPhone = /^tel:/i.test(data);
+        const isSms   = /^smsto?:/i.test(data);
+        const isWifi  = /^WIFI:/i.test(data);
+
+        let badge = 'METİN';
+        if (isUrl)   badge = 'URL';
+        else if (isEmail) badge = 'E-POSTA';
+        else if (isPhone) badge = 'TELEFON';
+        else if (isSms)   badge = 'SMS';
+        else if (isWifi)  badge = 'Wi-Fi';
+
+        document.getElementById(`${type}ResultType`).textContent = badge;
+        document.getElementById(`${type}ResultText`).textContent = data;
+
+        const openBtn = document.getElementById(type === 'camera' ? 'btnOpenCamera' : 'btnOpenUpload');
+        openBtn.style.display = (isUrl || isEmail || isPhone || isSms) ? '' : 'none';
+
+        if (type === 'camera') _camResult = data;
+        else                   _upResult  = data;
+
+        document.getElementById(`${type}Result`).classList.add('visible');
+    }
+
+    window.qrOpenResult = function (type) {
+        const d = type === 'camera' ? _camResult : _upResult;
+        if (d) window.open(d, '_blank', 'noopener,noreferrer');
+    };
+
+    window.qrCopyResult = function (type) {
+        const d = type === 'camera' ? _camResult : _upResult;
+        if (d) navigator.clipboard.writeText(d).then(() => _showQrToast('Panoya kopyalandı!'));
+    };
+
+    /* ── History ── */
+    function _addToHistory(data) {
+        _history.unshift({ data, time: new Date().toLocaleString('tr-TR') });
+        if (_history.length > 20) _history = _history.slice(0, 20);
+        try { localStorage.setItem('qrScanHistory', JSON.stringify(_history)); } catch (e) {}
+        _renderHistory();
+    }
+
+    function _renderHistory() {
+        const list  = document.getElementById('qrHistoryList');
+        const empty = document.getElementById('qrHistoryEmpty');
+        if (_history.length === 0) {
+            list.innerHTML = '';
+            list.appendChild(empty);
+            empty.style.display = '';
+            return;
+        }
+        empty.style.display = 'none';
+        list.innerHTML = _history.map((h, i) => {
+            const isUrl = /^https?:\/\//i.test(h.data);
+            const iconId = isUrl ? '#fa-link' : '#fa-qrcode';
+            return `<div class="history-item" onclick="qrCopyHistoryItem(${i})">
+                <div class="history-item-icon">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="${iconId}"></use></svg>
+                </div>
+                <div class="history-item-content">
+                    <div class="history-item-text">${_esc(h.data)}</div>
+                    <div class="history-item-time">${h.time}</div>
+                </div>
+                <button class="history-item-copy" title="Kopyala"
+                        onclick="event.stopPropagation();qrCopyHistoryItem(${i})"
+                        aria-label="Kopyala">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-copy"></use></svg>
+                </button>
+            </div>`;
+        }).join('');
+    }
+
+    window.qrCopyHistoryItem = function (i) {
+        navigator.clipboard.writeText(_history[i].data)
+            .then(() => _showQrToast('Panoya kopyalandı!'));
+    };
+
+    window.qrClearHistory = function () {
+        _history = [];
+        try { localStorage.setItem('qrScanHistory', '[]'); } catch (e) {}
+        _renderHistory();
+    };
+
+    /* ── Error helpers ── */
+    function _showError(type, msg) {
+        document.getElementById(`${type}ErrorText`).textContent = msg;
+        document.getElementById(`${type}Error`).classList.add('visible');
+    }
+    function _hideError(type) {
+        document.getElementById(`${type}Error`).classList.remove('visible');
+    }
+
+    /* ── Toast ── */
+    function _showQrToast(msg) {
+        const toast = document.getElementById('qrToast');
+        document.getElementById('qrToastMsg').textContent = msg;
+        toast.classList.add('active', 'success');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => toast.classList.remove('active'), 2500);
+    }
+
+    /* ── Escape HTML ── */
+    function _esc(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── Init ── */
+    _renderHistory();
+})();
+</script>
+{% endblock %}
