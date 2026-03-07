@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentResultText = "";
     let isScanning = false;
 
-    const config = { fps: 10, qrbox: viewfinder => { let h=Math.min(400,viewfinder*1); return {width:h*0.75,height:h}; } };
+    const config = { fps: 10, qrbox: { width: 300, height: 400 } };
     const cameraFacingMode = { facingMode: "environment" };
     const isValidUrl = s => { try { new URL(s); return true; } catch { return false; };
     };
