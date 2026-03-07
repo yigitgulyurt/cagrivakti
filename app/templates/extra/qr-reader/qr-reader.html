@@ -87,15 +87,6 @@
 }
 
 /* Butonlar */
-.btn-result-actions, .btn-primary /*.btn-secondary*/ {
-    width: 95%;
-    max-width: 400px;
-    margin: 16px auto;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
 
 button {
     padding: 12px 20px;
@@ -108,11 +99,12 @@ button {
     box-shadow: var(--card-shadow);
 }
 
-.btn-primary {
-    flex: 1 ;
-    max-width: 200px;
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.35);
 }
-.btn-secondary {
+
+.btn-result-actions{
     width: 95%;
     max-width: 400px;
     margin: 16px auto;
@@ -122,9 +114,25 @@ button {
     flex-wrap: wrap;
 }
 
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+.btn-primary {
+    flex: 1 ;
+    max-width: 200px;
+    width: 95%;
+    margin: 16px auto;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-secondary {
+    width: 95%;
+    max-width: 400px;
+    margin: 0px auto;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 /* Responsive Küçük Ekran */
