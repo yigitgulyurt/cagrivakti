@@ -10,8 +10,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    /*min-height: 100vh;*/
-    padding: 20px;
+    padding-top: 20px;
     background: linear-gradient(135deg, #121212, #1e1e1e);
     color: var(--text);
     font-family: "Inter", sans-serif;
@@ -95,12 +94,6 @@ button:hover {
     box-shadow: 0 8px 25px rgba(0,0,0,0.35);
 }
 
-/* Özel Buton Renkleri */
-/* #scanAgainBtn { background: var(--primary); }
-#openUrlBtn { background: #4cc9f0; } 
-#shareUrlBtn { background: #72efdd; } 
-#clearHistoryBtn { background: #f72585; }*/
-
 /* Responsive Küçük Ekran */
 @media (max-width: 480px) {
     #reader-container { width: 90vmin; }
@@ -128,7 +121,7 @@ button:hover {
     <button id="scanAgainBtn" class="btn-primary" style="display:none;">🔄 Yeni Tarama</button>
 
     </div>
-        <button id="clearHistoryBtn" class="btn-primary">🗑️ Geçmişi Temizle</button>
+        <button id="clearHistoryBtn" class="btn-secondary">🗑️ Geçmişi Temizle</button>
     <div id="history"></div>
 </div>
 {% endblock %}
