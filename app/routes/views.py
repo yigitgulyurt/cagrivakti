@@ -795,7 +795,7 @@ def admin_logs():
                          
 @views_bp.route('/asal-sayi')
 def prime_number():
-    return render_template('prime-number.html')
+    return render_template('extra/prime-number/prime-number.html')
 
 @views_bp.route('/rainmeter-rehber')
 def rainmeter_guide():
@@ -809,4 +809,4 @@ def download_widget():
 
 @views_bp.route('/newtab')
 def newtab():
-    return render_template('newtab.html')
+    return render_template('extra/newtab/newtab.html')
