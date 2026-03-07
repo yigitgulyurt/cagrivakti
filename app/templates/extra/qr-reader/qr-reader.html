@@ -120,22 +120,9 @@ button:hover {
 .btn-primary {
     flex: 1 ;
     max-width: 200px;
-    width: 95%;
-    margin: 16px auto;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
 }
 
 .btn-secondary {
-    width: 95%;
-    max-width: 400px;
-    margin: 0px auto;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
 }
 
 /* Responsive Küçük Ekran */
@@ -163,15 +150,15 @@ button:hover {
     <div id="result">📸 Kamera başlatılıyor...</div>
 
     <div id="result-actions" class="btn-result-actions" style="display:none;">
-        <button id="openUrlBtn" class="btn-primary">🔗 URL'yi Aç</button>
-        <button id="shareUrlBtn" class="btn-primary">📤 Paylaş</button>
+        <button id="openUrlBtn" class="btn-primary btn">🔗 URL'yi Aç</button>
+        <button id="shareUrlBtn" class="btn-primary btn">📤 Paylaş</button>
     </div>
 
-    <button id="scanAgainBtn" class="btn-primary" style="min-width: 400px !important;display:none;">🔄 Yeni Tarama</button>
+    <button id="scanAgainBtn" class="btn-primary btn" style="min-width: 400px !important;display:none;">🔄 Yeni Tarama</button>
 
 </div>
 <div id="history-container">
-    <button id="clearHistoryBtn" class="btn-secondary">🗑️ Geçmişi Temizle</button>
+    <button id="clearHistoryBtn" class="btn-secondary btn">🗑️ Geçmişi Temizle</button>
     <div id="history" class="history"></div>
 </div>
 {% endblock %}
