@@ -26,6 +26,12 @@
 
 {% block extra_css %}
 <style>
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    user-select: none;
+}
 /* QR Sayfası Konteyneri */
 #qr-page {
     display: flex;
@@ -125,7 +131,8 @@ button:hover {
 {% endblock %}
 
 {% block content %}
-    <!-- Breadcrumb -->
+<div class="container">
+        <!-- Breadcrumb -->
     <nav aria-label="Breadcrumb" class="breadcrumb-nav">
         <ol class="breadcrumb-list">
             <li class="breadcrumb-item"><a href="{{ url_for('views.index') }}">Ana Sayfa</a></li>
@@ -151,7 +158,7 @@ button:hover {
     </div>
         <button id="clearHistoryBtn" class="btn-secondary">🗑️ Geçmişi Temizle</button>
     <div id="history"></div>
-</div>
+</div></div>
 {% endblock %}
 
 {% block extra_js %}
