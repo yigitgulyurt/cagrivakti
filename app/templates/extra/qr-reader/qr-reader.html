@@ -125,7 +125,6 @@ button:hover {
 {% endblock %}
 
 {% block content %}
-<div id="qr-page">
     <!-- Breadcrumb -->
     <nav aria-label="Breadcrumb" class="breadcrumb-nav">
         <ol class="breadcrumb-list">
@@ -133,7 +132,7 @@ button:hover {
             <li class="breadcrumb-item active"><a href="{{ url_for('views.qr_okuyucu') }}">QR Okuyucu</a></li>
         </ol>
     </nav>
-
+<div id="qr-page">
     <h1>QR | Çağrı Vakti</h1>
     
     <div id="reader-container">
