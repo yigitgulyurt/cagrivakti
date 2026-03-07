@@ -1,6 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}QRyi - QR Kod Okuyucu{% endblock %}
+{% block title %}QR | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}QR{% endblock %}
+
+{% block breadcrumb_json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Ana Sayfa",
+    "item": "https://cagrivakti.com.tr"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "{{ get_display_name(sehir) }}",
+    "item": "https://cagrivakti.com.tr/qr-okuyucu"
+  }]
+}
+</script>
 
 {% block extra_css %}
 <style>
