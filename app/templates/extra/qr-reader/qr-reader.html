@@ -4,263 +4,197 @@
 
 {% block extra_css %}
 <style>
-* { box-sizing: border-box; }
-
+/* QR Sayfası Konteyneri */
 #qr-page {
-  margin: 0;
-  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    background: linear-gradient(135deg, #121212, #1e1e1e);
+    color: var(--text);
+    font-family: "Inter", sans-serif;
 }
 
 #qr-page h1 {
-  margin: 0 0 20px;
-  font-size: 28px;
-  text-align: center;
-  font-weight: 700;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: var(--primary);
 }
 
+/* QR Okuyucu Kartı */
 #reader-container {
-  width: 80vmin;
-  max-width: 400px;
-  aspect-ratio: 1 / 1;
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-  background: rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 80vmin;
+    max-width: 400px;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #reader { width: 100%; height: 100%; background: #000; }
 
+/* Sonuç ve Geçmiş */
 #result, #history {
-  width: 90%;
-  max-width: 400px;
-  margin: 16px auto;
-  padding: 16px;
-  border-radius: 16px;
-  text-align: center;
-  word-break: break-word;
-  font-size: 16px;
-  min-height: 2em;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(255, 255, 255, 0.08);
+    width: 90%;
+    max-width: 400px;
+    margin: 16px auto;
+    padding: 16px;
+    border-radius: 16px;
+    text-align: center;
+    word-break: break-word;
+    font-size: 16px;
+    min-height: 2em;
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
 }
 
 #history {
-  text-align: left;
-  font-size: 14px;
-  max-height: 150px;
-  overflow-y: auto;
-  background: rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.05);
+    text-align: left;
+    font-size: 14px;
+    max-height: 150px;
+    overflow-y: auto;
 }
 
-#result-actions {
-  width: 90%;
-  max-width: 400px;
-  margin: 16px auto;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
+/* Butonlar */
+#result-actions, #scanAgainBtn, #clearHistoryBtn {
+    width: 90%;
+    max-width: 400px;
+    margin: 16px auto;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 50px;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  min-width: 140px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: var(--transition);
+    color: var(--text);
+    background: var(--primary);
+    box-shadow: var(--card-shadow);
 }
 
 button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.35);
 }
 
-#scanAgainBtn { background: linear-gradient(135deg, #ff9a00, #ff6a00); }
-#openUrlBtn { background: linear-gradient(135deg, #4cc9f0, #4361ee); }
-#shareUrlBtn { background: linear-gradient(135deg, #72efdd, #4895ef); }
-#clearHistoryBtn { background: linear-gradient(135deg, #f72585, #b5179e); width: 90%; max-width: 400px; }
+/* Özel Buton Renkleri */
+#scanAgainBtn { background: var(--primary); }
+#openUrlBtn { background: #4cc9f0; }
+#shareUrlBtn { background: #72efdd; }
+#clearHistoryBtn { background: #f72585; }
 
+/* Responsive Küçük Ekran */
+@media (max-width: 480px) {
+    #reader-container { width: 90vmin; }
+    #result, #history, #result-actions { width: 95%; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-
 <div id="qr-page">
 
-<h1>QRyi<br>QR Kod Okuyucu</h1>
+    <h1>QRyi<br>QR Kod Okuyucu</h1>
 
-<div id="reader-container">
-  <div id="reader"></div>
+    <div id="reader-container">
+        <div id="reader"></div>
+    </div>
+
+    <div id="result">📸 Kamera başlatılıyor...</div>
+
+    <div id="result-actions" style="display:none;">
+        <button id="openUrlBtn">🔗 URL'yi Aç</button>
+        <button id="shareUrlBtn">📤 Paylaş</button>
+    </div>
+
+    <button id="scanAgainBtn" style="display:none;">🔄 Yeni Tarama</button>
+    <button id="clearHistoryBtn">🗑️ Geçmişi Temizle</button>
+
+    <div id="history"></div>
 </div>
-
-<div id="result">📸 Kamera başlatılıyor...</div>
-
-<div id="result-actions" style="display:none;">
-  <button id="openUrlBtn">🔗 URL'yi Aç</button>
-  <button id="shareUrlBtn">📤 Paylaş</button>
-</div>
-
-<button id="scanAgainBtn" style="display:none;">🔄 Yeni Tarama</button>
-<button id="clearHistoryBtn">🗑️ Geçmişi Temizle</button>
-
-<div id="history"></div>
-
-</div>
-
 {% endblock %}
 
 {% block extra_js %}
-
 <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+    const resultDiv = document.getElementById("result");
+    const historyDiv = document.getElementById("history");
+    const resultActionsDiv = document.getElementById("result-actions");
+    const openUrlBtn = document.getElementById("openUrlBtn");
+    const shareUrlBtn = document.getElementById("shareUrlBtn");
+    const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+    const scanAgainBtn = document.getElementById("scanAgainBtn");
 
-  const resultDiv = document.getElementById("result");
-  const historyDiv = document.getElementById("history");
-  const resultActionsDiv = document.getElementById("result-actions");
-  const openUrlBtn = document.getElementById("openUrlBtn");
-  const shareUrlBtn = document.getElementById("shareUrlBtn");
-  const clearHistoryBtn = document.getElementById("clearHistoryBtn");
-  const scanAgainBtn = document.getElementById("scanAgainBtn");
+    const html5QrCode = new Html5Qrcode("reader");
+    let history = JSON.parse(localStorage.getItem("qr_history") || "[]");
+    let currentResultText = "";
+    let isScanning = false;
 
-  const html5QrCode = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: viewfinder => { let h=Math.min(400,viewfinder*1); return {width:h*0.75,height:h}; } };
+    const cameraFacingMode = { facingMode: "environment" };
+    const isValidUrl = s => { try { new URL(s); return true; } catch { return false; };
+    };
 
-  let history = JSON.parse(localStorage.getItem("qr_history") || "[]");
-  let currentResultText = "";
-  let isScanning = false;
+    const renderHistory = () => {
+        historyDiv.innerHTML = history.length === 0
+            ? "<b>📜 Geçmiş yok</b>"
+            : "<b>📜 Okunan QR Geçmişi:</b><br>" + history.map(q => `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.1);">${q}</div>`).join("");
+    };
 
-  const config = {
-    fps: 10,
-    qrbox: (viewfinderWidth, viewfinderHeight) => {
-      let boxHeight = Math.min(400, viewfinderHeight * 1);
-      let boxWidth = (3 / 4) * boxHeight;
-      return { width: Math.floor(boxWidth), height: Math.floor(boxHeight) };
-    }
-  };
+    const startScanning = () => {
+        if (isScanning) return;
+        resultDiv.textContent = "🔍 QR kodunu tarama alanına getirin...";
+        scanAgainBtn.style.display = "none";
+        resultActionsDiv.style.display = "none";
+        html5QrCode.start(cameraFacingMode, config, handleResult, console.warn)
+        .then(() => isScanning = true)
+        .catch(err => {
+            isScanning=false;
+            resultDiv.textContent=String(err).includes("Permission denied")
+                ? "⚠️ Kamera izni reddedildi. Lütfen izin verin."
+                : "❌ Kamera başlatılamadı.";
+            scanAgainBtn.style.display = "inline-block";
+        });
+    };
 
-  const cameraFacingMode = { facingMode: "environment" };
+    const handleResult = text => {
+        html5QrCode.stop().then(() => {
+            isScanning=false;
+            scanAgainBtn.style.display="inline-block";
+            currentResultText=text;
+            resultDiv.textContent=text;
+            resultActionsDiv.style.display=isValidUrl(text)?"flex":"none";
+            if(!history.includes(text)){history.unshift(text); if(history.length>10)history.pop(); localStorage.setItem("qr_history",JSON.stringify(history)); renderHistory();}
+        });
+    };
 
-  const isValidUrl = (string) => {
-    try { new URL(string); return true; }
-    catch { return false; }
-  };
+    scanAgainBtn?.addEventListener("click", startScanning);
+    openUrlBtn?.addEventListener("click",()=>isValidUrl(currentResultText)&&window.open(currentResultText,'_blank'));
+    shareUrlBtn?.addEventListener("click",()=>navigator.share&&isValidUrl(currentResultText)&&navigator.share({title:'Taranan QR Kod',text:'Bu QR kod içeriğini paylaşıyorum:',url:currentResultText}));
+    clearHistoryBtn?.addEventListener("click",()=>{if(confirm("Geçmişi silmek istediğinizden emin misiniz?")){history=[];localStorage.removeItem("qr_history");renderHistory();}});
 
-  const renderHistory = () => {
-    historyDiv.innerHTML = history.length === 0
-      ? "<b>📜 Geçmiş yok</b>"
-      : "<b>📜 Okunan QR Geçmişi:</b><br>" +
-        history.map(q => `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.1);">${q}</div>`).join("");
-  };
-
-  const startScanning = () => {
-
-    if (isScanning) return;
-
-    resultDiv.innerHTML = "🔍 QR kodunu tarama alanına getirin...";
-    scanAgainBtn.style.display = "none";
-    resultActionsDiv.style.display = "none";
-
-    html5QrCode.start(cameraFacingMode, config, handleResult, console.warn)
-      .then(() => isScanning = true)
-      .catch(err => {
-
-        isScanning = false;
-
-        resultDiv.textContent =
-          String(err).includes("Permission denied")
-          ? "⚠️ Kamera izni reddedildi. Lütfen izin verin."
-          : "❌ Kamera başlatılamadı.";
-
-        scanAgainBtn.style.display = "inline-block";
-
-      });
-
-  };
-
-  const handleResult = (text) => {
-
-    html5QrCode.stop().then(() => {
-
-      isScanning = false;
-      scanAgainBtn.style.display = "inline-block";
-
-      currentResultText = text;
-      resultDiv.textContent = text;
-
-      resultActionsDiv.style.display =
-        isValidUrl(text) ? "flex" : "none";
-
-      if (!history.includes(text)) {
-
-        history.unshift(text);
-
-        if (history.length > 10) history.pop();
-
-        localStorage.setItem("qr_history", JSON.stringify(history));
-
-        renderHistory();
-
-      }
-
-    });
-
-  };
-
-  scanAgainBtn?.addEventListener("click", startScanning);
-
-  openUrlBtn?.addEventListener("click", () =>
-    isValidUrl(currentResultText) &&
-    window.open(currentResultText, '_blank')
-  );
-
-  shareUrlBtn?.addEventListener("click", () =>
-    navigator.share &&
-    isValidUrl(currentResultText) &&
-    navigator.share({
-      title:'Taranan QR Kod',
-      text:'Bu QR kod içeriğini paylaşıyorum:',
-      url:currentResultText
-    })
-  );
-
-  clearHistoryBtn?.addEventListener("click", () => {
-
-    if(confirm("Geçmişi silmek istediğinizden emin misiniz?")) {
-
-      history=[];
-      localStorage.removeItem("qr_history");
-
-      renderHistory();
-
-    }
-
-  });
-
-  startScanning();
-  renderHistory();
-
+    startScanning();
+    renderHistory();
 });
 </script>
-
 {% endblock %}
