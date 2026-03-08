@@ -215,7 +215,10 @@ document.addEventListener("DOMContentLoaded", () => {
         resultDiv.textContent = "🔍 QR kodunu tarama alanına getirin...";
         scanAgainBtn.style.display = "none";
         resultActionsDiv.style.display = "none";
-        html5QrCode.start(cameraFacingMode, config, handleResult, console.warn)
+        html5QrCode.start(cameraFacingMode, config, handleResult, err => {
+        // "No MultiFormat" spam'ini filtrele, gerçek hataları göster
+        if (!String(err).includes("No MultiFormat")) console.warn(err);
+        })
         .then(() => isScanning = true)
         .catch(err => {
             isScanning=false;
