@@ -198,11 +198,14 @@ def serve_robots():
 
 @views_bp.route('/favicon.ico')
 def favicon():
-    return send_from_directory(
+    response = make_response(send_from_directory(
         os.path.join(current_app.root_path, 'static', 'icons'),
         'favicon.ico',
         mimetype='image/vnd.microsoft.icon'
-    )
+    ))
+    response.headers.pop('ETag', None)
+    response.headers.pop('Last-Modified', None)  # bunu da kaldır, gereksiz bilgi
+    return response
 
 @views_bp.route('/sw.js')
 def serve_sw():
