@@ -6,6 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}Çağrı Vakti | Çağdaş, Hızlı ve Doğru{% endblock %}</title>
 
+    <script>
+    (function () {
+        const ua = navigator.userAgent;
+        const isFirefox = ua.includes("Firefox/") && !ua.includes("Chrome");
+        if (isFirefox) document.documentElement.classList.add("firefox-user");
+    })();
+    </script>
+
     <!-- SEO Meta Etiketleri -->
     <meta name="description" content="{% block description %}Dünya genelinde ezan vakitleri, imsakiye ve dini içerikler. Çağdaş arayüz ve doğru verilerle yanınızdayız.{% endblock %}">
     <meta name="keywords" content="{% block keywords %}ramazan, imsakiye, ezan vakitleri, iftar ve sahur vakitleri{% endblock %}">
