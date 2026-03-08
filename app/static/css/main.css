@@ -10,6 +10,42 @@
     --transition: all 0.3s ease;
 }
 
+/* Zen Browser - Transparent Window Support */
+@media (-moz-bool-pref: "widget.transparent-windows") {
+    body {
+        background-color: transparent !important;
+    }
+
+    .navbar {
+        background-color: rgba(30, 30, 30, 0.55) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .landing-footer {
+        background: rgba(18, 18, 18, 0.55) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    .nav-links {
+        background: rgba(30, 30, 30, 0.80) !important;
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+    }
+
+    .skeleton {
+        background: linear-gradient(
+            90deg,
+            rgba(30, 30, 30, 0.65) 25%,
+            rgba(45, 45, 45, 0.70) 50%,
+            rgba(30, 30, 30, 0.65) 75%
+        );
+        background-size: 200% 100%;
+    }
+}
+
 .icon {
     display: inline-block;
     width: 1em;
