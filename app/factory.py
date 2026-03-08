@@ -79,6 +79,14 @@ def create_app(config_class=Config):
                 "http://localhost:*",
                 "http://127.0.0.1:*"
             ]
+        },
+        r"/redirect*": {
+            "origins": [
+                "https://cagrivakti.com.tr",
+                "https://www.cagrivakti.com.tr",
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+            ]
         }
     })
     
