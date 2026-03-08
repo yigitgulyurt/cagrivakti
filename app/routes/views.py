@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from functools import wraps
 from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city, CITY_DISPLAY_NAME_MAPPING
 from app.models import ContactMessage, DailyContent, Guide, QrRedirect
-from app.extensions import cache, db, limiter
+from app.extensions import cache, db, limiter, csrf
 from datetime import datetime, timedelta
 import os
 import json
@@ -11,8 +11,6 @@ import requests
 from threading import Thread
 import re
 import hashlib
-import random, string
-from app.extensions import csrf
 
 views_bp = Blueprint('views', __name__)
 
