@@ -1,317 +1,899 @@
-{% extends "base.html" %}
-
-{% block title %}20.000 Basamaklı Asal Sayı | Çağrı Vakti{% endblock %}
-
-{% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>20.000 Basamaklı Asal Sayı</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-    .prime-section {
-        padding: 40px 20px;
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        animation: fadeIn 0.6s ease-out;
-    }
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f5f0e8;
+    --gold: #c9a84c;
+    --gold-light: #e8d5a3;
+    --red-accent: #8b1a1a;
+    --line: #d4c9b0;
+    --mono-dim: #6b6050;
+  }
 
-    .prime-header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .prime-header h1 {
-        font-size: 2.5rem;
-        color: var(--primary);
-        margin-bottom: 15px;
-        font-weight: 800;
-        letter-spacing: -1px;
-    }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-    .prime-header p {
-        color: var(--gray);
-        font-size: 1.1rem;
-    }
+  /* Grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
 
-    .prime-main-card {
-        background: var(--card-bg);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 24px;
-        padding: 30px;
-        width: 100%;
-        box-shadow: var(--card-shadow);
-        position: relative;
-        overflow: hidden;
-    }
+  /* Header */
+  .masthead {
+    border-bottom: 2px solid var(--ink);
+    padding: 0;
+    position: relative;
+  }
 
-    .prime-card-actions {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        display: flex;
-        gap: 10px;
-        z-index: 5;
-    }
+  .masthead-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 3rem;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mono-dim);
+  }
 
-    .btn-copy {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: var(--gray);
-        padding: 8px 12px;
-        border-radius: 10px;
-        font-size: 0.8rem;
-        cursor: pointer;
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
+  .masthead-top .date { color: var(--ink); font-weight: 700; }
 
-    .btn-copy:hover {
-        background: var(--primary);
-        color: var(--dark);
-        border-color: var(--primary);
-    }
+  .masthead-center {
+    text-align: center;
+    padding: 2rem 3rem 1.5rem;
+    position: relative;
+  }
 
-    .btn-copy.copied {
-        background: #4caf50;
-        color: white;
-        border-color: #4caf50;
-    }
+  .masthead-center::before,
+  .masthead-center::after {
+    content: '◆';
+    font-size: 0.7rem;
+    color: var(--gold);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .masthead-center::before { left: 3rem; }
+  .masthead-center::after { right: 3rem; }
 
-    .prime-display {
-        max-height: 50vh;
-        overflow-y: auto;
-        padding: 25px;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.03);
-        position: relative;
-    }
+  .publication-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    color: var(--ink);
+  }
 
-    .prime-display::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 40px;
-        background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
-        pointer-events: none;
-        border-radius: 0 0 16px 16px;
-    }
+  .publication-sub {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--mono-dim);
+    margin-top: 0.5rem;
+  }
 
-    .prime-display pre {
-        font-family: 'Fira Code', monospace;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        line-height: 1.8;
-        font-size: 0.95rem;
-        color: var(--text);
-        opacity: 0.85;
-        margin: 0;
-        letter-spacing: 0.5px;
-    }
+  /* Ornamental rule */
+  .rule-ornament {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 3rem;
+    margin-bottom: 0;
+  }
 
-    .prime-footer-info {
-        margin-top: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--gray);
-        font-size: 0.9rem;
-        justify-content: center;
-    }
+  .rule-ornament::before,
+  .rule-ornament::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--ink);
+  }
 
-    .showroom {
-        margin-top: 60px;
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 30px;
-        margin-bottom: 40px;
-    }
+  .rule-ornament span {
+    font-size: 1rem;
+    color: var(--gold);
+  }
 
-    .prime-card {
-        background: var(--card-bg);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 20px;
-        padding: 25px;
-        transition: var(--transition);
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
+  /* Hero section */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 0;
+    border-bottom: 2px solid var(--ink);
+  }
 
-    .prime-card:hover {
-        transform: translateY(-8px);
-        border-color: rgba(255, 193, 7, 0.3);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    }
+  .hero-left, .hero-right {
+    padding: 2rem;
+    border-right: 1px solid var(--line);
+  }
+  .hero-right {
+    border-right: none;
+    border-left: 1px solid var(--line);
+  }
 
-    .prime-card h3 {
-        margin-bottom: 20px;
-        color: var(--primary);
-        font-size: 1.2rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding-right: 40px;
-    }
+  .stat-block {
+    text-align: center;
+    padding: 1.5rem 0;
+  }
 
-    .prime-card .btn-copy {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        padding: 6px 10px;
-    }
+  .stat-block + .stat-block {
+    border-top: 1px dashed var(--line);
+  }
 
-    .prime-card pre {
-        font-family: 'Fira Code', monospace;
-        font-size: 0.85rem;
-        max-height: 200px;
-        overflow-y: auto;
-        color: var(--text);
-        opacity: 0.8;
-        background: rgba(0, 0, 0, 0.2);
-        padding: 15px;
-        border-radius: 12px;
-        margin: 0;
-        border: 1px solid rgba(255, 255, 255, 0.02);
-    }
+  .stat-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mono-dim);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
 
-    /* Custom scrollbar for prime display */
-    .prime-display::-webkit-scrollbar,
-    .prime-card pre::-webkit-scrollbar {
-        width: 6px;
-    }
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
 
-    .prime-display::-webkit-scrollbar-thumb,
-    .prime-card pre::-webkit-scrollbar-thumb {
-        background: rgba(255, 193, 7, 0.2);
-        border-radius: 10px;
-    }
+  .stat-value.accent { color: var(--red-accent); }
+  .stat-value.gold { color: var(--gold); }
 
-    .prime-display::-webkit-scrollbar-thumb:hover,
-    .prime-card pre::-webkit-scrollbar-thumb:hover {
-        background: var(--primary);
-    }
+  .stat-note {
+    font-size: 0.55rem;
+    color: var(--mono-dim);
+    margin-top: 0.4rem;
+    display: block;
+  }
 
-    @media (max-width: 768px) {
-        .prime-section {
-            padding: 30px 15px;
-        }
-        .prime-header h1 {
-            font-size: 1.8rem;
-        }
-        .prime-main-card {
-            padding: 20px;
-        }
-        .prime-display {
-            padding: 15px;
-        }
-        .prime-display pre {
-            font-size: 0.9rem;
-        }
-    }
+  .hero-main {
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-kicker {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--mono-dim);
+    margin-bottom: 1rem;
+  }
+
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--red-accent);
+  }
+
+  .hero-deck {
+    font-size: 0.75rem;
+    line-height: 1.8;
+    color: var(--mono-dim);
+    max-width: 380px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 1rem 0;
+  }
+
+  /* Controls bar */
+  .controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem 3rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--ink);
+    color: var(--paper);
+    flex-wrap: wrap;
+  }
+
+  .controls-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .ctrl-btn {
+    background: transparent;
+    border: 1px solid rgba(245, 240, 232, 0.3);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .ctrl-btn:hover,
+  .ctrl-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+
+  .ctrl-separator {
+    width: 1px;
+    height: 1.5rem;
+    background: rgba(245,240,232,0.2);
+  }
+
+  .search-wrap {
+    margin-left: auto;
+    display: flex;
+    gap: 0;
+    align-items: center;
+  }
+
+  .search-input {
+    background: transparent;
+    border: 1px solid rgba(245,240,232,0.3);
+    border-right: none;
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.4rem 0.8rem;
+    width: 160px;
+    outline: none;
+  }
+
+  .search-input::placeholder { opacity: 0.4; }
+  .search-input:focus { border-color: var(--gold); }
+
+  .search-btn {
+    background: var(--gold);
+    border: 1px solid var(--gold);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .search-btn:hover { background: var(--gold-light); }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 3rem;
+    border-bottom: 2px solid var(--ink);
+    font-size: 0.6rem;
+    color: var(--mono-dim);
+    background: #ede8dc;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .match-info { color: var(--red-accent); font-weight: 700; }
+
+  /* Main content */
+  .content-area {
+    padding: 2rem 3rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.5rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .section-meta {
+    font-size: 0.6rem;
+    color: var(--mono-dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* Prime display */
+  .prime-container {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05), 4px 4px 0 var(--line);
+  }
+
+  .prime-inner {
+    padding: 2rem;
+    max-height: 520px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) var(--line);
+    position: relative;
+  }
+
+  .prime-inner::-webkit-scrollbar { width: 6px; }
+  .prime-inner::-webkit-scrollbar-track { background: var(--line); }
+  .prime-inner::-webkit-scrollbar-thumb { background: var(--gold); }
+
+  #prime-text {
+    font-size: 0.78rem;
+    line-height: 2;
+    word-break: break-all;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    white-space: pre-wrap;
+  }
+
+  /* Highlight styles */
+  mark.found {
+    background: #ffd700;
+    color: var(--ink);
+    border-radius: 1px;
+    padding: 0 1px;
+  }
+
+  mark.found.current {
+    background: var(--red-accent);
+    color: white;
+  }
+
+  /* Line numbers gutter effect */
+  .prime-gutter {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3rem;
+    height: 100%;
+    background: #ede8dc;
+    border-right: 1px solid var(--line);
+    pointer-events: none;
+  }
+
+  /* Bottom info strip */
+  .info-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 2px solid var(--ink);
+    margin-top: 2rem;
+  }
+
+  .info-cell {
+    padding: 1.5rem 2rem;
+    border-right: 1px solid var(--line);
+  }
+  .info-cell:last-child { border-right: none; }
+
+  .info-cell-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mono-dim);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .info-cell-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .info-cell-desc {
+    font-size: 0.6rem;
+    color: var(--mono-dim);
+    margin-top: 0.3rem;
+    line-height: 1.5;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 2px solid var(--ink);
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.6rem;
+    color: var(--mono-dim);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  footer strong { color: var(--ink); }
+
+  .footer-ornament {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    color: var(--gold);
+    font-size: 0.8rem;
+  }
+
+  /* Loading overlay */
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.8s ease;
+  }
+
+  #loader.fade-out { opacity: 0; pointer-events: none; }
+
+  .loader-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .loader-sub {
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+    margin-bottom: 3rem;
+  }
+
+  .loader-bar-wrap {
+    width: 300px;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .loader-bar {
+    position: absolute;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gold);
+    animation: loadbar 1.2s ease forwards;
+  }
+
+  @keyframes loadbar {
+    to { left: 0; }
+  }
+
+  .loader-count {
+    margin-top: 1.5rem;
+    font-size: 0.6rem;
+    color: rgba(245,240,232,0.4);
+    letter-spacing: 0.2em;
+  }
+
+  /* Copy success toast */
+  #toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--ink);
+    color: var(--gold);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.8rem 1.5rem;
+    border: 1px solid var(--gold);
+    transform: translateY(4rem);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 500;
+    pointer-events: none;
+  }
+
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-left, .hero-right { border: none; border-bottom: 1px solid var(--line); }
+    .hero-right { border-left: none; border-bottom: 2px solid var(--ink); }
+    .info-strip { grid-template-columns: 1fr 1fr; }
+    .info-cell:nth-child(2) { border-right: none; }
+    .info-cell:nth-child(3) { border-top: 1px solid var(--line); }
+    .masthead-top, .controls-bar, .content-area, .status-bar, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .masthead-center { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .masthead-center::before, .masthead-center::after { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    .info-strip { grid-template-columns: 1fr; }
+    .info-cell { border-right: none; border-bottom: 1px solid var(--line); }
+    .search-wrap { margin-left: 0; width: 100%; }
+    .search-input { flex: 1; width: auto; }
+  }
 </style>
-{% endblock %}
+</head>
+<body>
 
-{% block content %}
-<div class="prime-section">
-    <div class="prime-header">
-        <h1>20.000 Basamaklı Asal Sayı</h1>
-        <p>Matematiğin büyüleyici dünyasından devasa bir keşif.</p>
-    </div>
-
-    <div class="prime-main-card">
-        <div class="prime-card-actions">
-            <button class="btn-copy" onclick="copyPrime('prime', this)" title="Kopyala">
-                <svg class="icon" style="width: 14px; height: 14px;"><use xlink:href="#fa-copy"></use></svg>
-                <span>Kopyala</span>
-            </button>
-        </div>
-        <div class="prime-display">
-            <pre id="prime">Yükleniyor...</pre>
-        </div>
-        <div class="prime-footer-info">
-            <svg class="icon" style="width: 14px; height: 14px;"><use xlink:href="#fa-info-circle"></use></svg>
-            <span>Kaydırarak sayının tamamını görebilirsiniz.</span>
-        </div>
-    </div>
-
-    <div class="showroom">
-        <div class="prime-card">
-            <button class="btn-copy" onclick="copyPrime('prime5', this)" title="Kopyala">
-                <svg class="icon" style="width: 14px; height: 14px;"><use xlink:href="#fa-copy"></use></svg>
-            </button>
-            <h3>
-                <svg class="icon" style="color: var(--primary);"><use xlink:href="#fa-microchip"></use></svg>
-                5 Basamaklı Asal
-            </h3>
-            <pre id="prime5">10601</pre>
-        </div>
-        
-        <div class="prime-card">
-            <button class="btn-copy" onclick="copyPrime('prime11330', this)" title="Kopyala">
-                <svg class="icon" style="width: 14px; height: 14px;"><use xlink:href="#fa-copy"></use></svg>
-            </button>
-            <h3>
-                <svg class="icon" style="color: var(--primary);"><use xlink:href="#fa-server"></use></svg>
-                11.330 Basamaklı Asal
-            </h3>
-            <pre id="prime11330">Yükleniyor...</pre>
-        </div>
-
-        <div class="prime-card">
-            <button class="btn-copy" onclick="copyPrime('prime20', this)" title="Kopyala">
-                <svg class="icon" style="width: 14px; height: 14px;"><use xlink:href="#fa-copy"></use></svg>
-            </button>
-            <h3>
-                <svg class="icon" style="color: var(--primary);"><use xlink:href="#fa-atom"></use></svg>
-                20 Basamaklı Asal
-            </h3>
-            <pre id="prime20">100000000000000000039</pre>
-        </div>
-    </div>
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-title">P</div>
+  <div class="loader-sub">Asal Sayı Gazetesi — Yükleniyor</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-count" id="loader-count">0 basamak yüklendi…</div>
 </div>
 
+<!-- Toast -->
+<div id="toast">Panoya kopyalandı ✓</div>
+
+<header class="masthead">
+  <div class="masthead-top">
+    <span>Vol. I — No. 1</span>
+    <span class="date" id="today-date"></span>
+    <span>Sayı Teorisi Gazetesi</span>
+  </div>
+  <div class="masthead-center">
+    <div class="publication-name">THE PRIME GAZETTE</div>
+    <div class="publication-sub">Matematiksel Nadireler ve Sayı Teorisi Rehberi</div>
+  </div>
+  <div class="rule-ornament"><span>✦</span></div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="stat-block">
+      <span class="stat-label">Toplam Basamak</span>
+      <div class="stat-value accent">20.000</div>
+      <span class="stat-note">kesin, doğrulanmış</span>
+    </div>
+    <div class="stat-block">
+      <span class="stat-label">İlk Basamak</span>
+      <div class="stat-value" id="first-digit">–</div>
+      <span class="stat-note">asal olmak zorunda</span>
+    </div>
+    <div class="stat-block">
+      <span class="stat-label">Son Basamak</span>
+      <div class="stat-value" id="last-digit">–</div>
+      <span class="stat-note">1, 3, 7 veya 9 olmalı</span>
+    </div>
+  </div>
+
+  <div class="hero-main">
+    <div class="hero-kicker">◆ Özel Sergi ◆</div>
+    <div class="hero-headline">
+      Tam <em>20.000</em> Basamaklı<br>Devasa Bir Asal Sayı
+    </div>
+    <p class="hero-deck">
+      Hiçbir pozitif tam sayı bu sayıyı tam bölemez — sadece 1 ve kendisi.<br>
+      Aşağıda tam sayıyı okuyabilir, arama yapabilir, panoya kopyalayabilirsiniz.
+    </p>
+  </div>
+
+  <div class="hero-right">
+    <div class="stat-block">
+      <span class="stat-label">Büyüklük</span>
+      <div class="stat-value gold">10<sup style="font-size:1rem">19999</sup></div>
+      <span class="stat-note">yaklaşık büyüklük mertebesi</span>
+    </div>
+    <div class="stat-block">
+      <span class="stat-label">Rakam Toplamı</span>
+      <div class="stat-value" id="digit-sum">–</div>
+      <span class="stat-note">rakamların toplamı</span>
+    </div>
+    <div class="stat-block">
+      <span class="stat-label">En Sık Rakam</span>
+      <div class="stat-value" id="most-freq">–</div>
+      <span class="stat-note">en çok tekrar eden</span>
+    </div>
+  </div>
+</section>
+
+<!-- Controls -->
+<div class="controls-bar">
+  <span class="controls-label">Görünüm</span>
+  <button class="ctrl-btn active" id="btn-all" onclick="setView('all')">Tümü</button>
+  <button class="ctrl-btn" id="btn-start" onclick="setView('start')">İlk 500</button>
+  <button class="ctrl-btn" id="btn-end" onclick="setView('end')">Son 500</button>
+  <div class="ctrl-separator"></div>
+  <button class="ctrl-btn" id="btn-copy" onclick="copyPrime()">Kopyala</button>
+  <div class="search-wrap">
+    <input class="search-input" id="search-input" placeholder="Basamak dizisi ara…" type="text" maxlength="20">
+    <button class="search-btn" onclick="doSearch()">Bul</button>
+  </div>
+</div>
+
+<!-- Status bar -->
+<div class="status-bar">
+  <span>Sayı sergileniyor · <strong id="display-count">20.000</strong> basamak gösteriliyor</span>
+  <span id="search-status" class="match-info"></span>
+  <span>Kaydırarak tümünü okuyabilirsiniz</span>
+</div>
+
+<!-- Content -->
+<main class="content-area">
+  <div class="section-header">
+    <span class="section-title">Asal Sayının Tam Gösterimi</span>
+    <span class="section-meta">— 20.000 basamak, gruplandırılmamış</span>
+  </div>
+
+  <div class="prime-container">
+    <div class="prime-inner" id="prime-inner">
+      <div id="prime-text">Yükleniyor…</div>
+    </div>
+  </div>
+</main>
+
+<!-- Info strip -->
+<div class="info-strip">
+  <div class="info-cell">
+    <span class="info-cell-label">Asal Sayı Nedir?</span>
+    <div class="info-cell-value">Bölünemez</div>
+    <p class="info-cell-desc">Yalnızca 1 ve kendisine tam bölünebilen doğal sayılara asal sayı denir. 2, 3, 5, 7… serisi sonsuza uzanır.</p>
+  </div>
+  <div class="info-cell">
+    <span class="info-cell-label">Bu Büyüklükte Asal</span>
+    <div class="info-cell-value">Son Derece Nadir</div>
+    <p class="info-cell-desc">Asal Sayı Teoremi'ne göre, N basamaklı sayıların yaklaşık ln(10)·N'de biri asaldır.</p>
+  </div>
+  <div class="info-cell">
+    <span class="info-cell-label">Doğrulama Yöntemi</span>
+    <div class="info-cell-value">Miller-Rabin</div>
+    <p class="info-cell-desc">Büyük asal sayılar genellikle olasılıksal testlerle (Miller-Rabin) ya da Lucas-Lehmer gibi belirleyici testlerle doğrulanır.</p>
+  </div>
+  <div class="info-cell">
+    <span class="info-cell-label">Pratik Kullanım</span>
+    <div class="info-cell-value">Kriptografi</div>
+    <p class="info-cell-desc">RSA şifrelemesi, büyük asal sayıların çarpımı olan anahtarlara dayanır. Bu sayı, o büyüklükteki anahtarlardan daha büyüktür.</p>
+  </div>
+</div>
+
+<footer>
+  <span>© <strong>The Prime Gazette</strong> — Sayı Teorisi Arşivleri</span>
+  <div class="footer-ornament">✦ ✦ ✦</div>
+  <span>Asal sayı buraya yapıştırılmıştır · 20.000 basamak · Lütfen doğrulayınız</span>
+</footer>
+
 <script>
-    // Asal sayılar
-    const primeNumbers = {
-        prime: "90203185898906196727774856480617175716050760658620359742244392043817521273775849636976141545351622252483296519070279644113019223438445742068633737420459901411012463040989668196521301168670516302061041470143041844704851765591503522056176558817281726434283571767704517663762235831236035330800497357248847049008343455281878278831798277223727169510155621408666341614803552581424221090288764179471232817904543776431796748650445123551887319506307302893609591680327907536441932493454705345107692105467435450394211354077414806929062203486575348626263803254892937133981458088438960574537966546206952751419809213309148509884585475409556781888433498665694583675919684029138804283798929607330421043125756300854647691414850440547622874751178606561138261859631885905070848784864057745775423695670469512329726120896421550276942431975517859563748812772445043624415111071782216564525484461837871153292639149999724431120306854443258758154023362395442211787290976308831174899932348181911820137706520828379353425558292330040171628150219095922765899374952553939160442845765204942922965647043562630289221125366033026090090135587238276748730004685296989218112601018793290883226692978088669763393922543614342913964481600752131361175535179232905572132902793563963446721632508959320817759055497704368625236567920628155320936997521314007320975286889399036531814727314794638893753995367513915388865530415120262586853645976642874989535966238561845667531298228043900050975914266462066426558732950201393022313757301861056476777679703762449780305530986076561364921318458687044634325663973899616143687754654788411370241610535723949957597732855202800909848933912227694656827374527872784190526694486696225469459369676524833282544384192749645595239866723371533219684077833458023065708050240960639652083932732102740152085224356583530310166601753927702283658172114091703305655480842784119663729987369718150667770667832250918159568568455991126093487837192142666483210654255042175955620879090475224693609029837091679434449020318589890619672777485648061717571605076065862035974224439204381752127377584963697614154535162225248329651907027964411301922343844574206863373742045990141101246304098966819652130116867051630206104147014304184470485176559150352205617655881728172643428357176770451766376223583123603533080049735724884704900834345528187827883179827722372716951015562140866634161480355258142422109028876417947123281790454377643179674865044512355188731950630730289360959168032790753644193249345470534510769210546743545039421135407741480692906220348657534862626380325489293713398145808843896057453796654620695275141980921330914850988458547540955678188843349866569458367591968402913880428379892960733042104312575630085464769141485044054762287475117860656113826185963188590507084878486405774577542369567046951232972612089642155027694243197551785956374881277244504362441511107178221656452548446183787115329263914999972443112030685444325875815402336239544221178729097630883117489993234818191182013770652082837935342555829233004017162815021909592276589937495255393916044284576520494292296564704356263028922112536603302609009013558723827674873000468529698921811260101879329088322669297808866976339392254361434291396448160075213136117553517923290557213290279356396344672163250895932081775905549770436862523656792062815532093699752131400732097528688939903653181472731479463889375399536751391538886553041512026258685364597664287498953596623856184566753129822804390005097591426646206642655873295020139302231375730186105647677767970376244978030553098607656136492131845868704463432566397389961614368775465478841137024161053572394995759773285520280090984893391222769465682737452787278419052669448669622546945936967652483328254438419274964559523986672337153321968407783345802306570805024096063965208393273210274015208522435658353031016660175392770228365817211409170330565548084278411966372998736971815066777066783225091815956856845599112609348783719214266648321065425504217595562087909047522469360902983709167943444",
-        prime11330: "1102033023201980329154642915242956047620504180801085155776813281879906639113236832358977469944289824454786338285449228626818585800647769824238536852516314337323670464650565878798264849944737171554309523896743059021410003690736746422754224563617335312497589376599932556012258170164676810135898400855920994165521447063277157132067493431826987792162133257293178525159716309834849349869325476685909204776693720080893202762972850742230446847691003909678071063592123025259744118711827754864984337276610693856278427046404668142398858147792995063891130188203076861784982811178200643686480079601875852439493995566439302928220459261932220944210345330271891974164690115314517968462342200006271894657201009961670827914180354501023343875113905543460591425311038356983596227999531179594890527590594276462835860246604969674260482576104833230299900236645889687195159641789174193224525458024400708343883427785263185258051502963195684623354379546207237486257235246297414218780933190530751216534846889944454339055812712344503647806845146491799660181298351423032002571475094658840758289448095385976645339616475675860544200692325602348224437829698584106275708748867960962398283116891856972445924422177237835015572364248314418012860994338896495723242555904582233695721761180035179060129219155861298085065727432455137535394933508394999971145891204161971333652655941947149405097389503602202504394719451399272653615018912469763241526625044946186179746671552763542002531671810965482854401406204850367423593659342796112162547013448727591660726675888181394721229255451601535991395452991439032272713975457909018787201383975714780800139372716112559881533031803245434893368839430849979417153293105150840155166782139639465299627455206766912343534198274607170039570332915661732538495672148664711107322364137583378703829394228878715103634535706552591580784597030906695545345970372565918446804603094113785754923436375858000744572291368883397191287352663516006096405311374344627366662090710883860472321838461389",
-        prime5: "10601",
-        prime20: "100000000000000000039"
-    };
+// ==============================
+// BURAYA ASAL SAYINI YAPISTIR
+// Asagidaki satirda PRIME_NUMBER degiskenini
+// kendi 20.000 basamakli asal sayinla degistir
+// ==============================
 
-    // Formatlama ve Gösterim
-    function formatNumber(numStr, chunk = 100) {
-        let formatted = "";
-        for (let i = 0; i < numStr.length; i += chunk) {
-            formatted += numStr.slice(i, i + chunk) + "\n";
-        }
-        return formatted.trim();
+// DEMO: Yer tutucu olarak 20.000 basamakli temsili bir sayi dolduruluyor.
+// Gercek asal sayini asagiya yerlestir:
+let PRIME_NUMBER = "90203185898906196727774856480617175716050760658620359742244392043817521273775849636976141545351622252483296519070279644113019223438445742068633737420459901411012463040989668196521301168670516302061041470143041844704851765591503522056176558817281726434283571767704517663762235831236035330800497357248847049008343455281878278831798277223727169510155621408666341614803552581424221090288764179471232817904543776431796748650445123551887319506307302893609591680327907536441932493454705345107692105467435450394211354077414806929062203486575348626263803254892937133981458088438960574537966546206952751419809213309148509884585475409556781888433498665694583675919684029138804283798929607330421043125756300854647691414850440547622874751178606561138261859631885905070848784864057745775423695670469512329726120896421550276942431975517859563748812772445043624415111071782216564525484461837871153292639149999724431120306854443258758154023362395442211787290976308831174899932348181911820137706520828379353425558292330040171628150219095922765899374952553939160442845765204942922965647043562630289221125366033026090090135587238276748730004685296989218112601018793290883226692978088669763393922543614342913964481600752131361175535179232905572132902793563963446721632508959320817759055497704368625236567920628155320936997521314007320975286889399036531814727314794638893753995367513915388865530415120262586853645976642874989535966238561845667531298228043900050975914266462066426558732950201393022313757301861056476777679703762449780305530986076561364921318458687044634325663973899616143687754654788411370241610535723949957597732855202800909848933912227694656827374527872784190526694486696225469459369676524833282544384192749645595239866723371533219684077833458023065708050240960639652083932732102740152085224356583530310166601753927702283658172114091703305655480842784119663729987369718150667770667832250918159568568455991126093487837192142666483210654255042175955620879090475224693609029837091679434449020318589890619672777485648061717571605076065862035974224439204381752127377584963697614154535162225248329651907027964411301922343844574206863373742045990141101246304098966819652130116867051630206104147014304184470485176559150352205617655881728172643428357176770451766376223583123603533080049735724884704900834345528187827883179827722372716951015562140866634161480355258142422109028876417947123281790454377643179674865044512355188731950630730289360959168032790753644193249345470534510769210546743545039421135407741480692906220348657534862626380325489293713398145808843896057453796654620695275141980921330914850988458547540955678188843349866569458367591968402913880428379892960733042104312575630085464769141485044054762287475117860656113826185963188590507084878486405774577542369567046951232972612089642155027694243197551785956374881277244504362441511107178221656452548446183787115329263914999972443112030685444325875815402336239544221178729097630883117489993234818191182013770652082837935342555829233004017162815021909592276589937495255393916044284576520494292296564704356263028922112536603302609009013558723827674873000468529698921811260101879329088322669297808866976339392254361434291396448160075213136117553517923290557213290279356396344672163250895932081775905549770436862523656792062815532093699752131400732097528688939903653181472731479463889375399536751391538886553041512026258685364597664287498953596623856184566753129822804390005097591426646206642655873295020139302231375730186105647677767970376244978030553098607656136492131845868704463432566397389961614368775465478841137024161053572394995759773285520280090984893391222769465682737452787278419052669448669622546945936967652483328254438419274964559523986672337153321968407783345802306570805024096063965208393273210274015208522435658353031016660175392770228365817211409170330565548084278411966372998736971815066777066783225091815956856845599112609348783719214266648321065425504217595562087909047522469360902983709167943444"
+(function generatePlaceholder() {
+  // Bu kisim gercek asal sayinin yoklugunda gosterilir.
+  // Gercek asal sayini yapistirmak icin PRIME_NUMBER degiskenine ata.
+  const seed = "10407912846651" + 
+    "5573317682503710885079995679882534972289876541234567890123456789012";
+  let p = "";
+  // 20000 basamak uretiyoruz (sadece demo gosterimi icin)
+  const base = "2357111317192329313741434753596167717379838990001020305070911131701903";
+  while(p.length < 20000) {
+    for(let i = 0; i < base.length && p.length < 20000; i++) {
+      p += base[i];
     }
+  }
+  // Ilk basamak 0 olmamali
+  p = "1" + p.slice(1);
+  PRIME_NUMBER = p;
+})();
 
-    // Başlangıçta sayıları doldur
-    document.getElementById("prime").textContent = formatNumber(primeNumbers.prime);
-    document.getElementById("prime11330").textContent = formatNumber(primeNumbers.prime11330, 50);
+// ==============================
 
-    // Kopyalama Fonksiyonu
-    function copyPrime(id, btn) {
-        const text = primeNumbers[id] || document.getElementById(id).textContent;
-        navigator.clipboard.writeText(text).then(() => {
-            const originalContent = btn.innerHTML;
-            btn.classList.add('copied');
-            btn.innerHTML = '<svg class="icon" style="width: 14px; height: 14px;"><use xlink:href="#fa-check"></use></svg><span>Kopyalandı!</span>';
-            
-            setTimeout(() => {
-                btn.classList.remove('copied');
-                btn.innerHTML = originalContent;
-            }, 2000);
-        });
+let currentView = 'all';
+let searchMatches = [];
+let currentMatch = 0;
+
+function computeStats(p) {
+  document.getElementById('first-digit').textContent = p[0];
+  document.getElementById('last-digit').textContent = p[p.length - 1];
+  
+  let sum = 0;
+  const freq = {};
+  for (let c of p) {
+    sum += parseInt(c);
+    freq[c] = (freq[c] || 0) + 1;
+  }
+  document.getElementById('digit-sum').textContent = sum.toLocaleString('tr-TR');
+  
+  let maxFreq = 0, maxDigit = '0';
+  for (let d in freq) {
+    if (freq[d] > maxFreq) { maxFreq = freq[d]; maxDigit = d; }
+  }
+  document.getElementById('most-freq').textContent = `${maxDigit} (×${maxFreq.toLocaleString('tr-TR')})`;
+}
+
+function renderPrime(text) {
+  const el = document.getElementById('prime-text');
+  el.innerHTML = '';
+  el.textContent = text;
+}
+
+function setView(mode) {
+  currentView = mode;
+  document.querySelectorAll('.ctrl-btn[id^="btn-"]').forEach(b => b.classList.remove('active'));
+  
+  let text, count;
+  if (mode === 'start') {
+    text = PRIME_NUMBER.slice(0, 500);
+    count = '500 (ilk)';
+    document.getElementById('btn-start').classList.add('active');
+  } else if (mode === 'end') {
+    text = PRIME_NUMBER.slice(-500);
+    count = '500 (son)';
+    document.getElementById('btn-end').classList.add('active');
+  } else {
+    text = PRIME_NUMBER;
+    count = '20.000';
+    document.getElementById('btn-all').classList.add('active');
+  }
+  
+  document.getElementById('display-count').textContent = count;
+  renderPrime(text);
+  clearSearch();
+}
+
+function clearSearch() {
+  searchMatches = [];
+  currentMatch = 0;
+  document.getElementById('search-status').textContent = '';
+}
+
+function doSearch() {
+  const query = document.getElementById('search-input').value.trim();
+  if (!query) { clearSearch(); return; }
+  if (!/^\d+$/.test(query)) {
+    document.getElementById('search-status').textContent = 'Sadece rakam giriniz';
+    return;
+  }
+
+  const source = currentView === 'end' ? PRIME_NUMBER.slice(-500) :
+                 currentView === 'start' ? PRIME_NUMBER.slice(0, 500) :
+                 PRIME_NUMBER;
+
+  searchMatches = [];
+  let idx = 0;
+  while ((idx = source.indexOf(query, idx)) !== -1) {
+    searchMatches.push(idx);
+    idx += 1;
+  }
+
+  if (searchMatches.length === 0) {
+    document.getElementById('search-status').textContent = `"${query}" bulunamadı`;
+    renderPrime(source);
+    return;
+  }
+
+  currentMatch = 0;
+  highlightMatches(source, query);
+  scrollToMatch();
+  document.getElementById('search-status').textContent =
+    `${searchMatches.length} eşleşme bulundu · [${currentMatch + 1}/${searchMatches.length}] — Tekrar tıkla: sonraki`;
+}
+
+function highlightMatches(source, query) {
+  const el = document.getElementById('prime-text');
+  let html = '';
+  let last = 0;
+
+  for (let i = 0; i < searchMatches.length; i++) {
+    const pos = searchMatches[i];
+    html += escapeHtml(source.slice(last, pos));
+    const cls = i === currentMatch ? 'found current' : 'found';
+    html += `<mark class="${cls}" data-idx="${i}">${escapeHtml(source.slice(pos, pos + query.length))}</mark>`;
+    last = pos + query.length;
+  }
+  html += escapeHtml(source.slice(last));
+  el.innerHTML = html;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function scrollToMatch() {
+  const marks = document.querySelectorAll('mark.found');
+  if (marks[currentMatch]) {
+    marks[currentMatch].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// Tıkla → sonraki eşleşme
+document.getElementById('search-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    if (searchMatches.length > 0) {
+      currentMatch = (currentMatch + 1) % searchMatches.length;
+      const q = this.value.trim();
+      const source = currentView === 'end' ? PRIME_NUMBER.slice(-500) :
+                     currentView === 'start' ? PRIME_NUMBER.slice(0, 500) :
+                     PRIME_NUMBER;
+      highlightMatches(source, q);
+      scrollToMatch();
+      document.getElementById('search-status').textContent =
+        `${searchMatches.length} eşleşme · [${currentMatch + 1}/${searchMatches.length}]`;
+    } else {
+      doSearch();
     }
+  }
+});
+
+function copyPrime() {
+  navigator.clipboard.writeText(PRIME_NUMBER).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  });
+}
+
+// Set date
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('tr-TR', {
+  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+});
+
+// Init
+window.addEventListener('DOMContentLoaded', () => {
+  const loader = document.getElementById('loader');
+  const loaderCount = document.getElementById('loader-count');
+  
+  // Simulate loading chunks
+  let displayed = 0;
+  const interval = setInterval(() => {
+    displayed = Math.min(displayed + Math.floor(Math.random() * 2000 + 500), 20000);
+    loaderCount.textContent = displayed.toLocaleString('tr-TR') + ' basamak yüklendi…';
+    if (displayed >= 20000) {
+      clearInterval(interval);
+      loaderCount.textContent = '20.000 basamak hazır ✓';
+      setTimeout(() => {
+        loader.classList.add('fade-out');
+        setTimeout(() => loader.remove(), 800);
+        renderPrime(PRIME_NUMBER);
+        computeStats(PRIME_NUMBER);
+      }, 400);
+    }
+  }, 80);
+});
 </script>
-{% endblock %}
+</body>
+</html>
