@@ -1076,7 +1076,9 @@ to {
 
     /* ═══ TAM TRANSPARENT ═══ */
     html,
-    body {
+    body,
+    .hero,
+    .landing-footer {
         background-color: transparent !important;
         background: none !important;
         border: none !important;
