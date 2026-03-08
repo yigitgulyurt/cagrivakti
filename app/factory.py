@@ -154,7 +154,15 @@ def create_app(config_class=Config):
         # Yeni UID üretildiyse cookie olarak ekle
         try:
             if getattr(g, '_set_uid_cookie', None):
-                response.set_cookie('cv_uid', g._set_uid_cookie, max_age=60*60*24*365, samesite='Lax', path='/')
+                response.set_cookie(
+                    'cv_uid',
+                    g._set_uid_cookie,
+                    max_age=60*60*24*365,
+                    samesite='Lax',
+                    path='/',
+                    secure=True,    # <-- ekle
+                    httponly=True   # <-- ekle
+                )
         except Exception:
             pass
         # Statik dosyalar için uzun süreli cache (Daima overwrite)
