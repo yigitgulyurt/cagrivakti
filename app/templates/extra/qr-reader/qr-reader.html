@@ -242,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isValidUrl(text)) {
             openUrlBtn.style.display = "inline-block";
             try {
-                const res = await fetch('/api/shorten', {
+                const res = await fetch('/qr/shorten', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: text })

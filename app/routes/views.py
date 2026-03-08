@@ -819,7 +819,7 @@ def qr_okuyucu():
 def generate_id(length=7):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
-@views_bp.route('/api/shorten', methods=['POST'])
+@views_bp.route('/qr/shorten', methods=['POST'])
 def shorten():
     return jsonify({'test': 'ok', 'data': request.get_json(silent=True, force=True)})
 
