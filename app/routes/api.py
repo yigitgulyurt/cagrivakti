@@ -348,6 +348,7 @@ def shorten():
     return jsonify({'short_id': short_id})
 
 @api_bp.route('/r/<short_id>')
+@csrf.exempt
 def redirect_url(short_id):
     obj = QrRedirect.query.get_or_404(short_id)
     obj.hit_count += 1
