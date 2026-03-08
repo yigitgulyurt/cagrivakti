@@ -1182,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', function() {
     position: relative;
     padding: 3px;
     border-radius: 24px;
-    background: linear-gradient(135deg, var(--primary), #fbbf24, var(--primary));
+    /*background: linear-gradient(135deg, var(--primary), #fbbf24, var(--primary));*/
     background-size: 200% auto;
     text-decoration: none;
     display: inline-block;
@@ -1190,6 +1190,7 @@ document.addEventListener('DOMContentLoaded', function() {
     animation: shine 3s linear infinite;
     box-shadow: 0 4px 15px rgba(255, 193, 7, 0.15);
     width: 360px; /* Genişliği biraz daha artırdım */
+    border: 2px solid var(--primary) !important
 }
 
 .btn-ultra-hero:hover {
