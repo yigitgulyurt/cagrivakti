@@ -821,6 +821,7 @@ def generate_id(length=7):
 
 @views_bp.route('/api/shorten', methods=['POST'])
 def shorten():
+    current_app.logger.info(f"shorten called | content_type={request.content_type} | data={request.data} | json={request.get_json(silent=True, force=True)}")
     data = request.get_json(silent=True, force=True)  # ← silent+force ekle
     if not data:
         return jsonify({'error': 'JSON parse edilemedi'}), 400
