@@ -240,6 +240,28 @@ document.addEventListener("DOMContentLoaded", () => {
     scanAgainBtn?.addEventListener("click", startScanning);
     openUrlBtn?.addEventListener("click",()=>isValidUrl(currentResultText)&&window.open(currentResultText,'_blank'));
     shareUrlBtn?.addEventListener("click", () => {
+    if (!navigator.share) {
+        // Fallback: panoya kopyala
+        navigator.clipboard?.writeText(currentResultText).then(() => {
+            shareUrlBtn.textContent = "✅ Kopyalandı!";
+            setTimeout(() => shareUrlBtn.textContent = "📤 Paylaş", 2000);
+        });
+        return;
+    }
+
+    const shareMessages = [
+        `📷 QR kodu taradım:\n${currentResultText}\n\n⏰ Namaz vakitleri için → cagrivakti.com.tr`,
+        `🔍 Bu QR kod içeriğini buldum:\n${currentResultText}\n\n🕌 Çağrı Vakti: cagrivakti.com.tr`,
+        `📲 QR okuyucu ile tespit ettim:\n${currentResultText}\n\n🌙 cagrivakti.com.tr`,
+    ];
+
+    const text = shareMessages[Math.floor(Math.random() * shareMessages.length)];
+
+    navigator.share({
+        title: 'QR Kod — Çağrı Vakti',
+        text: text,   // URL dahil her şey buraya, url parametresi YOK
+    }).catch(() => {});
+    });
     if (!navigator.share) return;
     
     const isUrl = isValidUrl(currentResultText);
