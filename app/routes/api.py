@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, request, current_app, abort
 import logging
 from app.services import UserService, PrayerService, get_daily_content
-from app.extensions import cache, limiter
+from app.extensions import cache, limiter, db, csrf
 from datetime import datetime, date, timedelta
 from functools import wraps
 import re
+import random
+import string
 
 api_bp = Blueprint('api', __name__, subdomain='api')
 
@@ -313,3 +315,40 @@ def public_api_vakitler():
         return jsonify({'durum': 'hata', 'mesaj': 'Vakit bulunamadı.'}), 404
     except Exception as e:
         return jsonify({'durum': 'hata', 'mesaj': str(e)}), 500
+
+
+def generate_id(length=7):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+
+@api_bp.route('/shorten', methods=['POST'])
+@csrf.exempt
+def shorten():
+    data = request.get_json(silent=True, force=True)  # ← silent+force ekle
+    if not data:
+        return jsonify({'error': 'JSON parse edilemedi'}), 400
+    
+    url = data.get('url', '').strip()
+    
+    if not url:
+        return jsonify({'error': 'URL gerekli'}), 400
+    
+    existing = QrRedirect.query.filter_by(url=url).first()
+    if existing:
+        return jsonify({'short_id': existing.id})
+    
+    short_id = generate_id()
+    while QrRedirect.query.get(short_id):
+        short_id = generate_id()
+    
+    redirect_obj = QrRedirect(id=short_id, url=url)
+    db.session.add(redirect_obj)
+    db.session.commit()
+    
+    return jsonify({'short_id': short_id})
+
+@api_bp.route('/r/<short_id>')
+def redirect_url(short_id):
+    obj = QrRedirect.query.get_or_404(short_id)
+    obj.hit_count += 1
+    db.session.commit()
+    return redirect(obj.url)
