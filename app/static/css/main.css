@@ -1080,4 +1080,11 @@ to {
     	box-shadow: none !important;
     	transition: background-color 0.5s ease-in-out, background 0.5s ease-in-out, border 0.5s ease-in-out, box-shadow 0.5s ease-in-out !important;
     }
+      /* Navbar'ı arkadan ayır */
+    nav, #nav, .nav, .navbar, #navbar, .header, #header, header, .global-head-cont, #navigation-wrapper, #global-navbar {
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
 }
