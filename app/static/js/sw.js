@@ -25,7 +25,11 @@ const PRECACHE_ASSETS = [
     '/static/icons/android/android-launchericon-192-192.png',
     '/static/icons/android/android-launchericon-512-512.png',
     '/static/icons/ios/180.png',
-    '/static/icons/windows11/Square150x150Logo.scale-100.png'
+    '/static/icons/windows11/Square150x150Logo.scale-100.png',
+    '/static/font/jetbrains-mono-v24-latin-regular.woff2',
+    '/static/font/jetbrains-mono-v24-latin-700.woff2',
+    '/static/font/playfair-display-v40-latin-700.woff2',
+    '/static/font/playfair-display-v40-latin-900.woff2',
 ];
 
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
