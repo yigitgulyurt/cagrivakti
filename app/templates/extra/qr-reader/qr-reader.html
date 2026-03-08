@@ -249,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 const data = await res.json();
                 if (data.short_id) {
-                    currentShortUrl = `https://api.cagrivakti.com.tr/r/${data.short_id}`;
+                    currentShortUrl = `https://cagrivakti.com.tr/r/${data.short_id}`;
                 }
             } catch { currentShortUrl = text; }
         } else {
