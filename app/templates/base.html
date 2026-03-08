@@ -1,723 +1,616 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}Çağrı Vakti | Çağdaş, Hızlı ve Doğru{% endblock %}</title>
 
-{% block title %}20.000 Basamaklı Asal Sayı | Çağrı Vakti{% endblock %}
-{% block description %}Tam 20.000 basamaklı devasa bir asal sayının tam gösterimi. Sayı teorisi ve kriptografi hakkında bilgiler.{% endblock %}
-{% block keywords %}asal sayı, 20000 basamak, büyük asal, sayı teorisi, kriptografi, Miller-Rabin{% endblock %}
+    <!-- SEO Meta Etiketleri -->
+    <meta name="description" content="{% block description %}Dünya genelinde ezan vakitleri, imsakiye ve dini içerikler. Çağdaş arayüz ve doğru verilerle yanınızdayız.{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}ramazan, imsakiye, ezan vakitleri, iftar ve sahur vakitleri{% endblock %}">
+    <meta name="author" content="Çağrı Vakti">
+    <link rel="canonical" href="{% block canonical %}https://cagrivakti.com.tr{{ request.path }}{% endblock %}">
 
-{% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-  /* ── Sayfa kök değişkenleri ── */
-  :root {
-    --pg-ink:       #0a0a0f;
-    --pg-paper:     #f5f0e8;
-    --pg-gold:      #c9a84c;
-    --pg-gold-lt:   #e8d5a3;
-    --pg-red:       #8b1a1a;
-    --pg-line:      #d4c9b0;
-    --pg-dim:       #6b6050;
-  }
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cagrivakti.com.tr{{ request.path }}" />
+    <meta property="og:title" content="Çağrı Vakti" />
+    <meta property="og:description" content="Namaz Vakitlerine anında eriş " />
+    <meta property="og:image" content="https://cagrivakti.com.tr/static/icons/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
-  /* ── Wrapper: sitenin body'sini ezmeden sadece bu sayfayı kapsar ── */
-  .prime-page {
-    background: var(--pg-paper);
-    color: var(--pg-ink);
-    font-family: 'JetBrains Mono', monospace;
-    position: relative;
-  }
-
-  /* Grain dokusu */
-  .prime-page::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.35;
-  }
-
-  /* ── Loader ── */
-  #pg-loader {
-    position: fixed;
-    inset: 0;
-    background: var(--pg-ink);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    transition: opacity 0.8s ease;
-  }
-  #pg-loader.fade-out { opacity: 0; pointer-events: none; }
-
-  .pg-loader-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 3rem;
-    font-weight: 900;
-    color: var(--pg-gold);
-    letter-spacing: 0.1em;
-    margin-bottom: 0.4rem;
-  }
-  .pg-loader-sub {
-    font-size: 0.65rem;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: rgba(245,240,232,0.45);
-    margin-bottom: 2.5rem;
-  }
-  .pg-loader-bar-wrap {
-    width: 280px; height: 2px;
-    background: rgba(255,255,255,0.1);
-    overflow: hidden; position: relative;
-  }
-  .pg-loader-bar {
-    position: absolute; left: -100%; width: 100%; height: 100%;
-    background: var(--pg-gold);
-    animation: pgLoadbar 1.2s ease forwards;
-  }
-  @keyframes pgLoadbar { to { left: 0; } }
-  .pg-loader-count {
-    margin-top: 1.2rem;
-    font-size: 0.6rem;
-    color: rgba(245,240,232,0.35);
-    letter-spacing: 0.2em;
-  }
-
-  /* ── Copy toast ── */
-  #pg-toast {
-    position: fixed;
-    bottom: 2rem; right: 2rem;
-    background: var(--pg-ink);
-    color: var(--pg-gold);
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    padding: 0.8rem 1.5rem;
-    border: 1px solid var(--pg-gold);
-    transform: translateY(4rem);
-    opacity: 0;
-    transition: all 0.3s ease;
-    z-index: 5000;
-    pointer-events: none;
-  }
-  #pg-toast.show { transform: translateY(0); opacity: 1; }
-
-  /* ── Masthead ── */
-  .pg-masthead {
-    border-bottom: 2px solid var(--pg-ink);
-    border-top: 2px solid var(--pg-ink);
-    margin-top: 0.5rem;
-    position: relative;
-    z-index: 2;
-  }
-  .pg-masthead-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.8rem 3rem;
-    border-bottom: 1px solid var(--pg-line);
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--pg-dim);
-  }
-  .pg-masthead-top .pg-date { color: var(--pg-ink); font-weight: 700; }
-
-  .pg-masthead-center {
-    text-align: center;
-    padding: 1.8rem 3rem 1.3rem;
-    position: relative;
-  }
-  .pg-masthead-center::before,
-  .pg-masthead-center::after {
-    content: '◆'; font-size: 0.7rem; color: var(--pg-gold);
-    position: absolute; top: 50%; transform: translateY(-50%);
-  }
-  .pg-masthead-center::before { left: 3rem; }
-  .pg-masthead-center::after  { right: 3rem; }
-
-  .pg-pub-name {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 4.5vw, 4rem);
-    font-weight: 900;
-    letter-spacing: 0.05em;
-    line-height: 1;
-    color: var(--pg-ink);
-  }
-  .pg-pub-sub {
-    font-size: 0.58rem;
-    letter-spacing: 0.38em;
-    text-transform: uppercase;
-    color: var(--pg-dim);
-    margin-top: 0.4rem;
-  }
-
-  .pg-rule {
-    display: flex; align-items: center; gap: 0.5rem;
-    padding: 0 3rem;
-  }
-  .pg-rule::before, .pg-rule::after {
-    content: ''; flex: 1; height: 1px; background: var(--pg-ink);
-  }
-  .pg-rule span { font-size: 0.9rem; color: var(--pg-gold); }
-
-  /* ── Hero ── */
-  .pg-hero {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-    border-bottom: 2px solid var(--pg-ink);
-    position: relative; z-index: 2;
-  }
-  .pg-hero-left, .pg-hero-right {
-    padding: 1.5rem;
-    border-right: 1px solid var(--pg-line);
-  }
-  .pg-hero-right { border-right: none; border-left: 1px solid var(--pg-line); }
-
-  .pg-stat { text-align: center; padding: 1.2rem 0; }
-  .pg-stat + .pg-stat { border-top: 1px dashed var(--pg-line); }
-  .pg-stat-label {
-    font-size: 0.52rem; letter-spacing: 0.28em;
-    text-transform: uppercase; color: var(--pg-dim);
-    display: block; margin-bottom: 0.4rem;
-  }
-  .pg-stat-val {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem; font-weight: 700;
-    color: var(--pg-ink); line-height: 1;
-  }
-  .pg-stat-val.acc  { color: var(--pg-red); }
-  .pg-stat-val.gold { color: var(--pg-gold); }
-  .pg-stat-note {
-    font-size: 0.52rem; color: var(--pg-dim);
-    margin-top: 0.3rem; display: block;
-  }
-
-  .pg-hero-main {
-    padding: 2rem 1.5rem;
-    text-align: center;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-  }
-  .pg-kicker {
-    font-size: 0.58rem; letter-spacing: 0.32em;
-    text-transform: uppercase; color: var(--pg-dim); margin-bottom: 0.8rem;
-  }
-  .pg-headline {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.6rem, 3.5vw, 3rem);
-    font-weight: 900; line-height: 1.1; color: var(--pg-ink);
-    margin-bottom: 1rem;
-  }
-  .pg-headline em { font-style: italic; color: var(--pg-red); }
-  .pg-deck {
-    font-size: 0.72rem; line-height: 1.85; color: var(--pg-dim);
-    max-width: 360px;
-    border-top: 1px solid var(--pg-line);
-    border-bottom: 1px solid var(--pg-line);
-    padding: 0.9rem 0;
-  }
-
-  /* ── Controls ── */
-  .pg-controls {
-    display: flex; align-items: center;
-    gap: 1.2rem; flex-wrap: wrap;
-    padding: 0.9rem 3rem;
-    border-bottom: 1px solid var(--pg-line);
-    background: var(--pg-ink);
-    color: var(--pg-paper);
-    position: relative; z-index: 2;
-  }
-  .pg-ctrl-label {
-    font-size: 0.58rem; letter-spacing: 0.2em;
-    text-transform: uppercase; opacity: 0.55;
-  }
-  .pg-ctrl-btn {
-    background: transparent;
-    border: 1px solid rgba(245,240,232,0.3);
-    color: var(--pg-paper);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.62rem; letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.38rem 0.9rem;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .pg-ctrl-btn:hover, .pg-ctrl-btn.active {
-    background: var(--pg-gold);
-    border-color: var(--pg-gold);
-    color: var(--pg-ink);
-  }
-  .pg-ctrl-sep {
-    width: 1px; height: 1.4rem;
-    background: rgba(245,240,232,0.18);
-  }
-  .pg-search-wrap {
-    margin-left: auto;
-    display: flex; align-items: center;
-  }
-  .pg-search-input {
-    background: transparent;
-    border: 1px solid rgba(245,240,232,0.28);
-    border-right: none;
-    color: var(--pg-paper);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.62rem;
-    padding: 0.38rem 0.75rem;
-    width: 155px; outline: none;
-  }
-  .pg-search-input::placeholder { opacity: 0.38; }
-  .pg-search-input:focus { border-color: var(--pg-gold); }
-  .pg-search-btn {
-    background: var(--pg-gold); border: 1px solid var(--pg-gold);
-    color: var(--pg-ink);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.62rem; font-weight: 700;
-    padding: 0.38rem 0.75rem; cursor: pointer;
-    letter-spacing: 0.08em; text-transform: uppercase;
-  }
-  .pg-search-btn:hover { background: var(--pg-gold-lt); }
-
-  /* ── Status bar ── */
-  .pg-status {
-    display: flex; justify-content: space-between;
-    align-items: center; flex-wrap: wrap; gap: 0.4rem;
-    padding: 0.45rem 3rem;
-    border-bottom: 2px solid var(--pg-ink);
-    background: #ede8dc;
-    font-size: 0.58rem; color: var(--pg-dim);
-    position: relative; z-index: 2;
-  }
-  .pg-status .match { color: var(--pg-red); font-weight: 700; }
-
-  /* ── Content ── */
-  .pg-content {
-    padding: 2rem 3rem;
-    position: relative; z-index: 2;
-  }
-  .pg-section-hdr {
-    display: flex; align-items: baseline; gap: 0.8rem;
-    margin-bottom: 1.2rem;
-    border-bottom: 1px solid var(--pg-line);
-    padding-bottom: 0.45rem;
-  }
-  .pg-section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem; font-weight: 700;
-  }
-  .pg-section-meta { font-size: 0.58rem; color: var(--pg-dim); letter-spacing: 0.08em; }
-
-  .pg-prime-box {
-    background: #fff;
-    border: 1px solid var(--pg-line);
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.04), 4px 4px 0 var(--pg-line);
-  }
-  .pg-prime-inner {
-    padding: 1.8rem;
-    max-height: 500px;
-    overflow-y: auto; overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: var(--pg-gold) var(--pg-line);
-  }
-  .pg-prime-inner::-webkit-scrollbar { width: 5px; }
-  .pg-prime-inner::-webkit-scrollbar-track { background: var(--pg-line); }
-  .pg-prime-inner::-webkit-scrollbar-thumb { background: var(--pg-gold); }
-
-  #pg-prime-text {
-    font-size: 0.76rem; line-height: 2;
-    word-break: break-all; letter-spacing: 0.07em;
-    color: var(--pg-ink); white-space: pre-wrap;
-  }
-
-  mark.pg-found { background: #ffd700; color: var(--pg-ink); border-radius: 1px; padding: 0 1px; }
-  mark.pg-found.current { background: var(--pg-red); color: #fff; }
-
-  /* ── Info strip ── */
-  .pg-info-strip {
-    display: grid; grid-template-columns: repeat(4,1fr);
-    border-top: 2px solid var(--pg-ink);
-    position: relative; z-index: 2;
-  }
-  .pg-info-cell {
-    padding: 1.3rem 1.8rem;
-    border-right: 1px solid var(--pg-line);
-  }
-  .pg-info-cell:last-child { border-right: none; }
-  .pg-info-cell-label {
-    font-size: 0.52rem; letter-spacing: 0.28em;
-    text-transform: uppercase; color: var(--pg-dim);
-    display: block; margin-bottom: 0.3rem;
-  }
-  .pg-info-cell-val {
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem; font-weight: 700; color: var(--pg-ink);
-  }
-  .pg-info-cell-desc {
-    font-size: 0.58rem; color: var(--pg-dim);
-    margin-top: 0.25rem; line-height: 1.55;
-  }
-
-  /* ── Inner footer (sadece bu bölüm için, sitenin footer'ından farklı) ── */
-  .pg-inner-footer {
-    border-top: 2px solid var(--pg-ink);
-    padding: 1.2rem 3rem;
-    display: flex; justify-content: space-between;
-    align-items: center; flex-wrap: wrap; gap: 0.8rem;
-    font-size: 0.58rem; color: var(--pg-dim);
-    position: relative; z-index: 2;
-    margin-bottom: 0;
-  }
-  .pg-inner-footer strong { color: var(--pg-ink); }
-  .pg-orn { display: flex; gap: 0.4rem; color: var(--pg-gold); font-size: 0.8rem; }
-
-  /* ── Responsive ── */
-  @media (max-width: 900px) {
-    .pg-hero { grid-template-columns: 1fr; }
-    .pg-hero-left, .pg-hero-right {
-      border: none; border-bottom: 1px solid var(--pg-line);
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://cagrivakti.com.tr{{ request.path }}" />
+    <meta name="twitter:title" content="Çağrı Vakti" />
+    <meta name="twitter:description" content="Namaz Vakitlerine anında eriş " />
+    <meta name="twitter:image" content="https://cagrivakti.com.tr/static/icons/og-image.png" />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {% block json_ld %}
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Çağrı Vakti",
+      "url": "https://cagrivakti.com.tr",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://cagrivakti.com.tr/sehir/{search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
     }
-    .pg-hero-right { border-left: none; border-bottom: 2px solid var(--pg-ink); }
-    .pg-info-strip { grid-template-columns: 1fr 1fr; }
-    .pg-info-cell:nth-child(2) { border-right: none; }
-    .pg-info-cell:nth-child(3) { border-top: 1px solid var(--pg-line); }
-    .pg-masthead-top,
-    .pg-controls,
-    .pg-content,
-    .pg-status,
-    .pg-inner-footer { padding-left: 1.2rem; padding-right: 1.2rem; }
-    .pg-masthead-center { padding-left: 1.2rem; padding-right: 1.2rem; }
-    .pg-masthead-center::before,
-    .pg-masthead-center::after { display: none; }
-  }
-  @media (max-width: 600px) {
-    .pg-info-strip { grid-template-columns: 1fr; }
-    .pg-info-cell { border-right: none; border-bottom: 1px solid var(--pg-line); }
-    .pg-search-wrap { margin-left: 0; width: 100%; }
-    .pg-search-input { flex: 1; width: auto; }
-  }
-</style>
-{% endblock %}
+    {% endblock %}
+    
+    {% block breadcrumb_json_ld %}{% endblock %}
+    </script>
 
-{% block content %}
+    <!-- Favicon ve App Icons -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/ios/180.png') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}" color="#FFC107">
 
-<!-- Loader -->
-<div id="pg-loader">
-  <div class="pg-loader-title">P</div>
-  <div class="pg-loader-sub">Asal Sayı Gazetesi — Yükleniyor</div>
-  <div class="pg-loader-bar-wrap"><div class="pg-loader-bar"></div></div>
-  <div class="pg-loader-count" id="pg-loader-count">0 basamak yüklendi…</div>
-</div>
+    <!-- PWA Meta Etiketleri -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#121212">
+    <meta name="msapplication-TileColor" content="#121212">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='icons/windows11/Square150x150Logo.scale-100.png') }}">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Çağrı">
+    
+    <!-- iOS Splash Screens -->
+    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}">
 
-<!-- Toast -->
-<div id="pg-toast">Panoya kopyalandı ✓</div>
+    <!-- CSS Dosyaları -->
+    {% assets "css_main" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
 
-<div class="prime-page">
+    <!-- API Preconnect -->
+    <link rel="preconnect" href="https://api.cagrivakti.com.tr">
 
-  <!-- Masthead -->
-  <header class="pg-masthead">
-    <div class="pg-masthead-top">
-      <span>Vol. I — No. 1</span>
-      <span class="pg-date" id="pg-today"></span>
-      <span>Sayı Teorisi Gazetesi</span>
+    {% block extra_css %}{% endblock %}
+
+    <script>
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => {
+                        //console.log('SW Registered');
+                        
+                        // Periyodik Arka Plan Senkronizasyonu (Destekleyen tarayıcılar için)
+                        if ('periodicSync' in reg) {
+                            reg.periodicSync.register('refresh-vakitler', {
+                                minInterval: 24 * 60 * 60 * 1000 // 24 saatte bir
+                            }).catch(err => console.log('Periodic Sync failed', err));
+                        }
+                    })
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+    </script>
+</head>
+<body>
+    <script>
+        (function(){
+            var v = "{{ app_version }}";
+            try {
+                var now = new Date();
+                var cur = now.toLocaleDateString('en-CA');
+                var prevDate = localStorage.getItem('LAST_VISIT_DATE');
+                if (prevDate && prevDate !== cur) {
+                    var keep = ['user_city','tour_shown','introSectionsHidden','guidesSectionHidden','APP_VERSION'];
+                    var backup = {};
+                    for (var i = 0; i < keep.length; i++) {
+                        var k = keep[i];
+                        var val = localStorage.getItem(k);
+                        if (val !== null) backup[k] = val;
+                    }
+                    localStorage.clear();
+                    for (var key in backup) {
+                        localStorage.setItem(key, backup[key]);
+                    }
+                }
+                localStorage.setItem('LAST_VISIT_DATE', cur);
+                var s = localStorage.getItem('APP_VERSION');
+                if (!s || s !== v) {
+                    var keysToKeep = ['guidesSectionHidden', 'introSectionsHidden', 'tour_shown', 'user_city','APP_VERSION' ];
+                    var backup2 = {};
+                    keysToKeep.forEach(function(key){
+                        var val2 = localStorage.getItem(key);
+                        if (val2 !== null) backup2[key] = val2;
+                    });
+                    localStorage.clear();
+                    Object.keys(backup2).forEach(function(key){
+                        localStorage.setItem(key, backup2[key]);
+                    });
+                    localStorage.setItem('APP_VERSION', v);
+                    localStorage.setItem('LAST_VISIT_DATE', cur);
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <!-- SVG Sprite -->
+    <div style="display: none;">
+        {% include 'img/icons.svg' %}
     </div>
-    <div class="pg-masthead-center">
-      <div class="pg-pub-name">THE PRIME GAZETTE</div>
-      <div class="pg-pub-sub">Matematiksel Nadireler ve Sayı Teorisi Rehberi</div>
+
+    <nav class="navbar">
+        <a href="{{ url_for('views.index') }}" class="nav-brand" title="Ana Sayfa">{% block brand_text %}ÇAĞRI{% endblock %}</a>
+        <div id="navbar-vakit-countdown" class="fade-in" style="display: none; margin-left: 15px; font-size: 0.85rem; font-weight: 600; color: var(--primary); white-space: nowrap;"></div>
+        <button class="nav-toggle" id="navToggle" aria-label="Menüyü Aç/Kapat">
+            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-bars"></use></svg>
+        </button>
+        <div class="nav-links" id="navLinks">
+            <a href="{{ url_for('views.sehir_secimi') }}" class="nav-link" title="İl ve İlçe Seçerek Namaz Vakitlerini Öğrenin">İl Seçimi</a>
+            <a href="{{ url_for('views.imsakiye_secimi') }}" class="nav-link" title="{{ current_year }} Ramazan İmsakiye Çizelgesi ve İftar Vakitleri">İmsakiye</a>
+            <a href="{{ url_for('views.kible_pusulasi') }}" class="nav-link" title="Harita Üzerinden Kıble Yönünü Bulun">Kıble</a>
+            <a href="{{ url_for('views.ramazan_nedir') }}" class="nav-link" title="Ramazan Ayı Hakkında Merak Edilenler">Ramazan?</a>
+            <a href="{{ url_for('views.orucu_bozan_durumlar') }}" class="nav-link" title="Orucu Bozan ve Bozmayan Durumlar Rehberi">Oruç Bozan Durumlar?</a>
+            <a href="{{ url_for('views.bilgi_kosesi_liste') }}" class="nav-link" title="İslam ve Dini Konularda Yararlı Bilgiler">Bilgi Köşesi</a>
+            <a href="{{ url_for('views.neden_biz') }}" class="nav-link" title="Neden Çağrı Vakti'ni Tercih Etmelisiniz?">Neden Biz?</a>
+            <a href="{{ url_for('views.indir') }}" class="nav-link" title="Çağrı Vakti Mobil Uygulamasını Ücretsiz İndirin">Uygulamayı İndir</a>
+            <a href="{{ url_for('views.ilkelerimiz') }}" class="nav-link" title="Yayın İlkelerimiz ve Değerlerimiz">İlkelerimiz</a>
+            <a href="{{ url_for('views.iletisim') }}" class="nav-link" title="Görüş, Öneri ve İletişim">İletişim</a>
+            <a href="{{ url_for('views.ataturk') }}" class="nav-link nav-link-ataturk" title="Ulu Önder Mustafa Kemal Atatürk'ü Saygıyla Anıyoruz" style="color: #ff5252 !important; font-weight: 600;">Atatürk</a>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="landing-footer fade-in" style="padding: 60px 20px; background: var(--dark); text-align: center; border-top: 1px solid rgba(255,255,255,0.05); color: var(--gray);">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <svg class="icon"><use xlink:href="#fa-mosque"></use></svg>
+                <span>Çağrı Vakti</span>
+            </div>
+            <div class="footer-popular-cities">
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Istanbul', country='TR') }}">İstanbul</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Ankara', country='TR') }}">Ankara</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Izmir', country='TR') }}">İzmir</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Antalya', country='TR') }}">Antalya</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Trabzon', country='TR') }}">Trabzon</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Erzurum', country='TR') }}">Erzurum</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Diyarbakir', country='TR') }}">Diyarbakır</a>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('views.ataturk') }}" class="footer-link-ataturk">Atatürk</a>
+                <a href="{{ url_for('views.sehir_secimi') }}">Vakitler</a>
+                <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye {{ current_year }}</a>
+                <a href="{{ url_for('views.kible_pusulasi') }}">Kıble</a>
+                <a href="{{ url_for('views.indir') }}">Uygulamayı İndir</a>
+                <a href="{{ url_for('views.iletisim') }}">İletişim</a>
+                <a href="{{ url_for('views.neden_biz') }}">Neden Biz?</a>
+                <a href="{{ url_for('views.ilkelerimiz') }}">İlkelerimiz</a>
+                <a href="{{ url_for('views.sitene_ekle') }}">Sitene Ekle</a>
+                <a href="{{ url_for('views.rainmeter_guide') }}">Masaüstü Widget</a>
+                <a href="{{ url_for('views.qr_okuyucu') }}">QR Okuyucu</a>
+                <a href="#" onclick="openTutorialModal(); return false;">Tanıtım Turu</a>
+            </div>
+            <div class="footer-creator">
+                <a href="https://www.instagram.com/yigitgulyurt/" target="_blank" rel="noopener noreferrer" style="color: var(--text); font-weight: 600;">BİR YİĞİT GÜLYURT PROJESİ</a>
+            </div>
+            
+            <div class="national-identity" title="Varlığım Türk varlığına armağan olsun.">
+                <svg class="icon left" aria-hidden="true">
+                    <use xlink:href="#icon-turk-bayragi"></use>
+                </svg>
+            
+                <span class="text">NE MUTLU TÜRKÜM DİYENE</span>
+            
+                <svg class="icon right" aria-hidden="true">
+        <use xlink:href="#icon-turk-bayragi"></use>
+                </svg>
+            </div>
+
+            <div class="footer-copy" style="color: var(--gray);">
+                &copy; {{ current_year }} Çağrı Vakti. Bütün hakları saklıdır.
+                <br><small style="opacity: 0.8;">Sürüm {{ app_version }}</small>
+            </div>
+        </div>
+    </footer>
+
+    {% block modals %}
+    {% endblock %}
+
+    {% set is_mobile = request.user_agent and (request.user_agent.platform in ['android', 'iphone', 'ipad'] or 'mobile' in request.user_agent.string.lower()) %}
+    {% if is_mobile %}
+    <!-- Custom Location Permission Modal -->
+    <div id="locationPermissionModal" class="custom-modal-overlay">
+        <div class="custom-modal">
+            <div class="modal-icon">
+                <svg class="icon"><use xlink:href="#fa-map-marker-alt"></use></svg>
+            </div>
+            <h3>Size Özel Vakitler</h3>
+            <p>Doğru ezan vakitlerini hesaplayabilmemiz için konum bilginize ihtiyacımız var. İzin verdiğinizde konumunuz anlık olarak alınacak ve cihazınıza kaydedilecektir.</p>
+            <div class="modal-actions">
+                <button id="denyLocationBtn" class="btn btn-secondary">Daha Sonra</button>
+                <button id="allowLocationBtn" class="btn btn-primary">Konumu Paylaş</button>
+            </div>
+        </div>
     </div>
-    <div class="pg-rule"><span>✦</span></div>
-  </header>
 
-  <!-- Hero -->
-  <section class="pg-hero">
-    <div class="pg-hero-left">
-      <div class="pg-stat">
-        <span class="pg-stat-label">Toplam Basamak</span>
-        <div class="pg-stat-val acc">20.000</div>
-        <span class="pg-stat-note">kesin, doğrulanmış</span>
-      </div>
-      <div class="pg-stat">
-        <span class="pg-stat-label">İlk Basamak</span>
-        <div class="pg-stat-val" id="pg-first">–</div>
-        <span class="pg-stat-note">sayının ilk hanesi</span>
-      </div>
-      <div class="pg-stat">
-        <span class="pg-stat-label">Son Basamak</span>
-        <div class="pg-stat-val" id="pg-last">–</div>
-        <span class="pg-stat-note">1, 3, 7 veya 9 olmalı</span>
-      </div>
+    <!-- Process Toast -->
+    <div id="processToast" class="process-toast">
+        <div class="toast-spinner"></div>
+        <svg class="icon toast-success-icon"><use xlink:href="#fa-check-circle"></use></svg>
+        <span id="toastMessage">İşlem yapılıyor...</span>
     </div>
 
-    <div class="pg-hero-main">
-      <div class="pg-kicker">◆ Özel Sergi ◆</div>
-      <div class="pg-headline">
-        Tam <em>20.000</em> Basamaklı<br>Devasa Bir Asal Sayı
-      </div>
-      <p class="pg-deck">
-        Hiçbir pozitif tam sayı bu sayıyı tam bölemez — sadece 1 ve kendisi.<br>
-        Aşağıda tam sayıyı okuyabilir, arama yapabilir, panoya kopyalayabilirsiniz.
-      </p>
+    <!-- PWA Kurulum Banner'ı -->
+    <div id="pwaInstallBanner" class="pwa-install-banner" title="Çağrı Vakti'ni Yükle">
+        <div class="pwa-content">
+            <div class="pwa-icon">
+                <img src="{{ url_for('static', filename='icons/android/android-launchericon-96-96.png') }}" alt="Çağrı Vakti Uygulama İkonu" loading="lazy">
+            </div>
+            <div class="pwa-text">
+                <h3>Çağrı Vakti'ni Yükleyin</h3>
+                <p>Size özel ezan vakitleri ve imsakiye için uygulamayı ana ekranınıza ekleyin.</p>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button id="pwaInstallBtn" class="btn btn-primary btn-sm" title="Uygulamayı Cihaza Yükle">
+                <svg class="icon" aria-hidden="true" style="margin-right: 4px;"><use xlink:href="#fa-download-solid-full"></use></svg> Yükle
+            </button>
+            <button id="pwaCloseBtn" class="btn-close-pwa" title="Kapat">
+                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-xmark"></use></svg>
+            </button>
+        </div>
     </div>
+    {% endif %}
 
-    <div class="pg-hero-right">
-      <div class="pg-stat">
-        <span class="pg-stat-label">Büyüklük</span>
-        <div class="pg-stat-val gold">10<sup style="font-size:0.9rem">19999</sup></div>
-        <span class="pg-stat-note">yaklaşık mertebe</span>
-      </div>
-      <div class="pg-stat">
-        <span class="pg-stat-label">Rakam Toplamı</span>
-        <div class="pg-stat-val" id="pg-dsum">–</div>
-        <span class="pg-stat-note">rakamların toplamı</span>
-      </div>
-      <div class="pg-stat">
-        <span class="pg-stat-label">En Sık Rakam</span>
-        <div class="pg-stat-val" id="pg-freq">–</div>
-        <span class="pg-stat-note">en çok tekrar eden</span>
-      </div>
-    </div>
-  </section>
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Scripts -->
+    {% assets "js_main" %}
+    <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 
-  <!-- Controls -->
-  <div class="pg-controls">
-    <span class="pg-ctrl-label">Görünüm</span>
-    <button class="pg-ctrl-btn active" id="pgb-all"   onclick="pgSetView('all')">Tümü</button>
-    <button class="pg-ctrl-btn"        id="pgb-start" onclick="pgSetView('start')">İlk 500</button>
-    <button class="pg-ctrl-btn"        id="pgb-end"   onclick="pgSetView('end')">Son 500</button>
-    <div class="pg-ctrl-sep"></div>
-    <button class="pg-ctrl-btn" onclick="pgCopy()">Kopyala</button>
-    <div class="pg-search-wrap">
-      <input class="pg-search-input" id="pg-search" placeholder="Basamak dizisi ara…" type="text" maxlength="20">
-      <button class="pg-search-btn" onclick="pgDoSearch()">Bul</button>
-    </div>
-  </div>
+    <!-- Global Scripts -->
+    <script>
+        function updateOnlineStatus() {
+            // Sadece bağlantı koptuğunda offline sayfasına yönlendirilebilir 
+            // ya da uygulama genelinde sessizce yönetilebilir.
+            // Kullanıcının bahsettiği "kırmızı kutu" uyarısı burada tetiklenmiyor.
+            console.log(navigator.onLine ? "Çevrimiçi" : "Çevrimdışı");
+        }
 
-  <!-- Status -->
-  <div class="pg-status">
-    <span>Sayı sergileniyor · <strong id="pg-disp-count">20.000</strong> basamak gösteriliyor</span>
-    <span id="pg-search-status" class="match"></span>
-    <span>Kaydırarak tümünü okuyabilirsiniz</span>
-  </div>
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
 
-  <!-- Prime display -->
-  <div class="pg-content">
-    <div class="pg-section-hdr">
-      <span class="pg-section-title">Asal Sayının Tam Gösterimi</span>
-      <span class="pg-section-meta">— 20.000 basamak, gruplandırılmamış</span>
-    </div>
-    <div class="pg-prime-box">
-      <div class="pg-prime-inner">
-        <div id="pg-prime-text">Yükleniyor…</div>
-      </div>
-    </div>
-  </div>
+        // Manifest URL'ini kullanıcı şehrine göre güncelle (Cache busting ve Parametre)
+        window.addEventListener('DOMContentLoaded', () => {
+            const userCityMatch = document.cookie.match(/user_city=([^;]+)/);
+            if (userCityMatch && userCityMatch[1]) {
+                const city = userCityMatch[1];
+                const manifestLink = document.querySelector('link[rel="manifest"]');
+                if (manifestLink) {
+                    const url = new URL(manifestLink.href, window.location.origin);
+                    url.searchParams.set('city', city);
+                    // Tarayıcının cache'ini zorlamak için versiyon ekle
+                    // url.searchParams.set('v', '2.11'); 
+                    manifestLink.href = url.toString();
+                    // console.log('Manifest updated for:', city);
+                }
+            }
+        });
 
-  <!-- Info strip -->
-  <div class="pg-info-strip">
-    <div class="pg-info-cell">
-      <span class="pg-info-cell-label">Asal Sayı Nedir?</span>
-      <div class="pg-info-cell-val">Bölünemez</div>
-      <p class="pg-info-cell-desc">Yalnızca 1 ve kendisine tam bölünebilen doğal sayılara asal sayı denir. 2, 3, 5, 7… serisi sonsuza uzanır.</p>
-    </div>
-    <div class="pg-info-cell">
-      <span class="pg-info-cell-label">Bu Büyüklükte Asal</span>
-      <div class="pg-info-cell-val">Son Derece Nadir</div>
-      <p class="pg-info-cell-desc">Asal Sayı Teoremi'ne göre, N basamaklı sayıların yaklaşık ln(10)·N'de biri asaldır.</p>
-    </div>
-    <div class="pg-info-cell">
-      <span class="pg-info-cell-label">Doğrulama Yöntemi</span>
-      <div class="pg-info-cell-val">Miller-Rabin</div>
-      <p class="pg-info-cell-desc">Büyük asal sayılar genellikle olasılıksal testlerle (Miller-Rabin) ya da Lucas-Lehmer gibi belirleyici testlerle doğrulanır.</p>
-    </div>
-    <div class="pg-info-cell">
-      <span class="pg-info-cell-label">Pratik Kullanım</span>
-      <div class="pg-info-cell-val">Kriptografi</div>
-      <p class="pg-info-cell-desc">RSA şifrelemesi, büyük asal sayıların çarpımı olan anahtarlara dayanır. Bu sayı, o büyüklükteki anahtarlardan daha büyüktür.</p>
-    </div>
-  </div>
+        // PWA Kurulum Mantığı
+        window.deferredPrompt = null;
+        const pwaBanner = document.getElementById('pwaInstallBanner');
+        const installBtn = document.getElementById('pwaInstallBtn');
+        const closeBtn = document.getElementById('pwaCloseBtn');
 
-  <!-- Inner footer -->
-  <div class="pg-inner-footer">
-    <span>© <strong>The Prime Gazette</strong> — Sayı Teorisi Arşivleri</span>
-    <div class="pg-orn">✦ ✦ ✦</div>
-    <span>Asal sayı doğrulanmıştır · 20.000 basamak</span>
-  </div>
+        // Şehir eşleştirme ve normalizasyon fonksiyonları (Global Scope'da tanımlı olabilir, kontrol et)
+        const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
+        const REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
+            Object.entries(CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
+        );
 
-</div>{# .prime-page #}
-{% endblock %}
+        function getLatinNameGlobal(turkishName) {
+             if (REVERSE_CITY_MAPPING_GLOBAL[turkishName]) {
+                 return REVERSE_CITY_MAPPING_GLOBAL[turkishName];
+             }
+             const charMap = {
+                 'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G', 'ı': 'i', 'İ': 'I',
+                 'ö': 'o', 'Ö': 'O', 'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U'
+             };
+             let normalized = turkishName.split('').map(char => charMap[char] || char).join('');
+             return normalized.replace(/\s+/g, '-').replace(/[^A-Za-z0-9\-]/g, '');
+        }
 
-{% block extra_js %}
-<script>
-// =====================================================
-// BURAYA ASAL SAYINI YAPISTIR
-// PRIME_NUMBER degiskenine 20.000 basamakli sayini ata
-// generatePlaceholder() satirlarini tamamen sil
-// =====================================================
-const PRIME_NUMBER = ""; // <-- BURAYA YAPISTIR
+        // Banner'ı kapatma fonksiyonu
+        function closePwaBanner() {
+            if (pwaBanner) {
+                pwaBanner.classList.remove('active');
+                pwaBanner.classList.remove('ready');
+                // Bu oturumda tekrar gösterme
+                sessionStorage.setItem('pwaBannerDismissed', 'true');
+            }
+        }
 
-// =====================================================
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Masaüstü cihazlarda PWA kurulumunu tamamen engelle
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (!isMobile) {
+                e.preventDefault();
+                console.log('PWA prompt suppressed on desktop');
+                return;
+            }
 
-let pgView = 'all';
-let pgMatches = [];
-let pgMatchIdx = 0;
+            // İndir sayfasında ise native banner'ın çıkmasına izin ver (preventDefault yapma)
+            // Diğer sayfalarda otomatik gösterimi engelle
+            const isDownloadPage = window.location.pathname.includes('/indir') || window.location.pathname.includes('/uygulamayi-indir');
+            
+            if (!isDownloadPage) {
+                e.preventDefault();
+            }
+            
+            // Olayı sakla ki daha sonra tetikleyebilelim
+            window.deferredPrompt = e;
+            
+            // Eğer indir sayfasındaysak ve kullanıcı bir butona basarsa tetiklemek için hazır olsun
+            if (isDownloadPage) {
+                console.log('PWA native prompt allowed on download page');
+                // İndir sayfasında özel butonları aktif et (varsa)
+                const downloadPageBtn = document.getElementById('pwa-install-btn-main');
+                if (downloadPageBtn) {
+                    downloadPageBtn.style.display = 'inline-block';
+                    downloadPageBtn.addEventListener('click', async () => {
+                        if (window.deferredPrompt) {
+                            window.deferredPrompt.prompt();
+                            const { outcome } = await window.deferredPrompt.userChoice;
+                            console.log(`User response to the install prompt: ${outcome}`);
+                            window.deferredPrompt = null;
+                            downloadPageBtn.style.display = 'none';
+                        }
+                    });
+                }
+                return; // Custom banner'ı gösterme
+            }
+            
+            // Eğer reload sonrası ise hemen göster
+            if (sessionStorage.getItem('reloadingForPWA')) {
+                pwaBanner.classList.add('active');
+                pwaBanner.classList.add('ready'); // Büyük ve ortalı görünüm
+                
+                const pwaText = document.querySelector('.pwa-text p');
+                const pwaTitle = document.querySelector('.pwa-text h3');
+                const installBtn = document.getElementById('pwaInstallBtn');
+                
+                if (pwaTitle) pwaTitle.textContent = 'Kuruluma Hazır';
+                if (pwaText) pwaText.textContent = 'Her şey hazır, şimdi uygulamayı yükleyebilirsin.';
+                if (installBtn) {
+                    installBtn.innerHTML = '<svg class="icon" style="font-size: 1.2em; margin-right: 8px;"><use xlink:href="#fa-download-solid-full"></use></svg> Uygulamayı Yükle';
+                    installBtn.classList.add('pulse-animation');
+                }
+                
+                sessionStorage.removeItem('reloadingForPWA');
+            } 
+            // Eğer kullanıcı daha önce bu oturumda kapatmadıysa banner'ı göster
+            else if (!sessionStorage.getItem('pwaBannerDismissed')) {
+                setTimeout(() => {
+                    pwaBanner.classList.add('active');
+                }, 1000); // 1 saniye sonra göster
+            }
+        });
 
-/* ── İstatistikler ── */
-function pgStats(p) {
-  document.getElementById('pg-first').textContent = p[0];
-  document.getElementById('pg-last').textContent  = p[p.length - 1];
+        // iOS ve Desteklenmeyen Tarayıcılar İçin Fallback Logic
+        window.addEventListener('load', () => {
+             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+             const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+             const isDismissed = sessionStorage.getItem('pwaBannerDismissed');
+             const isDownloadPage = window.location.pathname.includes('/indir') || window.location.pathname.includes('/uygulamayi-indir');
+             
+             if (isMobile && !isStandalone && !isDismissed && !isDownloadPage) {
+                 // beforeinstallprompt'un tetiklenip tetiklenmediğini kontrol et (Android için biraz bekle)
+                 setTimeout(() => {
+                     if (!window.deferredPrompt) {
+                         // Eğer native prompt yoksa, banner'ı yine de göster (Redirect modu)
+                         if (pwaBanner) {
+                             pwaBanner.classList.add('active');
+                             // Buton metnini gerekirse güncelle (Şimdilik "Yükle" kalabilir)
+                         }
+                     }
+                 }, 3000); // 3 saniye bekle
+             }
+        });
 
-  let sum = 0;
-  const freq = {};
-  for (const c of p) { sum += +c; freq[c] = (freq[c] || 0) + 1; }
-  document.getElementById('pg-dsum').textContent = sum.toLocaleString('tr-TR');
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (window.deferredPrompt) {
+                    // 1. Şehir kontrolü (Cookie)
+                    const userCity = document.cookie.split('; ').find(row => row.startsWith('user_city='));
+                    const pwaText = document.querySelector('.pwa-text p');
+                    
+                    if (!userCity) {
+                        // MODAL VE TOAST ELEMENTLERİNİ SEÇ
+                        const permissionModal = document.getElementById('locationPermissionModal');
+                        const allowBtn = document.getElementById('allowLocationBtn');
+                        const denyBtn = document.getElementById('denyLocationBtn');
+                        const toast = document.getElementById('processToast');
+                        const toastMsg = document.getElementById('toastMessage');
 
-  let maxF = 0, maxD = '0';
-  for (const d in freq) { if (freq[d] > maxF) { maxF = freq[d]; maxD = d; } }
-  document.getElementById('pg-freq').textContent = `${maxD} (×${maxF.toLocaleString('tr-TR')})`;
-}
+                        // Modalı göster
+                        if (permissionModal) {
+                            permissionModal.classList.add('active');
+                            
+                            // İzin ver butonuna tıklandığında
+                            const handleAllow = async () => {
+                                permissionModal.classList.remove('active');
+                                
+                                // Toast göster
+                                if (toast && toastMsg) {
+                                    toastMsg.textContent = 'Konum uydudan alınıyor...';
+                                    toast.classList.add('active');
+                                    toast.classList.remove('success'); // Reset success state
+                                }
 
-/* ── Render ── */
-function pgRender(text) {
-  const el = document.getElementById('pg-prime-text');
-  el.innerHTML = '';
-  el.textContent = text;
-}
+                                try {
+                                    // Konum izni iste
+                                    const position = await new Promise((resolve, reject) => {
+                                        navigator.geolocation.getCurrentPosition(resolve, reject);
+                                    });
+                                    
+                                    // Konum alındı
+                                    if (toastMsg) toastMsg.textContent = 'Şehir bilgisi işleniyor...';
+                                    
+                                    const lat = position.coords.latitude;
+                                    const lon = position.coords.longitude;
+                                    
+                                    // Reverse Geocoding
+                                    let originalCityName = null;
 
-/* ── Görünüm seçimi ── */
-function pgSetView(mode) {
-  pgView = mode;
-  document.querySelectorAll('.pg-ctrl-btn[id^="pgb-"]').forEach(b => b.classList.remove('active'));
+                                    // 1. Deneme: Nominatim (OpenStreetMap)
+                                    try {
+                                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=tr`);
+                                        if (response.ok) {
+                                            const data = await response.json();
+                                            if (data && data.address) {
+                                                originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
+                                            }
+                                        }
+                                    } catch (err) {
+                                        console.warn('Nominatim failed, trying fallback...');
+                                    }
 
-  let text, label;
-  if (mode === 'start') {
-    text = PRIME_NUMBER.slice(0, 500); label = '500 (ilk)';
-    document.getElementById('pgb-start').classList.add('active');
-  } else if (mode === 'end') {
-    text = PRIME_NUMBER.slice(-500); label = '500 (son)';
-    document.getElementById('pgb-end').classList.add('active');
-  } else {
-    text = PRIME_NUMBER; label = '20.000';
-    document.getElementById('pgb-all').classList.add('active');
-  }
-  document.getElementById('pg-disp-count').textContent = label;
-  pgRender(text);
-  pgClearSearch();
-}
+                                    // 2. Deneme: BigDataCloud (Fallback)
+                                    if (!originalCityName) {
+                                        try {
+                                            if (toastMsg) toastMsg.textContent = 'Alternatif servis deneniyor...';
+                                            const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=tr`);
+                                            if (response.ok) {
+                                                const data = await response.json();
+                                                // BigDataCloud field mapping
+                                                originalCityName = data.city || data.locality || data.principalSubdivision;
+                                            }
+                                        } catch (err) {
+                                            console.error('Fallback geocoding failed:', err);
+                                        }
+                                    }
 
-/* ── Arama ── */
-function pgClearSearch() {
-  pgMatches = []; pgMatchIdx = 0;
-  document.getElementById('pg-search-status').textContent = '';
-}
+                                    if (originalCityName) {
+                                        // Başarılı
+                                        originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
+                                        const latinCityName = getLatinNameGlobal(originalCityName);
+                                        
+                                        // Cookie ve LocalStorage güncelle
+                                        document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
+                                        localStorage.setItem('user_city', latinCityName);
+                                        
+                                        if (toastMsg) toastMsg.textContent = `Şehir bulundu: ${originalCityName}`;
+                                        if (toast) {
+                                            toast.classList.add('success');
+                                            // Başarı ikonunu göster (spinner gizlenir css ile)
+                                            const icon = toast.querySelector('.toast-success-icon use');
+                                            if(icon) icon.setAttribute('xlink:href', '#fa-check-circle');
+                                        }
+                                        
+                                        // Biraz bekle sonra yenile
+                                        setTimeout(() => {
+                                            sessionStorage.setItem('reloadingForPWA', 'true');
+                                            window.location.reload();
+                                        }, 1500);
+                                    } else {
+                                        // Başarısız - Manuel Seçime Yönlendir
+                                        console.error('All reverse geocoding attempts failed.');
+                                        if (toastMsg) toastMsg.textContent = 'Otomatik konum bulunamadı.';
+                                        if (toast) toast.classList.remove('success'); // Hata durumunda success olmamalı
+                                        
+                                        setTimeout(() => {
+                                            if (toastMsg) toastMsg.textContent = 'Manuel seçime yönlendiriliyorsunuz...';
+                                            // Hata durumunda da yönlendir
+                                            window.location.href = "{{ url_for('views.sehir_secimi') }}";
+                                        }, 1500);
+                                    }
 
-function pgSource() {
-  return pgView === 'end'   ? PRIME_NUMBER.slice(-500) :
-         pgView === 'start' ? PRIME_NUMBER.slice(0, 500) :
-         PRIME_NUMBER;
-}
+                                } catch (error) {
+                                    console.log('Konum hatası:', error);
+                                    if (toastMsg) toastMsg.textContent = 'Konum izni verilmedi.';
+                                    setTimeout(() => {
+                                        if (toast) toast.classList.remove('active');
+                                    }, 2000);
+                                }
+                                
+                                // Event listener'ı temizle (gerekirse)
+                                allowBtn.removeEventListener('click', handleAllow);
+                            };
 
-function pgDoSearch() {
-  const q = document.getElementById('pg-search').value.trim();
-  if (!q) { pgClearSearch(); return; }
-  if (!/^\d+$/.test(q)) {
-    document.getElementById('pg-search-status').textContent = 'Sadece rakam giriniz';
-    return;
-  }
+                            allowBtn.onclick = handleAllow; // onclick kullanarak önceki listenerları ezeriz
 
-  const src = pgSource();
-  pgMatches = [];
-  let i = 0;
-  while ((i = src.indexOf(q, i)) !== -1) { pgMatches.push(i); i++; }
+                            // Vazgeç butonuna tıklandığında
+                            denyBtn.onclick = () => {
+                                permissionModal.classList.remove('active');
+                            };
+                            
+                            return; // Modal sonucunu bekle
+                        }
+                    }
 
-  if (!pgMatches.length) {
-    document.getElementById('pg-search-status').textContent = `"${q}" bulunamadı`;
-    pgRender(src);
-    return;
-  }
+                    // 2. Yükleme işlemini başlat (Eğer şehir varsa)
+                    window.deferredPrompt.prompt();
+                    
+                    const { outcome } = await window.deferredPrompt.userChoice;
+                    console.log(`User response to the install prompt: ${outcome}`);
+                    
+                    window.deferredPrompt = null;
+                    closePwaBanner();
+                } else {
+                    // Fallback: Native prompt yoksa (iOS vb.) indir sayfasına yönlendir
+                    window.location.href = "{{ url_for('views.indir') }}";
+                }
+            });
+        }
 
-  pgMatchIdx = 0;
-  pgHighlight(src, q);
-  pgScrollMatch();
-  pgUpdateStatus();
-}
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closePwaBanner();
+            });
+        }
 
-function pgHighlight(src, q) {
-  const el = document.getElementById('pg-prime-text');
-  let html = '', last = 0;
-  for (let i = 0; i < pgMatches.length; i++) {
-    const pos = pgMatches[i];
-    html += pgEsc(src.slice(last, pos));
-    const cls = i === pgMatchIdx ? 'pg-found current' : 'pg-found';
-    html += `<mark class="${cls}">${pgEsc(src.slice(pos, pos + q.length))}</mark>`;
-    last = pos + q.length;
-  }
-  html += pgEsc(src.slice(last));
-  el.innerHTML = html;
-}
+        // Uygulama yüklendiğinde
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA başarıyla yüklendi');
+            pwaBanner.classList.remove('active');
+        });
 
-function pgEsc(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+        // Navbar Toggle
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
 
-function pgScrollMatch() {
-  const marks = document.querySelectorAll('mark.pg-found');
-  if (marks[pgMatchIdx]) marks[pgMatchIdx].scrollIntoView({ behavior:'smooth', block:'center' });
-}
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                const icon = navToggle.querySelector('use');
+                if (navLinks.classList.contains('active')) {
+                    icon.setAttribute('xlink:href', '#fa-xmark');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    icon.setAttribute('xlink:href', '#fa-bars');
+                    document.body.style.overflow = 'auto';
+                }
+            });
 
-function pgUpdateStatus() {
-  document.getElementById('pg-search-status').textContent =
-    `${pgMatches.length} eşleşme · [${pgMatchIdx+1}/${pgMatches.length}] — Enter: sonraki`;
-}
+            // Menü linklerine tıklandığında menüyü kapat
+            navLinks.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    navToggle.querySelector('use').setAttribute('xlink:href', '#fa-bars');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+        }
+    </script>
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('pg-search').addEventListener('keydown', function(e) {
-    if (e.key !== 'Enter') return;
-    if (pgMatches.length) {
-      pgMatchIdx = (pgMatchIdx + 1) % pgMatches.length;
-      const q = this.value.trim();
-      pgHighlight(pgSource(), q);
-      pgScrollMatch();
-      pgUpdateStatus();
-    } else {
-      pgDoSearch();
-    }
-  });
-});
-
-/* ── Kopyala ── */
-function pgCopy() {
-  navigator.clipboard.writeText(PRIME_NUMBER).then(() => {
-    const t = document.getElementById('pg-toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
-  });
-}
-
-/* ── Tarih ── */
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('pg-today').textContent =
-    new Date().toLocaleDateString('tr-TR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-});
-
-/* ── Loader ── */
-window.addEventListener('DOMContentLoaded', () => {
-  const loader = document.getElementById('pg-loader');
-  const lcount = document.getElementById('pg-loader-count');
-  let shown = 0;
-
-  const iv = setInterval(() => {
-    shown = Math.min(shown + Math.floor(Math.random() * 2000 + 400), 20000);
-    lcount.textContent = shown.toLocaleString('tr-TR') + ' basamak yüklendi…';
-    if (shown >= 20000) {
-      clearInterval(iv);
-      lcount.textContent = '20.000 basamak hazır ✓';
-      setTimeout(() => {
-        loader.classList.add('fade-out');
-        setTimeout(() => loader.remove(), 800);
-        pgRender(PRIME_NUMBER);
-        pgStats(PRIME_NUMBER);
-      }, 400);
-    }
-  }, 75);
-});
-</script>
-{% endblock %}
+    {% block footer_js %}{% endblock %}
+</body>
+</html>
