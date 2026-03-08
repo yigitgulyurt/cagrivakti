@@ -195,6 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const html5QrCode = new Html5Qrcode("reader");
     let history = JSON.parse(localStorage.getItem("qr_history") || "[]");
     let currentResultText = "";
+    let currentShortUrl = null;  
     let isScanning = false;
 
     const config = { fps: 10, qrbox: { width: 340, height: 450 } };
