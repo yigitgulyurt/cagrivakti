@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, current_app, abort
 import logging
+from app.models import QrRedirect
 from app.services import UserService, PrayerService, get_daily_content
 from app.extensions import cache, limiter, db, csrf
 from datetime import datetime, date, timedelta
