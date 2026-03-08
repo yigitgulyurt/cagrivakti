@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, request, current_app, abort
 import logging
-from pandas import api
 from app.services import UserService, PrayerService, get_daily_content
 from app.extensions import cache, limiter
 from datetime import datetime, date, timedelta
