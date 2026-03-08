@@ -11,30 +11,38 @@
 }
 
 /* Zen Browser - Transparent Window Support */
-@media (-moz-bool-pref: "widget.transparent-windows") {
+@media (-moz-bool-pref: "zen.theme.use-system-transparent-window") {
+    :root {
+        --dark: rgba(18, 18, 18, 0.72);
+        --card-bg: rgba(30, 30, 30, 0.65);
+        --hover-color: rgba(45, 45, 45, 0.70);
+    }
+
     body {
-        background-color: transparent !important;
+        background-color: transparent;
     }
 
     .navbar {
-        background-color: rgba(30, 30, 30, 0.55) !important;
+        background-color: rgba(30, 30, 30, 0.55);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+        border-bottom-color: rgba(255, 255, 255, 0.08);
     }
 
     .landing-footer {
-        background: rgba(18, 18, 18, 0.55) !important;
+        background: rgba(18, 18, 18, 0.55);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
     }
 
+    /* Nav mobile panel */
     .nav-links {
-        background: rgba(30, 30, 30, 0.80) !important;
+        background: rgba(30, 30, 30, 0.80);
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
     }
 
+    /* Skeleton shimmer'ı transparan bg'a göre güncelle */
     .skeleton {
         background: linear-gradient(
             90deg,
