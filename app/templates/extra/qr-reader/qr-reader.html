@@ -262,29 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
         text: text,   // URL dahil her şey buraya, url parametresi YOK
     }).catch(() => {});
     });
-    if (!navigator.share) return;
-    
-    const isUrl = isValidUrl(currentResultText);
-    
-    const shareMessages = [
-        `📷 QR kodunu okuttum ve şu içeriği buldum:\n"${currentResultText}"\n\n🕌 Namaz vakitlerini öğrenmek için: cagrivakti.com.tr`,
-        `🔍 Bu QR kodu taradım:\n${currentResultText}\n\n⏰ Namaz vakitlerini anlık takip et → cagrivakti.com.tr`,
-        `📲 QR okuyucu ile tespit ettiğim içerik:\n${currentResultText}\n\n🌙 Çağrı Vakti uygulamasına göz at: cagrivakti.com.tr`,
-    ];
-    
-    const randomMsg = shareMessages[Math.floor(Math.random() * shareMessages.length)];
-    
-    const shareData = {
-        title: '📷 QR Kod İçeriği — Çağrı Vakti',
-        text: randomMsg,
-    };
-    
-    if (isUrl) {
-        shareData.url = currentResultText;
-    }
-    
-    navigator.share(shareData).catch(() => {});
-});
     clearHistoryBtn?.addEventListener("click",()=>{if(confirm("Geçmişi silmek istediğinizden emin misiniz?")){history=[];localStorage.removeItem("qr_history");renderHistory();}});
 
     startScanning();
