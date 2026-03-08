@@ -453,7 +453,8 @@ to {
 
 .navbar {
     padding: 0.5rem 2rem;
-    background-color: var(--card-bg);
+    /*background-color: var(--card-bg);*/
+    background-color: transparent;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -956,7 +957,8 @@ to {
 /* Footer Styles */
 .landing-footer {
     padding: 60px 20px;
-    background: var(--dark);
+    /*background: var(--dark);*/
+    background-color: transparent;
     text-align: center;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     color: var(--gray);
