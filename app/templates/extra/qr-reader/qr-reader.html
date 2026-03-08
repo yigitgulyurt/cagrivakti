@@ -268,11 +268,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     scanAgainBtn?.addEventListener("click", startScanning);
-    openUrlBtn?.addEventListener("click",()=>isValidUrl(currentResultText)&&window.open(currentResultText,'_blank'));
+    openUrlBtn?.addEventListener("click",()=>isValidUrl(currentShortUrl ?? currentResultText)&&window.open(currentShortUrl ?? currentResultText,'_blank'));
     shareUrlBtn?.addEventListener("click", () => {
     if (!navigator.share) {
         // Fallback: panoya kopyala
-        navigator.clipboard?.writeText(currentResultText).then(() => {
+        navigator.clipboard?.writeText(currentShortUrl ?? currentResultText).then(() => {
             shareUrlBtn.textContent = "✅ Kopyalandı!";
             setTimeout(() => shareUrlBtn.textContent = "📤 Paylaş", 2000);
         });
