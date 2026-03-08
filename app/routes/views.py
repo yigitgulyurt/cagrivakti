@@ -820,11 +820,31 @@ def qr_okuyucu():
 def generate_id(length=7):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
-@views_bp.route('/qr/shorten', methods=['POST'])
+@views_bp.route('/api/shorten', methods=['POST'])
 @csrf.exempt
 def shorten():
-    return jsonify({'test': 'ok', 'data': request.get_json(silent=True, force=True)})
-
+    data = request.get_json(silent=True, force=True)  # ← silent+force ekle
+    if not data:
+        return jsonify({'error': 'JSON parse edilemedi'}), 400
+    
+    url = data.get('url', '').strip()
+    
+    if not url:
+        return jsonify({'error': 'URL gerekli'}), 400
+    
+    existing = QrRedirect.query.filter_by(url=url).first()
+    if existing:
+        return jsonify({'short_id': existing.id})
+    
+    short_id = generate_id()
+    while QrRedirect.query.get(short_id):
+        short_id = generate_id()
+    
+    redirect_obj = QrRedirect(id=short_id, url=url)
+    db.session.add(redirect_obj)
+    db.session.commit()
+    
+    return jsonify({'short_id': short_id})
 @views_bp.route('/r/<short_id>')
 def redirect_url(short_id):
     obj = QrRedirect.query.get_or_404(short_id)
