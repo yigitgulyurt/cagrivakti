@@ -12,6 +12,7 @@ from threading import Thread
 import re
 import hashlib
 import random, string
+from app.extensions import csrf
 
 views_bp = Blueprint('views', __name__)
 
