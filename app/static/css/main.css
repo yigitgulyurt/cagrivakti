@@ -1070,30 +1070,3 @@ to {
         align-items: center;
     }
 }
-
-
-@media (min-width: 1024px) {
-  .firefox-user body,
-  .firefox-user .hero,
-  .firefox-user .landing-footer,
-  .firefox-user .btn-ultra-hero {
-    background-color: transparent !important;
-    background: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    transition: background-color 0.5s ease-in-out,
-                background 0.5s ease-in-out,
-                border 0.5s ease-in-out,
-                box-shadow 0.5s ease-in-out !important;
-  }
-
-  .firefox-user .navbar,
-  .firefox-user .daily-content-card,
-  .firefox-user .vakit-card,
-  .firefox-user .btn-inner {
-    background-color: rgba(18, 18, 18, 0.75) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-  }
-}
