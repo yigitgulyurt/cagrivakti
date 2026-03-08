@@ -815,3 +815,11 @@ def newtab():
 @views_bp.route('/qr-okuyucu')
 def qr_okuyucu():
     return render_template('extra/qr-reader/qr-reader.html')
+
+@views_bp.route('/r/<short_id>')
+@csrf.exempt
+def redirect_url(short_id):
+    obj = QrRedirect.query.get_or_404(short_id)
+    obj.hit_count += 1
+    db.session.commit()
+    return redirect(obj.url)
