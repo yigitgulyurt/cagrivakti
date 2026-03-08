@@ -370,6 +370,245 @@
   .pg-inner-footer strong { color: var(--pg-ink); }
   .pg-orn { display: flex; gap: 0.4rem; color: var(--pg-gold); font-size: 0.8rem; }
 
+  /* ══════════════════════════════════════════
+     NAVBAR OVERRIDE — gazete temasına uyum
+     ══════════════════════════════════════════ */
+
+  /* Tüm body'ye krem zemin — navbar dahil */
+  body { background: var(--pg-paper) !important; }
+
+  .navbar {
+    background: var(--pg-ink) !important;
+    border-bottom: 3px solid var(--pg-gold) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    padding: 0 3rem !important;
+    height: auto !important;
+    min-height: 52px;
+    position: relative;
+  }
+
+  /* Üst süsleme çizgisi */
+  .navbar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--pg-gold) 0px, var(--pg-gold) 8px,
+      transparent 8px, transparent 14px
+    );
+  }
+
+  /* Marka adı */
+  .nav-brand {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.3rem !important;
+    font-weight: 900 !important;
+    color: var(--pg-gold) !important;
+    letter-spacing: 0.12em !important;
+    text-decoration: none !important;
+    text-transform: uppercase;
+    padding: 0.9rem 0 !important;
+    border-right: 1px solid rgba(201,168,76,0.25);
+    padding-right: 1.5rem !important;
+    margin-right: 0.5rem;
+    transition: color 0.2s;
+  }
+  .nav-brand:hover { color: var(--pg-gold-lt) !important; }
+
+  /* Vakıt sayaç */
+  #navbar-vakit-countdown {
+    color: var(--pg-gold) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.08em;
+    border-left: 1px solid rgba(201,168,76,0.2);
+    padding-left: 1rem !important;
+  }
+
+  /* Nav linkleri */
+  .nav-links {
+    gap: 0 !important;
+  }
+
+  .nav-link {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.15em !important;
+    text-transform: uppercase !important;
+    color: rgba(245,240,232,0.65) !important;
+    padding: 0.9rem 0.85rem !important;
+    border-left: 1px solid rgba(245,240,232,0.06) !important;
+    transition: color 0.15s, background 0.15s !important;
+    text-decoration: none !important;
+  }
+  .nav-link:hover {
+    color: var(--pg-gold) !important;
+    background: rgba(201,168,76,0.08) !important;
+  }
+  .nav-link:last-child { border-right: 1px solid rgba(245,240,232,0.06) !important; }
+
+  /* Atatürk linki özel rengi korunuyor */
+  .nav-link-ataturk { color: #ff5252 !important; }
+  .nav-link-ataturk:hover { color: #ff7878 !important; background: rgba(255,82,82,0.08) !important; }
+
+  /* Toggle butonu */
+  .nav-toggle {
+    color: var(--pg-gold) !important;
+    background: transparent !important;
+    border: 1px solid rgba(201,168,76,0.35) !important;
+    padding: 0.4rem 0.6rem !important;
+  }
+  .nav-toggle:hover { border-color: var(--pg-gold) !important; }
+
+  /* Mobil açık menü */
+  @media (max-width: 768px) {
+    .navbar { padding: 0 1.2rem !important; }
+    .nav-links.active {
+      background: var(--pg-ink) !important;
+      border-top: 1px solid rgba(201,168,76,0.2) !important;
+    }
+    .nav-link {
+      border-left: none !important;
+      border-bottom: 1px solid rgba(245,240,232,0.06) !important;
+      padding: 0.85rem 1.2rem !important;
+    }
+  }
+
+  /* ══════════════════════════════════════════
+     FOOTER OVERRIDE — gazete temasına uyum
+     ══════════════════════════════════════════ */
+
+  .landing-footer {
+    background: var(--pg-ink) !important;
+    border-top: 3px solid var(--pg-gold) !important;
+    color: rgba(245,240,232,0.55) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    padding: 3rem 3rem 2rem !important;
+    position: relative;
+  }
+
+  /* Alt süsleme şeridi */
+  .landing-footer::after {
+    content: '✦  ✦  ✦  ✦  ✦';
+    display: block;
+    text-align: center;
+    color: rgba(201,168,76,0.25);
+    font-size: 0.7rem;
+    letter-spacing: 0.6em;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(201,168,76,0.15);
+    padding-top: 1.2rem;
+  }
+
+  /* Footer marka */
+  .footer-brand {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 900 !important;
+    color: var(--pg-gold) !important;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.6rem !important;
+  }
+  .footer-brand .icon { color: var(--pg-gold) !important; }
+
+  /* Popüler şehirler */
+  .footer-popular-cities {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    margin-bottom: 1.2rem !important;
+    border-top: 1px solid rgba(201,168,76,0.18) !important;
+    border-bottom: 1px solid rgba(201,168,76,0.18) !important;
+    padding: 0.6rem 0 !important;
+  }
+  .footer-popular-cities a {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.15em !important;
+    text-transform: uppercase !important;
+    color: rgba(245,240,232,0.5) !important;
+    padding: 0.35rem 0.9rem !important;
+    border-right: 1px solid rgba(245,240,232,0.1) !important;
+    text-decoration: none !important;
+    transition: color 0.15s !important;
+  }
+  .footer-popular-cities a:last-child { border-right: none !important; }
+  .footer-popular-cities a:hover { color: var(--pg-gold) !important; }
+
+  /* Footer linkleri */
+  .footer-links {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0.2rem 0 !important;
+    margin-bottom: 1.5rem !important;
+  }
+  .footer-links a {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.58rem !important;
+    letter-spacing: 0.12em !important;
+    color: rgba(245,240,232,0.45) !important;
+    padding: 0.25rem 0.75rem !important;
+    border-right: 1px solid rgba(245,240,232,0.08) !important;
+    text-decoration: none !important;
+    transition: color 0.15s !important;
+    text-transform: uppercase !important;
+  }
+  .footer-links a:last-child { border-right: none !important; }
+  .footer-links a:hover { color: var(--pg-gold) !important; }
+  .footer-link-ataturk { color: rgba(255,130,130,0.7) !important; }
+  .footer-link-ataturk:hover { color: #ff7878 !important; }
+
+  /* Creator */
+  .footer-creator {
+    margin-bottom: 1.2rem !important;
+  }
+  .footer-creator a {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.62rem !important;
+    letter-spacing: 0.25em !important;
+    color: rgba(245,240,232,0.35) !important;
+    text-decoration: none !important;
+    text-transform: uppercase !important;
+    transition: color 0.2s !important;
+  }
+  .footer-creator a:hover { color: var(--pg-gold) !important; }
+
+  /* Milli kimlik */
+  .national-identity {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.8rem !important;
+    margin-bottom: 1.2rem !important;
+    padding: 0.6rem 0 !important;
+    border-top: 1px solid rgba(201,168,76,0.12) !important;
+    border-bottom: 1px solid rgba(201,168,76,0.12) !important;
+  }
+  .national-identity .text {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.62rem !important;
+    letter-spacing: 0.35em !important;
+    color: rgba(245,240,232,0.4) !important;
+  }
+  .national-identity .icon { opacity: 0.4 !important; }
+
+  /* Copyright */
+  .footer-copy {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.58rem !important;
+    letter-spacing: 0.1em !important;
+    color: rgba(245,240,232,0.28) !important;
+  }
+  .footer-copy small { opacity: 0.7 !important; }
+
   /* ── Responsive ── */
   @media (max-width: 900px) {
     .pg-hero { grid-template-columns: 1fr; }
