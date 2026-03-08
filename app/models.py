@@ -86,3 +86,10 @@ class Guide(db.Model):
             "image_url": self.image_url,
             "last_updated": self.updated_at.strftime("%Y-%m-%d") if self.updated_at else None
         }
+
+# Eğer SQLite/SQLAlchemy kullanıyorsan
+class QrRedirect(db.Model):
+    id = db.Column(db.String(8), primary_key=True)
+    url = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    hit_count = db.Column(db.Integer, default=0)

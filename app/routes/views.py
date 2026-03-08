@@ -4,6 +4,7 @@ from app.services import UserService, PrayerService, RamadanService, get_timezon
 from app.models import EzanVakti, ContactMessage, DailyContent, Guide
 from app.extensions import cache, db, limiter
 from datetime import datetime, timedelta
+import random, string
 import os
 import json
 import bleach
@@ -814,3 +815,37 @@ def newtab():
 @views_bp.route('/qr-okuyucu')
 def qr_okuyucu():
     return render_template('extra/qr-reader/qr-reader.html')
+
+def generate_id(length=7):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+
+@views_bp.route('/api/shorten', methods=['POST'])
+def shorten():
+    data = request.get_json()
+    url = data.get('url', '').strip()
+    
+    if not url:
+        return jsonify({'error': 'URL gerekli'}), 400
+    
+    # Aynı URL varsa tekrar oluşturma
+    existing = QrRedirect.query.filter_by(url=url).first()
+    if existing:
+        return jsonify({'short_id': existing.id})
+    
+    short_id = generate_id()
+    # Çakışma kontrolü
+    while QrRedirect.query.get(short_id):
+        short_id = generate_id()
+    
+    redirect_obj = QrRedirect(id=short_id, url=url)
+    db.session.add(redirect_obj)
+    db.session.commit()
+    
+    return jsonify({'short_id': short_id})
+
+@views_bp.route('/r/<short_id>')
+def redirect_url(short_id):
+    obj = QrRedirect.query.get_or_404(short_id)
+    obj.hit_count += 1
+    db.session.commit()
+    return redirect(obj.url)

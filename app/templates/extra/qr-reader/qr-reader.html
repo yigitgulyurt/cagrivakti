@@ -229,16 +229,41 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    const handleResult = text => {
-        html5QrCode.stop().then(() => {
-            isScanning=false;
-            scanAgainBtn.style.display="inline-block";
-            currentResultText=text;
-            resultDiv.textContent=text;
-            resultActionsDiv.style.display="flex";
-            if(!history.includes(text)){history.unshift(text); if(history.length>10)history.pop(); localStorage.setItem("qr_history",JSON.stringify(history)); renderHistory();}
-            openUrlBtn.style.display = isValidUrl(text) ? "inline-block" : "none";
-        });
+    const handleResult = async text => {
+        html5QrCode.stop().then(async () => {
+        isScanning = false;
+        scanAgainBtn.style.display = "inline-block";
+        currentResultText = text;
+        resultDiv.textContent = text;
+        resultActionsDiv.style.display = "flex";
+
+        // URL ise kısalt
+        if (isValidUrl(text)) {
+            openUrlBtn.style.display = "inline-block";
+            try {
+                const res = await fetch('/api/shorten', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: text })
+                });
+                const data = await res.json();
+                if (data.short_id) {
+                    currentShortUrl = `https://cagrivakti.com.tr/r/${data.short_id}`;
+                }
+            } catch { currentShortUrl = text; }
+        } else {
+            openUrlBtn.style.display = "none";
+            currentShortUrl = null;
+        }
+
+        // geçmiş kayıt (mevcut kodun aynısı)
+        if (!history.includes(text)) {
+            history.unshift(text);
+            if (history.length > 10) history.pop();
+            localStorage.setItem("qr_history", JSON.stringify(history));
+            renderHistory();
+        }
+    });
     };
 
     scanAgainBtn?.addEventListener("click", startScanning);
@@ -252,23 +277,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         return;
     }
-
+    const shareText = currentShortUrl ?? currentResultText;
     const shareMessages = [
-        `📷 QR kodu taradım:\n${currentResultText}\n\n⏰ cagrivakti.com.tr`,
-        `🔍 Bu QR kod içeriğini buldum:\n${currentResultText}\n\n🕌 cagrivakti.com.tr`,
-        `📲 QR okuyucu ile tespit ettim:\n${currentResultText}\n\n🌙 cagrivakti.com.tr`,
-        `✅ QR kod başarıyla okundu:\n${currentResultText}\n\n⏰ cagrivakti.com.tr`,
-        `📡 QR içeriği tarandı:\n${currentResultText}\n\n🕌 cagrivakti.com.tr`,
-        `🗂️ QR koddan bilgi alındı:\n${currentResultText}\n\n🌙 cagrivakti.com.tr`,
-        `🔎 QR kod analiz edildi:\n${currentResultText}\n\n⏰ cagrivakti.com.tr`,
-        `📋 Taranan QR kod verisi:\n${currentResultText}\n\n🕌 cagrivakti.com.tr`,
-        `💡 QR kod çözümlendi:\n${currentResultText}\n\n🌙 cagrivakti.com.tr`,
-        `🖨️ QR okuma tamamlandı:\n${currentResultText}\n\n⏰ cagrivakti.com.tr`,
-        `🔓 QR kod içeriği açıldı:\n${currentResultText}\n\n🕌 cagrivakti.com.tr`,
-        `📌 QR tarama sonucu:\n${currentResultText}\n\n🌙 cagrivakti.com.tr`,
-        `🌐 QR koddan veri okundu:\n${currentResultText}\n\n⏰ cagrivakti.com.tr`,
-        `⚡  QR kod anında tarandı:\n${currentResultText}\n\n🕌 cagrivakti.com.tr`,
-        `🧩 QR içeriği tespit edildi:\n${currentResultText}\n\n🌙 cagrivakti.com.tr`,
+        `📷 QR kodu taradım:\n${shareText}\n\n⏰ cagrivakti.com.tr`,
+        `🔍 Bu QR kod içeriğini buldum:\n${shareText}\n\n🕌 cagrivakti.com.tr`,
+        `📲 QR okuyucu ile tespit ettim:\n${shareText}\n\n🌙 cagrivakti.com.tr`,
+        `✅ QR kod başarıyla okundu:\n${shareText}\n\n⏰ cagrivakti.com.tr`,
+        `📡 QR içeriği tarandı:\n${shareText}\n\n🕌 cagrivakti.com.tr`,
+        `🗂️ QR koddan bilgi alındı:\n${shareText}\n\n🌙 cagrivakti.com.tr`,
+        `🔎 QR kod analiz edildi:\n${shareText}\n\n⏰ cagrivakti.com.tr`,
+        `📋 Taranan QR kod verisi:\n${shareText}\n\n🕌 cagrivakti.com.tr`,
+        `💡 QR kod çözümlendi:\n${shareText}\n\n🌙 cagrivakti.com.tr`,
+        `🖨️ QR okuma tamamlandı:\n${shareText}\n\n⏰ cagrivakti.com.tr`,
+        `🔓 QR kod içeriği açıldı:\n${shareText}\n\n🕌 cagrivakti.com.tr`,  
+        `📌 QR tarama sonucu:\n${shareText}\n\n🌙 cagrivakti.com.tr`,
+        `🌐 QR koddan veri okundu:\n${shareText}\n\n⏰ cagrivakti.com.tr`,
+        `⚡  QR kod anında tarandı:\n${shareText}\n\n🕌 cagrivakti.com.tr`,
+        `🧩 QR içeriği tespit edildi:\n${shareText}\n\n🌙 cagrivakti.com.tr`,
     ];
 
     const text = shareMessages[Math.floor(Math.random() * shareMessages.length)];

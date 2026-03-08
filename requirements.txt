@@ -15,7 +15,7 @@ Flask-WTF==1.2.1
 bleach==6.1.0
 gunicorn==21.2.0
 python-telegram-bot[job-queue]==20.8
-flask-minify==0.6.11
-flask-assets==2.0.0
-cssmin==0.2.0
-jsmin==2.2.2
+flask-minify
+flask-assets
+cssmin
+jsmin
