@@ -232,8 +232,9 @@ document.addEventListener("DOMContentLoaded", () => {
             scanAgainBtn.style.display="inline-block";
             currentResultText=text;
             resultDiv.textContent=text;
-            resultActionsDiv.style.display=isValidUrl(text)?"flex";
+            resultActionsDiv.style.display="flex";
             if(!history.includes(text)){history.unshift(text); if(history.length>10)history.pop(); localStorage.setItem("qr_history",JSON.stringify(history)); renderHistory();}
+            openUrlBtn.style.display = isValidUrl(text) ? "inline-block" : "none";
         });
     };
 
