@@ -19,7 +19,7 @@ instance/telegram_bot.db
 .env
 .env.*
 !.env.example
-
+asal
 # Logs
 app/logs/app_info.log
 app/logs/cagrivakti-api.log
