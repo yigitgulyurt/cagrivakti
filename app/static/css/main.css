@@ -1092,7 +1092,8 @@ to {
     /* ═══ NAVBAR — BLUR ARKAPLAN ═══ */
     .navbar,
     .daily-content-card,
-    .vakit-card {
+    .vakit-card,
+    .btn-ultra-hero {
         background-color: rgba(18, 18, 18, 0.75) !important;
         backdrop-filter: blur(20px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(12px) !important;
