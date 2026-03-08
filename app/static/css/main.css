@@ -1082,9 +1082,9 @@ to {
     }
       /* Navbar'ı arkadan ayır */
     nav, #nav, .nav, .navbar, #navbar, .header, #header, header, .global-head-cont, #navigation-wrapper, #global-navbar {
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
-      background-color: rgba(255, 255, 255, 0.08) !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background-color: rgba(18, 18, 18, 0.75) !important;
+        backdrop-filter: blur(20px) saturate(180%) !important
     }
 }
