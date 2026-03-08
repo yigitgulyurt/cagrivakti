@@ -821,19 +821,20 @@ def generate_id(length=7):
 
 @views_bp.route('/api/shorten', methods=['POST'])
 def shorten():
-    data = request.get_json()
+    data = request.get_json(silent=True, force=True)  # ← silent+force ekle
+    if not data:
+        return jsonify({'error': 'JSON parse edilemedi'}), 400
+    
     url = data.get('url', '').strip()
     
     if not url:
         return jsonify({'error': 'URL gerekli'}), 400
     
-    # Aynı URL varsa tekrar oluşturma
     existing = QrRedirect.query.filter_by(url=url).first()
     if existing:
         return jsonify({'short_id': existing.id})
     
     short_id = generate_id()
-    # Çakışma kontrolü
     while QrRedirect.query.get(short_id):
         short_id = generate_id()
     
