@@ -1093,7 +1093,8 @@ to {
     .navbar,
     .daily-content-card,
     .vakit-card,
-    .btn-ultra-hero {
+    .btn-ultra-hero,
+    .btn-inner {
         background-color: rgba(18, 18, 18, 0.75) !important;
         backdrop-filter: blur(20px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(12px) !important;
