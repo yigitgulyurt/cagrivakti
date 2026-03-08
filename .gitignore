@@ -38,7 +38,7 @@ migrations/*.sqlite3
 # Static Files & SEO (Generated)
 # robots.txt
 # sitemap.xml
-
+css-maker.html
 # IDEs
 .vscode/
 .idea/
