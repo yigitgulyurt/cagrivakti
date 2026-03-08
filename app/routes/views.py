@@ -11,6 +11,7 @@ import requests
 from threading import Thread
 import re
 import hashlib
+import random, string
 
 views_bp = Blueprint('views', __name__)
 
