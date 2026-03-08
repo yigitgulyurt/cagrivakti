@@ -165,6 +165,8 @@ def create_app(config_class=Config):
                 )
         except Exception:
             pass
+            # Tüm response'lara güvenlik header'ları ekle  <-- bunu ekle
+        response.headers.setdefault('X-Content-Type-Options', 'nosniff')
         # Statik dosyalar için uzun süreli cache (Daima overwrite)
         # request.endpoint == 'static' kontrolü Flask'ın kendi static handler'ını yakalar
         if request.endpoint == 'static' or request.path.startswith('/static/'):
