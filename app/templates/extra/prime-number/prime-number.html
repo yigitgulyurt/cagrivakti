@@ -5,7 +5,36 @@
 {% block keywords %}asal sayı, 20000 basamak, büyük asal, sayı teorisi, kriptografi, Miller-Rabin{% endblock %}
 
 {% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url("{{ url_for('static', filename='font/jetbrains-mono-v24-latin-regular.woff2') }}") format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url("{{ url_for('static', filename='font/jetbrains-mono-v24-latin-700.woff2') }}") format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Playfair Display';
+    src: url("{{ url_for('static', filename='font/playfair-display-v40-latin-700.woff2') }}") format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Playfair Display';
+    src: url("{{ url_for('static', filename='font/playfair-display-v40-latin-900.woff2') }}") format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+</style>
 <style>
   /* ── Sayfa kök değişkenleri ── */
   :root {
