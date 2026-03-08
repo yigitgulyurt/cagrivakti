@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
             scanAgainBtn.style.display="inline-block";
             currentResultText=text;
             resultDiv.textContent=text;
-            resultActionsDiv.style.display=isValidUrl(text)?"flex":"none";
+            resultActionsDiv.style.display=isValidUrl(text)?"flex";
             if(!history.includes(text)){history.unshift(text); if(history.length>10)history.pop(); localStorage.setItem("qr_history",JSON.stringify(history)); renderHistory();}
         });
     };
@@ -261,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
         title: 'QR Kod — Çağrı Vakti',
         text: text,   // URL dahil her şey buraya, url parametresi YOK
     }).catch(() => {});
-    });
+        });
     clearHistoryBtn?.addEventListener("click",()=>{if(confirm("Geçmişi silmek istediğinizden emin misiniz?")){history=[];localStorage.removeItem("qr_history");renderHistory();}});
 
     startScanning();
