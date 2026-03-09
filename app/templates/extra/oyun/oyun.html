@@ -6,14 +6,6 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
 
-    .landing-footer {
-    background-color: transparent !important;
-    }
-
-    .navbar {
-    background-color: transparent !important;
-    }
-  
   .game-wrapper {
     min-height: 100vh;
     padding: 2rem 1rem 3rem;
@@ -458,17 +450,31 @@
     margin: 1rem 0;
   }
 
-  /* Desktop kontrolleri sadece masaüstünde tam görünür,
-     mobilde hafifçe soluk göster (bilgi amaçlı) */
-  @media (hover: none) and (pointer: coarse) {
-    /* Mobil cihaz */
-    .desktop-controls { opacity: 0.45; }
-    .mobile-controls  { opacity: 1; }
+  /*
+   * Kontrol görünürlüğü — JS tarafından body'e eklenen
+   * .device-mobile veya .device-desktop class'ına göre yönetilir.
+   * Varsayılan: ikisi de gizli, JS yüklenince açılır.
+   */
+  .desktop-controls,
+  .mobile-controls {
+    display: none;
   }
-  @media (hover: hover) and (pointer: fine) {
-    /* Masaüstü */
-    .desktop-controls { opacity: 1; }
-    .mobile-controls  { opacity: 0.45; }
+  .device-desktop .desktop-controls {
+    display: block;
+  }
+  .device-mobile .mobile-controls {
+    display: block;
+  }
+  /* Divider: sadece masaüstünde iki bölüm arasında gerekli */
+  .device-desktop .control-divider { display: block; }
+  .device-mobile  .control-divider { display: none;  }
+
+  /* Navbar ve footer şeffaf */
+  .landing-footer {
+    background-color: transparent !important;
+  }
+  .navbar {
+    background-color: transparent !important;
   }
 </style>
 
@@ -670,24 +676,31 @@
     else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
   }
 
-  // Mobil tespiti ve yatay mod tavsiyesi
+  // ── Cihaz tespiti ──────────────────────────────────────────
+  // User-agent + maxTouchPoints birleşimiyle en güvenilir yöntem
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-    || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
+    || (navigator.maxTouchPoints > 0 && !/Macintosh/.test(navigator.userAgent) && window.innerWidth <= 1024);
 
+  document.body.classList.add(isMobile ? 'device-mobile' : 'device-desktop');
+
+  // ── Yatay mod tavsiyesi (sadece mobil) ────────────────────
   const landscapeTip = document.getElementById('landscapeTip');
 
   if (isMobile) {
-    landscapeTip.style.display = 'flex';
-
-    // Telefon zaten yataysa gizle
     function checkOrientation() {
       const isLandscape = window.innerWidth > window.innerHeight;
+      // Yataysa uyarıya gerek yok, dikeydeyse göster
       landscapeTip.style.display = isLandscape ? 'none' : 'flex';
     }
 
     checkOrientation();
     window.addEventListener('resize', checkOrientation);
-    screen.orientation && screen.orientation.addEventListener('change', checkOrientation);
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', () => {
+        // Orientasyon değişiminden sonra boyutlar güncellenir, kısa bekle
+        setTimeout(checkOrientation, 100);
+      });
+    }
   }
 </script>
 {% endblock %}
