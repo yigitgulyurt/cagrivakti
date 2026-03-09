@@ -254,6 +254,94 @@
     stroke: currentColor; fill: none;
     stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
   }
+
+  /* Tuş rehberi */
+  .key-guide {
+    margin-top: 1.6rem;
+    border: 1px solid rgba(245,158,11,0.12);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    padding: 1.1rem 1.4rem;
+    animation: fadeUp 0.8s ease 0.5s both;
+  }
+
+  .key-guide-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(245,158,11,0.5);
+    margin-bottom: 1rem;
+  }
+
+  .key-guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.55rem 1.5rem;
+  }
+
+  .key-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .key-row.highlight .key-desc {
+    color: rgba(255,255,255,0.75);
+  }
+
+  .key-badges {
+    display: flex;
+    gap: 0.3rem;
+    flex-shrink: 0;
+  }
+
+  .kbd {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 0.22rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(245,158,11,0.35);
+    background: rgba(245,158,11,0.1);
+    color: #f59e0b;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  /* P tuşu özel vurgu */
+  .kbd.kbd-special {
+    border-color: rgba(255, 107, 53, 0.6);
+    background: rgba(255, 107, 53, 0.12);
+    color: #ff6b35;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 0 8px rgba(255,107,53,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  /* ESC tuşu özel vurgu */
+  .kbd.kbd-esc {
+    border-color: rgba(148,163,184,0.4);
+    background: rgba(148,163,184,0.08);
+    color: rgba(148,163,184,0.85);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .key-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.3;
+  }
+
+  /* P açıklaması altındaki note */
+  .key-note {
+    font-size: 0.68rem;
+    color: rgba(255,107,53,0.55);
+    margin-top: 0.15rem;
+    font-style: italic;
+  }
 </style>
 
 <!-- Yıldız parçacıkları -->
@@ -292,6 +380,63 @@
           allowfullscreen
           title="Under the Red Sky">
         </iframe>
+      </div>
+    </div>
+
+    <!-- Tuş Rehberi -->
+    <div class="key-guide">
+      <div class="key-guide-title">⌨ Kontroller</div>
+      <div class="key-guide-grid">
+
+        <div class="key-row">
+          <div class="key-badges">
+            <span class="kbd">W</span>
+            <span class="kbd">A</span>
+            <span class="kbd">S</span>
+            <span class="kbd">D</span>
+          </div>
+          <div>
+            <div class="key-desc">Hareket et</div>
+          </div>
+        </div>
+
+        <div class="key-row">
+          <div class="key-badges">
+            <span class="kbd">SPACE</span>
+          </div>
+          <div>
+            <div class="key-desc">Zıpla</div>
+          </div>
+        </div>
+
+        <div class="key-row">
+          <div class="key-badges">
+            <span class="kbd">R</span>
+          </div>
+          <div>
+            <div class="key-desc">Seviyeyi yeniden başlat</div>
+          </div>
+        </div>
+
+        <div class="key-row highlight">
+          <div class="key-badges">
+            <span class="kbd kbd-special">P</span>
+          </div>
+          <div>
+            <div class="key-desc">Duraklat / Devam et</div>
+            <div class="key-note">Ayarlar ve müzik kontrolü buradan</div>
+          </div>
+        </div>
+
+        <div class="key-row">
+          <div class="key-badges">
+            <span class="kbd kbd-esc">ESC</span>
+          </div>
+          <div>
+            <div class="key-desc">Tam ekrandan çık</div>
+          </div>
+        </div>
+
       </div>
     </div>
 
