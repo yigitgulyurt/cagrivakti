@@ -861,9 +861,9 @@ def oyun_dispatchworker():
         'dispatchworker.js'
     )
 
-@views_bp.route('/scripts/<path:filename>')
-def oyun_scripts(filename):
-    return send_from_directory(
-        os.path.join(current_app.root_path, 'static', 'oyun', 'scripts'),
-        filename
-    )
+# @views_bp.route('/scripts/<path:filename>')
+# def oyun_scripts(filename):
+#     return send_from_directory(
+#         os.path.join(current_app.root_path, 'static', 'oyun', 'scripts'),
+#         filename
+#     )
