@@ -64,6 +64,15 @@ self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
     const url = new URL(event.request.url);
+    
+    if (
+        url.pathname.startsWith('/oyun') ||
+        url.pathname === '/workermain.js' ||
+        url.pathname.startsWith('/scripts/jobworker') ||
+        url.pathname.startsWith('/scripts/dispatchworker')
+    ) {
+        return;
+    }
 
     // API istekleri (Vakitler vb.) - Network-First, ama Cache'e kaydet ve hata durumunda Cache'den getir
     if (url.hostname === 'api.cagrivakti.com.tr' && (url.pathname.startsWith('/ezan_vakitleri') || url.pathname.startsWith('/vakitler/'))) {
