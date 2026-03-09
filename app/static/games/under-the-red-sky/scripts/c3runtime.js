@@ -14149,7 +14149,7 @@ self.C3_ExpressionFuncs = [
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			const n1 = p._GetNode(1);
-			return () => f0("en,ger", n1.ExpObject("settings.language"));
+			return () => f0("en,ger,tr", n1.ExpObject("settings.language"));
 		},
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
