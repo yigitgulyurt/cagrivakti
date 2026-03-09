@@ -1,0 +1,88 @@
+{
+    "strings": {
+        "inputsKBM": "[icon=keyW] [icon=keyA] [icon=keyS] [icon=keyD] hareket etmek için\n[icon=keySpace] zıplamak için\n[icon=keyR] bölümü yeniden başlatmak için\n[icon=keyP] duraklatma ekranına girmek için",
+        "inputsTouch": "[b]SOL TARAFTAKİ DOKUNMA ÇUBUĞU[/b] hareket etmek için\n[b]EKRANA DOKUN[/b] zıplamak için\n[b]EKRANDA SÜRÜKLE[/b] kamerayı hareket ettirmek için",
+        "space": "[icon=keySpace]",
+        "wasd": "[icon=keyW] [icon=keyA] [icon=keyS] [icon=keyD]",
+        "leftStick": "ekranın sol tarafına dokunarak",
+        "tapScreen": "EKRANA DOKUN",
+        "noTime": "SÜRE YOK",
+        "bestTime": "EN İYİ SÜRE: ",
+        "creditsText": "-skybox büyük ölçüde değiştirildi: https://opengameart.org/content/sky-box-sunny-day\n-dash: qubodup tarafından - bounce: duckduckpony tarafından\n-rüzgar döngüsü: nsstudios tarafından\n-karakter sesleri: Mont Blanc Candies'ten",
+        "levelCleared": "BÖLÜM TAMAMLANDI",
+        "chapterCleared": "BÖLÜM TAMAMLANDI",
+        "secretFound": "GİZLİ BULUNDU",
+        "chapter": "BÖLÜM",
+        "nextChapter": "SONRAKİ BÖLÜM",
+        "star": {
+            "one": "YILDIZ",
+            "other": "YILDIZLAR"
+        },
+        "achievements": {
+            "hidden": "GİZLİ BAŞARI",
+            "unlocked": " BAŞARI AÇILDI",
+            "header": "[b]//BAŞARI: [/b]",
+            "firstDeath": "DÜŞMEK VE YENİDEN KALKMAK",
+            "first4Star": "USTALAŞILMIŞ BİR BÖLÜM",
+            "fewDeaths": "DEVAM ET (50 DÜŞÜŞ)",
+            "fewDeathsHint": "50 KEZ DÜŞ",
+            "manyDeaths": "AZIM (250 DÜŞÜŞ)",
+            "allTheDeaths": "ASLA VAZGEÇMEMEK (1000 DÜŞÜŞ)"
+        },
+        "ui": {
+            "menu": "MENÜ",
+            "continue": "DEVAM ET",
+            "settings": "AYARLAR",
+            "play": "OYNA",
+            "levels": "BÖLÜMLER",
+            "FPSLimit": "FPS: ",
+            "vsync": "V-SYNC",
+            "60fps": "60",
+            "unlimited": "SINIR YOK",
+            "graphicsQuality": "KALİTE: ",
+            "low": "DÜŞÜK",
+            "medium": "ORTA",
+            "high": "YÜKSEK",
+            "ultra": "ULTRA",
+            "musicVolume": "MÜZİK SESİ",
+            "soundVolume": "EFEKT SESİ",
+            "FOV": "GÖRÜŞ ALANI",
+            "lookSensitivity": "KAMERA HASSASİYETİ",
+            "closeDialog": "KAPAT",
+            "back": "GERİ",
+            "wipeSave": "KAYDI SİL",
+            "achievements": "BAŞARILAR",
+            "credits": "KREDİLER",
+            "language": "DİL: ",
+            "en": "İNGİLİZCE",
+            "tr": "TÜRKÇE",
+            "ger": "ALMANCA",
+            "resetDemo": "DEMOYİ YENİDEN BAŞLAT",
+            "failPity": "BÖLÜMÜ ATLA",
+            "cancel": "İPTAL",
+            "watchAd": "REKLAM İZLE"
+        },
+        "levelMessages": {
+            "blueBox": "Mavi Kutuya ulaş, {keyMove} ile hareket et",
+            "jump": "Zıplamak için {keyJump}",
+            "wallRun": "Duvara bakarak duvara zıpla, duvar koşusunu başlatmak için",
+            "wallJump": "Duvar koşusu sırasında Zıpla'ya bas, baktığın yönde duvardan sıçramak için",
+            "wallClimb": "Duvara bakarak koş, tırmanmayı başlatmak için",
+            "Section 1": "Eğitim",
+            "Section 2": "Yüzen Bloklar",
+            "Section 3": "Dış Mahalleler",
+            "Section 4": "Şehir",
+            "Demo_End": "Oynadığın için teşekkürler! Güncellemeler için takipte kal :)"
+        },
+        "levelNames": {
+            "testLevel": "TEST BÖLÜMÜ",
+            "arrival": "VARIŞ"
+        },
+        "chapterNames": {
+            "tutorial": "EĞİTİM",
+            "floatingBlocks": "YÜZEN BLOKLAR",
+            "outskirts": "DIŞ MAHALLELER",
+            "city": "ŞEHİR"
+        }
+    }
+}
