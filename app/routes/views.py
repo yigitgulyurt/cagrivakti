@@ -138,7 +138,7 @@ def serve_sitemap():
         'views.neden_biz', 'views.indir', 'views.konum_bul', 
         'views.iletisim', 'views.ilkelerimiz',
         'views.bilgi_kosesi_liste','views.prime_number','views.qr_okuyucu',
-        'views.asal_sayi'
+        'views.asal_sayi', 'views.zeninternet_styles'
     ]
     
     for rule in static_urls:
@@ -827,5 +827,9 @@ def redirect_url(short_id):
     return redirect(obj.url)
 
 @views_bp.route('/zeninternet-styles')
+@cache.cached(timeout=3600)
 def zeninternet_styles():
-    return render_template('app/static/data/styles.json')
+    styles_path = os.path.join(current_app.root_path, 'static', 'data', 'styles.json')
+    with open(styles_path, 'r', encoding='utf-8') as f:
+        styles = json.load(f)
+    return render_template('extra/zeninternet_styles/zeninternet_styles.html', styles=styles)
