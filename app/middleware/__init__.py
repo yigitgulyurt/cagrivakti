@@ -67,6 +67,25 @@ def setup_middleware(app):
             response.headers.pop('X-Frame-Options', None)
             # Cross-origin erişim izni (CORS)
             response.headers['Access-Control-Allow-Origin'] = '*'
+
+        elif request.path.startswith('/oyunlar/'):
+                # Oyun sayfası: frame'e izin ver ama diğer güvenlik kuralları sıkı kalsın
+            csp = (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdnjs.cloudflare.com; "
+                "style-src 'self' 'unsafe-inline'; "
+                "font-src 'self' data:; "
+                "img-src 'self' data: blob: https:; "
+                "connect-src 'self' blob:; "
+                "frame-src 'self'; "
+                "frame-ancestors 'self'; "
+                "worker-src 'self' blob:; "
+                "base-uri 'self'; "
+                "form-action 'self';"
+                )
+            response.headers['Content-Security-Policy'] = csp
+            response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+
             
         else:
             # Standart sayfalar için sıkı güvenlik
