@@ -831,12 +831,7 @@ def under_the_red_sky():
     return render_template('extra/oyun/oyun.html',
                            oyun_adi="Under the Red Sky")
 
-@views_bp.route('/kaynak/under-the-red-sky')
-def under_the_red_sky_game():
-    game_dir = os.path.join(current_app.root_path, 'static', 'games', 'under-the-red-sky')
-    return send_from_directory(game_dir, 'index.html')
-
 @views_bp.route('/kaynak/under-the-red-sky/<path:filename>')
-def under_the_red_sky_files(filename):
+def serve_game_files(filename):
     game_dir = os.path.join(current_app.root_path, 'static', 'games', 'under-the-red-sky')
     return send_from_directory(game_dir, filename)
