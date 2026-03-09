@@ -1,21 +1,346 @@
 {% extends "base.html" %}
 
-{% block title %}Under the Red Sky{% endblock %}
+{% block title %}Under the Red Sky — Oyun{% endblock %}
 
 {% block content %}
-<div style="text-align:center; padding: 1rem 0;">
-    <h2 style="color: var(--amber); font-family: 'Inter', sans-serif; margin-bottom: 1rem;">
-        🎮 Under the Red Sky
-    </h2>
-    <div style="max-width: 960px; margin: 0 auto;">
-        <iframe 
-            src="/kaynak/under-the-red-sky/index.html"
-            width="100%" 
-            height="720px"
-            style="border: none; border-radius: 12px; display: block;"
-            allow="autoplay; fullscreen; gamepad"
-            allowfullscreen>
-        </iframe>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
+
+  .game-wrapper {
+    min-height: 100vh;
+    padding: 2rem 1rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Kırmızı gökyüzü atmosfer arka planı */
+  .game-wrapper::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(180, 30, 10, 0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 30% at 20% 80%, rgba(220, 80, 20, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Yıldız parçacıkları */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(255, 180, 60, 0.6);
+    border-radius: 50%;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+  }
+
+  .game-container {
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  /* Başlık alanı */
+  .game-header {
+    text-align: center;
+    margin-bottom: 1.8rem;
+    animation: fadeDown 0.7s ease both;
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .game-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber, #f59e0b);
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .game-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.6rem, 5vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+    margin: 0 0 0.6rem;
+    background: linear-gradient(135deg, #ff6b35 0%, #f59e0b 40%, #ffd166 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.3));
+  }
+
+  .game-subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.08em;
+  }
+
+  /* İframe çerçevesi */
+  .game-frame-outer {
+    position: relative;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Köşe dekorasyonları */
+  .corner {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .corner::before, .corner::after {
+    content: '';
+    position: absolute;
+    background: var(--amber, #f59e0b);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  }
+  .corner::before { width: 100%; height: 2px; }
+  .corner::after  { width: 2px; height: 100%; }
+  .corner-tl { top: -1px; left: -1px; }
+  .corner-tr { top: -1px; right: -1px; transform: scaleX(-1); }
+  .corner-bl { bottom: -1px; left: -1px; transform: scaleY(-1); }
+  .corner-br { bottom: -1px; right: -1px; transform: scale(-1); }
+
+  /* Dış çerçeve */
+  .game-frame-border {
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 8px;
+    padding: 3px;
+    background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(255,107,53,0.05));
+    box-shadow:
+      0 0 40px rgba(180, 30, 10, 0.15),
+      0 0 80px rgba(245, 158, 11, 0.06),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  /* Yükleniyor overlay */
+  .game-loading {
+    position: absolute;
+    inset: 3px;
+    border-radius: 6px;
+    background: rgba(10, 10, 15, 0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 3;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+  .game-loading.hidden { opacity: 0; }
+
+  .loading-icon {
+    font-size: 2.5rem;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1);   opacity: 0.7; }
+    50%       { transform: scale(1.15); opacity: 1; }
+  }
+
+  .loading-bar-track {
+    width: 160px;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .loading-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #ff6b35);
+    border-radius: 2px;
+    animation: loadBar 1.8s ease-in-out infinite;
+  }
+  @keyframes loadBar {
+    0%   { width: 0%;   margin-left: 0; }
+    50%  { width: 70%;  margin-left: 0; }
+    100% { width: 0%;   margin-left: 100%; }
+  }
+
+  .loading-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  iframe.game-iframe {
+    display: block;
+    width: 100%;
+    height: clamp(400px, 56vw, 700px);
+    border: none;
+    border-radius: 6px;
+    background: #050508;
+  }
+
+  /* Alt bilgi bar */
+  .game-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding: 0 0.25rem;
+    animation: fadeUp 0.8s ease 0.4s both;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .game-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(245,158,11,0.25);
+    color: rgba(245,158,11,0.7);
+    background: rgba(245,158,11,0.06);
+  }
+
+  .game-fullscreen-btn {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    border: 1px solid rgba(245,158,11,0.35);
+    background: rgba(245,158,11,0.08);
+    color: rgba(245,158,11,0.85);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .game-fullscreen-btn:hover {
+    background: rgba(245,158,11,0.16);
+    border-color: rgba(245,158,11,0.6);
+    color: #f59e0b;
+    box-shadow: 0 0 12px rgba(245,158,11,0.2);
+  }
+  .game-fullscreen-btn svg {
+    width: 14px; height: 14px;
+    stroke: currentColor; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+</style>
+
+<!-- Yıldız parçacıkları -->
+<div class="stars" id="starsContainer"></div>
+
+<div class="game-wrapper">
+  <div class="game-container">
+
+    <!-- Başlık -->
+    <div class="game-header">
+      <div class="game-eyebrow">🎮 Ekstra — Mini Oyun</div>
+      <h1 class="game-title">Under the Red Sky</h1>
+      <p class="game-subtitle">Kırmızı gökyüzünün altında bir platform macerası</p>
     </div>
+
+    <!-- İframe çerçevesi -->
+    <div class="game-frame-outer">
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+      <div class="game-frame-border">
+        <!-- Yükleniyor overlay -->
+        <div class="game-loading" id="gameLoading">
+          <div class="loading-icon">🔴</div>
+          <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
+          <div class="loading-text">Oyun yükleniyor…</div>
+        </div>
+
+        <iframe
+          id="gameIframe"
+          class="game-iframe"
+          src="/kaynak/under-the-red-sky/index.html"
+          allow="autoplay; fullscreen; gamepad"
+          allowfullscreen
+          title="Under the Red Sky">
+        </iframe>
+      </div>
+    </div>
+
+    <!-- Alt meta bar -->
+    <div class="game-meta">
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <span class="game-tag">Platform</span>
+        <span class="game-tag">Construct 3</span>
+        <span class="game-tag">Tarayıcı Oyunu</span>
+      </div>
+      <button class="game-fullscreen-btn" onclick="openFullscreen()">
+        <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        Tam Ekran
+      </button>
+    </div>
+
+  </div>
 </div>
+
+<script>
+  // Yıldız parçacıkları
+  const container = document.getElementById('starsContainer');
+  for (let i = 0; i < 60; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.cssText = `
+      left: ${Math.random()*100}%;
+      top:  ${Math.random()*100}%;
+      --dur:   ${2 + Math.random()*4}s;
+      --delay: ${-Math.random()*4}s;
+      opacity: ${0.2 + Math.random()*0.5};
+    `;
+    container.appendChild(star);
+  }
+
+  // Iframe yüklenince overlay'i kaldır
+  const iframe  = document.getElementById('gameIframe');
+  const loading = document.getElementById('gameLoading');
+  iframe.addEventListener('load', () => {
+    loading.classList.add('hidden');
+    setTimeout(() => loading.style.display = 'none', 500);
+  });
+
+  // Tam ekran
+  function openFullscreen() {
+    const el = iframe;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+  }
+</script>
 {% endblock %}
