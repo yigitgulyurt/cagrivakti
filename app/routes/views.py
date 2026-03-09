@@ -138,7 +138,7 @@ def serve_sitemap():
         'views.neden_biz', 'views.indir', 'views.konum_bul', 
         'views.iletisim', 'views.ilkelerimiz',
         'views.bilgi_kosesi_liste','views.prime_number','views.qr_okuyucu',
-        'views.asal_sayi'
+        'views.asal_sayi', 'views.under_the_red_sky',
     ]
     
     for rule in static_urls:
@@ -826,6 +826,12 @@ def redirect_url(short_id):
     db.session.commit()
     return redirect(obj.url)
 
-@views_bp.route('/oyun')
-def oyun():
-    return render_template('extra/oyun/oyun.html')
+@views_bp.route('/oyunlar/under-the-red-sky')
+def under_the_red_sky():
+    return render_template('extra/oyun/oyun.html',
+                           oyun_adi="Under the Red Sky")
+
+@views_bp.route('/oyunlar/under-the-red-sky/<path:filename>')
+def serve_game_files(filename):
+    game_dir = os.path.join(current_app.root_path, 'static', 'games', 'under-the-red-sky')
+    return send_from_directory(game_dir, filename)
