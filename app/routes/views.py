@@ -825,3 +825,17 @@ def redirect_url(short_id):
     obj.hit_count += 1
     db.session.commit()
     return redirect(obj.url)
+
+@views_bp.route('/oyun')
+def oyun():
+    return send_from_directory(
+        os.path.join(current_app.root_path, 'static', 'oyun'),
+        'index.html'
+    )
+
+@views_bp.route('/oyun/<path:filename>')
+def oyun_static(filename):
+    return send_from_directory(
+        os.path.join(current_app.root_path, 'static', 'oyun'),
+        filename
+    )
