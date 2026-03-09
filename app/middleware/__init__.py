@@ -68,7 +68,7 @@ def setup_middleware(app):
             # Cross-origin erişim izni (CORS)
             response.headers['Access-Control-Allow-Origin'] = '*'
 
-        elif request.path.startswith('/oyunlar/'):
+        elif request.path.startswith('/kaynak/'):
                 # Oyun sayfası: frame'e izin ver ama diğer güvenlik kuralları sıkı kalsın
             csp = (
                 "default-src 'self'; "
