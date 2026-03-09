@@ -825,3 +825,7 @@ def redirect_url(short_id):
     obj.hit_count += 1
     db.session.commit()
     return redirect(obj.url)
+
+@views_bp.route('/zeninternet-styles')
+def zeninternet_styles():
+    return render_template('app/static/data/styles.json')
