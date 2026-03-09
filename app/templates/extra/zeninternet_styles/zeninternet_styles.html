@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}ZenInternet Stilleri | Çağrı Vakti{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold text-amber-400 mb-6">ZenInternet Stilleri</h1>
+
+  {% if styles %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for style in styles %}
+        <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 hover:border-amber-500 transition-colors">
+          {% if style.name %}
+            <h2 class="text-lg font-semibold text-amber-300 mb-2">{{ style.name }}</h2>
+          {% endif %}
+          {% if style.description %}
+            <p class="text-gray-400 text-sm mb-3">{{ style.description }}</p>
+          {% endif %}
+          {% if style.url %}
+            <a href="{{ style.url }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="text-amber-500 hover:text-amber-300 text-sm underline break-all">
+              {{ style.url }}
+            </a>
+          {% endif %}
+          {# styles.json'da ek alanlar varsa buraya ekle #}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-500">Henüz stil eklenmemiş.</p>
+  {% endif %}
+</div>
+{% endblock %}
