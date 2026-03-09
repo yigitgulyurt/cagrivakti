@@ -6,6 +6,11 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
 
+    .landing-footer {
+    background-color: transparent !important;
+    background: transparent !important;
+    }
+  
   .game-wrapper {
     min-height: 100vh;
     padding: 2rem 1rem 3rem;
@@ -94,6 +99,40 @@
     font-size: 0.9rem;
     color: rgba(255,255,255,0.45);
     letter-spacing: 0.08em;
+  }
+
+  /* === MOBİL UYARI BANNER === */
+  .landscape-tip {
+    display: none; /* JS ile mobilde gösterilecek */
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(245,158,11,0.3);
+    background: rgba(245,158,11,0.07);
+    animation: fadeDown 0.6s ease both;
+  }
+  .landscape-tip-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    animation: rotateHint 2.5s ease-in-out infinite;
+  }
+  @keyframes rotateHint {
+    0%, 60%, 100% { transform: rotate(0deg); }
+    30% { transform: rotate(90deg); }
+  }
+  .landscape-tip-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: rgba(245,158,11,0.85);
+    line-height: 1.4;
+  }
+  .landscape-tip-text span {
+    color: rgba(255,255,255,0.5);
+    font-weight: 400;
   }
 
   /* İframe çerçevesi */
@@ -201,6 +240,16 @@
     background: #050508;
   }
 
+  /* Mobilde iframe daha iyi görünsün */
+  @media (max-width: 600px) {
+    iframe.game-iframe {
+      height: clamp(280px, 58vw, 420px);
+    }
+    .game-wrapper {
+      padding: 1.2rem 0.6rem 2rem;
+    }
+  }
+
   /* Alt bilgi bar */
   .game-meta {
     display: flex;
@@ -255,7 +304,7 @@
     stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
   }
 
-  /* Tuş rehberi */
+  /* ===== KONTROL REHBERİ ===== */
   .key-guide {
     margin-top: 1.6rem;
     border: 1px solid rgba(245,158,11,0.12);
@@ -273,6 +322,39 @@
     text-transform: uppercase;
     color: rgba(245,158,11,0.5);
     margin-bottom: 1rem;
+  }
+
+  /* Cihaz bazlı bölümler */
+  .control-section {
+    margin-bottom: 1rem;
+  }
+  .control-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .control-section-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .control-section-label.desktop-label {
+    color: rgba(100,180,255,0.55);
+  }
+  .control-section-label.mobile-label {
+    color: rgba(100,220,140,0.55);
+  }
+  .control-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.2;
   }
 
   .key-guide-grid {
@@ -295,6 +377,7 @@
     display: flex;
     gap: 0.3rem;
     flex-shrink: 0;
+    align-items: center;
   }
 
   .kbd {
@@ -327,6 +410,28 @@
     box-shadow: 0 2px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
   }
 
+  /* Dokunmatik ikon badge */
+  .touch-badge {
+    font-size: 1rem;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  /* Dokunmatik açıklama chip */
+  .touch-chip {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    border: 1px solid rgba(100,220,140,0.3);
+    background: rgba(100,220,140,0.07);
+    color: rgba(100,220,140,0.8);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
   .key-desc {
     font-family: 'Rajdhani', sans-serif;
     font-size: 0.82rem;
@@ -342,6 +447,26 @@
     margin-top: 0.15rem;
     font-style: italic;
   }
+
+  /* Divider */
+  .control-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.05);
+    margin: 1rem 0;
+  }
+
+  /* Desktop kontrolleri sadece masaüstünde tam görünür,
+     mobilde hafifçe soluk göster (bilgi amaçlı) */
+  @media (hover: none) and (pointer: coarse) {
+    /* Mobil cihaz */
+    .desktop-controls { opacity: 0.45; }
+    .mobile-controls  { opacity: 1; }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    /* Masaüstü */
+    .desktop-controls { opacity: 1; }
+    .mobile-controls  { opacity: 0.45; }
+  }
 </style>
 
 <!-- Yıldız parçacıkları -->
@@ -355,6 +480,14 @@
       <div class="game-eyebrow">🎮 Ekstra — Mini Oyun</div>
       <h1 class="game-title">Under the Red Sky</h1>
       <p class="game-subtitle">Kırmızı gökyüzünün altında bir platform macerası</p>
+    </div>
+
+    <!-- Mobil yatay yön tavsiyesi (JS tarafından gösterilir) -->
+    <div class="landscape-tip" id="landscapeTip">
+      <div class="landscape-tip-icon">📱</div>
+      <div class="landscape-tip-text">
+        Telefonu yatay tut — <span>oyun yatay modda çok daha iyi görünür</span>
+      </div>
     </div>
 
     <!-- İframe çerçevesi -->
@@ -383,61 +516,107 @@
       </div>
     </div>
 
-    <!-- Tuş Rehberi -->
+    <!-- Kontrol Rehberi -->
     <div class="key-guide">
       <div class="key-guide-title">⌨ Kontroller</div>
-      <div class="key-guide-grid">
 
-        <div class="key-row">
-          <div class="key-badges">
-            <span class="kbd">W</span>
-            <span class="kbd">A</span>
-            <span class="kbd">S</span>
-            <span class="kbd">D</span>
+      <!-- MASAÜSTÜ KONTROLLERİ -->
+      <div class="control-section desktop-controls">
+        <div class="control-section-label desktop-label">🖥 Klavye — Bilgisayar</div>
+        <div class="key-guide-grid">
+
+          <div class="key-row">
+            <div class="key-badges">
+              <span class="kbd">W</span>
+              <span class="kbd">A</span>
+              <span class="kbd">S</span>
+              <span class="kbd">D</span>
+            </div>
+            <div>
+              <div class="key-desc">Hareket et</div>
+            </div>
           </div>
-          <div>
-            <div class="key-desc">Hareket et</div>
+
+          <div class="key-row">
+            <div class="key-badges">
+              <span class="kbd">SPACE</span>
+            </div>
+            <div>
+              <div class="key-desc">Zıpla</div>
+            </div>
           </div>
+
+          <div class="key-row">
+            <div class="key-badges">
+              <span class="kbd">R</span>
+            </div>
+            <div>
+              <div class="key-desc">Seviyeyi yeniden başlat</div>
+            </div>
+          </div>
+
+          <div class="key-row highlight">
+            <div class="key-badges">
+              <span class="kbd kbd-special">P</span>
+            </div>
+            <div>
+              <div class="key-desc">Duraklat / Devam et</div>
+              <div class="key-note">Ayarlar ve müzik kontrolü buradan</div>
+            </div>
+          </div>
+
+          <div class="key-row">
+            <div class="key-badges">
+              <span class="kbd kbd-esc">ESC</span>
+            </div>
+            <div>
+              <div class="key-desc">Tam ekrandan çık</div>
+            </div>
+          </div>
+
         </div>
-
-        <div class="key-row">
-          <div class="key-badges">
-            <span class="kbd">SPACE</span>
-          </div>
-          <div>
-            <div class="key-desc">Zıpla</div>
-          </div>
-        </div>
-
-        <div class="key-row">
-          <div class="key-badges">
-            <span class="kbd">R</span>
-          </div>
-          <div>
-            <div class="key-desc">Seviyeyi yeniden başlat</div>
-          </div>
-        </div>
-
-        <div class="key-row highlight">
-          <div class="key-badges">
-            <span class="kbd kbd-special">P</span>
-          </div>
-          <div>
-            <div class="key-desc">Duraklat / Devam et</div>
-            <div class="key-note">Ayarlar ve müzik kontrolü buradan</div>
-          </div>
-        </div>
-
-        <div class="key-row">
-          <div class="key-badges">
-            <span class="kbd kbd-esc">ESC</span>
-          </div>
-          <div>
-            <div class="key-desc">Tam ekrandan çık</div>
-          </div>
-        </div>
-
       </div>
+
+      <div class="control-divider"></div>
+
+      <!-- MOBİL KONTROLLERİ -->
+      <div class="control-section mobile-controls">
+        <div class="control-section-label mobile-label">📱 Dokunmatik — Mobil</div>
+        <div class="key-guide-grid">
+
+          <div class="key-row">
+            <div class="key-badges">
+              <span class="touch-badge">👈</span>
+              <span class="touch-chip">Sol ekran</span>
+            </div>
+            <div>
+              <div class="key-desc">Hareket kontrolleri</div>
+            </div>
+          </div>
+
+          <div class="key-row">
+            <div class="key-badges">
+              <span class="touch-badge">👉</span>
+              <span class="touch-chip">Sağ ekran</span>
+            </div>
+            <div>
+              <div class="key-desc">Ekranı döndür / Bak</div>
+            </div>
+          </div>
+
+          <div class="key-row">
+            <div class="key-badges">
+              <span class="touch-badge">☝️</span>
+              <span class="touch-chip">Sağ ekrana dokun</span>
+            </div>
+            <div>
+              <div class="key-desc">Zıpla</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
 
     <!-- Alt meta bar -->
@@ -486,6 +665,26 @@
     if (el.requestFullscreen) el.requestFullscreen();
     else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+  }
+
+  // Mobil tespiti ve yatay mod tavsiyesi
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
+
+  const landscapeTip = document.getElementById('landscapeTip');
+
+  if (isMobile) {
+    landscapeTip.style.display = 'flex';
+
+    // Telefon zaten yataysa gizle
+    function checkOrientation() {
+      const isLandscape = window.innerWidth > window.innerHeight;
+      landscapeTip.style.display = isLandscape ? 'none' : 'flex';
+    }
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    screen.orientation && screen.orientation.addEventListener('change', checkOrientation);
   }
 </script>
 {% endblock %}
