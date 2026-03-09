@@ -847,6 +847,27 @@ def oyun_workermain():
         'workermain.js'
     )
 
+@views_bp.route('/workermain.js')
+def oyun_workermain():
+    return send_from_directory(
+        os.path.join(current_app.root_path, 'static', 'oyun', 'scripts'),
+        'workermain.js'
+    )
+
+@views_bp.route('/scripts/jobworker.js')
+def oyun_jobworker():
+    return send_from_directory(
+        os.path.join(current_app.root_path, 'static', 'oyun', 'scripts'),
+        'jobworker.js'
+    )
+
+@views_bp.route('/scripts/dispatchworker.js')
+def oyun_dispatchworker():
+    return send_from_directory(
+        os.path.join(current_app.root_path, 'static', 'oyun', 'scripts'),
+        'dispatchworker.js'
+    )
+
 @views_bp.route('/scripts/<path:filename>')
 def oyun_scripts(filename):
     return send_from_directory(
