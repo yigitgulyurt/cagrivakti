@@ -832,4 +832,7 @@ def zeninternet_styles():
     styles_path = os.path.join(current_app.root_path, 'static', 'data', 'styles.json')
     with open(styles_path, 'r', encoding='utf-8') as f:
         styles = json.load(f)
-    return render_template('extra/zeninternet_styles/zeninternet_styles.html', styles=styles)
+    return current_app.response_class(
+        response=json.dumps(styles, ensure_ascii=False, indent=2),
+        mimetype='application/json'
+    )
