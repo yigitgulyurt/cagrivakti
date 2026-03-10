@@ -26,6 +26,7 @@
   var pc = null;
 
   async function startStream() {
+    try {
     document.getElementById('status').textContent = 'Kamera açılıyor...';
     
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -71,6 +72,13 @@
     document.getElementById('btnStop').disabled = false;
     document.getElementById('btnStop').style.background = '#e53e3e';
   }
+    
+  catch(err) {
+    document.getElementById('status').textContent = 'Hata: ' + err.name + ' — ' + err.message;
+    console.error(err);
+  }
+  }
+
 
   async function stopStream() {
     if (pc) { pc.close(); pc = null; }
@@ -83,6 +91,6 @@
     document.getElementById('btnStart').disabled = false;
     document.getElementById('btnStop').disabled = true;
     document.getElementById('btnStop').style.background = '#555';
-  }
+    }
 </script>
 {% endblock %}
