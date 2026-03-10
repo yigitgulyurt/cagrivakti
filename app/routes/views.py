@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, make_response, send_from_directory, current_app, abort, flash, jsonify
 from functools import wraps
 from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city, CITY_DISPLAY_NAME_MAPPING
-from app.models import ContactMessage, DailyContent, Guide, QrRedirect
+from app.models import ContactMessage, DailyContent, Guide, QrRedirect, StreamState
 from app.extensions import cache, db, limiter, csrf
 from datetime import datetime, timedelta
 import os
@@ -841,42 +841,36 @@ def serve_game_files(filename):
 # canlı yayın sistemi için gerekli rotalar
 
 # Yayın durumu (basit, DB'ye gerek yok bu iş için)
-_stream_live = False
+# _stream_live = False  ← bunu sil
 
 @views_bp.route('/canli')
 def canli():
-    return render_template('extra/canli-yayin/canli.html', stream_live=_stream_live)
+    stream_live = StreamState.get().is_live
+    return render_template('extra/canli/canli.html', stream_live=stream_live)
 
 @views_bp.route('/stream/on_publish', methods=['POST'])
 @csrf.exempt
 def stream_on_publish():
-    """MediaMTX yayın başladığında çağırır."""
-    global _stream_live
-    stream_name = request.form.get('name', '')
-    secret = request.form.get('secret', '')
-    
-    # Güvenlik: sadece doğru key ile yayın açılabilsin
-    if secret != current_app.config.get('STREAM_SECRET'):
+    if request.form.get('secret') != current_app.config.get('STREAM_SECRET'):
         return 'Forbidden', 403
-    
-    _stream_live = True
-    current_app.logger.info(f"Canlı yayın başladı: {stream_name}")
+    state = StreamState.get()
+    state.is_live = True
+    db.session.commit()
     return 'OK', 200
 
 @views_bp.route('/stream/on_done', methods=['POST'])
-@csrf.exempt  
+@csrf.exempt
 def stream_on_done():
-    """MediaMTX yayın bittiğinde çağırır."""
-    global _stream_live
-    _stream_live = False
-    current_app.logger.info("Canlı yayın bitti.")
+    if request.form.get('secret') != current_app.config.get('STREAM_SECRET'):
+        return 'Forbidden', 403
+    state = StreamState.get()
+    state.is_live = False
+    db.session.commit()
     return 'OK', 200
 
 @views_bp.route('/stream/status')
 def stream_status():
-    """Tahtalar yayın var mı diye polling yapar."""
-    return jsonify({'live': _stream_live})
-
+    return jsonify({'live': StreamState.get().is_live})
 @views_bp.route('/canli-yayinla')
 def canli_yayinla():
     """Sadece yetkili kişi bu sayfayı kullanacak."""

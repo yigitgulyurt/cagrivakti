@@ -17,7 +17,7 @@
   
   function startPlayer() {
     var video = document.getElementById('video');
-    var src = '/canli-stream/canli/index.m3u8';
+    var src = 'https://cagrivakti.com.tr/canli-stream/canli/index.m3u8';
     if (Hls.isSupported()) {
       var hls = new Hls({ lowLatencyMode: true });
       hls.loadSource(src);

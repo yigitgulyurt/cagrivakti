@@ -93,3 +93,17 @@ class QrRedirect(db.Model):
     url = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     hit_count = db.Column(db.Integer, default=0)
+
+class StreamState(db.Model):
+    __tablename__ = 'stream_state'
+    id = db.Column(db.Integer, primary_key=True)
+    is_live = db.Column(db.Boolean, default=False)
+
+    @staticmethod
+    def get():
+        state = StreamState.query.first()
+        if not state:
+            state = StreamState(is_live=False)
+            db.session.add(state)
+            db.session.commit()
+        return state
