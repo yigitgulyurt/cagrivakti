@@ -13,7 +13,7 @@
 
   .yayinla-header {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -70,16 +70,27 @@
     50% { opacity: 0.4; transform: scale(0.8); }
   }
 
-  /* Preview */
+  /* Preview container — yöne göre boyut değişir */
+  .preview-wrapper {
+    width: 100%;
+    max-width: 700px;
+    position: relative;
+  }
+
   .preview-container {
     width: 100%;
-    max-width: 600px;
-    aspect-ratio: 16 / 9;
     background: #0a0a0a;
     border-radius: 16px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+    transition: aspect-ratio 0.3s ease;
+    /* Başlangıçta dikey (9:16) — JS ile güncellenir */
+    aspect-ratio: 9 / 16;
+  }
+
+  .preview-container.landscape {
+    aspect-ratio: 16 / 9;
   }
 
   #preview {
@@ -87,7 +98,6 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    transform: scaleX(-1); /* selfie mirror */
   }
 
   .preview-placeholder {
@@ -101,48 +111,82 @@
     color: var(--gray);
   }
 
-  .preview-placeholder .ph-icon {
-    font-size: 3rem;
-    opacity: 0.4;
-  }
+  .preview-placeholder .ph-icon { font-size: 3rem; opacity: 0.4; }
+  .preview-placeholder p { font-size: 0.85rem; opacity: 0.6; margin: 0; }
 
-  .preview-placeholder p {
-    font-size: 0.85rem;
-    opacity: 0.6;
-    margin: 0;
-  }
-
-  /* Süre sayacı */
-  .duration-overlay {
+  /* Süre + tam ekran overlay */
+  .preview-controls {
     position: absolute;
-    top: 14px;
-    left: 14px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(transparent, rgba(0,0,0,0.6));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .preview-container:hover .preview-controls,
+  .preview-container.show-controls .preview-controls {
+    opacity: 1;
+  }
+
+  .duration-badge {
     background: rgba(0,0,0,0.7);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 8px;
-    padding: 5px 12px;
-    font-size: 0.85rem;
+    padding: 4px 10px;
+    font-size: 0.82rem;
     font-weight: 700;
     color: var(--text);
     font-variant-numeric: tabular-nums;
     display: none;
   }
 
-  /* Kontrol paneli */
+  .fullscreen-btn {
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+    line-height: 1;
+  }
+
+  .fullscreen-btn:hover { background: rgba(255,255,255,0.15); }
+
+  /* Yön göstergesi */
+  .orientation-hint {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    color: var(--gray);
+  }
+
+  /* Kontroller */
   .controls {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     margin-top: 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
-  .btn-row {
-    display: flex;
-    gap: 10px;
-  }
+  .btn-row { display: flex; gap: 10px; }
 
   .btn-start {
     flex: 1;
@@ -167,11 +211,7 @@
     box-shadow: 0 5px 15px rgba(255,193,7,0.3);
   }
 
-  .btn-start:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-  }
+  .btn-start:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
   .btn-stop {
     flex: 1;
@@ -195,13 +235,8 @@
     transform: translateY(-1px);
   }
 
-  .btn-stop:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    transform: none;
-  }
+  .btn-stop:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
-  /* Durum mesajı */
   .status-card {
     background: var(--card-bg);
     border: 1px solid rgba(255,255,255,0.06);
@@ -215,30 +250,11 @@
     min-height: 48px;
   }
 
-  .status-card.error {
-    border-color: rgba(220,38,38,0.2);
-    color: #f87171;
-    background: rgba(220,38,38,0.06);
-  }
+  .status-card.error { border-color: rgba(220,38,38,0.2); color: #f87171; background: rgba(220,38,38,0.06); }
+  .status-card.success { border-color: rgba(255,193,7,0.2); color: var(--primary); background: rgba(255,193,7,0.06); }
 
-  .status-card.success {
-    border-color: rgba(255,193,7,0.2);
-    color: var(--primary);
-    background: rgba(255,193,7,0.06);
-  }
-
-  /* Kamera seçimi */
-  .cam-select-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .cam-label {
-    font-size: 0.82rem;
-    color: var(--gray);
-    white-space: nowrap;
-  }
+  .cam-select-row { display: flex; align-items: center; gap: 10px; }
+  .cam-label { font-size: 0.82rem; color: var(--gray); white-space: nowrap; }
 
   .cam-select {
     flex: 1;
@@ -252,25 +268,7 @@
     outline: none;
   }
 
-  .cam-select:focus {
-    border-color: rgba(255,193,7,0.3);
-  }
-
-  .spinner-sm {
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(0,0,0,0.2);
-    border-top-color: var(--dark);
-    border-radius: 50%;
-    animation: spinAnim 0.8s linear infinite;
-    display: inline-block;
-  }
-
-  @keyframes spinAnim {
-    to { transform: rotate(360deg); }
-  }
-
-  .hidden { display: none !important; }
+  .cam-select:focus { border-color: rgba(255,193,7,0.3); }
 </style>
 
 <div class="yayinla-wrap">
@@ -279,13 +277,23 @@
     <div class="conn-badge idle" id="connBadge">Hazır</div>
   </div>
 
-  <div class="preview-container">
-    <div class="preview-placeholder" id="previewPlaceholder">
-      <div class="ph-icon">📷</div>
-      <p>Kamera önizlemesi burada görünecek</p>
+  <div class="preview-wrapper">
+    <div class="preview-container" id="previewContainer">
+
+      <div class="preview-placeholder" id="previewPlaceholder">
+        <div class="ph-icon">📷</div>
+        <p>Kamera önizlemesi burada görünecek</p>
+      </div>
+
+      <video id="preview" autoplay muted playsinline></video>
+
+      <div class="orientation-hint" id="orientationHint">📱 Dikey</div>
+
+      <div class="preview-controls" id="previewControls">
+        <div class="duration-badge" id="durationBadge">00:00</div>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Tam Ekran">⛶</button>
+      </div>
     </div>
-    <video id="preview" autoplay muted playsinline></video>
-    <div class="duration-overlay" id="durationOverlay">00:00</div>
   </div>
 
   <div class="controls">
@@ -316,7 +324,101 @@
   var pc = null;
   var durationTimer = null;
   var startTime = null;
+  var currentStream = null;
 
+  // --- Yön algılama ---
+  function isLandscape() {
+    // screen.orientation API (modern)
+    if (screen.orientation && screen.orientation.type) {
+      return screen.orientation.type.includes('landscape');
+    }
+    // Fallback: window boyutları
+    return window.innerWidth > window.innerHeight;
+  }
+
+  function updateOrientation() {
+    var landscape = isLandscape();
+    var container = document.getElementById('previewContainer');
+    var hint = document.getElementById('orientationHint');
+
+    if (landscape) {
+      container.classList.add('landscape');
+      hint.textContent = '🔄 Yatay';
+    } else {
+      container.classList.remove('landscape');
+      hint.textContent = '📱 Dikey';
+    }
+
+    // Eğer kamera açıksa yeniden başlat — doğru constraint ile
+    if (currentStream) {
+      var facingMode = document.getElementById('camSelect').value;
+      restartCamera(facingMode);
+    }
+  }
+
+  window.addEventListener('orientationchange', function() {
+    setTimeout(updateOrientation, 300); // biraz bekle, tarayıcı yerleşsin
+  });
+  window.addEventListener('resize', updateOrientation);
+
+  // İlk yükleme
+  updateOrientation();
+
+  // --- Kamera ---
+  async function restartCamera(facingMode) {
+    if (currentStream) {
+      currentStream.getVideoTracks().forEach(function(t) { t.stop(); });
+    }
+    var landscape = isLandscape();
+    try {
+      var newStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: facingMode,
+          width: { ideal: landscape ? 1920 : 1080 },
+          height: { ideal: landscape ? 1080 : 1920 },
+          frameRate: { ideal: 30 }
+        },
+        audio: false // ses track'ini koruyoruz, sadece video yenileniyor
+      });
+      var preview = document.getElementById('preview');
+      // Eski ses track'lerini koru, sadece video track'i değiştir
+      if (currentStream) {
+        var oldVideoTrack = currentStream.getVideoTracks()[0];
+        if (oldVideoTrack) currentStream.removeTrack(oldVideoTrack);
+        var newVideoTrack = newStream.getVideoTracks()[0];
+        currentStream.addTrack(newVideoTrack);
+        preview.srcObject = currentStream;
+        // RTCPeerConnection'daki sender'ı da güncelle
+        if (pc) {
+          var sender = pc.getSenders().find(function(s) { return s.track && s.track.kind === 'video'; });
+          if (sender) sender.replaceTrack(newVideoTrack);
+        }
+      }
+    } catch(e) {
+      console.warn('Kamera yeniden başlatılamadı:', e);
+    }
+  }
+
+  // --- Tam ekran ---
+  function toggleFullscreen() {
+    var container = document.getElementById('previewContainer');
+    if (!document.fullscreenElement) {
+      container.requestFullscreen && container.requestFullscreen();
+    } else {
+      document.exitFullscreen && document.exitFullscreen();
+    }
+  }
+
+  // Tam ekranda kontrolleri göster
+  document.getElementById('previewContainer').addEventListener('click', function() {
+    this.classList.add('show-controls');
+    clearTimeout(this._hideTimer);
+    this._hideTimer = setTimeout(function() {
+      document.getElementById('previewContainer').classList.remove('show-controls');
+    }, 3000);
+  });
+
+  // --- Durum ---
   function setStatus(msg, type) {
     var card = document.getElementById('statusCard');
     card.textContent = msg;
@@ -335,40 +437,40 @@
 
   function startDuration() {
     startTime = Date.now();
-    var overlay = document.getElementById('durationOverlay');
-    overlay.style.display = 'block';
+    var badge = document.getElementById('durationBadge');
+    badge.style.display = 'block';
     durationTimer = setInterval(function() {
       var elapsed = Math.floor((Date.now() - startTime) / 1000);
       var m = String(Math.floor(elapsed / 60)).padStart(2, '0');
       var s = String(elapsed % 60).padStart(2, '0');
-      overlay.textContent = m + ':' + s;
+      badge.textContent = m + ':' + s;
     }, 1000);
   }
 
   function stopDuration() {
     clearInterval(durationTimer);
     durationTimer = null;
-    document.getElementById('durationOverlay').style.display = 'none';
+    document.getElementById('durationBadge').style.display = 'none';
   }
 
+  // --- H264 tercihi ---
   function preferH264(sdp) {
     var lines = sdp.split('\n');
-    var h264Regex = /a=rtpmap:(\d+) H264/;
     var h264Payload = null;
     for (var i = 0; i < lines.length; i++) {
-      var match = lines[i].match(h264Regex);
+      var match = lines[i].match(/a=rtpmap:(\d+) H264/);
       if (match) { h264Payload = match[1]; break; }
     }
     if (!h264Payload) return sdp;
     return lines.map(function(line) {
       if (line.startsWith('m=video')) {
-        var parts = line.split(' ');
-        return parts.slice(0, 3).join(' ') + ' ' + h264Payload;
+        return line.split(' ').slice(0, 3).join(' ') + ' ' + h264Payload;
       }
       return line;
     }).join('\n');
   }
 
+  // --- Yayın başlat ---
   async function startStream() {
     try {
       setBadge('connecting', 'Bağlanıyor...');
@@ -376,25 +478,25 @@
       document.getElementById('btnStart').disabled = true;
 
       var facingMode = document.getElementById('camSelect').value;
-      var stream = await navigator.mediaDevices.getUserMedia({
+      var landscape = isLandscape();
+
+      currentStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: facingMode,
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          aspectRatio: { ideal: 16/9 },
+          width: { ideal: landscape ? 1920 : 1080 },
+          height: { ideal: landscape ? 1080 : 1920 },
           frameRate: { ideal: 30 }
         },
         audio: true
       });
 
       var preview = document.getElementById('preview');
-      preview.srcObject = stream;
-      // Arka kamerada mirror kaldır
-      preview.style.transform = facingMode === 'environment' ? 'none' : 'scaleX(-1)';
+      preview.srcObject = currentStream;
       document.getElementById('previewPlaceholder').style.display = 'none';
+      document.getElementById('orientationHint').style.display = 'block';
 
       pc = new RTCPeerConnection();
-      stream.getTracks().forEach(function(track) { pc.addTrack(track, stream); });
+      currentStream.getTracks().forEach(function(track) { pc.addTrack(track, currentStream); });
 
       var offer = await pc.createOffer();
       var modifiedOffer = new RTCSessionDescription({
@@ -409,9 +511,7 @@
         var resolved = false;
         var done = function() { if (!resolved) { resolved = true; resolve(); } };
         if (pc.iceGatheringState === 'complete') { done(); return; }
-        pc.onicegatheringstatechange = function() {
-          if (pc.iceGatheringState === 'complete') done();
-        };
+        pc.onicegatheringstatechange = function() { if (pc.iceGatheringState === 'complete') done(); };
         pc.onicecandidate = function(e) { if (e.candidate === null) done(); };
         setTimeout(done, 4000);
       });
@@ -422,9 +522,7 @@
         body: pc.localDescription.sdp
       });
 
-      if (!resp.ok) {
-        throw new Error('Sunucu hatası: ' + resp.status);
-      }
+      if (!resp.ok) throw new Error('Sunucu hatası: ' + resp.status);
 
       var answer = await resp.text();
       await pc.setRemoteDescription({ type: 'answer', sdp: answer });
@@ -435,34 +533,32 @@
       document.getElementById('camSelect').disabled = true;
       startDuration();
 
-      // Bağlantı kopunca
       pc.onconnectionstatechange = function() {
         if (pc && (pc.connectionState === 'failed' || pc.connectionState === 'disconnected')) {
-          setStatus('⚡ Bağlantı kesildi, yeniden bağlanılıyor...', 'error');
+          setStatus('⚡ Bağlantı kesildi...', 'error');
           setBadge('connecting', 'Yeniden bağlanıyor...');
         }
       };
 
     } catch(err) {
       var msg = err.message || err.name || 'Bilinmeyen hata';
-      if (err.name === 'NotAllowedError') {
-        msg = 'Kamera/mikrofon izni verilmedi. Tarayıcı ayarlarından izin verin.';
-      } else if (err.name === 'NotFoundError') {
-        msg = 'Kamera bulunamadı. Cihazınızda kamera mevcut mu?';
-      }
+      if (err.name === 'NotAllowedError') msg = 'Kamera/mikrofon izni verilmedi. Tarayıcı ayarlarından izin verin.';
+      else if (err.name === 'NotFoundError') msg = 'Kamera bulunamadı.';
       setStatus('❌ Hata: ' + msg, 'error');
       setBadge('idle', 'Hata');
       document.getElementById('btnStart').disabled = false;
     }
   }
 
+  // --- Yayın durdur ---
   async function stopStream() {
     if (pc) { pc.close(); pc = null; }
-    var preview = document.getElementById('preview');
-    if (preview.srcObject) {
-      preview.srcObject.getTracks().forEach(function(t) { t.stop(); });
-      preview.srcObject = null;
+    if (currentStream) {
+      currentStream.getTracks().forEach(function(t) { t.stop(); });
+      currentStream = null;
     }
+    var preview = document.getElementById('preview');
+    preview.srcObject = null;
     document.getElementById('previewPlaceholder').style.display = 'flex';
     document.getElementById('btnStart').disabled = false;
     document.getElementById('btnStop').disabled = true;
