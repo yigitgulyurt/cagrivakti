@@ -826,6 +826,8 @@ def redirect_url(short_id):
     db.session.commit()
     return redirect(obj.url)
 
+# under the red sky oyun rotaları
+
 @views_bp.route('/oyunlar/under-the-red-sky')
 def under_the_red_sky():
     return render_template('extra/oyun/oyun.html',
@@ -835,3 +837,42 @@ def under_the_red_sky():
 def serve_game_files(filename):
     game_dir = os.path.join(current_app.root_path, 'static', 'games', 'under-the-red-sky')
     return send_from_directory(game_dir, filename)
+
+# canlı yayın sistemi için gerekli rotalar
+
+# Yayın durumu (basit, DB'ye gerek yok bu iş için)
+_stream_live = False
+
+@views_bp.route('/canli')
+def canli():
+    return render_template('extra/canli/canli.html', stream_live=_stream_live)
+
+@views_bp.route('/stream/on_publish', methods=['POST'])
+@csrf.exempt
+def stream_on_publish():
+    """MediaMTX yayın başladığında çağırır."""
+    global _stream_live
+    stream_name = request.form.get('name', '')
+    secret = request.form.get('secret', '')
+    
+    # Güvenlik: sadece doğru key ile yayın açılabilsin
+    if secret != current_app.config.get('STREAM_SECRET'):
+        return 'Forbidden', 403
+    
+    _stream_live = True
+    current_app.logger.info(f"Canlı yayın başladı: {stream_name}")
+    return 'OK', 200
+
+@views_bp.route('/stream/on_done', methods=['POST'])
+@csrf.exempt  
+def stream_on_done():
+    """MediaMTX yayın bittiğinde çağırır."""
+    global _stream_live
+    _stream_live = False
+    current_app.logger.info("Canlı yayın bitti.")
+    return 'OK', 200
+
+@views_bp.route('/stream/status')
+def stream_status():
+    """Tahtalar yayın var mı diye polling yapar."""
+    return jsonify({'live': _stream_live})

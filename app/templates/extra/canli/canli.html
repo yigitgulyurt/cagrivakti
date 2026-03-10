@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="player-wrap" style="background:#000;display:flex;justify-content:center;padding:20px;">
+  {% if stream_live %}
+    <video id="video" controls autoplay playsinline style="width:100%;max-width:1280px;"></video>
+  {% else %}
+    <div id="waiting" style="color:#fff;text-align:center;padding:60px;">
+      <h2>📡 Yayın henüz başlamadı</h2>
+      <p>Tören başladığında otomatik olarak yüklenecek...</p>
+    </div>
+  {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+  var isLive = {{ stream_live | tojson }};
+  
+  function startPlayer() {
+    var video = document.getElementById('video');
+    var src = '/canli-stream/canli/index.m3u8';
+    if (Hls.isSupported()) {
+      var hls = new Hls({ lowLatencyMode: true });
+      hls.loadSource(src);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = src;
+    }
+  }
+
+  if (isLive) {
+    startPlayer();
+  } else {
+    // Yayın başlayana kadar her 5 saniyede kontrol et
+    var poller = setInterval(function() {
+      fetch('/stream/status')
+        .then(r => r.json())
+        .then(data => {
+          if (data.live) {
+            clearInterval(poller);
+            document.getElementById('waiting').style.display = 'none';
+            var v = document.createElement('video');
+            v.id = 'video';
+            v.controls = true;
+            v.autoplay = true;
+            v.setAttribute('playsinline', '');
+            v.style = 'width:100%;max-width:1280px;';
+            document.getElementById('player-wrap').appendChild(v);
+            startPlayer();
+          }
+        });
+    }, 5000);
+  }
+</script>
+{% endblock %}
