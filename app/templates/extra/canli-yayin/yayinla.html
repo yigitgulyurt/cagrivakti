@@ -85,8 +85,7 @@
     position: relative;
     box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
     transition: aspect-ratio 0.3s ease;
-    /* Başlangıçta dikey (9:16) — JS ile güncellenir */
-    aspect-ratio: 9 / 16;
+    aspect-ratio: 16 / 9;  
   }
 
   .preview-container.landscape {
@@ -287,8 +286,6 @@
 
       <video id="preview" autoplay muted playsinline></video>
 
-      <div class="orientation-hint" id="orientationHint">📱 Dikey</div>
-
       <div class="preview-controls" id="previewControls">
         <div class="duration-badge" id="durationBadge">00:00</div>
         <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Tam Ekran">⛶</button>
@@ -326,44 +323,6 @@
   var startTime = null;
   var currentStream = null;
 
-  // --- Yön algılama ---
-  function isLandscape() {
-    // screen.orientation API (modern)
-    if (screen.orientation && screen.orientation.type) {
-      return screen.orientation.type.includes('landscape');
-    }
-    // Fallback: window boyutları
-    return window.innerWidth > window.innerHeight;
-  }
-
-  function updateOrientation() {
-    var landscape = isLandscape();
-    var container = document.getElementById('previewContainer');
-    var hint = document.getElementById('orientationHint');
-
-    if (landscape) {
-      container.classList.add('landscape');
-      hint.textContent = '🔄 Yatay';
-    } else {
-      container.classList.remove('landscape');
-      hint.textContent = '📱 Dikey';
-    }
-
-    // Eğer kamera açıksa yeniden başlat — doğru constraint ile
-    if (currentStream) {
-      var facingMode = document.getElementById('camSelect').value;
-      restartCamera(facingMode);
-    }
-  }
-
-  window.addEventListener('orientationchange', function() {
-    setTimeout(updateOrientation, 300); // biraz bekle, tarayıcı yerleşsin
-  });
-  window.addEventListener('resize', updateOrientation);
-
-  // İlk yükleme
-  updateOrientation();
-
   // --- Kamera ---
   async function restartCamera(facingMode) {
     if (currentStream) {
@@ -374,8 +333,8 @@
       var newStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: facingMode,
-          width: { ideal: landscape ? 1920 : 1080 },
-          height: { ideal: landscape ? 1080 : 1920 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
           frameRate: { ideal: 30 }
         },
         audio: false // ses track'ini koruyoruz, sadece video yenileniyor
@@ -493,7 +452,6 @@
       var preview = document.getElementById('preview');
       preview.srcObject = currentStream;
       document.getElementById('previewPlaceholder').style.display = 'none';
-      document.getElementById('orientationHint').style.display = 'block';
 
       pc = new RTCPeerConnection();
       currentStream.getTracks().forEach(function(track) { pc.addTrack(track, currentStream); });
