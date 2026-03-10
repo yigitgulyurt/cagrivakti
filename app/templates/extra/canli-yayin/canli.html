@@ -280,7 +280,7 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="{{ url_for('static', filename='js/hls.js') }}"></script>
 <script>
   var STREAM_URL = 'https://cagrivakti.com.tr/canli-stream/canli/index.m3u8';
   var isLive = {{ stream_live | tojson }};
