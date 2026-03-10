@@ -40,7 +40,32 @@
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
     
     const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
+    
+    function preferH264(sdp) {
+      const lines = sdp.split('\n');
+      const h264Regex = /a=rtpmap:(\d+) H264/;
+      let h264Payload = null;
+      for (const line of lines) {
+        const match = line.match(h264Regex);
+        if (match) { h264Payload = match[1]; break; }
+      }
+      if (!h264Payload) return sdp;
+      return lines.map(line => {
+        if (line.startsWith('m=video')) {
+          const parts = line.split(' ');
+          const header = parts.slice(0, 3).join(' ');
+          return `${header} ${h264Payload}`;
+        }
+        return line;
+      }).join('\n');
+    }
+    
+    const modifiedOffer = new RTCSessionDescription({
+      type: offer.type,
+      sdp: preferH264(offer.sdp)
+    });
+    
+    await pc.setLocalDescription(modifiedOffer);
     
     // ICE toplanmasını bekle
     await new Promise(resolve => {
@@ -48,9 +73,9 @@
       pc.addEventListener('icegatheringstatechange', () => {
         if (pc.iceGatheringState === 'complete') resolve();
       });
-      setTimeout(resolve, 3000); // max 3 sn bekle
+      setTimeout(resolve, 3000);
     });
-
+    
     document.getElementById('status').textContent = 'Sunucuya bağlanıyor...';
 
     const resp = await fetch('https://cagrivakti.com.tr/canli/whip', {
