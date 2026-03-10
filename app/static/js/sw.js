@@ -66,6 +66,8 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
     if (
+        url.hostname === 'fonts.googleapis.com' ||
+        url.hostname === 'fonts.gstatic.com' ||
         url.pathname.startsWith('/canli-kaynak/') ||
         url.pathname === '/stream/status'
     ) {
