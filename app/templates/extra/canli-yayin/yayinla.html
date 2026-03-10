@@ -379,19 +379,35 @@
 
   // --- H264 tercihi ---
   function preferH264(sdp) {
-    var lines = sdp.split('\n');
-    var h264Payload = null;
-    for (var i = 0; i < lines.length; i++) {
-      var match = lines[i].match(/a=rtpmap:(\d+) H264/);
-      if (match) { h264Payload = match[1]; break; }
+  var lines = sdp.split('\n');
+  var h264Payloads = [];
+  var otherVideoPayloads = [];
+  var inVideo = false;
+
+  // H264 payload ID'lerini topla
+  lines.forEach(function(line) {
+    if (line.startsWith('m=video')) inVideo = true;
+    else if (line.startsWith('m=')) inVideo = false;
+    if (inVideo) {
+      var h264Match = line.match(/a=rtpmap:(\d+) H264/i);
+      if (h264Match) h264Payloads.push(h264Match[1]);
     }
-    if (!h264Payload) return sdp;
-    return lines.map(function(line) {
-      if (line.startsWith('m=video')) {
-        return line.split(' ').slice(0, 3).join(' ') + ' ' + h264Payload;
-      }
-      return line;
-    }).join('\n');
+  });
+
+  if (!h264Payloads.length) return sdp;
+
+  // m=video satırındaki payload sırasını H264 öne gelecek şekilde yeniden yaz
+  return lines.map(function(line) {
+    if (line.startsWith('m=video')) {
+      var parts = line.trim().split(' ');
+      var header = parts.slice(0, 3); // m=video PORT RTP/...
+      var payloads = parts.slice(3);
+      var h264First = h264Payloads.filter(function(p) { return payloads.indexOf(p) !== -1; });
+      var rest = payloads.filter(function(p) { return h264First.indexOf(p) === -1; });
+      return header.concat(h264First).concat(rest).join(' ');
+    }
+    return line;
+  }).join('\n');
   }
 
   // --- Yayın başlat ---
