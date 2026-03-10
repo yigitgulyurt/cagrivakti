@@ -308,6 +308,8 @@
     var video = document.getElementById('canli-video');
     document.getElementById('waitingScreen').style.display = 'none';
     video.style.display = 'block';
+    video.style.width = '100%';
+    video.style.height = '100%';
     showOverlay('loadingOverlay');
     showLiveBadge(true);
     setStatus('🔄 Yayına bağlanıyor...');
