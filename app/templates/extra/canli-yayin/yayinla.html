@@ -53,7 +53,7 @@
 
     document.getElementById('status').textContent = 'Sunucuya bağlanıyor...';
 
-    const resp = await fetch('/canli/whip', {
+    const resp = await fetch('https://cagrivakti.com.tr/canli/whip', {
       method: 'POST',
       headers: { 'Content-Type': 'application/sdp' },
       body: pc.localDescription.sdp
