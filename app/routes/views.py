@@ -846,7 +846,7 @@ def serve_game_files(filename):
 @views_bp.route('/canli')
 def canli():
     stream_live = StreamState.get().is_live
-    return render_template('extra/canli/canli.html', stream_live=stream_live)
+    return render_template('extra/canli-yayin/canli.html', stream_live=stream_live)
 
 @views_bp.route('/stream/on_publish', methods=['POST'])
 @csrf.exempt
@@ -871,6 +871,7 @@ def stream_on_done():
 @views_bp.route('/stream/status')
 def stream_status():
     return jsonify({'live': StreamState.get().is_live})
+
 @views_bp.route('/canli-yayinla')
 def canli_yayinla():
     """Sadece yetkili kişi bu sayfayı kullanacak."""
