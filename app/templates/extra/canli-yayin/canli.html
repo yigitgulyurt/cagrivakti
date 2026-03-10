@@ -11,7 +11,7 @@
   {% endif %}
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="{{ url_for('static', filename='js/hls.js') }}"></script>
 <script>
   var isLive = {{ stream_live | tojson }};
   
