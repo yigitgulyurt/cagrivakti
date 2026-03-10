@@ -52,3 +52,6 @@ class Config:
     CACHE_TYPE = os.environ.get('CACHE_TYPE', 'RedisCache' if os.environ.get('REDIS_URL') else 'SimpleCache')
     CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
     CACHE_DEFAULT_TIMEOUT = 3600
+
+    # Canlı Yayın Secret
+    STREAM_SECRET = os.environ.get('STREAM_SECRET', 'okulcanli2025')
