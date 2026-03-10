@@ -323,41 +323,6 @@
   var startTime = null;
   var currentStream = null;
 
-  // --- Kamera ---
-  async function restartCamera(facingMode) {
-    if (currentStream) {
-      currentStream.getVideoTracks().forEach(function(t) { t.stop(); });
-    }
-    var landscape = isLandscape();
-    try {
-      var newStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: facingMode,
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          frameRate: { ideal: 30 }
-        },
-        audio: false // ses track'ini koruyoruz, sadece video yenileniyor
-      });
-      var preview = document.getElementById('preview');
-      // Eski ses track'lerini koru, sadece video track'i değiştir
-      if (currentStream) {
-        var oldVideoTrack = currentStream.getVideoTracks()[0];
-        if (oldVideoTrack) currentStream.removeTrack(oldVideoTrack);
-        var newVideoTrack = newStream.getVideoTracks()[0];
-        currentStream.addTrack(newVideoTrack);
-        preview.srcObject = currentStream;
-        // RTCPeerConnection'daki sender'ı da güncelle
-        if (pc) {
-          var sender = pc.getSenders().find(function(s) { return s.track && s.track.kind === 'video'; });
-          if (sender) sender.replaceTrack(newVideoTrack);
-        }
-      }
-    } catch(e) {
-      console.warn('Kamera yeniden başlatılamadı:', e);
-    }
-  }
-
   // --- Tam ekran ---
   function toggleFullscreen() {
     var container = document.getElementById('previewContainer');
@@ -437,13 +402,12 @@
       document.getElementById('btnStart').disabled = true;
 
       var facingMode = document.getElementById('camSelect').value;
-      var landscape = isLandscape();
 
       currentStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: facingMode,
-          width: { ideal: landscape ? 1920 : 1080 },
-          height: { ideal: landscape ? 1080 : 1920 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
           frameRate: { ideal: 30 }
         },
         audio: true
