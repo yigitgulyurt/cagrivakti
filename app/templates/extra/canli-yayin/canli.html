@@ -82,11 +82,13 @@
   }
 
   #canli-video {
-    width: 100%;
-    height: 100%;
-    object-fit: fill; /* kendi oranında göster, kırpma yok */
-    background: #000;
-    display: none;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      background: #000;
+      display: none;
+      transform: rotate(90deg);
+      transform-origin: center center;
   }
 
   .waiting-screen {
@@ -308,13 +310,26 @@
 
   // Video metadata yüklenince gerçek aspect ratio'yu container'a uygula
   function applyAspectRatio(video) {
-    video.addEventListener('loadedmetadata', function() {
-      var w = video.videoWidth;
-      var h = video.videoHeight;
-      if (w && h) {
-        document.getElementById('playerContainer').style.aspectRatio = w + ' / ' + h;
-      }
-    });
+      video.addEventListener('loadedmetadata', function() {
+          var w = video.videoWidth;
+          var h = video.videoHeight;
+          if (w && h) {
+              // Stream dikey geliyorsa (9/16) rotate uygula, container'ı yatay ayarla
+              if (h > w) {
+                  video.style.transform = 'rotate(90deg)';
+                  video.style.width = '177.78%';  // 16/9 oranı için
+                  video.style.height = '56.25%';
+                  video.style.marginLeft = '-38.89%';
+                  document.getElementById('playerContainer').style.aspectRatio = h + ' / ' + w;
+              } else {
+                  video.style.transform = 'none';
+                  video.style.width = '100%';
+                  video.style.height = '100%';
+                  video.style.marginLeft = '0';
+                  document.getElementById('playerContainer').style.aspectRatio = w + ' / ' + h;
+              }
+          }
+      });
   }
 
   function startPlayer() {
