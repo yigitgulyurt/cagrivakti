@@ -1,55 +1,391 @@
 {% extends "base.html" %}
 {% block content %}
-<div id="player-wrap" style="background:#000;display:flex;justify-content:center;padding:20px;">
-  {% if stream_live %}
-    <video id="video" controls autoplay playsinline style="width:100%;max-width:1280px;"></video>
-  {% else %}
-    <div id="waiting" style="color:#fff;text-align:center;padding:60px;">
-      <h2>📡 Yayın henüz başlamadı</h2>
-      <p>Tören başladığında otomatik olarak yüklenecek...</p>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap');
+
+  :root {
+    --bg:        #0a0a0f;
+    --surface:   #111118;
+    --border:    #1e1e2e;
+    --red:       #e63946;
+    --red-dim:   #7f1d1d;
+    --text:      #e8e8f0;
+    --muted:     #6b6b80;
+    --accent:    #4361ee;
+  }
+
+  .canli-page {
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 48px;
+    font-family: 'Syne', sans-serif;
+  }
+
+  /* ── Header ── */
+  .canli-header {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .canli-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .canli-title span {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* ── LIVE badge ── */
+  .live-badge {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--red);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .live-badge.visible { display: flex; }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: .4; transform: scale(.7); }
+  }
+
+  /* ── Player wrap ── */
+  .player-outer {
+    width: 100%;
+    max-width: 900px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* 16:9 aspect ratio kutusu */
+  .player-ratio {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 9/16 */
+  }
+
+  #video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    display: none;
+  }
+
+  /* ── Waiting / offline overlay ── */
+  .player-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: var(--surface);
+  }
+
+  .overlay-icon {
+    font-size: 2.8rem;
+    opacity: .5;
+  }
+
+  .overlay-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .overlay-sub {
+    font-size: .85rem;
+    color: var(--muted);
+    margin: 0;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Spinner */
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Status bar ── */
+  .status-bar {
+    width: 100%;
+    max-width: 900px;
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .75rem;
+    color: var(--muted);
+  }
+
+  #statusText { color: var(--text); }
+
+  /* ── Reconnect notice ── */
+  .reconnect-notice {
+    display: none;
+    width: 100%;
+    max-width: 900px;
+    margin-top: 10px;
+    padding: 12px 16px;
+    background: #1a1a0a;
+    border: 1px solid #5a4a00;
+    border-radius: 8px;
+    font-size: .82rem;
+    color: #f0c040;
+    font-family: 'IBM Plex Mono', monospace;
+    text-align: center;
+  }
+</style>
+
+<div class="canli-page">
+
+  <div class="canli-header">
+    <div class="canli-title">18 Mart <span>· Çanakkale Zaferi Töreni</span></div>
+    <div class="live-badge" id="liveBadge">
+      <div class="live-dot"></div>
+      Canlı
     </div>
-  {% endif %}
+  </div>
+
+  <div class="player-outer">
+    <div class="player-ratio">
+      <video id="video" controls playsinline></video>
+
+      <div class="player-overlay" id="overlay">
+        <div class="spinner" id="spinner"></div>
+        <div class="overlay-icon" id="overlayIcon">📡</div>
+        <p class="overlay-title" id="overlayTitle">Yayın henüz başlamadı</p>
+        <p class="overlay-sub" id="overlaySub">Tören başladığında otomatik olarak yüklenecek</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span id="statusText">Bekleniyor…</span>
+    <span id="retryText"></span>
+  </div>
+
+  <div class="reconnect-notice" id="reconnectNotice">
+    ⚠ Yayın kesildi — yeniden bağlanılıyor…
+  </div>
+
 </div>
 
 <script src="{{ url_for('static', filename='js/hls.js') }}"></script>
 <script>
-  var isLive = {{ stream_live | tojson }};
-  
-  function startPlayer() {
-    var video = document.getElementById('video');
-    var src = 'https://cagrivakti.com.tr/canli-stream/canli/index.m3u8';
-    if (Hls.isSupported()) {
-      var hls = new Hls({ lowLatencyMode: true });
-      hls.loadSource(src);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = src;
-    }
+(function () {
+  var SRC       = 'https://cagrivakti.com.tr/canli-stream/canli/index.m3u8';
+  var STATUS_EP = '/stream/status';
+
+  var isLive    = {{ stream_live | tojson }};
+
+  /* DOM */
+  var video            = document.getElementById('video');
+  var overlay          = document.getElementById('overlay');
+  var overlayIcon      = document.getElementById('overlayIcon');
+  var overlayTitle     = document.getElementById('overlayTitle');
+  var overlaySub       = document.getElementById('overlaySub');
+  var spinner          = document.getElementById('spinner');
+  var liveBadge        = document.getElementById('liveBadge');
+  var statusText       = document.getElementById('statusText');
+  var retryText        = document.getElementById('retryText');
+  var reconnectNotice  = document.getElementById('reconnectNotice');
+
+  var hls          = null;
+  var poller       = null;
+  var retryCount   = 0;
+  var MAX_RETRY    = 5;
+  var retryTimer   = null;
+
+  /* ── Durum göstericiler ── */
+  function setStatus(msg) { statusText.textContent = msg; }
+
+  function showOverlay(icon, title, sub, showSpinner) {
+    overlay.style.display      = 'flex';
+    video.style.display        = 'none';
+    overlayIcon.style.display  = showSpinner ? 'none' : 'block';
+    spinner.style.display      = showSpinner ? 'block' : 'none';
+    overlayIcon.textContent    = icon;
+    overlayTitle.textContent   = title;
+    overlaySub.textContent     = sub;
+    liveBadge.classList.remove('visible');
   }
 
-  if (isLive) {
-    startPlayer();
-  } else {
-    // Yayın başlayana kadar her 5 saniyede kontrol et
-    var poller = setInterval(function() {
-      fetch('/stream/status')
-        .then(r => r.json())
-        .then(data => {
-          if (data.live) {
+  function showPlayer() {
+    overlay.style.display = 'none';
+    video.style.display   = 'block';
+    liveBadge.classList.add('visible');
+    reconnectNotice.style.display = 'none';
+    retryText.textContent = '';
+  }
+
+  /* ── HLS Player ── */
+  function startPlayer() {
+    if (hls) { hls.destroy(); hls = null; }
+
+    if (!Hls.isSupported()) {
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = SRC;
+        video.play().catch(function(){});
+        showPlayer();
+        setStatus('Oynatılıyor (native HLS)');
+        watchVideoErrors();
+      } else {
+        showOverlay('⚠️', 'Tarayıcı desteklenmiyor', 'Lütfen Chrome veya Firefox kullanın.', false);
+      }
+      return;
+    }
+
+    hls = new Hls({
+      lowLatencyMode: false,
+      maxBufferLength: 10,
+      manifestLoadingTimeOut: 8000,
+      manifestLoadingMaxRetry: 2,
+    });
+
+    hls.loadSource(SRC);
+    hls.attachMedia(video);
+
+    hls.on(Hls.Events.MANIFEST_PARSED, function () {
+      video.play().catch(function(){});
+      showPlayer();
+      setStatus('Oynatılıyor');
+      retryCount = 0;
+      reconnectNotice.style.display = 'none';
+    });
+
+    hls.on(Hls.Events.ERROR, function (event, data) {
+      if (!data.fatal) return;
+      handleFatalError();
+    });
+  }
+
+  function handleFatalError() {
+    if (retryCount >= MAX_RETRY) {
+      if (hls) { hls.destroy(); hls = null; }
+      showOverlay('📴', 'Yayın kesildi', 'Yayın sona erdi veya bağlantı kurulamadı.', false);
+      setStatus('Yayın kesildi');
+      liveBadge.classList.remove('visible');
+      reconnectNotice.style.display = 'none';
+      startPolling(); /* yayın tekrar başlarsa yakala */
+      return;
+    }
+
+    retryCount++;
+    var wait = retryCount * 4; /* 4, 8, 12, 16, 20 sn */
+    reconnectNotice.style.display = 'block';
+    setStatus('Bağlantı kesildi');
+    retryText.textContent = retryCount + '/' + MAX_RETRY + ' deneme';
+
+    if (hls) { hls.destroy(); hls = null; }
+    showOverlay('🔄', 'Yeniden bağlanıyor…', wait + ' saniye sonra tekrar denenecek', true);
+
+    retryTimer = setTimeout(function () {
+      /* Önce yayın gerçekten var mı kontrol et */
+      fetch(STATUS_EP)
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.live) {
+            startPlayer();
+          } else {
+            /* Yayın bitti, offline moduna geç */
+            showOverlay('📡', 'Yayın henüz başlamadı', 'Tören başladığında otomatik olarak yüklenecek', false);
+            setStatus('Bekleniyor…');
+            liveBadge.classList.remove('visible');
+            reconnectNotice.style.display = 'none';
+            retryText.textContent = '';
+            retryCount = 0;
+            startPolling();
+          }
+        })
+        .catch(function () { startPlayer(); }); /* fetch başarısız olsa da dene */
+    }, wait * 1000);
+  }
+
+  function watchVideoErrors() {
+    video.addEventListener('error', function () { handleFatalError(); });
+  }
+
+  /* ── Polling (yayın başlayana kadar) ── */
+  function startPolling() {
+    if (poller) return;
+    poller = setInterval(function () {
+      fetch(STATUS_EP)
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.live) {
             clearInterval(poller);
-            document.getElementById('waiting').style.display = 'none';
-            var v = document.createElement('video');
-            v.id = 'video';
-            v.controls = true;
-            v.autoplay = true;
-            v.setAttribute('playsinline', '');
-            v.style = 'width:100%;max-width:1280px;';
-            document.getElementById('player-wrap').appendChild(v);
+            poller = null;
+            showOverlay('', 'Yayına bağlanıyor…', '', true);
+            setStatus('Bağlanıyor…');
             startPlayer();
           }
-        });
+        })
+        .catch(function () {});
     }, 5000);
   }
+
+  /* ── Başlangıç ── */
+  if (isLive) {
+    showOverlay('', 'Yayına bağlanıyor…', '', true);
+    setStatus('Bağlanıyor…');
+    startPlayer();
+  } else {
+    showOverlay('📡', 'Yayın henüz başlamadı', 'Tören başladığında otomatik olarak yüklenecek', false);
+    setStatus('Bekleniyor…');
+    startPolling();
+  }
+
+})();
 </script>
+
 {% endblock %}
