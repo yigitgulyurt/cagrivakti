@@ -2,92 +2,213 @@
 {% block content %}
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+
+  :root {
+    --kirmizi: #c0392b;
+    --kirmizi-koyu: #96281b;
+    --kirmizi-acik: rgba(192,57,43,0.15);
+    --altin: #d4a843;
+    --altin-acik: rgba(212,168,67,0.12);
+    --lacivert: #1a2744;
+    --bej: #e8dcc8;
+    --bej-soluk: rgba(232,220,200,0.06);
+  }
+
+  * { box-sizing: border-box; }
+
   .canli-wrap {
     min-height: calc(100vh - 60px);
     background: var(--dark);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 32px 16px 48px;
+    padding: 0 0 60px;
+    position: relative;
+    overflow: hidden;
   }
 
-  .canli-header {
+  .canli-wrap::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(192,57,43,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(26,39,68,0.3) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .canli-wrap::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--kirmizi), var(--altin), var(--kirmizi), transparent);
+    z-index: 10;
+  }
+
+  .hero-banner {
     width: 100%;
+    padding: 40px 24px 32px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
     max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: var(--altin);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.85;
+  }
+
+  .hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 900;
+    color: var(--bej);
+    line-height: 1.15;
+    margin: 0 0 8px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    letter-spacing: 1px;
+  }
+
+  .hero-title em {
+    color: var(--kirmizi);
+    font-style: normal;
+  }
+
+  .hero-subtitle {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(232,220,200,0.5);
+    letter-spacing: 1px;
+  }
+
+  .hero-divider {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    gap: 12px;
+    justify-content: center;
+    margin: 16px 0;
   }
 
-  .canli-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: 0.5px;
+  .hero-divider::before,
+  .hero-divider::after {
+    content: '';
+    height: 1px;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, var(--altin));
   }
 
-  .canli-title span {
-    color: var(--gray);
-    font-weight: 400;
-    font-size: 0.9rem;
-    margin-left: 8px;
+  .hero-divider::after {
+    background: linear-gradient(90deg, var(--altin), transparent);
+  }
+
+  .hero-divider-star {
+    color: var(--altin);
+    font-size: 0.7rem;
+    opacity: 0.7;
   }
 
   .live-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 7px;
-    background: rgba(220, 38, 38, 0.15);
-    border: 1px solid rgba(220, 38, 38, 0.35);
-    color: #f87171;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    padding: 5px 12px;
-    border-radius: 20px;
+    gap: 8px;
+    background: var(--kirmizi-acik);
+    border: 1px solid rgba(192,57,43,0.4);
+    color: #e87070;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    padding: 6px 16px;
+    border-radius: 2px;
     text-transform: uppercase;
   }
 
   .live-dot {
-    width: 7px;
-    height: 7px;
-    background: #ef4444;
+    width: 6px;
+    height: 6px;
+    background: var(--kirmizi);
     border-radius: 50%;
     animation: livePulse 1.4s infinite;
+    box-shadow: 0 0 6px var(--kirmizi);
   }
 
   @keyframes livePulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 6px var(--kirmizi); }
+    50% { opacity: 0.5; transform: scale(0.85); box-shadow: 0 0 2px var(--kirmizi); }
   }
 
-  /* Player container — boyutu video metadata'dan alır */
   .player-outer {
     width: 100%;
     max-width: 900px;
-    display: flex;
-    justify-content: center;
+    padding: 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .player-frame {
+    position: relative;
+    border: 1px solid rgba(212,168,67,0.15);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(192,57,43,0.08),
+      0 32px 80px rgba(0,0,0,0.7),
+      inset 0 1px 0 rgba(212,168,67,0.08);
+  }
+
+  .player-frame::before,
+  .player-frame::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .player-frame::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid var(--altin);
+    border-left: 2px solid var(--altin);
+  }
+
+  .player-frame::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid var(--altin);
+    border-right: 2px solid var(--altin);
   }
 
   .player-container {
     width: 100%;
     background: #000;
-    border-radius: 16px;
-    overflow: hidden;
     position: relative;
-    /* aspect-ratio video yüklendikten sonra JS ile set edilir */
-    aspect-ratio: 16 / 9; /* varsayılan, sonra güncellenir */
-    box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+    aspect-ratio: 16 / 9;
   }
 
   #canli-video {
-      width: 100%;
-      height: 100%;
-      object-fit: fill;
-      background: #000;
-      display: none;
-      transform-origin: center center;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    background: #000;
+    display: none;
+    transform-origin: center center;
   }
 
   .waiting-screen {
@@ -97,94 +218,117 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #0a0a0a;
+    background: linear-gradient(160deg, #0c0c0c 0%, #111318 100%);
     gap: 20px;
     padding: 32px;
   }
 
-  .waiting-icon {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: rgba(255,193,7,0.08);
-    border: 1px solid rgba(255,193,7,0.2);
+  .waiting-emblem {
+    position: relative;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    position: relative;
   }
 
-  .waiting-icon::after {
-    content: '';
+  .waiting-emblem-ring {
     position: absolute;
-    inset: -8px;
+    inset: 0;
     border-radius: 50%;
-    border: 1px solid rgba(255,193,7,0.12);
-    animation: waitRing 2.5s infinite ease-out;
+    border: 1px solid rgba(212,168,67,0.2);
+    animation: emblemRing 3s infinite ease-out;
   }
 
-  @keyframes waitRing {
+  .waiting-emblem-ring:nth-child(2) {
+    inset: -12px;
+    border-color: rgba(212,168,67,0.1);
+    animation-delay: 0.8s;
+  }
+
+  @keyframes emblemRing {
     0% { transform: scale(0.9); opacity: 0.6; }
-    100% { transform: scale(1.6); opacity: 0; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+
+  .waiting-emblem-icon {
+    font-size: 2.2rem;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 0 12px rgba(212,168,67,0.3));
   }
 
   .waiting-screen h3 {
-    color: var(--text);
-    font-size: 1.2rem;
+    font-family: 'Cinzel', serif;
+    color: var(--bej);
+    font-size: 1.1rem;
     font-weight: 700;
     margin: 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
   }
 
   .waiting-screen p {
-    color: var(--gray);
-    font-size: 0.9rem;
+    font-family: 'Crimson Pro', serif;
+    color: rgba(232,220,200,0.45);
+    font-size: 1rem;
+    font-style: italic;
     text-align: center;
     margin: 0;
-    max-width: 300px;
-    line-height: 1.5;
+    max-width: 280px;
+    line-height: 1.6;
   }
 
   .waiting-dots {
     display: flex;
-    gap: 6px;
+    gap: 8px;
   }
 
   .waiting-dots span {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
-    background: var(--primary);
-    opacity: 0.3;
-    animation: dotBounce 1.4s infinite;
+    background: var(--altin);
+    opacity: 0.25;
+    animation: dotBounce 1.6s infinite;
   }
 
-  .waiting-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .waiting-dots span:nth-child(3) { animation-delay: 0.4s; }
+  .waiting-dots span:nth-child(2) { animation-delay: 0.25s; }
+  .waiting-dots span:nth-child(3) { animation-delay: 0.5s; }
 
   @keyframes dotBounce {
-    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-    40% { opacity: 1; transform: scale(1); }
+    0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+    40% { opacity: 0.9; transform: scale(1.1); }
   }
 
   .loading-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.65);
+    background: rgba(0,0,0,0.7);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 5;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
+    gap: 16px;
   }
 
   .spinner {
-    width: 44px;
-    height: 44px;
-    border: 3px solid rgba(255,193,7,0.2);
-    border-top-color: var(--primary);
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(212,168,67,0.15);
+    border-top-color: var(--altin);
     border-radius: 50%;
-    animation: spinAnim 0.9s linear infinite;
+    animation: spinAnim 0.8s linear infinite;
+  }
+
+  .loading-text {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: rgba(212,168,67,0.6);
+    text-transform: uppercase;
   }
 
   @keyframes spinAnim { to { transform: rotate(360deg); } }
@@ -192,95 +336,154 @@
   .error-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.88);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 14px;
+    gap: 12px;
     z-index: 5;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
   }
 
-  .error-overlay .err-icon { font-size: 2.5rem; opacity: 0.7; }
+  .error-overlay .err-icon { font-size: 2rem; opacity: 0.6; }
 
   .error-overlay p {
-    color: var(--gray);
-    font-size: 0.9rem;
+    font-family: 'Crimson Pro', serif;
+    color: rgba(232,220,200,0.5);
+    font-size: 1rem;
+    font-style: italic;
     text-align: center;
     margin: 0;
   }
 
   .retry-btn {
-    background: var(--primary);
-    color: var(--dark);
-    border: none;
-    padding: 10px 24px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.9rem;
+    background: transparent;
+    color: var(--altin);
+    border: 1px solid rgba(212,168,67,0.3);
+    padding: 9px 22px;
+    border-radius: 2px;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     cursor: pointer;
     transition: all 0.2s;
     margin-top: 4px;
   }
 
   .retry-btn:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
+    background: var(--altin-acik);
+    border-color: rgba(212,168,67,0.6);
   }
 
-  .status-bar {
+  .info-bar {
     width: 100%;
     max-width: 900px;
-    margin-top: 14px;
-    font-size: 0.82rem;
-    color: var(--gray);
+    padding: 0 16px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+  }
+
+  .status-text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.88rem;
+    font-style: italic;
+    color: rgba(232,220,200,0.35);
+    letter-spacing: 0.5px;
+  }
+
+  .quote-section {
+    width: 100%;
+    max-width: 600px;
+    padding: 32px 24px 0;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .quote-text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    font-weight: 300;
+    color: rgba(232,220,200,0.3);
+    line-height: 1.8;
+    letter-spacing: 0.3px;
+  }
+
+  .quote-author {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    color: rgba(212,168,67,0.3);
+    text-transform: uppercase;
+    margin-top: 12px;
   }
 
   .hidden { display: none !important; }
 </style>
 
 <div class="canli-wrap">
-  <div class="canli-header">
-    <div class="canli-title">
-      18 Mart Çanakkale Zaferi
-      <span>Canlı Yayın</span>
-    </div>
-    <div class="live-badge" id="liveBadge" style="display:none;">
-      <div class="live-dot"></div>
-      CANLI
-    </div>
+
+  <div class="hero-banner">
+    <div class="hero-eyebrow">Canlı Yayın · 18 Mart 2026</div>
+    <h1 class="hero-title"><em>Çanakkale</em> Zaferi</h1>
+    <div class="hero-divider"><span class="hero-divider-star">✦</span></div>
+    <div class="hero-subtitle">111. Yıl Anma Töreni</div>
   </div>
 
   <div class="player-outer">
-    <div class="player-container" id="playerContainer">
+    <div class="player-frame">
+      <div class="player-container" id="playerContainer">
 
-      <div class="waiting-screen" id="waitingScreen">
-        <div class="waiting-icon">📡</div>
-        <h3>Yayın Bekleniyor</h3>
-        <p>Tören başladığında yayın otomatik olarak açılacak</p>
-        <div class="waiting-dots">
-          <span></span><span></span><span></span>
+        <div class="waiting-screen" id="waitingScreen">
+          <div class="waiting-emblem">
+            <div class="waiting-emblem-ring"></div>
+            <div class="waiting-emblem-ring"></div>
+            <div class="waiting-emblem-icon">📡</div>
+          </div>
+          <h3>Yayın Bekleniyor</h3>
+          <p>Tören başladığında yayın otomatik olarak açılacak</p>
+          <div class="waiting-dots">
+            <span></span><span></span><span></span>
+          </div>
         </div>
-      </div>
 
-      <div class="loading-overlay hidden" id="loadingOverlay">
-        <div class="spinner"></div>
-      </div>
+        <div class="loading-overlay hidden" id="loadingOverlay">
+          <div class="spinner"></div>
+          <div class="loading-text">Bağlanıyor</div>
+        </div>
 
-      <div class="error-overlay hidden" id="errorOverlay">
-        <div class="err-icon">⚠️</div>
-        <p id="errorMsg">Bağlantı kesildi</p>
-        <button class="retry-btn" onclick="retryStream()">Yeniden Bağlan</button>
-      </div>
+        <div class="error-overlay hidden" id="errorOverlay">
+          <div class="err-icon">⚠️</div>
+          <p id="errorMsg">Bağlantı kesildi</p>
+          <button class="retry-btn" onclick="retryStream()">Yeniden Bağlan</button>
+        </div>
 
-      <video id="canli-video" controls playsinline></video>
+        <video id="canli-video" controls playsinline></video>
+      </div>
     </div>
   </div>
 
-  <div class="status-bar">
-    <div id="statusText">⏳ Yayın bekleniyor...</div>
+  <div class="info-bar">
+    <div class="status-text" id="statusText">Yayın bekleniyor...</div>
+    <div class="live-badge" id="liveBadge" style="display:none;">
+      <div class="live-dot"></div>
+      Canlı
+    </div>
   </div>
+
+  <div class="quote-section">
+    <div class="quote-text">"Çanakkale geçilmez."</div>
+    <div class="quote-author">Türk Milletinin Destanı</div>
+  </div>
+
 </div>
 
 <script src="{{ url_for('static', filename='js/hls.js') }}"></script>
@@ -297,7 +500,7 @@
   }
 
   function showLiveBadge(show) {
-    document.getElementById('liveBadge').style.display = show ? 'flex' : 'none';
+    document.getElementById('liveBadge').style.display = show ? 'inline-flex' : 'none';
   }
 
   function showOverlay(name) {
@@ -307,28 +510,26 @@
     if (name) document.getElementById(name).classList.remove('hidden');
   }
 
-  // Video metadata yüklenince gerçek aspect ratio'yu container'a uygula
   function applyAspectRatio(video) {
-      video.addEventListener('loadedmetadata', function() {
-          var w = video.videoWidth;
-          var h = video.videoHeight;
-          if (w && h) {
-              // Stream dikey geliyorsa (9/16) rotate uygula, container'ı yatay ayarla
-              if (h > w) {
-                  video.style.transform = 'rotate(90deg)';
-                  video.style.width = '177.78%';  // 16/9 oranı için
-                  video.style.height = '56.25%';
-                  video.style.marginLeft = '-38.89%';
-                  document.getElementById('playerContainer').style.aspectRatio = h + ' / ' + w;
-              } else {
-                  video.style.transform = 'none';
-                  video.style.width = '100%';
-                  video.style.height = '100%';
-                  video.style.marginLeft = '0';
-                  document.getElementById('playerContainer').style.aspectRatio = w + ' / ' + h;
-              }
-          }
-      });
+    video.addEventListener('loadedmetadata', function() {
+      var w = video.videoWidth;
+      var h = video.videoHeight;
+      if (w && h) {
+        if (h > w) {
+          video.style.transform = 'rotate(90deg)';
+          video.style.width = '177.78%';
+          video.style.height = '56.25%';
+          video.style.marginLeft = '-38.89%';
+          document.getElementById('playerContainer').style.aspectRatio = h + ' / ' + w;
+        } else {
+          video.style.transform = 'none';
+          video.style.width = '100%';
+          video.style.height = '100%';
+          video.style.marginLeft = '0';
+          document.getElementById('playerContainer').style.aspectRatio = w + ' / ' + h;
+        }
+      }
+    });
   }
 
   function startPlayer() {
@@ -337,10 +538,9 @@
     video.style.display = 'block';
     showOverlay('loadingOverlay');
     showLiveBadge(true);
-    setStatus('🔄 Yayına bağlanıyor...');
+    setStatus('Yayına bağlanıyor...');
 
     if (hls) { hls.destroy(); hls = null; }
-
     applyAspectRatio(video);
 
     if (Hls.isSupported()) {
@@ -350,34 +550,28 @@
 
       hls.on(Hls.Events.MANIFEST_PARSED, function() {
         showOverlay(null);
-        setStatus('🔴 Canlı yayın aktif');
+        setStatus('Canlı yayın aktif');
         retryCount = 0;
         video.play().catch(function(){});
       });
 
       hls.on(Hls.Events.ERROR, function(event, data) {
-        if (data.fatal) {
-          handleStreamError();
-          return;
-        }
-        // Segment 404 alınca yayın bitmiş mi kontrol et
+        if (data.fatal) { handleStreamError(); return; }
         if (data.type === Hls.ErrorTypes.NETWORK_ERROR &&
             data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR &&
             data.response && data.response.code === 404) {
           fetch('/stream/status')
             .then(function(r){ return r.json(); })
-            .then(function(d) {
-              if (!d.live) { streamEnded(); }
-            })
+            .then(function(d) { if (!d.live) { streamEnded(); } })
             .catch(function(){});
         }
       });
-    
+
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = STREAM_URL;
       video.addEventListener('canplay', function() {
         showOverlay(null);
-        setStatus('🔴 Canlı yayın aktif');
+        setStatus('Canlı yayın aktif');
         video.play();
       });
     }
@@ -386,7 +580,7 @@
   function handleStreamError() {
     if (retryCount < MAX_RETRY) {
       retryCount++;
-      setStatus('⚡ Yeniden bağlanıyor... (' + retryCount + '/' + MAX_RETRY + ')');
+      setStatus('Yeniden bağlanıyor... (' + retryCount + '/' + MAX_RETRY + ')');
       showOverlay('loadingOverlay');
       setTimeout(function() {
         fetch('/stream/status')
@@ -398,16 +592,14 @@
           })
           .catch(function(){ streamEnded(); });
       }, 4000);
-    } else {
-      streamEnded();
-    }
+    } else { streamEnded(); }
   }
 
   function streamEnded() {
     showLiveBadge(false);
-    document.getElementById('errorMsg').textContent = 'Yayın sona erdi veya bağlantı kesildi';
+    document.getElementById('errorMsg').textContent = 'Yayın sona erdi';
     showOverlay('errorOverlay');
-    setStatus('⚫ Yayın sona erdi');
+    setStatus('Yayın sona erdi');
     startPolling();
   }
 
@@ -423,7 +615,7 @@
           document.getElementById('waitingScreen').style.display = 'flex';
           document.getElementById('canli-video').style.display = 'none';
           showLiveBadge(false);
-          setStatus('⏳ Yayın bekleniyor...');
+          setStatus('Yayın bekleniyor...');
           startPolling();
         }
       });
