@@ -40,7 +40,7 @@
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
     
     const offer = await pc.createOffer();
-    
+
     function preferH264(sdp) {
       const lines = sdp.split('\n');
       const h264Regex = /a=rtpmap:(\d+) H264/;
@@ -59,23 +59,34 @@
         return line;
       }).join('\n');
     }
-    
+
     const modifiedOffer = new RTCSessionDescription({
       type: offer.type,
       sdp: preferH264(offer.sdp)
     });
-    
+
     await pc.setLocalDescription(modifiedOffer);
     
-    // ICE toplanmasını bekle
+    // ICE toplanmasını bekle (max 4 sn, her durumda devam et)
     await new Promise(resolve => {
-      if (pc.iceGatheringState === 'complete') { resolve(); return; }
-      pc.addEventListener('icegatheringstatechange', () => {
-        if (pc.iceGatheringState === 'complete') resolve();
-      });
-      setTimeout(resolve, 3000);
-    });
+      let resolved = false;
+      const done = () => { if (!resolved) { resolved = true; resolve(); } };
     
+      if (pc.iceGatheringState === 'complete') { done(); return; }
+    
+      pc.onicegatheringstatechange = () => {
+        console.log('ICE state:', pc.iceGatheringState);
+        if (pc.iceGatheringState === 'complete') done();
+      };
+      
+      pc.onicecandidate = (e) => {
+        console.log('ICE candidate:', e.candidate);
+        if (e.candidate === null) done(); // null = toplama bitti
+      };
+      
+      setTimeout(() => { console.log('ICE timeout, devam ediliyor'); done(); }, 4000);
+    });
+
     document.getElementById('status').textContent = 'Sunucuya bağlanıyor...';
 
     const resp = await fetch('https://cagrivakti.com.tr/canli/whip', {
