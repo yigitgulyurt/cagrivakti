@@ -2,155 +2,229 @@
 {% block content %}
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap');
-
-  :root {
-    --bg:        #0a0a0f;
-    --surface:   #111118;
-    --border:    #1e1e2e;
-    --red:       #e63946;
-    --red-dim:   #7f1d1d;
-    --text:      #e8e8f0;
-    --muted:     #6b6b80;
-    --accent:    #4361ee;
-  }
-
-  .canli-page {
-    min-height: 100vh;
-    background: var(--bg);
+  .canli-wrap {
+    min-height: calc(100vh - 60px);
+    background: var(--dark);
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 32px 16px 48px;
-    font-family: 'Syne', sans-serif;
   }
 
-  /* ── Header ── */
   .canli-header {
     width: 100%;
     max-width: 900px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .canli-title {
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--text);
-    letter-spacing: .05em;
-    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .canli-title span {
-    color: var(--muted);
+    color: var(--gray);
     font-weight: 400;
+    font-size: 0.9rem;
+    margin-left: 8px;
   }
 
-  /* ── LIVE badge ── */
   .live-badge {
-    display: none;
+    display: flex;
     align-items: center;
     gap: 7px;
-    background: var(--red-dim);
-    border: 1px solid var(--red);
-    border-radius: 4px;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    color: #f87171;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
     padding: 5px 12px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: .72rem;
-    font-weight: 600;
-    color: var(--red);
-    letter-spacing: .12em;
+    border-radius: 20px;
     text-transform: uppercase;
   }
 
-  .live-badge.visible { display: flex; }
-
   .live-dot {
-    width: 7px; height: 7px;
+    width: 7px;
+    height: 7px;
+    background: #ef4444;
     border-radius: 50%;
-    background: var(--red);
-    animation: pulse-dot 1.4s ease-in-out infinite;
+    animation: livePulse 1.4s infinite;
   }
 
-  @keyframes pulse-dot {
+  @keyframes livePulse {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: .4; transform: scale(.7); }
+    50% { opacity: 0.4; transform: scale(0.8); }
   }
 
-  /* ── Player wrap ── */
-  .player-outer {
+  .player-container {
     width: 100%;
     max-width: 900px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    background: #000;
+    border-radius: 16px;
     overflow: hidden;
     position: relative;
+    aspect-ratio: 16 / 9;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
   }
 
-  /* 16:9 aspect ratio kutusu */
-  .player-ratio {
-    position: relative;
-    width: 100%;
-    padding-top: 56.25%; /* 9/16 */
-  }
-
-  #video {
-    position: absolute;
-    inset: 0;
+  #canli-video {
     width: 100%;
     height: 100%;
     object-fit: contain;
     background: #000;
-    display: none;
+    display: block;
   }
 
-  /* ── Waiting / offline overlay ── */
-  .player-overlay {
+  .waiting-screen {
     position: absolute;
     inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    background: var(--surface);
+    background: #0a0a0a;
+    gap: 20px;
+    padding: 32px;
   }
 
-  .overlay-icon {
-    font-size: 2.8rem;
-    opacity: .5;
-  }
-
-  .overlay-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text);
-    margin: 0;
-  }
-
-  .overlay-sub {
-    font-size: .85rem;
-    color: var(--muted);
-    margin: 0;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  /* Spinner */
-  .spinner {
-    width: 32px; height: 32px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
+  .waiting-icon {
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
-    animation: spin .8s linear infinite;
-    display: none;
+    background: rgba(255,193,7,0.08);
+    border: 1px solid rgba(255,193,7,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    position: relative;
   }
 
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .waiting-icon::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,193,7,0.12);
+    animation: waitRing 2.5s infinite ease-out;
+  }
 
-  /* ── Status bar ── */
+  @keyframes waitRing {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+
+  .waiting-screen h3 {
+    color: var(--text);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .waiting-screen p {
+    color: var(--gray);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0;
+    max-width: 300px;
+    line-height: 1.5;
+  }
+
+  .waiting-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .waiting-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    opacity: 0.3;
+    animation: dotBounce 1.4s infinite;
+  }
+
+  .waiting-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .waiting-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes dotBounce {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  .loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    backdrop-filter: blur(4px);
+  }
+
+  .spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid rgba(255,193,7,0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spinAnim 0.9s linear infinite;
+  }
+
+  @keyframes spinAnim {
+    to { transform: rotate(360deg); }
+  }
+
+  .error-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    z-index: 5;
+    backdrop-filter: blur(4px);
+  }
+
+  .error-overlay .err-icon {
+    font-size: 2.5rem;
+    opacity: 0.7;
+  }
+
+  .error-overlay p {
+    color: var(--gray);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0;
+  }
+
+  .retry-btn {
+    background: var(--primary);
+    color: var(--dark);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+
+  .retry-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+
   .status-bar {
     width: 100%;
     max-width: 900px;
@@ -158,234 +232,176 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: .75rem;
-    color: var(--muted);
+    font-size: 0.82rem;
+    color: var(--gray);
   }
 
-  #statusText { color: var(--text); }
-
-  /* ── Reconnect notice ── */
-  .reconnect-notice {
-    display: none;
-    width: 100%;
-    max-width: 900px;
-    margin-top: 10px;
-    padding: 12px 16px;
-    background: #1a1a0a;
-    border: 1px solid #5a4a00;
-    border-radius: 8px;
-    font-size: .82rem;
-    color: #f0c040;
-    font-family: 'IBM Plex Mono', monospace;
-    text-align: center;
-  }
+  .hidden { display: none !important; }
 </style>
 
-<div class="canli-page">
-
+<div class="canli-wrap">
   <div class="canli-header">
-    <div class="canli-title">18 Mart <span>· Çanakkale Zaferi Töreni</span></div>
-    <div class="live-badge" id="liveBadge">
+    <div class="canli-title">
+      18 Mart Çanakkale Zaferi
+      <span>Canlı Yayın</span>
+    </div>
+    <div class="live-badge" id="liveBadge" style="display:none;">
       <div class="live-dot"></div>
-      Canlı
+      CANLI
     </div>
   </div>
 
-  <div class="player-outer">
-    <div class="player-ratio">
-      <video id="video" controls playsinline></video>
+  <div class="player-container" id="playerContainer">
 
-      <div class="player-overlay" id="overlay">
-        <div class="spinner" id="spinner"></div>
-        <div class="overlay-icon" id="overlayIcon">📡</div>
-        <p class="overlay-title" id="overlayTitle">Yayın henüz başlamadı</p>
-        <p class="overlay-sub" id="overlaySub">Tören başladığında otomatik olarak yüklenecek</p>
+    <div class="waiting-screen" id="waitingScreen">
+      <div class="waiting-icon">📡</div>
+      <h3>Yayın Bekleniyor</h3>
+      <p>Tören başladığında yayın otomatik olarak açılacak</p>
+      <div class="waiting-dots">
+        <span></span><span></span><span></span>
       </div>
     </div>
+
+    <div class="loading-overlay hidden" id="loadingOverlay">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="error-overlay hidden" id="errorOverlay">
+      <div class="err-icon">⚠️</div>
+      <p id="errorMsg">Bağlantı kesildi</p>
+      <button class="retry-btn" onclick="retryStream()">Yeniden Bağlan</button>
+    </div>
+
+    <video id="canli-video" controls playsinline style="display:none;"></video>
   </div>
 
   <div class="status-bar">
-    <span id="statusText">Bekleniyor…</span>
-    <span id="retryText"></span>
+    <div id="statusText">⏳ Yayın bekleniyor...</div>
   </div>
-
-  <div class="reconnect-notice" id="reconnectNotice">
-    ⚠ Yayın kesildi — yeniden bağlanılıyor…
-  </div>
-
 </div>
 
-<script src="{{ url_for('static', filename='js/hls.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
-(function () {
-  var SRC       = 'https://cagrivakti.com.tr/canli-stream/canli/index.m3u8';
-  var STATUS_EP = '/stream/status';
+  var STREAM_URL = 'https://cagrivakti.com.tr/canli-stream/canli/index.m3u8';
+  var isLive = {{ stream_live | tojson }};
+  var hls = null;
+  var poller = null;
+  var retryCount = 0;
+  var MAX_RETRY = 3;
 
-  var isLive    = {{ stream_live | tojson }};
-
-  /* DOM */
-  var video            = document.getElementById('video');
-  var overlay          = document.getElementById('overlay');
-  var overlayIcon      = document.getElementById('overlayIcon');
-  var overlayTitle     = document.getElementById('overlayTitle');
-  var overlaySub       = document.getElementById('overlaySub');
-  var spinner          = document.getElementById('spinner');
-  var liveBadge        = document.getElementById('liveBadge');
-  var statusText       = document.getElementById('statusText');
-  var retryText        = document.getElementById('retryText');
-  var reconnectNotice  = document.getElementById('reconnectNotice');
-
-  var hls          = null;
-  var poller       = null;
-  var retryCount   = 0;
-  var MAX_RETRY    = 5;
-  var retryTimer   = null;
-
-  /* ── Durum göstericiler ── */
-  function setStatus(msg) { statusText.textContent = msg; }
-
-  function showOverlay(icon, title, sub, showSpinner) {
-    overlay.style.display      = 'flex';
-    video.style.display        = 'none';
-    overlayIcon.style.display  = showSpinner ? 'none' : 'block';
-    spinner.style.display      = showSpinner ? 'block' : 'none';
-    overlayIcon.textContent    = icon;
-    overlayTitle.textContent   = title;
-    overlaySub.textContent     = sub;
-    liveBadge.classList.remove('visible');
+  function setStatus(msg) {
+    document.getElementById('statusText').textContent = msg;
   }
 
-  function showPlayer() {
-    overlay.style.display = 'none';
-    video.style.display   = 'block';
-    liveBadge.classList.add('visible');
-    reconnectNotice.style.display = 'none';
-    retryText.textContent = '';
+  function showLiveBadge(show) {
+    document.getElementById('liveBadge').style.display = show ? 'flex' : 'none';
   }
 
-  /* ── HLS Player ── */
+  function showOverlay(name) {
+    ['loadingOverlay','errorOverlay'].forEach(function(id) {
+      document.getElementById(id).classList.add('hidden');
+    });
+    if (name) document.getElementById(name).classList.remove('hidden');
+  }
+
   function startPlayer() {
+    var video = document.getElementById('canli-video');
+    document.getElementById('waitingScreen').style.display = 'none';
+    video.style.display = 'block';
+    showOverlay('loadingOverlay');
+    showLiveBadge(true);
+    setStatus('🔄 Yayına bağlanıyor...');
+
     if (hls) { hls.destroy(); hls = null; }
 
-    if (!Hls.isSupported()) {
-      if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = SRC;
+    if (Hls.isSupported()) {
+      hls = new Hls({ maxBufferLength: 15, maxMaxBufferLength: 30 });
+      hls.loadSource(STREAM_URL);
+      hls.attachMedia(video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        showOverlay(null);
+        setStatus('🔴 Canlı yayın aktif');
+        retryCount = 0;
         video.play().catch(function(){});
-        showPlayer();
-        setStatus('Oynatılıyor (native HLS)');
-        watchVideoErrors();
-      } else {
-        showOverlay('⚠️', 'Tarayıcı desteklenmiyor', 'Lütfen Chrome veya Firefox kullanın.', false);
-      }
-      return;
+      });
+
+      hls.on(Hls.Events.ERROR, function(event, data) {
+        if (data.fatal) { handleStreamError(); }
+      });
+
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = STREAM_URL;
+      video.addEventListener('loadedmetadata', function() {
+        showOverlay(null);
+        setStatus('🔴 Canlı yayın aktif');
+        video.play();
+      });
     }
-
-    hls = new Hls({
-      lowLatencyMode: false,
-      maxBufferLength: 10,
-      manifestLoadingTimeOut: 8000,
-      manifestLoadingMaxRetry: 2,
-    });
-
-    hls.loadSource(SRC);
-    hls.attachMedia(video);
-
-    hls.on(Hls.Events.MANIFEST_PARSED, function () {
-      video.play().catch(function(){});
-      showPlayer();
-      setStatus('Oynatılıyor');
-      retryCount = 0;
-      reconnectNotice.style.display = 'none';
-    });
-
-    hls.on(Hls.Events.ERROR, function (event, data) {
-      if (!data.fatal) return;
-      handleFatalError();
-    });
   }
 
-  function handleFatalError() {
-    if (retryCount >= MAX_RETRY) {
-      if (hls) { hls.destroy(); hls = null; }
-      showOverlay('📴', 'Yayın kesildi', 'Yayın sona erdi veya bağlantı kurulamadı.', false);
-      setStatus('Yayın kesildi');
-      liveBadge.classList.remove('visible');
-      reconnectNotice.style.display = 'none';
-      startPolling(); /* yayın tekrar başlarsa yakala */
-      return;
+  function handleStreamError() {
+    if (retryCount < MAX_RETRY) {
+      retryCount++;
+      setStatus('⚡ Yeniden bağlanıyor... (' + retryCount + '/' + MAX_RETRY + ')');
+      showOverlay('loadingOverlay');
+      setTimeout(function() {
+        fetch('/stream/status')
+          .then(function(r){ return r.json(); })
+          .then(function(d) {
+            if (d.live) {
+              if (hls) { hls.startLoad(); } else { startPlayer(); }
+            } else { streamEnded(); }
+          })
+          .catch(function(){ streamEnded(); });
+      }, 4000);
+    } else {
+      streamEnded();
     }
-
-    retryCount++;
-    var wait = retryCount * 4; /* 4, 8, 12, 16, 20 sn */
-    reconnectNotice.style.display = 'block';
-    setStatus('Bağlantı kesildi');
-    retryText.textContent = retryCount + '/' + MAX_RETRY + ' deneme';
-
-    if (hls) { hls.destroy(); hls = null; }
-    showOverlay('🔄', 'Yeniden bağlanıyor…', wait + ' saniye sonra tekrar denenecek', true);
-
-    retryTimer = setTimeout(function () {
-      /* Önce yayın gerçekten var mı kontrol et */
-      fetch(STATUS_EP)
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          if (d.live) {
-            startPlayer();
-          } else {
-            /* Yayın bitti, offline moduna geç */
-            showOverlay('📡', 'Yayın henüz başlamadı', 'Tören başladığında otomatik olarak yüklenecek', false);
-            setStatus('Bekleniyor…');
-            liveBadge.classList.remove('visible');
-            reconnectNotice.style.display = 'none';
-            retryText.textContent = '';
-            retryCount = 0;
-            startPolling();
-          }
-        })
-        .catch(function () { startPlayer(); }); /* fetch başarısız olsa da dene */
-    }, wait * 1000);
   }
 
-  function watchVideoErrors() {
-    video.addEventListener('error', function () { handleFatalError(); });
-  }
-
-  /* ── Polling (yayın başlayana kadar) ── */
-  function startPolling() {
-    if (poller) return;
-    poller = setInterval(function () {
-      fetch(STATUS_EP)
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          if (d.live) {
-            clearInterval(poller);
-            poller = null;
-            showOverlay('', 'Yayına bağlanıyor…', '', true);
-            setStatus('Bağlanıyor…');
-            startPlayer();
-          }
-        })
-        .catch(function () {});
-    }, 5000);
-  }
-
-  /* ── Başlangıç ── */
-  if (isLive) {
-    showOverlay('', 'Yayına bağlanıyor…', '', true);
-    setStatus('Bağlanıyor…');
-    startPlayer();
-  } else {
-    showOverlay('📡', 'Yayın henüz başlamadı', 'Tören başladığında otomatik olarak yüklenecek', false);
-    setStatus('Bekleniyor…');
+  function streamEnded() {
+    showLiveBadge(false);
+    document.getElementById('errorMsg').textContent = 'Yayın sona erdi veya bağlantı kesildi';
+    showOverlay('errorOverlay');
+    setStatus('⚫ Yayın sona erdi');
     startPolling();
   }
 
-})();
-</script>
+  function retryStream() {
+    retryCount = 0;
+    fetch('/stream/status')
+      .then(function(r){ return r.json(); })
+      .then(function(d) {
+        if (d.live) {
+          startPlayer();
+        } else {
+          showOverlay(null);
+          document.getElementById('waitingScreen').style.display = 'flex';
+          document.getElementById('canli-video').style.display = 'none';
+          showLiveBadge(false);
+          setStatus('⏳ Yayın bekleniyor...');
+          startPolling();
+        }
+      });
+  }
 
+  function startPolling() {
+    if (poller) clearInterval(poller);
+    poller = setInterval(function() {
+      fetch('/stream/status')
+        .then(function(r){ return r.json(); })
+        .then(function(d) {
+          if (d.live) {
+            clearInterval(poller);
+            poller = null;
+            startPlayer();
+          }
+        })
+        .catch(function(){});
+    }, 5000);
+  }
+
+  if (isLive) { startPlayer(); } else { startPolling(); }
+</script>
 {% endblock %}

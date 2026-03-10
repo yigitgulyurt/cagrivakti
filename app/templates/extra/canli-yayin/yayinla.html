@@ -1,132 +1,474 @@
 {% extends "base.html" %}
 {% block content %}
-<div style="text-align:center; padding:20px; background:#111; min-height:100vh;">
-  <h2 style="color:#fff;">📡 Canlı Yayın Kontrolü</h2>
-  
-  <video id="preview" autoplay muted playsinline
-    style="width:100%; max-width:480px; border:2px solid #444; border-radius:8px; margin:16px 0;">
-  </video>
-  
-  <br>
-  <button id="btnStart" onclick="startStream()"
-    style="background:#e53e3e; color:#fff; border:none; padding:14px 32px; 
-           font-size:18px; border-radius:8px; margin:8px; cursor:pointer;">
-    🔴 Yayını Başlat
-  </button>
-  <button id="btnStop" onclick="stopStream()" disabled
-    style="background:#555; color:#fff; border:none; padding:14px 32px;
-           font-size:18px; border-radius:8px; margin:8px; cursor:pointer;">
-    ⏹ Yayını Durdur
-  </button>
-  
-  <p id="status" style="color:#aaa; margin-top:12px;">Hazır</p>
+
+<style>
+  .yayinla-wrap {
+    min-height: calc(100vh - 60px);
+    background: var(--dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 48px;
+  }
+
+  .yayinla-header {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .yayinla-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .conn-badge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+  }
+
+  .conn-badge.idle {
+    background: rgba(148,163,184,0.1);
+    border: 1px solid rgba(148,163,184,0.2);
+    color: var(--gray);
+  }
+
+  .conn-badge.connecting {
+    background: rgba(234,179,8,0.12);
+    border: 1px solid rgba(234,179,8,0.3);
+    color: #facc15;
+  }
+
+  .conn-badge.live {
+    background: rgba(220,38,38,0.15);
+    border: 1px solid rgba(220,38,38,0.35);
+    color: #f87171;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .conn-dot {
+    width: 7px;
+    height: 7px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: livePulse 1.4s infinite;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* Preview */
+  .preview-container {
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 16 / 9;
+    background: #0a0a0a;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+  }
+
+  #preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scaleX(-1); /* selfie mirror */
+  }
+
+  .preview-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--gray);
+  }
+
+  .preview-placeholder .ph-icon {
+    font-size: 3rem;
+    opacity: 0.4;
+  }
+
+  .preview-placeholder p {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    margin: 0;
+  }
+
+  /* Süre sayacı */
+  .duration-overlay {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    display: none;
+  }
+
+  /* Kontrol paneli */
+  .controls {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-start {
+    flex: 1;
+    background: var(--primary);
+    color: var(--dark);
+    border: none;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-start:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(255,193,7,0.3);
+  }
+
+  .btn-start:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-stop {
+    flex: 1;
+    background: rgba(220,38,38,0.15);
+    color: #f87171;
+    border: 1px solid rgba(220,38,38,0.3);
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-stop:hover:not(:disabled) {
+    background: rgba(220,38,38,0.25);
+    transform: translateY(-1px);
+  }
+
+  .btn-stop:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Durum mesajı */
+  .status-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 0.88rem;
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+  }
+
+  .status-card.error {
+    border-color: rgba(220,38,38,0.2);
+    color: #f87171;
+    background: rgba(220,38,38,0.06);
+  }
+
+  .status-card.success {
+    border-color: rgba(255,193,7,0.2);
+    color: var(--primary);
+    background: rgba(255,193,7,0.06);
+  }
+
+  /* Kamera seçimi */
+  .cam-select-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cam-label {
+    font-size: 0.82rem;
+    color: var(--gray);
+    white-space: nowrap;
+  }
+
+  .cam-select {
+    flex: 1;
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .cam-select:focus {
+    border-color: rgba(255,193,7,0.3);
+  }
+
+  .spinner-sm {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-top-color: var(--dark);
+    border-radius: 50%;
+    animation: spinAnim 0.8s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spinAnim {
+    to { transform: rotate(360deg); }
+  }
+
+  .hidden { display: none !important; }
+</style>
+
+<div class="yayinla-wrap">
+  <div class="yayinla-header">
+    <div class="yayinla-title">🎥 Yayın Kontrolü</div>
+    <div class="conn-badge idle" id="connBadge">Hazır</div>
+  </div>
+
+  <div class="preview-container">
+    <div class="preview-placeholder" id="previewPlaceholder">
+      <div class="ph-icon">📷</div>
+      <p>Kamera önizlemesi burada görünecek</p>
+    </div>
+    <video id="preview" autoplay muted playsinline></video>
+    <div class="duration-overlay" id="durationOverlay">00:00</div>
+  </div>
+
+  <div class="controls">
+    <div class="cam-select-row">
+      <span class="cam-label">Kamera:</span>
+      <select class="cam-select" id="camSelect">
+        <option value="environment">Arka Kamera</option>
+        <option value="user">Ön Kamera</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-start" id="btnStart" onclick="startStream()">
+        🔴 Yayını Başlat
+      </button>
+      <button class="btn-stop" id="btnStop" onclick="stopStream()" disabled>
+        ⏹ Durdur
+      </button>
+    </div>
+
+    <div class="status-card" id="statusCard">
+      ℹ️ Yayına başlamak için "Yayını Başlat" butonuna bas.
+    </div>
+  </div>
 </div>
 
 <script>
   var pc = null;
+  var durationTimer = null;
+  var startTime = null;
+
+  function setStatus(msg, type) {
+    var card = document.getElementById('statusCard');
+    card.textContent = msg;
+    card.className = 'status-card' + (type ? ' ' + type : '');
+  }
+
+  function setBadge(state, text) {
+    var badge = document.getElementById('connBadge');
+    badge.className = 'conn-badge ' + state;
+    if (state === 'live') {
+      badge.innerHTML = '<div class="conn-dot"></div>' + text;
+    } else {
+      badge.textContent = text;
+    }
+  }
+
+  function startDuration() {
+    startTime = Date.now();
+    var overlay = document.getElementById('durationOverlay');
+    overlay.style.display = 'block';
+    durationTimer = setInterval(function() {
+      var elapsed = Math.floor((Date.now() - startTime) / 1000);
+      var m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      var s = String(elapsed % 60).padStart(2, '0');
+      overlay.textContent = m + ':' + s;
+    }, 1000);
+  }
+
+  function stopDuration() {
+    clearInterval(durationTimer);
+    durationTimer = null;
+    document.getElementById('durationOverlay').style.display = 'none';
+  }
+
+  function preferH264(sdp) {
+    var lines = sdp.split('\n');
+    var h264Regex = /a=rtpmap:(\d+) H264/;
+    var h264Payload = null;
+    for (var i = 0; i < lines.length; i++) {
+      var match = lines[i].match(h264Regex);
+      if (match) { h264Payload = match[1]; break; }
+    }
+    if (!h264Payload) return sdp;
+    return lines.map(function(line) {
+      if (line.startsWith('m=video')) {
+        var parts = line.split(' ');
+        return parts.slice(0, 3).join(' ') + ' ' + h264Payload;
+      }
+      return line;
+    }).join('\n');
+  }
 
   async function startStream() {
     try {
-    document.getElementById('status').textContent = 'Kamera açılıyor...';
-    
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: {ideal:1280}, height: {ideal:720} },
-      audio: true
-    });
-    
-    document.getElementById('preview').srcObject = stream;
-    
-    pc = new RTCPeerConnection();
-    stream.getTracks().forEach(track => pc.addTrack(track, stream));
-    
-    const offer = await pc.createOffer();
+      setBadge('connecting', 'Bağlanıyor...');
+      setStatus('📷 Kamera açılıyor...');
+      document.getElementById('btnStart').disabled = true;
 
-    function preferH264(sdp) {
-      const lines = sdp.split('\n');
-      const h264Regex = /a=rtpmap:(\d+) H264/;
-      let h264Payload = null;
-      for (const line of lines) {
-        const match = line.match(h264Regex);
-        if (match) { h264Payload = match[1]; break; }
+      var facingMode = document.getElementById('camSelect').value;
+      var stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: facingMode,
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          frameRate: { ideal: 30 }
+        },
+        audio: true
+      });
+
+      var preview = document.getElementById('preview');
+      preview.srcObject = stream;
+      // Arka kamerada mirror kaldır
+      preview.style.transform = facingMode === 'environment' ? 'none' : 'scaleX(-1)';
+      document.getElementById('previewPlaceholder').style.display = 'none';
+
+      pc = new RTCPeerConnection();
+      stream.getTracks().forEach(function(track) { pc.addTrack(track, stream); });
+
+      var offer = await pc.createOffer();
+      var modifiedOffer = new RTCSessionDescription({
+        type: offer.type,
+        sdp: preferH264(offer.sdp)
+      });
+      await pc.setLocalDescription(modifiedOffer);
+
+      setStatus('📡 Sunucuya bağlanıyor...');
+
+      await new Promise(function(resolve) {
+        var resolved = false;
+        var done = function() { if (!resolved) { resolved = true; resolve(); } };
+        if (pc.iceGatheringState === 'complete') { done(); return; }
+        pc.onicegatheringstatechange = function() {
+          if (pc.iceGatheringState === 'complete') done();
+        };
+        pc.onicecandidate = function(e) { if (e.candidate === null) done(); };
+        setTimeout(done, 4000);
+      });
+
+      var resp = await fetch('https://cagrivakti.com.tr/canli/whip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/sdp' },
+        body: pc.localDescription.sdp
+      });
+
+      if (!resp.ok) {
+        throw new Error('Sunucu hatası: ' + resp.status);
       }
-      if (!h264Payload) return sdp;
-      return lines.map(line => {
-        if (line.startsWith('m=video')) {
-          const parts = line.split(' ');
-          const header = parts.slice(0, 3).join(' ');
-          return `${header} ${h264Payload}`;
+
+      var answer = await resp.text();
+      await pc.setRemoteDescription({ type: 'answer', sdp: answer });
+
+      setBadge('live', 'CANLI');
+      setStatus('🔴 Canlı yayın aktif — izleyiciler sizi görebiliyor.', 'success');
+      document.getElementById('btnStop').disabled = false;
+      document.getElementById('camSelect').disabled = true;
+      startDuration();
+
+      // Bağlantı kopunca
+      pc.onconnectionstatechange = function() {
+        if (pc && (pc.connectionState === 'failed' || pc.connectionState === 'disconnected')) {
+          setStatus('⚡ Bağlantı kesildi, yeniden bağlanılıyor...', 'error');
+          setBadge('connecting', 'Yeniden bağlanıyor...');
         }
-        return line;
-      }).join('\n');
-    }
-
-    const modifiedOffer = new RTCSessionDescription({
-      type: offer.type,
-      sdp: preferH264(offer.sdp)
-    });
-
-    await pc.setLocalDescription(modifiedOffer);
-    
-    // ICE toplanmasını bekle (max 4 sn, her durumda devam et)
-    await new Promise(resolve => {
-      let resolved = false;
-      const done = () => { if (!resolved) { resolved = true; resolve(); } };
-    
-      if (pc.iceGatheringState === 'complete') { done(); return; }
-    
-      pc.onicegatheringstatechange = () => {
-        console.log('ICE state:', pc.iceGatheringState);
-        if (pc.iceGatheringState === 'complete') done();
       };
-      
-      pc.onicecandidate = (e) => {
-        console.log('ICE candidate:', e.candidate);
-        if (e.candidate === null) done(); // null = toplama bitti
-      };
-      
-      setTimeout(() => { console.log('ICE timeout, devam ediliyor'); done(); }, 4000);
-    });
 
-    document.getElementById('status').textContent = 'Sunucuya bağlanıyor...';
-
-    const resp = await fetch('https://cagrivakti.com.tr/canli/whip', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/sdp' },
-      body: pc.localDescription.sdp
-    });
-
-    if (!resp.ok) {
-      document.getElementById('status').textContent = 'Bağlantı hatası: ' + resp.status;
-      return;
+    } catch(err) {
+      var msg = err.message || err.name || 'Bilinmeyen hata';
+      if (err.name === 'NotAllowedError') {
+        msg = 'Kamera/mikrofon izni verilmedi. Tarayıcı ayarlarından izin verin.';
+      } else if (err.name === 'NotFoundError') {
+        msg = 'Kamera bulunamadı. Cihazınızda kamera mevcut mu?';
+      }
+      setStatus('❌ Hata: ' + msg, 'error');
+      setBadge('idle', 'Hata');
+      document.getElementById('btnStart').disabled = false;
     }
-
-    const answer = await resp.text();
-    await pc.setRemoteDescription({ type: 'answer', sdp: answer });
-    
-    document.getElementById('status').textContent = '🔴 CANLI YAYIN AKTİF';
-    document.getElementById('btnStart').disabled = true;
-    document.getElementById('btnStop').disabled = false;
-    document.getElementById('btnStop').style.background = '#e53e3e';
   }
-    
-  catch(err) {
-    document.getElementById('status').textContent = 'Hata: ' + err.name + ' — ' + err.message;
-    console.error(err);
-  }
-  }
-
 
   async function stopStream() {
     if (pc) { pc.close(); pc = null; }
-    const preview = document.getElementById('preview');
+    var preview = document.getElementById('preview');
     if (preview.srcObject) {
-      preview.srcObject.getTracks().forEach(t => t.stop());
+      preview.srcObject.getTracks().forEach(function(t) { t.stop(); });
       preview.srcObject = null;
     }
-    document.getElementById('status').textContent = 'Yayın durduruldu.';
+    document.getElementById('previewPlaceholder').style.display = 'flex';
     document.getElementById('btnStart').disabled = false;
     document.getElementById('btnStop').disabled = true;
-    document.getElementById('btnStop').style.background = '#555';
-    }
+    document.getElementById('camSelect').disabled = false;
+    setBadge('idle', 'Hazır');
+    setStatus('⏹ Yayın durduruldu.');
+    stopDuration();
+  }
 </script>
 {% endblock %}
