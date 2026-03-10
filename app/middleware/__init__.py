@@ -72,7 +72,7 @@ def setup_middleware(app):
                 # Oyun sayfası: frame'e izin ver ama diğer güvenlik kuralları sıkı kalsın
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdnjs.cloudflare.com; "
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net/npm/hls.js@latest; "
                 "style-src 'self' 'unsafe-inline'; "
                 "font-src 'self' data:; "
                 "img-src 'self' data: blob: https:; "
