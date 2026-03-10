@@ -845,7 +845,7 @@ _stream_live = False
 
 @views_bp.route('/canli')
 def canli():
-    return render_template('extra/canli/canli.html', stream_live=_stream_live)
+    return render_template('extra/canli-yayin/canli.html', stream_live=_stream_live)
 
 @views_bp.route('/stream/on_publish', methods=['POST'])
 @csrf.exempt
@@ -876,3 +876,11 @@ def stream_on_done():
 def stream_status():
     """Tahtalar yayın var mı diye polling yapar."""
     return jsonify({'live': _stream_live})
+
+@views_bp.route('/canli-yayinla')
+def canli_yayinla():
+    """Sadece yetkili kişi bu sayfayı kullanacak."""
+    secret = request.args.get('k', '')
+    if secret != current_app.config.get('STREAM_SECRET'):
+        abort(403)
+    return render_template('extra/canli-yayin/yayinla.html')

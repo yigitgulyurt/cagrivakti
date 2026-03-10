@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="text-align:center; padding:20px; background:#111; min-height:100vh;">
+  <h2 style="color:#fff;">📡 Canlı Yayın Kontrolü</h2>
+  
+  <video id="preview" autoplay muted playsinline
+    style="width:100%; max-width:480px; border:2px solid #444; border-radius:8px; margin:16px 0;">
+  </video>
+  
+  <br>
+  <button id="btnStart" onclick="startStream()"
+    style="background:#e53e3e; color:#fff; border:none; padding:14px 32px; 
+           font-size:18px; border-radius:8px; margin:8px; cursor:pointer;">
+    🔴 Yayını Başlat
+  </button>
+  <button id="btnStop" onclick="stopStream()" disabled
+    style="background:#555; color:#fff; border:none; padding:14px 32px;
+           font-size:18px; border-radius:8px; margin:8px; cursor:pointer;">
+    ⏹ Yayını Durdur
+  </button>
+  
+  <p id="status" style="color:#aaa; margin-top:12px;">Hazır</p>
+</div>
+
+<script>
+  var pc = null;
+
+  async function startStream() {
+    document.getElementById('status').textContent = 'Kamera açılıyor...';
+    
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: {ideal:1280}, height: {ideal:720} },
+      audio: true
+    });
+    
+    document.getElementById('preview').srcObject = stream;
+    
+    pc = new RTCPeerConnection();
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+    
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    
+    // ICE toplanmasını bekle
+    await new Promise(resolve => {
+      if (pc.iceGatheringState === 'complete') { resolve(); return; }
+      pc.addEventListener('icegatheringstatechange', () => {
+        if (pc.iceGatheringState === 'complete') resolve();
+      });
+      setTimeout(resolve, 3000); // max 3 sn bekle
+    });
+
+    document.getElementById('status').textContent = 'Sunucuya bağlanıyor...';
+
+    const resp = await fetch('/whip/canli', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/sdp' },
+      body: pc.localDescription.sdp
+    });
+
+    if (!resp.ok) {
+      document.getElementById('status').textContent = 'Bağlantı hatası: ' + resp.status;
+      return;
+    }
+
+    const answer = await resp.text();
+    await pc.setRemoteDescription({ type: 'answer', sdp: answer });
+    
+    document.getElementById('status').textContent = '🔴 CANLI YAYIN AKTİF';
+    document.getElementById('btnStart').disabled = true;
+    document.getElementById('btnStop').disabled = false;
+    document.getElementById('btnStop').style.background = '#e53e3e';
+  }
+
+  async function stopStream() {
+    if (pc) { pc.close(); pc = null; }
+    const preview = document.getElementById('preview');
+    if (preview.srcObject) {
+      preview.srcObject.getTracks().forEach(t => t.stop());
+      preview.srcObject = null;
+    }
+    document.getElementById('status').textContent = 'Yayın durduruldu.';
+    document.getElementById('btnStart').disabled = false;
+    document.getElementById('btnStop').disabled = true;
+    document.getElementById('btnStop').style.background = '#555';
+  }
+</script>
+{% endblock %}
