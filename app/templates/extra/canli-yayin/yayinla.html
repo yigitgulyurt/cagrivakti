@@ -422,8 +422,8 @@
       currentStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: facingMode,
-          width: { min: 1280, ideal: 1920 },
-          height: { min: 720, ideal: 1080 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
           frameRate: { ideal: 30 }
         },
         audio: true
@@ -433,6 +433,22 @@
       preview.srcObject = currentStream;
       document.getElementById('previewPlaceholder').style.display = 'none';
 
+      var vTrack = currentStream.getVideoTracks()[0];
+      var settings = vTrack.getSettings();
+      if (settings.height > settings.width) {
+        currentStream.getTracks().forEach(function(t) { t.stop(); });
+        currentStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: facingMode,
+            width: { ideal: 1920, min: 1280 },
+            height: { ideal: 1080, max: 1080 },
+            frameRate: { ideal: 30 }
+          },
+          audio: true
+        });
+        preview.srcObject = currentStream;
+      }
+      
       pc = new RTCPeerConnection();
       currentStream.getTracks().forEach(function(track) { pc.addTrack(track, currentStream); });
 
