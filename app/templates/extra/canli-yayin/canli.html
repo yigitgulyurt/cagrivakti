@@ -356,9 +356,23 @@
       });
 
       hls.on(Hls.Events.ERROR, function(event, data) {
-        if (data.fatal) { handleStreamError(); }
+        if (data.fatal) {
+          handleStreamError();
+          return;
+        }
+        // Segment 404 alınca yayın bitmiş mi kontrol et
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR &&
+            data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR &&
+            data.response && data.response.code === 404) {
+          fetch('/stream/status')
+            .then(function(r){ return r.json(); })
+            .then(function(d) {
+              if (!d.live) { streamEnded(); }
+            })
+            .catch(function(){});
+        }
       });
-
+    
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = STREAM_URL;
       video.addEventListener('canplay', function() {
