@@ -64,7 +64,14 @@ self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
     const url = new URL(event.request.url);
-    
+
+    if (
+        url.pathname.startsWith('/canli-kaynak/') ||
+        url.pathname === '/stream/status'
+    ) {
+        return;
+    }
+
     if (
         url.pathname.startsWith('/oyun') ||
         url.pathname === '/workermain.js' ||
@@ -113,7 +120,9 @@ self.addEventListener('fetch', (event) => {
                 .then((response) => {
                     // Sadece başarılı ve geçerli yanıtları önbelleğe al
                     // Offline sayfasını veya hata sayfalarını dinamik olarak ana URL'lere kaydetme
-                    if (response.ok && response.status === 200 && !response.url.includes('/offline')) {
+                    if (response.ok && response.status === 200 && 
+                        !response.url.includes('/offline') && 
+                        !response.url.includes('/canli/')) { 
                         const responseClone = response.clone();
                         caches.open(CACHE_NAME).then((cache) => {
                             cache.put(event.request, responseClone);
