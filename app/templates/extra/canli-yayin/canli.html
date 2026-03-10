@@ -285,8 +285,8 @@
 
 <script src="{{ url_for('static', filename='js/hls.js') }}"></script>
 <script>
-  var STREAM_URL = 'https://cagrivakti.com.tr/canli-stream/canli/index.m3u8';
-  var isLive = {{ stream_live | tojson }};
+  var STREAM_URL = '{{ stream_url }}';
+  var isLive = false;
   var hls = null;
   var poller = null;
   var retryCount = 0;

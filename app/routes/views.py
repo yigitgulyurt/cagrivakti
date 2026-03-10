@@ -843,10 +843,23 @@ def serve_game_files(filename):
 # Yayın durumu (basit, DB'ye gerek yok bu iş için)
 # _stream_live = False  ← bunu sil
 
-@views_bp.route('/canli')
-def canli():
-    return render_template('extra/canli-yayin/canli.html', stream_live=True)
+@views_bp.route('/canli/<key>')
+def canli(key):
+    expected_key = current_app.config.get('STREAM_KEY')
+    if key != expected_key:
+        abort(404)
+    stream_url = f'https://cagrivakti.com.tr/canli-kaynak/canli/{key}/index.m3u8'
+    return render_template('extra/canli-yayin/canli.html', stream_url=stream_url)
 
 @views_bp.route('/stream/status')
 def stream_status():
-    return jsonify({'live': True})
+    key = current_app.config.get('STREAM_KEY', '')
+    path_name = f'canli/{key}'
+    try:
+        r = requests.get('http://localhost:9997/v3/paths/list', timeout=2)
+        items = r.json().get('items', [])
+        live = any(p.get('name') == path_name and p.get('ready') for p in items)
+        return jsonify({'live': live})
+    except:
+        fallback = current_app.config.get('STREAM_LIVE_FALLBACK', 'false').lower() == 'true'
+        return jsonify({'live': fallback})
