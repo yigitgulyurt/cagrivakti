@@ -658,6 +658,47 @@ function prevStep() {
             </div>
         </div>
     </section>
+    {% if SHOW_LIVE_SECTION %}
+    <section class="live-broadcast-promo fade-in" id="live-broadcast-section">
+        <div class="promo-container">
+            <div class="promo-icon">
+                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-circle-play"></use></svg>
+            </div>
+            <div class="promo-content">
+                <div class="guide-category" style="margin-bottom: 10px;">
+                    <svg class="icon" style="width:10px;height:10px;fill:#ef4444;animation:badgePulse 1.5s infinite;"></svg>
+                    CANLI YAYIN
+                </div>
+                <h2>Canlı Yayın Desteği</h2>
+                <p>Camilerden ve özel törenlere ait canlı yayınları kesintisiz izleyin. Tören ve etkinlikleri kaçırmayın, akıllı ekranlarda, telefonunuzda veya bilgisayarınızda anında açın.</p>
+                <ul style="list-style:none;padding:0;margin-bottom:25px;color:var(--gray);display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <li style="display:flex;align-items:center;gap:8px;">
+                        <svg class="icon" style="width:16px;height:16px;color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                        Kesintisiz HLS Yayın
+                    </li>
+                    <li style="display:flex;align-items:center;gap:8px;">
+                        <svg class="icon" style="width:16px;height:16px;color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                        Akıllı Tahta Uyumlu
+                    </li>
+                    <li style="display:flex;align-items:center;gap:8px;">
+                        <svg class="icon" style="width:16px;height:16px;color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                        Şifreli Erişim
+                    </li>
+                    <li style="display:flex;align-items:center;gap:8px;">
+                        <svg class="icon" style="width:16px;height:16px;color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                        Ücretsiz
+                    </li>
+                </ul>
+                <div class="promo-actions">
+                    <a href="{{ url_for('views.canli', key=STREAM_KEY) }}" class="btn btn-primary promo-btn pulse-animation">
+                        <svg class="icon"><use xlink:href="#fa-circle-play"></use></svg>
+                        Yayını İzle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 </div>
 {% endblock %}
 

@@ -43,9 +43,11 @@ def index():
                          vakitler=vakitler,
                          daily_content=get_daily_content(),
                          ramadan_info=RamadanService.get_ramadan_info(),
-                         guides=get_guides()[:3], # İlk 3 rehberi göster
+                         guides=get_guides()[:3],
                          seo_title=title,
-                         seo_description=description)
+                         seo_description=description,
+                         SHOW_LIVE_SECTION=current_app.config.get('SHOW_LIVE_SECTION', False),
+                         STREAM_KEY=current_app.config.get('STREAM_KEY', ''))
 
 @views_bp.route('/sehir/<sehir>')
 def sehir_sayfasi(sehir):

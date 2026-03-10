@@ -56,3 +56,4 @@ class Config:
     # Canlı Yayın Secret
     STREAM_SECRET = os.environ.get('STREAM_SECRET', 'okulcanli2025')
     STREAM_KEY = os.environ.get('STREAM_KEY', 'yayin')
+    SHOW_LIVE_SECTION = os.environ.get('SHOW_LIVE_SECTION', 'false').lower() in ('1', 'true', 'yes')
