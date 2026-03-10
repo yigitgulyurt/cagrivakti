@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, make_response, send_from_directory, current_app, abort, flash, jsonify
 from functools import wraps
 from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city, CITY_DISPLAY_NAME_MAPPING
-from app.models import ContactMessage, DailyContent, Guide, QrRedirect, StreamState
+from app.models import ContactMessage, DailyContent, Guide, QrRedirect
 from app.extensions import cache, db, limiter, csrf
 from datetime import datetime, timedelta
 import os
@@ -845,37 +845,8 @@ def serve_game_files(filename):
 
 @views_bp.route('/canli')
 def canli():
-    stream_live = StreamState.get().is_live
-    return render_template('extra/canli-yayin/canli.html', stream_live=stream_live)
-
-@views_bp.route('/stream/on_publish', methods=['POST'])
-@csrf.exempt
-def stream_on_publish():
-    if request.form.get('secret') != current_app.config.get('STREAM_SECRET'):
-        return 'Forbidden', 403
-    state = StreamState.get()
-    state.is_live = True
-    db.session.commit()
-    return 'OK', 200
-
-@views_bp.route('/stream/on_done', methods=['POST'])
-@csrf.exempt
-def stream_on_done():
-    if request.form.get('secret') != current_app.config.get('STREAM_SECRET'):
-        return 'Forbidden', 403
-    state = StreamState.get()
-    state.is_live = False
-    db.session.commit()
-    return 'OK', 200
+    return render_template('extra/canli-yayin/canli.html', stream_live=True)
 
 @views_bp.route('/stream/status')
 def stream_status():
-    return jsonify({'live': StreamState.get().is_live})
-
-@views_bp.route('/canli-yayinla')
-def canli_yayinla():
-    """Sadece yetkili kişi bu sayfayı kullanacak."""
-    secret = request.args.get('k', '')
-    if secret != current_app.config.get('STREAM_SECRET'):
-        abort(403)
-    return render_template('extra/canli-yayin/yayinla.html')
+    return jsonify({'live': True})
