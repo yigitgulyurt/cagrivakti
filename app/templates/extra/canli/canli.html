@@ -501,12 +501,6 @@
 
   :fullscreen .player-container.controls-visible .custom-controls,
   :-webkit-full-screen .player-container.controls-visible .custom-controls { opacity: 1; }
-  :fullscreen .player-container:not(.controls-visible) {
-    cursor: none;
-  }
-  :-webkit-full-screen .player-container:not(.controls-visible) {
-      cursor: none;
-  }
 </style>
 
 <div class="canli-wrap">
@@ -825,8 +819,8 @@
               pc.classList.remove('controls-visible');
           }, 3000);
       }
-      document.addEventListener('mousemove', controlsGoster);
-      document.addEventListener('touchstart', controlsGoster);
+      pc.addEventListener('touchstart', controlsGoster);
+      pc.addEventListener('mousemove', controlsGoster);
   })();
 
   /* ── BAŞLAT ── */
