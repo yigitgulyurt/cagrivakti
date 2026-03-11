@@ -67,22 +67,6 @@ self.addEventListener('fetch', (event) => {
         url.hostname === 'fonts.gstatic.com' ||
         url.hostname === 'fonts.cagrivakti.com.tr'
     ) {
-        event.respondWith(
-            caches.match(event.request).then(function(cached) {
-                if (cached) return cached;
-                return fetch(event.request, { mode: 'cors', credentials: 'omit' })
-                    .then(function(response) {
-                        if (response.ok) {
-                            var clone = response.clone();
-                            caches.open(CACHE_NAME).then(function(cache) {
-                                cache.put(event.request, clone);
-                            });
-                        }
-                        return response;
-                    })
-                    .catch(function() { return new Response('', { status: 408 }); });
-            })
-        );
         return;
     }
 
