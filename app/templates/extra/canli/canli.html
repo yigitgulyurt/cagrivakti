@@ -544,6 +544,7 @@
   var poller = null;
   var retryCount = 0;
   var MAX_RETRY = 3;
+  var playerActive = false;
 
   /* ── YARDIMCI ── */
   function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
@@ -583,6 +584,7 @@
 
   /* ── PLAYER ── */
   function startPlayer() {
+    playerActive = true;
     var video = document.getElementById('canli-video');
     document.getElementById('waitingScreen').style.display = 'none';
     video.style.display = 'block';
@@ -644,6 +646,7 @@
   }
 
   function streamEnded() {
+    playerActive = false;
     showLiveBadge(false);
     document.getElementById('errorMsg').textContent = 'Yayın sona erdi';
     showOverlay('errorOverlay');
@@ -677,6 +680,7 @@
     .catch(function(){ startPolling(); });
 
   function startPolling() {
+    if (playerActive) return;
     if (poller) clearInterval(poller);
     poller = setInterval(function() {
       fetch('/stream/status')
@@ -685,7 +689,7 @@
           if (d.live) { clearInterval(poller); poller = null; startPlayer(); }
         })
         .catch(function(){});
-    }, 2000); // 5000 → 2000
+    }, 5000);
   }
 
   /* ── CUSTOM CONTROLS ── */
