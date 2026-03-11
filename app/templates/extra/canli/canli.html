@@ -643,6 +643,7 @@
   function startPlayer() {
     playerActive = true;
     var video = document.getElementById('canli-video');
+    video.muted = true; // ← ekle
     document.getElementById('waitingScreen').style.display = 'none';
     video.style.display = 'block';
     showOverlay('loadingOverlay');
@@ -656,11 +657,15 @@
       hls.loadSource(STREAM_URL);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, function() {
-        showOverlay(null);
-        setStatus('Canlı yayın aktif');
-        retryCount = 0;
-        video.play().catch(function(){});
-        updatePlayIcon(false); // oynatılıyor → pause göster
+          showOverlay(null);
+          setStatus('Canlı yayın aktif');
+          retryCount = 0;
+          video.muted = true;
+          video.play().catch(function(e){ console.warn('play failed:', e); });
+          updatePlayIcon(false);
+          document.getElementById('iconVolume').style.display = 'none';
+          document.getElementById('iconMuted').style.display = 'block';
+          document.getElementById('volumeSlider').value = 0;
       });
       hls.on(Hls.Events.ERROR, function(event, data) {
         if (data.fatal) { handleStreamError(); return; }
@@ -801,6 +806,7 @@
   // Mobil: dokunuşta controls'ü kısa süreliğine göster
   (function() {
     var pc = document.getElementById('playerContainer');
+    if (!pc) return; // ← ekle
     var hideTimer;
     pc.addEventListener('touchstart', function() {
       pc.classList.add('controls-visible');
