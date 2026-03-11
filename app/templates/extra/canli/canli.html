@@ -227,6 +227,11 @@
     transform-origin: center center;
   }
 
+  .fade-in-delayed {
+    opacity: 0;
+    animation: fadeInOpacity 0.5s ease-in 1s forwards;
+  }
+  
   /* Bekleme / loading / hata ekranları */
   .waiting-screen {
     position: absolute; inset: 0;
@@ -512,7 +517,7 @@
       <div class="player-container" id="playerContainer">
 
         <!-- Bekleme -->
-        <div class="waiting-screen fade-in" id="waitingScreen">
+        <div class="waiting-screen fade-in-delayed" id="waitingScreen">
           <div class="waiting-emblem">
             <div class="waiting-emblem-ring"></div>
             <div class="waiting-emblem-ring"></div>
