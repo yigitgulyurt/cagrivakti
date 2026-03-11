@@ -34,7 +34,7 @@ app/logs
 # Standard practice is to keep migrations but ignore local db state
 migrations/*.db
 migrations/*.sqlite3
-
+cagrivakti canlı yayın.conf
 # Static Files & SEO (Generated)
 # robots.txt
 # sitemap.xml
