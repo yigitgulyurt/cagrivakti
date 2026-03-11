@@ -65,7 +65,9 @@ self.addEventListener('fetch', (event) => {
     if (
         url.hostname === 'fonts.googleapis.com' ||
         url.hostname === 'fonts.gstatic.com' ||
-        url.hostname === 'fonts.cagrivakti.com.tr'
+        url.hostname === 'fonts.cagrivakti.com.tr' ||
+        url.pathname.startsWith('/canli-kaynak/') ||
+        url.pathname === '/stream/status'
     ) {
         return;
     }
@@ -117,7 +119,6 @@ self.addEventListener('fetch', (event) => {
             fetch(event.request)
                 .then((response) => {
                     // Sadece başarılı ve geçerli yanıtları önbelleğe al
-                    // Offline sayfasını veya hata sayfalarını dinamik olarak ana URL'lere kaydetme
                     if (response.ok && response.status === 200 && 
                         !response.url.includes('/offline') && 
                         //!response.url.includes('/canli/') &&
