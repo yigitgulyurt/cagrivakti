@@ -683,6 +683,7 @@
     if (playerActive) return;
     if (poller) clearInterval(poller);
     poller = setInterval(function() {
+      if (playerActive) { clearInterval(poller); poller = null; return; }
       fetch('/stream/status')
         .then(function(r){ return r.json(); })
         .then(function(d) {
