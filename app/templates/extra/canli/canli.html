@@ -810,18 +810,20 @@
 
   // Mobil: dokunuşta controls'ü kısa süreliğine göster
   (function() {
-    var pc = document.getElementById('playerContainer');
-    if (!pc) return; // ← ekle
-    var hideTimer;
-    pc.addEventListener('touchstart', function() {
-      pc.classList.add('controls-visible');
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(function() { pc.classList.remove('controls-visible'); }, 3000);
-      document.getElementById('playerContainer').addEventListener('dblclick', function() {
-    toggleFullscreen();
-    });
-    });
+      var pc = document.getElementById('playerContainer');
+      if (!pc) return;
+      var hideTimer;
+      pc.addEventListener('touchstart', function() {
+          pc.classList.add('controls-visible');
+          clearTimeout(hideTimer);
+          hideTimer = setTimeout(function() { pc.classList.remove('controls-visible'); }, 3000);
+      });
   })();
+  
+  // Çift tıkla tam ekran
+  document.getElementById('playerContainer').addEventListener('dblclick', function() {
+      toggleFullscreen();
+  });
 
   /* ── BAŞLAT ── */
   startPolling();
