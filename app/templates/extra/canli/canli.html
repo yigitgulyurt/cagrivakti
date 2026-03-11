@@ -501,7 +501,7 @@
 
   /* Tam ekran modunda controls her zaman görünür olsun (hover zor) */
   :fullscreen .custom-controls,
-  :-webkit-full-screen .custom-controls { opacity: 1; }
+  :-webkit-full-screen .custom-controls { opacity: 0.2; }
 </style>
 
 <div class="canli-wrap">
@@ -819,7 +819,7 @@
           hideTimer = setTimeout(function() { pc.classList.remove('controls-visible'); }, 3000);
       });
   })();
-  
+
   // Çift tıkla tam ekran
   document.getElementById('playerContainer').addEventListener('dblclick', function() {
       toggleFullscreen();
