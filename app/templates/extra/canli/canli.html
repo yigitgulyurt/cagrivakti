@@ -798,49 +798,15 @@
     document.getElementById('iconFsExit').style.display = inFs ? 'block' : 'none';
   }
 
+  // Mobil: dokunuşta controls'ü kısa süreliğine göster
   (function() {
-  var pc = document.getElementById('playerContainer');
-  var hideTimer;
-  var lastTap = 0;
-
-  // Mobil: tek dokunuş controls göster, çift dokunuş tam ekran
-  pc.addEventListener('touchstart', function(e) {
-    var now = Date.now();
-    if (now - lastTap < 300) {
-      toggleFullscreen();
-      e.preventDefault();
-    } else {
+    var pc = document.getElementById('playerContainer');
+    var hideTimer;
+    pc.addEventListener('touchstart', function() {
       pc.classList.add('controls-visible');
       clearTimeout(hideTimer);
       hideTimer = setTimeout(function() { pc.classList.remove('controls-visible'); }, 3000);
-    }
-    lastTap = now;
-  });
-
-  // Masaüstü: çift tıklama tam ekran
-  pc.addEventListener('dblclick', function() {
-    toggleFullscreen();
-  });
-
-  // Masaüstü: tam ekranda mouse hareketsiz kalınca kontrolleri gizle
-  var fsTimer;
-  document.addEventListener('fullscreenchange', function() {
-    if (!document.fullscreenElement) {
-      clearTimeout(fsTimer);
-      pc.classList.remove('controls-visible');
-      pc.style.cursor = 'default';
-    }
-  });
-  pc.addEventListener('mousemove', function() {
-    pc.classList.add('controls-visible');
-    clearTimeout(fsTimer);
-    if (document.fullscreenElement) {
-      fsTimer = setTimeout(function() {
-        pc.classList.remove('controls-visible');
-        pc.style.cursor = 'none';
-      }, 3000);
-    }
-  });
+    });
   })();
 
   /* ── BAŞLAT ── */
