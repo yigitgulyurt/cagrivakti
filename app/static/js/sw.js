@@ -120,7 +120,8 @@ self.addEventListener('fetch', (event) => {
                     // Offline sayfasını veya hata sayfalarını dinamik olarak ana URL'lere kaydetme
                     if (response.ok && response.status === 200 && 
                         !response.url.includes('/offline') && 
-                        !response.url.includes('/canli/')) { 
+                        //!response.url.includes('/canli/') &&
+                        !response.url.includes('/canli-kaynak/')) { 
                         const responseClone = response.clone();
                         caches.open(CACHE_NAME).then((cache) => {
                             cache.put(event.request, responseClone);
