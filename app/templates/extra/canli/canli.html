@@ -90,9 +90,9 @@
     content: '';
     height: 1px;
     width: 60px;
+    background: linear-gradient(90deg, transparent, var(--altin));
   }
-  .hero-divider::before { background: linear-gradient(90deg, transparent, var(--altin)); }
-  .hero-divider::after  { background: linear-gradient(90deg, var(--altin), transparent); }
+  .hero-divider::after { background: linear-gradient(90deg, var(--altin), transparent); }
   .hero-divider-star { color: var(--altin); font-size: 0.7rem; opacity: 0.7; }
   .live-badge {
     display: inline-flex;
@@ -117,8 +117,8 @@
     box-shadow: 0 0 6px var(--kirmizi);
   }
   @keyframes livePulse {
-    0%,100% { opacity:1; transform:scale(1); box-shadow:0 0 6px var(--kirmizi); }
-    50%      { opacity:0.5; transform:scale(0.85); box-shadow:0 0 2px var(--kirmizi); }
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 6px var(--kirmizi); }
+    50% { opacity: 0.5; transform: scale(0.85); box-shadow: 0 0 2px var(--kirmizi); }
   }
 
   /* ── PLAYER ── */
@@ -146,37 +146,44 @@
     z-index: 10;
     pointer-events: none;
   }
-  .player-frame::before { top:-1px; left:-1px; border-top:2px solid var(--altin); border-left:2px solid var(--altin); }
-  .player-frame::after  { bottom:-1px; right:-1px; border-bottom:2px solid var(--altin); border-right:2px solid var(--altin); }
-
+  .player-frame::before {
+    top: -1px; left: -1px;
+    border-top: 2px solid var(--altin);
+    border-left: 2px solid var(--altin);
+  }
+  .player-frame::after {
+    bottom: -1px; right: -1px;
+    border-bottom: 2px solid var(--altin);
+    border-right: 2px solid var(--altin);
+  }
   .player-container {
     width: 100%;
     background: #000;
     position: relative;
     aspect-ratio: 16 / 9;
-    cursor: pointer;
-    user-select: none;
   }
-
   #canli-video {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     object-fit: fill;
     background: #000;
     display: none;
     transform-origin: center center;
   }
 
-  /* ── WAITING / LOADING / ERROR ── */
+  /* Bekleme / loading / hata ekranları */
   .waiting-screen {
     position: absolute; inset: 0;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     background: linear-gradient(160deg, #0c0c0c 0%, #111318 100%);
-    gap: 20px; padding: 32px;
+    gap: 20px;
+    padding: 32px;
   }
   .waiting-emblem {
-    position: relative; width: 80px; height: 80px;
+    position: relative;
+    width: 80px; height: 80px;
     display: flex; align-items: center; justify-content: center;
   }
   .waiting-emblem-ring {
@@ -185,179 +192,254 @@
     border: 1px solid rgba(212,168,67,0.2);
     animation: emblemRing 3s infinite ease-out;
   }
-  .waiting-emblem-ring:nth-child(2) { inset:-12px; border-color:rgba(212,168,67,0.1); animation-delay:0.8s; }
-  @keyframes emblemRing {
-    0%   { transform:scale(0.9); opacity:0.6; }
-    100% { transform:scale(1.4); opacity:0; }
+  .waiting-emblem-ring:nth-child(2) {
+    inset: -12px;
+    border-color: rgba(212,168,67,0.1);
+    animation-delay: 0.8s;
   }
-  .waiting-emblem-icon { font-size:2.2rem; position:relative; z-index:1; filter:drop-shadow(0 0 12px rgba(212,168,67,0.3)); }
-  .waiting-screen h3 { font-family:'Cinzel',serif; color:var(--bej); font-size:1.1rem; font-weight:700; margin:0; letter-spacing:2px; text-transform:uppercase; }
-  .waiting-screen p { font-family:'Crimson Pro',serif; color:rgba(232,220,200,0.45); font-size:1rem; font-style:italic; text-align:center; margin:0; max-width:280px; line-height:1.6; }
-  .waiting-dots { display:flex; gap:8px; }
-  .waiting-dots span { width:5px; height:5px; border-radius:50%; background:var(--altin); opacity:0.25; animation:dotBounce 1.6s infinite; }
-  .waiting-dots span:nth-child(2) { animation-delay:0.25s; }
-  .waiting-dots span:nth-child(3) { animation-delay:0.5s; }
+  @keyframes emblemRing {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+  .waiting-emblem-icon {
+    font-size: 2.2rem;
+    position: relative; z-index: 1;
+    filter: drop-shadow(0 0 12px rgba(212,168,67,0.3));
+  }
+  .waiting-screen h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--bej);
+    font-size: 1.1rem; font-weight: 700;
+    margin: 0; letter-spacing: 2px; text-transform: uppercase;
+  }
+  .waiting-screen p {
+    font-family: 'Crimson Pro', serif;
+    color: rgba(232,220,200,0.45);
+    font-size: 1rem; font-style: italic;
+    text-align: center; margin: 0;
+    max-width: 280px; line-height: 1.6;
+  }
+  .waiting-dots { display: flex; gap: 8px; }
+  .waiting-dots span {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--altin);
+    opacity: 0.25;
+    animation: dotBounce 1.6s infinite;
+  }
+  .waiting-dots span:nth-child(2) { animation-delay: 0.25s; }
+  .waiting-dots span:nth-child(3) { animation-delay: 0.5s; }
   @keyframes dotBounce {
-    0%,80%,100% { opacity:0.25; transform:scale(0.8); }
-    40%          { opacity:0.9; transform:scale(1.1); }
+    0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+    40% { opacity: 0.9; transform: scale(1.1); }
   }
   .loading-overlay {
-    position:absolute; inset:0;
-    background:rgba(0,0,0,0.7);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    z-index:5; backdrop-filter:blur(6px); gap:16px;
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 5;
+    backdrop-filter: blur(6px);
+    gap: 16px;
   }
-  .spinner { width:40px; height:40px; border:2px solid rgba(212,168,67,0.15); border-top-color:var(--altin); border-radius:50%; animation:spinAnim 0.8s linear infinite; }
-  .loading-text { font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:3px; color:rgba(212,168,67,0.6); text-transform:uppercase; }
-  @keyframes spinAnim { to { transform:rotate(360deg); } }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 2px solid rgba(212,168,67,0.15);
+    border-top-color: var(--altin);
+    border-radius: 50%;
+    animation: spinAnim 0.8s linear infinite;
+  }
+  .loading-text {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem; letter-spacing: 3px;
+    color: rgba(212,168,67,0.6);
+    text-transform: uppercase;
+  }
+  @keyframes spinAnim { to { transform: rotate(360deg); } }
   .error-overlay {
-    position:absolute; inset:0;
-    background:rgba(0,0,0,0.88);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:12px; z-index:5; backdrop-filter:blur(6px);
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px; z-index: 5;
+    backdrop-filter: blur(6px);
   }
-  .error-overlay .err-icon { font-size:2rem; opacity:0.6; }
-  .error-overlay p { font-family:'Crimson Pro',serif; color:rgba(232,220,200,0.5); font-size:1rem; font-style:italic; text-align:center; margin:0; }
+  .error-overlay .err-icon { font-size: 2rem; opacity: 0.6; }
+  .error-overlay p {
+    font-family: 'Crimson Pro', serif;
+    color: rgba(232,220,200,0.5);
+    font-size: 1rem; font-style: italic;
+    text-align: center; margin: 0;
+  }
   .retry-btn {
-    background:transparent; color:var(--altin);
-    border:1px solid rgba(212,168,67,0.3);
-    padding:9px 22px; border-radius:2px;
-    font-family:'Cinzel',serif; font-weight:600; font-size:0.7rem;
-    letter-spacing:2px; text-transform:uppercase;
-    cursor:pointer; transition:all 0.2s; margin-top:4px;
+    background: transparent;
+    color: var(--altin);
+    border: 1px solid rgba(212,168,67,0.3);
+    padding: 9px 22px; border-radius: 2px;
+    font-family: 'Cinzel', serif;
+    font-weight: 600; font-size: 0.7rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+    margin-top: 4px;
   }
-  .retry-btn:hover { background:var(--altin-acik); border-color:rgba(212,168,67,0.6); }
+  .retry-btn:hover {
+    background: var(--altin-acik);
+    border-color: rgba(212,168,67,0.6);
+  }
 
   /* ── CUSTOM CONTROLS ── */
-  .player-controls {
+  .custom-controls {
     position: absolute;
     bottom: 0; left: 0; right: 0;
     z-index: 20;
-    padding: 40px 14px 12px;
-    background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 100%);
+    padding: 0 14px 10px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    opacity: 0;
-    transition: opacity 0.28s ease;
-    pointer-events: none;
   }
-  .player-container:hover .player-controls,
-  .player-controls.always-visible {
+  .player-container:hover .custom-controls,
+  .player-container.controls-visible .custom-controls {
     opacity: 1;
-    pointer-events: all;
   }
-
-  /* Canlı ilerleme çubuğu */
-  .progress-bar-wrap {
-    width: 100%; height: 3px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 2px;
-    position: relative;
-    cursor: default;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--kirmizi), var(--altin));
-    border-radius: 2px;
-    width: 100%;
-    position: relative;
-  }
-  .progress-live-dot {
-    position: absolute;
-    right: -4px; top: 50%;
-    transform: translateY(-50%);
-    width: 10px; height: 10px;
-    background: var(--kirmizi);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--kirmizi);
-    animation: livePulse 1.4s infinite;
-  }
-
-  /* Kontrol satırı */
   .controls-row {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
   }
-  .ctrl-btn {
-    background: none; border: none;
-    cursor: pointer; padding: 5px;
-    display: flex; align-items: center; justify-content: center;
-    color: rgba(232,220,200,0.75);
-    transition: color 0.2s, transform 0.15s;
-    border-radius: 2px; flex-shrink: 0;
+  .ctrl-left, .ctrl-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-  .ctrl-btn:hover { color: var(--altin); transform: scale(1.15); }
-  .ctrl-btn svg { width: 18px; height: 18px; fill: currentColor; display: block; }
-
-  /* Ses */
-  .volume-wrap { display: flex; align-items: center; gap: 6px; }
+  .ctrl-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    color: var(--bej);
+  }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.08); }
+  .ctrl-btn svg {
+    width: 18px; height: 18px;
+    fill: currentColor;
+    display: block;
+  }
+  /* Ses slider */
+  .volume-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
   .volume-slider {
-    -webkit-appearance: none; appearance: none;
-    width: 68px; height: 3px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 2px; outline: none; cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 70px; height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+    cursor: pointer;
+    background-image: linear-gradient(var(--altin), var(--altin));
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    transition: width 0.2s;
   }
   .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 11px; height: 11px; border-radius: 50%;
-    background: var(--altin); cursor: pointer;
-    box-shadow: 0 0 4px rgba(212,168,67,0.5);
-  }
-  .volume-slider::-moz-range-thumb {
-    width: 11px; height: 11px; border-radius: 50%;
-    background: var(--altin); cursor: pointer; border: none;
-  }
-
-  /* Canlı pill */
-  .ctrl-live-pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--kirmizi-acik);
-    border: 1px solid rgba(192,57,43,0.35);
-    border-radius: 2px; padding: 3px 10px;
-    font-family: 'Cinzel', serif; font-size: 0.58rem;
-    font-weight: 700; letter-spacing: 2px;
-    color: #e87070; text-transform: uppercase;
-  }
-  .ctrl-live-pill .live-dot { width:5px; height:5px; }
-
-  .ctrl-spacer { flex: 1; }
-
-  /* Merkez oynat/duraklat göstergesi */
-  .center-play-btn {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.85);
-    width: 60px; height: 60px;
-    background: rgba(0,0,0,0.55);
-    border: 1px solid rgba(212,168,67,0.25);
+    width: 12px; height: 12px;
     border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
+    background: var(--altin);
+    box-shadow: 0 0 4px rgba(212,168,67,0.5);
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.22s, transform 0.22s;
-    z-index: 15;
-    pointer-events: none;
+    transition: transform 0.15s;
   }
-  .center-play-btn svg { width: 26px; height: 26px; fill: var(--altin); margin-left: 3px; }
-  .center-play-btn.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: all; }
+  .volume-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
+  .volume-slider::-moz-range-thumb {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--altin);
+    border: none;
+    cursor: pointer;
+  }
+  /* Canlı indikatör */
+  .ctrl-live {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #e87070;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 4px;
+    opacity: 0.9;
+  }
+  .ctrl-live-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--kirmizi);
+    animation: livePulse 1.4s infinite;
+    box-shadow: 0 0 5px var(--kirmizi);
+    flex-shrink: 0;
+  }
 
-  /* Fullscreen */
-  :fullscreen .player-controls,
-  :-webkit-full-screen .player-controls { opacity: 1; pointer-events: all; }
-
-  /* ── INFO BAR ── */
+  /* Info bar */
   .info-bar {
-    width: 100%; max-width: 900px;
-    padding: 0 16px; margin-top: 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    position: relative; z-index: 1;
+    width: 100%;
+    max-width: 900px;
+    padding: 0 16px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
   }
-  .status-text { font-family:'Crimson Pro',serif; font-size:0.88rem; font-style:italic; color:rgba(232,220,200,0.35); letter-spacing:0.5px; }
-  .quote-section { width:100%; max-width:600px; padding:32px 24px 0; text-align:center; position:relative; z-index:1; }
-  .quote-text { font-family:'Crimson Pro',serif; font-size:1.05rem; font-style:italic; font-weight:300; color:rgba(232,220,200,0.3); line-height:1.8; letter-spacing:0.3px; }
-  .quote-author { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:3px; color:rgba(212,168,67,0.3); text-transform:uppercase; margin-top:12px; }
-  .hidden { display:none !important; }
+  .status-text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.88rem;
+    font-style: italic;
+    color: rgba(232,220,200,0.35);
+    letter-spacing: 0.5px;
+  }
+  .quote-section {
+    width: 100%;
+    max-width: 600px;
+    padding: 32px 24px 0;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .quote-text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    font-weight: 300;
+    color: rgba(232,220,200,0.3);
+    line-height: 1.8;
+    letter-spacing: 0.3px;
+  }
+  .quote-author {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    color: rgba(212,168,67,0.3);
+    text-transform: uppercase;
+    margin-top: 12px;
+  }
+  .hidden { display: none !important; }
+
+  /* Tam ekran modunda controls her zaman görünür olsun (hover zor) */
+  :fullscreen .custom-controls,
+  :-webkit-full-screen .custom-controls { opacity: 1; }
 </style>
 
 <div class="canli-wrap">
@@ -372,6 +454,7 @@
     <div class="player-frame">
       <div class="player-container" id="playerContainer">
 
+        <!-- Bekleme -->
         <div class="waiting-screen" id="waitingScreen">
           <div class="waiting-emblem">
             <div class="waiting-emblem-ring"></div>
@@ -383,61 +466,56 @@
           <div class="waiting-dots"><span></span><span></span><span></span></div>
         </div>
 
+        <!-- Yükleniyor -->
         <div class="loading-overlay hidden" id="loadingOverlay">
           <div class="spinner"></div>
           <div class="loading-text">Bağlanıyor</div>
         </div>
 
+        <!-- Hata -->
         <div class="error-overlay hidden" id="errorOverlay">
           <div class="err-icon">⚠️</div>
           <p id="errorMsg">Bağlantı kesildi</p>
           <button class="retry-btn" onclick="retryStream()">Yeniden Bağlan</button>
         </div>
 
+        <!-- Video -->
         <video id="canli-video" playsinline></video>
 
-        <!-- Merkez oynat ikonu -->
-        <div class="center-play-btn" id="centerPlayBtn" onclick="togglePlay()">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-
-        <!-- Özel kontroller -->
-        <div class="player-controls" id="playerControls">
-          <div class="progress-bar-wrap">
-            <div class="progress-bar-fill">
-              <div class="progress-live-dot"></div>
-            </div>
-          </div>
+        <!-- Custom Controls -->
+        <div class="custom-controls" id="customControls">
           <div class="controls-row">
-
-            <!-- Oynat / Duraklat -->
-            <button class="ctrl-btn" onclick="togglePlay()" title="Oynat / Duraklat">
-              <svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
-            </button>
-
-            <!-- Ses -->
-            <div class="volume-wrap">
-              <button class="ctrl-btn" onclick="toggleMute()" title="Sessiz / Açık">
-                <svg id="iconVolume" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                <svg id="iconMute" viewBox="0 0 24 24" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19l1.27 1.27L20.27 19 5.27 4 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            <!-- Sol: play + ses -->
+            <div class="ctrl-left">
+              <button class="ctrl-btn" id="btnPlayPause" title="Oynat / Duraklat" onclick="togglePlay()">
+                <!-- Play icon (başlangıç) -->
+                <svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <!-- Pause icon -->
+                <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
               </button>
-              <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)">
+
+              <div class="volume-wrap">
+                <button class="ctrl-btn" id="btnMute" title="Sesi Kapat / Aç" onclick="toggleMute()">
+                  <svg id="iconVolume" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                  <svg id="iconMuted" viewBox="0 0 24 24" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                </button>
+                <input type="range" class="volume-slider" id="volumeSlider"
+                       min="0" max="1" step="0.02" value="1"
+                       oninput="changeVolume(this.value)" />
+              </div>
+
+              <span class="ctrl-live" id="ctrlLiveBadge" style="display:none;">
+                <span class="ctrl-live-dot"></span>CANLI
+              </span>
             </div>
 
-            <!-- Canlı pill -->
-            <div class="ctrl-live-pill" id="ctrlLivePill" style="display:none;">
-              <div class="live-dot"></div>
-              Canlı
+            <!-- Sağ: tam ekran -->
+            <div class="ctrl-right">
+              <button class="ctrl-btn" id="btnFullscreen" title="Tam Ekran" onclick="toggleFullscreen()">
+                <svg id="iconFs" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                <svg id="iconFsExit" viewBox="0 0 24 24" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+              </button>
             </div>
-
-            <div class="ctrl-spacer"></div>
-
-            <!-- Tam ekran -->
-            <button class="ctrl-btn" onclick="toggleFullscreen()" title="Tam Ekran (F)">
-              <svg id="iconFs" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-              <svg id="iconFsExit" viewBox="0 0 24 24" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
-            </button>
           </div>
         </div>
 
@@ -461,200 +539,208 @@
 
 <script src="{{ url_for('static', filename='js/hls.js') }}"></script>
 <script>
-var STREAM_URL = '{{ stream_url }}';
-var isLive     = false;
-var hls        = null;
-var poller     = null;
-var retryCount = 0;
-var MAX_RETRY  = 3;
-var video      = document.getElementById('canli-video');
-var container  = document.getElementById('playerContainer');
+  var STREAM_URL = '{{ stream_url }}';
+  var hls = null;
+  var poller = null;
+  var retryCount = 0;
+  var MAX_RETRY = 3;
 
-function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
+  /* ── YARDIMCI ── */
+  function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
 
-function showLiveBadge(show) {
-  document.getElementById('liveBadge').style.display    = show ? 'inline-flex' : 'none';
-  document.getElementById('ctrlLivePill').style.display = show ? 'inline-flex' : 'none';
-}
-
-function showOverlay(name) {
-  ['loadingOverlay','errorOverlay'].forEach(function(id) {
-    document.getElementById(id).classList.add('hidden');
-  });
-  if (name) document.getElementById(name).classList.remove('hidden');
-}
-
-/* ── Kontroller ── */
-function togglePlay() {
-  if (!video.src && !video.currentSrc) return;
-  if (video.paused) { video.play(); } else { video.pause(); }
-}
-
-function updatePlayIcon() {
-  document.getElementById('iconPlay').style.display  = video.paused ? 'block' : 'none';
-  document.getElementById('iconPause').style.display = video.paused ? 'none'  : 'block';
-  var cpb = document.getElementById('centerPlayBtn');
-  if (video.paused) { cpb.classList.add('show'); } else { cpb.classList.remove('show'); }
-}
-video.addEventListener('play',  updatePlayIcon);
-video.addEventListener('pause', updatePlayIcon);
-
-function toggleMute() {
-  video.muted = !video.muted;
-  document.getElementById('iconVolume').style.display = video.muted ? 'none'  : 'block';
-  document.getElementById('iconMute').style.display   = video.muted ? 'block' : 'none';
-}
-
-function setVolume(v) {
-  video.volume = parseFloat(v);
-  video.muted  = (parseFloat(v) === 0);
-  document.getElementById('iconVolume').style.display = video.muted ? 'none'  : 'block';
-  document.getElementById('iconMute').style.display   = video.muted ? 'block' : 'none';
-}
-
-function toggleFullscreen() {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    var el = container.closest('.player-frame') || container;
-    (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
-  } else {
-    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  function showLiveBadge(show) {
+    document.getElementById('liveBadge').style.display = show ? 'inline-flex' : 'none';
+    document.getElementById('ctrlLiveBadge').style.display = show ? 'flex' : 'none';
   }
-}
 
-document.addEventListener('fullscreenchange', onFsChange);
-document.addEventListener('webkitfullscreenchange', onFsChange);
-function onFsChange() {
-  var inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-  document.getElementById('iconFs').style.display     = inFs ? 'none'  : 'block';
-  document.getElementById('iconFsExit').style.display = inFs ? 'block' : 'none';
-  document.getElementById('playerControls').classList.toggle('always-visible', inFs);
-}
-
-/* Klavye kısayolları */
-document.addEventListener('keydown', function(e) {
-  if (['INPUT','TEXTAREA','SELECT'].indexOf(document.activeElement.tagName) > -1) return;
-  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
-  if (e.code === 'KeyF')  { toggleFullscreen(); }
-  if (e.code === 'KeyM')  { toggleMute(); }
-});
-
-/* ── Aspect Ratio ── */
-function applyAspectRatio(v) {
-  v.addEventListener('loadedmetadata', function() {
-    var w = v.videoWidth, h = v.videoHeight;
-    if (!w || !h) return;
-    if (h > w) {
-      v.style.transform  = 'rotate(90deg)';
-      v.style.width      = '177.78%';
-      v.style.height     = '56.25%';
-      v.style.marginLeft = '-38.89%';
-      container.style.aspectRatio = h + ' / ' + w;
-    } else {
-      v.style.transform  = 'none';
-      v.style.width      = '100%';
-      v.style.height     = '100%';
-      v.style.marginLeft = '0';
-      container.style.aspectRatio = w + ' / ' + h;
-    }
-  });
-}
-
-/* ── Player ── */
-function startPlayer() {
-  document.getElementById('waitingScreen').style.display = 'none';
-  video.style.display = 'block';
-  showOverlay('loadingOverlay');
-  showLiveBadge(true);
-  setStatus('Yayına bağlanıyor...');
-  if (hls) { hls.destroy(); hls = null; }
-  applyAspectRatio(video);
-
-  if (Hls.isSupported()) {
-    hls = new Hls({ maxBufferLength: 15, maxMaxBufferLength: 30 });
-    hls.loadSource(STREAM_URL);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, function() {
-      showOverlay(null);
-      setStatus('Canlı yayın aktif');
-      retryCount = 0;
-      video.play().catch(function(){});
+  function showOverlay(name) {
+    ['loadingOverlay','errorOverlay'].forEach(function(id) {
+      document.getElementById(id).classList.add('hidden');
     });
-    hls.on(Hls.Events.ERROR, function(event, data) {
-      if (data.fatal) { handleStreamError(); return; }
-      if (data.type === Hls.ErrorTypes.NETWORK_ERROR &&
-          data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR &&
-          data.response && data.response.code === 404) {
+    if (name) document.getElementById(name).classList.remove('hidden');
+  }
+
+  function applyAspectRatio(video) {
+    video.addEventListener('loadedmetadata', function() {
+      var w = video.videoWidth, h = video.videoHeight;
+      if (w && h) {
+        if (h > w) {
+          video.style.transform = 'rotate(90deg)';
+          video.style.width = '177.78%';
+          video.style.height = '56.25%';
+          video.style.marginLeft = '-38.89%';
+          document.getElementById('playerContainer').style.aspectRatio = h + ' / ' + w;
+        } else {
+          video.style.transform = 'none';
+          video.style.width = '100%';
+          video.style.height = '100%';
+          video.style.marginLeft = '0';
+          document.getElementById('playerContainer').style.aspectRatio = w + ' / ' + h;
+        }
+      }
+    });
+  }
+
+  /* ── PLAYER ── */
+  function startPlayer() {
+    var video = document.getElementById('canli-video');
+    document.getElementById('waitingScreen').style.display = 'none';
+    video.style.display = 'block';
+    showOverlay('loadingOverlay');
+    showLiveBadge(true);
+    setStatus('Yayına bağlanıyor...');
+    if (hls) { hls.destroy(); hls = null; }
+    applyAspectRatio(video);
+
+    if (Hls.isSupported()) {
+      hls = new Hls({ maxBufferLength: 15, maxMaxBufferLength: 30 });
+      hls.loadSource(STREAM_URL);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        showOverlay(null);
+        setStatus('Canlı yayın aktif');
+        retryCount = 0;
+        video.play().catch(function(){});
+        updatePlayIcon(false); // oynatılıyor → pause göster
+      });
+      hls.on(Hls.Events.ERROR, function(event, data) {
+        if (data.fatal) { handleStreamError(); return; }
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR &&
+            data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR &&
+            data.response && data.response.code === 404) {
+          fetch('/stream/status')
+            .then(function(r){ return r.json(); })
+            .then(function(d){ if (!d.live) streamEnded(); })
+            .catch(function(){});
+        }
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = STREAM_URL;
+      video.addEventListener('canplay', function() {
+        showOverlay(null);
+        setStatus('Canlı yayın aktif');
+        video.play();
+        updatePlayIcon(false);
+      });
+    }
+  }
+
+  function handleStreamError() {
+    if (retryCount < MAX_RETRY) {
+      retryCount++;
+      setStatus('Yeniden bağlanıyor... (' + retryCount + '/' + MAX_RETRY + ')');
+      showOverlay('loadingOverlay');
+      setTimeout(function() {
         fetch('/stream/status')
           .then(function(r){ return r.json(); })
-          .then(function(d){ if (!d.live) { streamEnded(); } })
-          .catch(function(){});
-      }
-    });
-  } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    video.src = STREAM_URL;
-    video.addEventListener('canplay', function() {
-      showOverlay(null);
-      setStatus('Canlı yayın aktif');
-      video.play();
-    });
+          .then(function(d) {
+            if (d.live) {
+              if (hls) hls.startLoad(); else startPlayer();
+            } else streamEnded();
+          })
+          .catch(function(){ streamEnded(); });
+      }, 4000);
+    } else streamEnded();
   }
-}
 
-function handleStreamError() {
-  if (retryCount < MAX_RETRY) {
-    retryCount++;
-    setStatus('Yeniden bağlanıyor... (' + retryCount + '/' + MAX_RETRY + ')');
-    showOverlay('loadingOverlay');
-    setTimeout(function() {
-      fetch('/stream/status')
-        .then(function(r){ return r.json(); })
-        .then(function(d) {
-          if (d.live) { if (hls) { hls.startLoad(); } else { startPlayer(); } }
-          else { streamEnded(); }
-        })
-        .catch(function(){ streamEnded(); });
-    }, 4000);
-  } else { streamEnded(); }
-}
+  function streamEnded() {
+    showLiveBadge(false);
+    document.getElementById('errorMsg').textContent = 'Yayın sona erdi';
+    showOverlay('errorOverlay');
+    setStatus('Yayın sona erdi');
+    startPolling();
+  }
 
-function streamEnded() {
-  showLiveBadge(false);
-  document.getElementById('errorMsg').textContent = 'Yayın sona erdi';
-  showOverlay('errorOverlay');
-  setStatus('Yayın sona erdi');
-  startPolling();
-}
-
-function retryStream() {
-  retryCount = 0;
-  fetch('/stream/status')
-    .then(function(r){ return r.json(); })
-    .then(function(d) {
-      if (d.live) {
-        startPlayer();
-      } else {
-        showOverlay(null);
-        document.getElementById('waitingScreen').style.display = 'flex';
-        video.style.display = 'none';
-        showLiveBadge(false);
-        setStatus('Yayın bekleniyor...');
-        startPolling();
-      }
-    });
-}
-
-function startPolling() {
-  if (poller) clearInterval(poller);
-  poller = setInterval(function() {
+  function retryStream() {
+    retryCount = 0;
     fetch('/stream/status')
       .then(function(r){ return r.json(); })
       .then(function(d) {
-        if (d.live) { clearInterval(poller); poller = null; startPlayer(); }
-      })
-      .catch(function(){});
-  }, 5000);
-}
+        if (d.live) {
+          startPlayer();
+        } else {
+          showOverlay(null);
+          document.getElementById('waitingScreen').style.display = 'flex';
+          document.getElementById('canli-video').style.display = 'none';
+          showLiveBadge(false);
+          setStatus('Yayın bekleniyor...');
+          startPolling();
+        }
+      });
+  }
 
-if (isLive) { startPlayer(); } else { startPolling(); }
+  function startPolling() {
+    if (poller) clearInterval(poller);
+    poller = setInterval(function() {
+      fetch('/stream/status')
+        .then(function(r){ return r.json(); })
+        .then(function(d) {
+          if (d.live) { clearInterval(poller); poller = null; startPlayer(); }
+        })
+        .catch(function(){});
+    }, 5000);
+  }
+
+  /* ── CUSTOM CONTROLS ── */
+  function updatePlayIcon(isPaused) {
+    document.getElementById('iconPlay').style.display  = isPaused  ? 'block' : 'none';
+    document.getElementById('iconPause').style.display = isPaused  ? 'none'  : 'block';
+  }
+
+  function togglePlay() {
+    var video = document.getElementById('canli-video');
+    if (video.paused) { video.play(); updatePlayIcon(false); }
+    else { video.pause(); updatePlayIcon(true); }
+  }
+
+  function toggleMute() {
+    var video = document.getElementById('canli-video');
+    video.muted = !video.muted;
+    document.getElementById('iconVolume').style.display = video.muted ? 'none'  : 'block';
+    document.getElementById('iconMuted').style.display  = video.muted ? 'block' : 'none';
+    document.getElementById('volumeSlider').value = video.muted ? 0 : video.volume;
+  }
+
+  function changeVolume(val) {
+    var video = document.getElementById('canli-video');
+    video.volume = val;
+    video.muted = (val == 0);
+    document.getElementById('iconVolume').style.display = (val == 0) ? 'none'  : 'block';
+    document.getElementById('iconMuted').style.display  = (val == 0) ? 'block' : 'none';
+    // slider dolgu rengini güncelle
+    var pct = val * 100;
+    document.getElementById('volumeSlider').style.backgroundSize = pct + '% 100%';
+  }
+
+  function toggleFullscreen() {
+    var el = document.getElementById('playerContainer');
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    }
+  }
+
+  document.addEventListener('fullscreenchange', syncFsIcon);
+  document.addEventListener('webkitfullscreenchange', syncFsIcon);
+  function syncFsIcon() {
+    var inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    document.getElementById('iconFs').style.display    = inFs ? 'none'  : 'block';
+    document.getElementById('iconFsExit').style.display = inFs ? 'block' : 'none';
+  }
+
+  // Mobil: dokunuşta controls'ü kısa süreliğine göster
+  (function() {
+    var pc = document.getElementById('playerContainer');
+    var hideTimer;
+    pc.addEventListener('touchstart', function() {
+      pc.classList.add('controls-visible');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function() { pc.classList.remove('controls-visible'); }, 3000);
+    });
+  })();
+
+  /* ── BAŞLAT ── */
+  startPolling();
 </script>
 {% endblock %}
