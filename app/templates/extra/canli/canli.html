@@ -828,6 +828,7 @@
     if (!document.fullscreenElement) {
       clearTimeout(fsTimer);
       pc.classList.remove('controls-visible');
+      pc.style.cursor = 'default';
     }
   });
   pc.addEventListener('mousemove', function() {
@@ -836,6 +837,7 @@
     if (document.fullscreenElement) {
       fsTimer = setTimeout(function() {
         pc.classList.remove('controls-visible');
+        pc.style.cursor = 'none';
       }, 3000);
     }
   });
