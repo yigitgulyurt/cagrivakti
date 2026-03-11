@@ -501,7 +501,9 @@
 
   /* Tam ekran modunda controls her zaman görünür olsun (hover zor) */
   :fullscreen .custom-controls,
-  :-webkit-full-screen .custom-controls { opacity: 0.2; }
+  :-webkit-full-screen .custom-controls,
+  :-moz-full-screen .custom-controls,
+  :-ms-fullscreen .custom-controls { opacity: 0.2; }
 </style>
 
 <div class="canli-wrap">
