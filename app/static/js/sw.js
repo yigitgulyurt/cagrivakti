@@ -25,8 +25,7 @@ const PRECACHE_ASSETS = [
     '/static/icons/android/android-launchericon-192-192.png',
     '/static/icons/android/android-launchericon-512-512.png',
     '/static/icons/ios/180.png',
-    '/static/icons/windows11/Square150x150Logo.scale-100.png',
-    'https://fonts.cagrivakti.com.tr/cinzel-v26-latin-regular.woff2'
+    '/static/icons/windows11/Square150x150Logo.scale-100.png'
 ];
 
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
@@ -64,10 +63,26 @@ self.addEventListener('fetch', (event) => {
 
     // ← BURAYA EKLE
     if (
-        url.hostname === 'fonts.cagrivakti.com.tr' ||
-        url.pathname.startsWith('/canli-kaynak/') ||
-        url.pathname === '/stream/status'
+        url.hostname === 'fonts.googleapis.com' ||
+        url.hostname === 'fonts.gstatic.com' ||
+        url.hostname === 'fonts.cagrivakti.com.tr'
     ) {
+        event.respondWith(
+            caches.match(event.request).then(function(cached) {
+                if (cached) return cached;
+                return fetch(event.request, { mode: 'cors', credentials: 'omit' })
+                    .then(function(response) {
+                        if (response.ok) {
+                            var clone = response.clone();
+                            caches.open(CACHE_NAME).then(function(cache) {
+                                cache.put(event.request, clone);
+                            });
+                        }
+                        return response;
+                    })
+                    .catch(function() { return new Response('', { status: 408 }); });
+            })
+        );
         return;
     }
 
