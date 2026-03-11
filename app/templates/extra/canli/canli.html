@@ -372,7 +372,12 @@
     justify-content: space-between;
     gap: 10px;
   }
-  .ctrl-left, .ctrl-right {
+  .ctrl-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ctrl-right {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -500,7 +505,8 @@
   .hidden { display: none !important; }
 
   /* Tam ekran modunda controls her zaman görünür olsun (hover zor) */
-  :fullscreen .controls-row { opacity: 0.2; }
+  :fullscreen .ctrl-left { opacity: 0; }
+  :fullscreen .custom-controls { background: transparent; }
 </style>
 
 <div class="canli-wrap">
