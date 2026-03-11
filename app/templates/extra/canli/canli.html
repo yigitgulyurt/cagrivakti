@@ -499,8 +499,7 @@
   }
   .hidden { display: none !important; }
 
-  :fullscreen .player-container.controls-visible .custom-controls,
-  :-webkit-full-screen .player-container.controls-visible .custom-controls { opacity: 1; }
+  .player-container.fullscreen-mode.controls-visible .custom-controls { opacity: 1; }
 </style>
 
 <div class="canli-wrap">
@@ -822,6 +821,19 @@
       pc.addEventListener('touchstart', controlsGoster);
       pc.addEventListener('mousemove', controlsGoster);
   })();
+
+  function syncFsIcon() {
+    var inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    document.getElementById('iconFs').style.display    = inFs ? 'none'  : 'block';
+    document.getElementById('iconFsExit').style.display = inFs ? 'block' : 'none';
+    
+    var pc = document.getElementById('playerContainer');
+    if (inFs) {
+        pc.classList.add('fullscreen-mode');
+    } else {
+        pc.classList.remove('fullscreen-mode');
+    }
+}
 
   /* ── BAŞLAT ── */
   startPolling();
