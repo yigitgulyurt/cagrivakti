@@ -851,7 +851,7 @@ def canli(key):
     if key != expected_key:
         abort(404)
     stream_url = f'https://cagrivakti.com.tr/canli-kaynak/canli/{key}/index.m3u8'
-    return render_template('extra/canli-yayin/canli.html', stream_url=stream_url)
+    return render_template('extra/canli/canli.html', stream_url=stream_url)
 
 @views_bp.route('/stream/status')
 def stream_status():
