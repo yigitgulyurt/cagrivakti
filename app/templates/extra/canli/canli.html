@@ -669,6 +669,13 @@
       });
   }
 
+  /* ── BAŞLAT ── */
+  // Sayfa açılınca anında bir kez kontrol et, canlıysa direkt başlat
+  fetch('/stream/status')
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (d.live) startPlayer(); else startPolling(); })
+    .catch(function(){ startPolling(); });
+
   function startPolling() {
     if (poller) clearInterval(poller);
     poller = setInterval(function() {
@@ -678,7 +685,7 @@
           if (d.live) { clearInterval(poller); poller = null; startPlayer(); }
         })
         .catch(function(){});
-    }, 5000);
+    }, 2000); // 5000 → 2000
   }
 
   /* ── CUSTOM CONTROLS ── */
