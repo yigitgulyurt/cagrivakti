@@ -102,6 +102,7 @@ def setup_middleware(app):
                 "base-uri 'self'; "
                 "form-action 'self';"
                 "worker-src 'self' blob:;" 
+                "media-src 'self' blob:;"
             )
             response.headers['Content-Security-Policy'] = csp
             # Clickjacking koruması (DENY yerine SAMEORIGIN yapıyoruz ki kendi sitemiz içinde iframe kullanımı gerekirse sorun olmasın)
