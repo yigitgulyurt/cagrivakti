@@ -812,10 +812,6 @@ def download_widget():
     directory = os.path.dirname(current_app.root_path)
     return send_from_directory(directory, 'cagrivakti-widget.rmskin', as_attachment=True)
 
-@views_bp.route('/newtab')
-def newtab():
-    return render_template('extra/newtab/newtab.html')
-
 @views_bp.route('/qr-okuyucu')
 def qr_okuyucu():
     return render_template('extra/qr-reader/qr-reader.html')

@@ -30,6 +30,18 @@ const PRECACHE_ASSETS = [
     '/static/font/jetbrains-mono-v24-latin-700.woff2',
     '/static/font/playfair-display-v40-latin-700.woff2',
     '/static/font/playfair-display-v40-latin-900.woff2',
+    '/static/font/playfair-display-v40-latin-400.woff2',
+    '/static/font/playfair-display-v40-latin-600.woff2',
+    '/static/font/rajdhani-v20-latin-300.woff2',
+    '/static/font/rajdhani-v20-latin-regular.woff2',
+    '/static/font/rajdhani-v20-latin-600.woff2',
+    '/static/font/orbitron-v31-latin-regular.woff2',
+    '/static/font/orbitron-v31-latin-700.woff2',
+    '/static/font/orbitron-v31-latin-900.woff2',
+    '/static/font/cinzel-v26-latin-regular.woff2',
+    '/static/font/cinzel-v26-latin-700.woff2',
+    '/static/font/cinzel-v26-latin-900.woff2',
+    '/static/font/cinzel-v26-latin-600.woff2'
 ];
 
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
