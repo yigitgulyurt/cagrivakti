@@ -499,7 +499,9 @@
   }
   .hidden { display: none !important; }
 
-  .player-container.fullscreen-mode.controls-visible .custom-controls { opacity: 1; }
+  /* Tam ekran modunda controls her zaman görünür olsun (hover zor) */
+  :fullscreen .custom-controls,
+  :-webkit-full-screen .custom-controls { opacity: 1; }
 </style>
 
 <div class="canli-wrap">
@@ -808,32 +810,15 @@
 
   // Mobil: dokunuşta controls'ü kısa süreliğine göster
   (function() {
-      var pc = document.getElementById('playerContainer');
-      if (!pc) return;
-      var hideTimer;
-      function controlsGoster() {
-          pc.classList.add('controls-visible');
-          clearTimeout(hideTimer);
-          hideTimer = setTimeout(function() {
-              pc.classList.remove('controls-visible');
-          }, 3000);
-      }
-      pc.addEventListener('touchstart', controlsGoster);
-      pc.addEventListener('mousemove', controlsGoster);
-  })();
-
-  function syncFsIcon() {
-    var inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    document.getElementById('iconFs').style.display    = inFs ? 'none'  : 'block';
-    document.getElementById('iconFsExit').style.display = inFs ? 'block' : 'none';
-    
     var pc = document.getElementById('playerContainer');
-    if (inFs) {
-        pc.classList.add('fullscreen-mode');
-    } else {
-        pc.classList.remove('fullscreen-mode');
-    }
-}
+    if (!pc) return; // ← ekle
+    var hideTimer;
+    pc.addEventListener('touchstart', function() {
+      pc.classList.add('controls-visible');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function() { pc.classList.remove('controls-visible'); }, 3000);
+    });
+  })();
 
   /* ── BAŞLAT ── */
   startPolling();
