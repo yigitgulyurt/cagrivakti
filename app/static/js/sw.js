@@ -25,23 +25,7 @@ const PRECACHE_ASSETS = [
     '/static/icons/android/android-launchericon-192-192.png',
     '/static/icons/android/android-launchericon-512-512.png',
     '/static/icons/ios/180.png',
-    '/static/icons/windows11/Square150x150Logo.scale-100.png',
-    '/static/font/jetbrains-mono-v24-latin-regular.woff2',
-    '/static/font/jetbrains-mono-v24-latin-700.woff2',
-    '/static/font/playfair-display-v40-latin-700.woff2',
-    '/static/font/playfair-display-v40-latin-900.woff2',
-    '/static/font/playfair-display-v40-latin-400.woff2',
-    '/static/font/playfair-display-v40-latin-600.woff2',
-    '/static/font/rajdhani-v20-latin-300.woff2',
-    '/static/font/rajdhani-v20-latin-regular.woff2',
-    '/static/font/rajdhani-v20-latin-600.woff2',
-    '/static/font/orbitron-v31-latin-regular.woff2',
-    '/static/font/orbitron-v31-latin-700.woff2',
-    '/static/font/orbitron-v31-latin-900.woff2',
-    '/static/font/cinzel-v26-latin-regular.woff2',
-    '/static/font/cinzel-v26-latin-700.woff2',
-    '/static/font/cinzel-v26-latin-900.woff2',
-    '/static/font/cinzel-v26-latin-600.woff2'
+    '/static/icons/windows11/Square150x150Logo.scale-100.png'
 ];
 
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
@@ -79,8 +63,7 @@ self.addEventListener('fetch', (event) => {
 
     // ← BURAYA EKLE
     if (
-        url.hostname === 'fonts.googleapis.com' ||
-        url.hostname === 'fonts.gstatic.com' ||
+        url.hostname === 'fonts.cagrivakti.com.tr' ||
         url.pathname.startsWith('/canli-kaynak/') ||
         url.pathname === '/stream/status'
     ) {
