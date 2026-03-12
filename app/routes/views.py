@@ -11,7 +11,7 @@ import requests
 from threading import Thread
 import re
 import hashlib
-from collections import defaultdict
+import redis as redis_lib
 import time
 
 views_bp = Blueprint('views', __name__)
@@ -851,22 +851,33 @@ def canli(key):
     stream_url = f'https://cagrivakti.com.tr/canli-kaynak/canli/{key}/index.m3u8'
     return render_template('extra/canli/canli.html', stream_url=stream_url)
 
-# Modül seviyesinde (route'ların dışında)
-_viewers = {}  # {session_id: last_seen}
-_VIEWER_TIMEOUT = 45  # saniye
+_VIEWER_TIMEOUT = 45
+_VIEWER_KEY_PREFIX = 'viewer:'
+
+def _get_redis():
+    url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    return redis_lib.from_url(url, decode_responses=True)
+
+@views_bp.route('/canli/<key>')
+def canli(key):
+    expected_key = current_app.config.get('STREAM_KEY')
+    if key != expected_key:
+        abort(404)
+    stream_url = f'https://cagrivakti.com.tr/canli-kaynak/canli/{key}/index.m3u8'
+    return render_template('extra/canli/canli.html', stream_url=stream_url)
 
 @views_bp.route('/stream/ping', methods=['POST'])
 @csrf.exempt
 def stream_ping():
     data = request.get_json(silent=True) or {}
     sid = data.get('sid', '')
-    if sid:
-        _viewers[sid] = time.time()
-    # Timeout olanları temizle
-    now = time.time()
-    expired = [k for k, v in _viewers.items() if now - v > _VIEWER_TIMEOUT]
-    for k in expired:
-        del _viewers[k]
+    if not sid:
+        return jsonify({'ok': False}), 400
+    try:
+        r = _get_redis()
+        r.setex(f'{_VIEWER_KEY_PREFIX}{sid}', _VIEWER_TIMEOUT, '1')
+    except Exception as e:
+        current_app.logger.warning(f'Redis ping error: {e}')
     return jsonify({'ok': True})
 
 @views_bp.route('/stream/status')
@@ -881,10 +892,14 @@ def stream_status():
         return jsonify({'live': live})
     except:
         fallback = current_app.config.get('STREAM_LIVE_FALLBACK', 'false').lower() == 'true'
-        return jsonify({'live': fallback    })
-        
+        return jsonify({'live': fallback})
+
 @views_bp.route('/stream/viewers')
 def stream_viewers():
-    now = time.time()
-    active = sum(1 for v in _viewers.values() if now - v <= _VIEWER_TIMEOUT)
-    return jsonify({'viewers': active})
+    try:
+        r = _get_redis()
+        keys = r.keys(f'{_VIEWER_KEY_PREFIX}*')
+        return jsonify({'viewers': len(keys)})
+    except Exception as e:
+        current_app.logger.warning(f'Redis viewers error: {e}')
+        return jsonify({'viewers': 0})
