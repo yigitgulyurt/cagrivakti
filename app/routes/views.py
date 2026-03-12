@@ -11,6 +11,8 @@ import requests
 from threading import Thread
 import re
 import hashlib
+from collections import defaultdict
+import time
 
 views_bp = Blueprint('views', __name__)
 
@@ -849,17 +851,35 @@ def canli(key):
     stream_url = f'https://cagrivakti.com.tr/canli-kaynak/canli/{key}/index.m3u8'
     return render_template('extra/canli/canli.html', stream_url=stream_url)
 
+# Modül seviyesinde (route'ların dışında)
+_viewers = {}  # {session_id: last_seen}
+_VIEWER_TIMEOUT = 45  # saniye
+
+@views_bp.route('/stream/ping', methods=['POST'])
+def stream_ping():
+    data = request.get_json(silent=True) or {}
+    sid = data.get('sid', '')
+    if sid:
+        _viewers[sid] = time.time()
+    # Timeout olanları temizle
+    now = time.time()
+    expired = [k for k, v in _viewers.items() if now - v > _VIEWER_TIMEOUT]
+    for k in expired:
+        del _viewers[k]
+    return jsonify({'ok': True})
+
 @views_bp.route('/stream/status')
 def stream_status():
     key = current_app.config.get('STREAM_KEY', '')
     path_name = f'canli/{key}'
+    now = time.time()
+    active_viewers = sum(1 for v in _viewers.values() if now - v <= _VIEWER_TIMEOUT)
     try:
         r = requests.get('http://localhost:9997/v3/paths/list', timeout=2)
         items = r.json().get('items', [])
         path = next((p for p in items if p.get('name') == path_name), None)
         live = bool(path and path.get('ready'))
-        readers = path.get('readers', []) if path else []
-        return jsonify({'live': live, 'viewers': len(readers)})
+        return jsonify({'live': live, 'viewers': active_viewers})
     except:
         fallback = current_app.config.get('STREAM_LIVE_FALLBACK', 'false').lower() == 'true'
-        return jsonify({'live': fallback, 'viewers': 0})
+        return jsonify({'live': fallback, 'viewers': active_viewers})

@@ -684,6 +684,23 @@
   var retryCount = 0;
   var MAX_RETRY = 3;
   var playerActive = false;
+  var SESSION_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);// Session ID üret (sekme başına benzersiz)
+  var pinger = null;
+
+  function startPinger() {
+    if (pinger) return;
+    // Hemen bir kez ping at
+    sendPing();
+    pinger = setInterval(sendPing, 30000);
+  }
+
+  function sendPing() {
+    fetch('/stream/ping', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({sid: SESSION_ID})
+    }).catch(function(){});
+  }
 
   /* ── YARDIMCI ── */
   function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
@@ -724,6 +741,7 @@
   /* ── PLAYER ── */
   function startPlayer() {
     playerActive = true;
+    startPinger();
     var video = document.getElementById('canli-video');
     video.muted = true; // ← ekle
     document.getElementById('waitingScreen').style.display = 'none';
