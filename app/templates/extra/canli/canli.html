@@ -511,6 +511,73 @@
   /* Tam ekran modunda controls her zaman görünür olsun (hover zor) */
   :fullscreen .ctrl-left { opacity: 0; }
   :fullscreen .custom-controls { background: transparent; }
+
+  /* ── RESPONSIVE: GENİŞ EKRANLAR ── */
+@media (min-width: 1400px) {
+  .player-outer,
+  .hero-banner,
+  .info-bar {
+    max-width: min(85vw, 1600px);
+  }
+  .quote-section {
+    max-width: min(60vw, 900px);
+  }
+  .hero-title {
+    font-size: clamp(2.6rem, 3.5vw, 4.2rem);
+  }
+  .hero-eyebrow {
+    font-size: clamp(0.7rem, 0.8vw, 1rem);
+    letter-spacing: 6px;
+  }
+  .hero-subtitle {
+    font-size: clamp(1rem, 1.2vw, 1.5rem);
+  }
+  .hero-divider::before,
+  .hero-divider::after {
+    width: min(30vw, 600px);
+  }
+  .status-text {
+    font-size: clamp(0.88rem, 0.9vw, 1.1rem);
+  }
+  .quote-text {
+    font-size: clamp(1.05rem, 1.1vw, 1.4rem);
+  }
+}
+
+@media (min-width: 2560px) {
+  .player-outer,
+  .hero-banner,
+  .info-bar {
+    max-width: 85vw;
+  }
+  .quote-section {
+    max-width: 55vw;
+  }
+  .hero-title {
+    font-size: clamp(4rem, 4vw, 6rem);
+  }
+  .hero-eyebrow {
+    font-size: clamp(0.9rem, 0.9vw, 1.2rem);
+    letter-spacing: 8px;
+  }
+  .hero-subtitle {
+    font-size: clamp(1.4rem, 1.4vw, 2rem);
+  }
+  .quote-text {
+    font-size: clamp(1.3rem, 1.3vw, 1.8rem);
+  }
+  .live-badge {
+    font-size: clamp(0.7rem, 0.8vw, 1rem);
+    padding: 10px 24px;
+  }
+  .ctrl-btn svg {
+    width: clamp(18px, 1.5vw, 28px);
+    height: clamp(18px, 1.5vw, 28px);
+  }
+  .volume-slider {
+    width: clamp(70px, 5vw, 140px);
+  }
+}
 </style>
 
 <div class="canli-wrap">
