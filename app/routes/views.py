@@ -856,6 +856,7 @@ _viewers = {}  # {session_id: last_seen}
 _VIEWER_TIMEOUT = 45  # saniye
 
 @views_bp.route('/stream/ping', methods=['POST'])
+@csrf.exempt
 def stream_ping():
     data = request.get_json(silent=True) or {}
     sid = data.get('sid', '')
