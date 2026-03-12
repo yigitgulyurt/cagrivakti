@@ -825,14 +825,14 @@
 
   function updateViewers(d) {
     var el = document.getElementById('viewerCount');
-    if (d.viewers > 0) {
+    if (d.live && d.viewers > 0) {
       document.getElementById('viewerNum').textContent = d.viewers;
       el.style.display = 'block';
     } else {
       el.style.display = 'none';
     }
   }
-
+  
   function startPolling() {
     if (playerActive) return;
     if (poller) clearInterval(poller);
