@@ -842,15 +842,6 @@ def serve_game_files(filename):
 
 # Yayın durumu (basit, DB'ye gerek yok bu iş için)
 # _stream_live = False  ← bunu sil
-
-@views_bp.route('/canli/<key>')
-def canli(key):
-    expected_key = current_app.config.get('STREAM_KEY')
-    if key != expected_key:
-        abort(404)
-    stream_url = f'https://cagrivakti.com.tr/canli-kaynak/canli/{key}/index.m3u8'
-    return render_template('extra/canli/canli.html', stream_url=stream_url)
-
 _VIEWER_TIMEOUT = 45
 _VIEWER_KEY_PREFIX = 'viewer:'
 
