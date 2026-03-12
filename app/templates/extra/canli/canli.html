@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-
   @font-face {
   font-family: 'Cinzel';
   font-style: normal;
@@ -58,7 +57,6 @@
   font-display: swap;
   src: url('https://fonts.cagrivakti.com.tr/crimson-pro-v28-latin-italic.woff2') format('woff2');
 }
-
   :root {
     --kirmizi: #c0392b;
     --kirmizi-koyu: #96281b;
@@ -177,7 +175,6 @@
     0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 6px var(--kirmizi); }
     50% { opacity: 0.5; transform: scale(0.85); box-shadow: 0 0 2px var(--kirmizi); }
   }
-
   /* ── PLAYER ── */
   .player-outer {
     width: 100%;
@@ -226,7 +223,6 @@
     display: none;
     transform-origin: center center;
   }
-
   .fade-in-delayed {
     opacity: 0;
     animation: fadeInOpacity 0.5s ease-in 1s forwards;
@@ -348,7 +344,6 @@
     background: var(--altin-acik);
     border-color: rgba(212,168,67,0.6);
   }
-
   /* ── CUSTOM CONTROLS ── */
   .custom-controls {
     position: absolute;
@@ -461,7 +456,6 @@
     box-shadow: 0 0 5px var(--kirmizi);
     flex-shrink: 0;
   }
-
   /* Info bar */
   .info-bar {
     width: 100%;
@@ -507,11 +501,9 @@
     margin-top: 12px;
   }
   .hidden { display: none !important; }
-
   /* Tam ekran modunda controls her zaman görünür olsun (hover zor) */
   :fullscreen .ctrl-left { opacity: 0; }
   :fullscreen .custom-controls { background: transparent; }
-
   /* ── RESPONSIVE: GENİŞ EKRANLAR ── */
 @media (min-width: 1400px) {
   .player-outer,
@@ -543,7 +535,6 @@
     font-size: clamp(1.05rem, 1.1vw, 1.4rem);
   }
 }
-
 @media (min-width: 2560px) {
   .player-outer,
   .hero-banner,
@@ -579,7 +570,6 @@
   }
 }
 </style>
-
 <div class="canli-wrap">
   <div class="hero-banner">
     <div class="hero-eyebrow">✦ 18 Mart 1915 ✦</div>
@@ -587,11 +577,9 @@
     <h1 class="hero-title"><em>Çanakkale</em> Zaferi</h1>
     <div class="hero-subtitle">111. Yıl Anma Töreni</div>
   </div>
-
   <div class="player-outer">
     <div class="player-frame">
       <div class="player-container" id="playerContainer">
-
         <!-- Bekleme -->
         <div class="waiting-screen fade-in-delayed" id="waitingScreen">
           <div class="waiting-emblem">
@@ -603,35 +591,28 @@
           <p>Tören başladığında yayın otomatik olarak açılacak</p>
           <div class="waiting-dots"><span></span><span></span><span></span></div>
         </div>
-
         <!-- Yükleniyor -->
         <div class="loading-overlay hidden fade-in" id="loadingOverlay">
           <div class="spinner"></div>
           <div class="loading-text">Bağlanıyor</div>
         </div>
-
         <!-- Hata -->
         <div class="error-overlay hidden fade-in" id="errorOverlay">
           <div class="err-icon">⚠️</div>
           <p id="errorMsg">Bağlantı kesildi</p>
           <button class="retry-btn" onclick="retryStream()">Yeniden Bağlan</button>
         </div>
-
         <!-- Video -->
         <video id="canli-video" playsinline></video>
-
         <!-- Custom Controls -->
         <div class="custom-controls" id="customControls">
           <div class="controls-row">
             <!-- Sol: play + ses -->
             <div class="ctrl-left">
               <button class="ctrl-btn" id="btnPlayPause" title="Oynat / Duraklat" onclick="togglePlay()">
-                <!-- Play icon (başlangıç) -->
                 <svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <!-- Pause icon -->
                 <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
               </button>
-
               <div class="volume-wrap">
                 <button class="ctrl-btn" id="btnMute" title="Sesi Kapat / Aç" onclick="toggleMute()">
                   <svg id="iconVolume" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
@@ -641,12 +622,10 @@
                        min="0" max="1" step="0.02" value="1"
                        oninput="changeVolume(this.value)" />
               </div>
-
               <span class="ctrl-live" id="ctrlLiveBadge" style="display:none;">
                 <span class="ctrl-live-dot"></span>CANLI
               </span>
             </div>
-
             <!-- Sağ: tam ekran -->
             <div class="ctrl-right">
               <button class="ctrl-btn" id="btnFullscreen" title="Tam Ekran" onclick="toggleFullscreen()">
@@ -656,40 +635,36 @@
             </div>
           </div>
         </div>
-
       </div><!-- /player-container -->
     </div><!-- /player-frame -->
   </div><!-- /player-outer -->
-
   <div class="info-bar">
     <div class="status-text" id="statusText">Yayın bekleniyor...</div>
-    <div class="status-text" id="viewerCount" style="display:none;"> <span id="viewerNum">0</span> izleyici </div>
+    <div class="status-text" id="viewerCount" style="display:none;">👁 <span id="viewerNum">0</span> izleyici</div>
     <div class="live-badge" id="liveBadge" style="display:none; visibility:hidden; position:absolute; pointer-events:none;">
       <div class="live-dot"></div>
       Canlı
     </div>
   </div>
-
   <div class="quote-section">
     <div class="quote-text">"Çanakkale geçilmez."</div>
     <div class="quote-author">Türk Milletinin Destanı</div>
   </div>
 </div>
-
 <script src="{{ url_for('static', filename='js/hls.js') }}"></script>
 <script>
   var STREAM_URL = '{{ stream_url }}';
   var hls = null;
   var poller = null;
+  var viewerPoller = null;
   var retryCount = 0;
   var MAX_RETRY = 3;
   var playerActive = false;
-  var SESSION_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);// Session ID üret (sekme başına benzersiz)
+  var SESSION_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
   var pinger = null;
 
   function startPinger() {
     if (pinger) return;
-    // Hemen bir kez ping at
     sendPing();
     pinger = setInterval(sendPing, 30000);
   }
@@ -717,6 +692,26 @@
     if (name) document.getElementById(name).classList.remove('hidden');
   }
 
+  function updateViewers(d) {
+    var el = document.getElementById('viewerCount');
+    if (d.live && d.viewers > 0) {
+      document.getElementById('viewerNum').textContent = d.viewers;
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
+  function startViewerPoller() {
+    if (viewerPoller) return;
+    viewerPoller = setInterval(function() {
+      fetch('/stream/status')
+        .then(function(r){ return r.json(); })
+        .then(function(d){ updateViewers(d); })
+        .catch(function(){});
+    }, 15000);
+  }
+
   function applyAspectRatio(video) {
     video.addEventListener('loadedmetadata', function() {
       var w = video.videoWidth, h = video.videoHeight;
@@ -742,8 +737,9 @@
   function startPlayer() {
     playerActive = true;
     startPinger();
+    startViewerPoller();
     var video = document.getElementById('canli-video');
-    video.muted = true; // ← ekle
+    video.muted = true;
     document.getElementById('waitingScreen').style.display = 'none';
     video.style.display = 'block';
     showOverlay('loadingOverlay');
@@ -751,7 +747,6 @@
     setStatus('Yayına bağlanıyor...');
     if (hls) { hls.destroy(); hls = null; }
     applyAspectRatio(video);
-
     if (Hls.isSupported()) {
       hls = new Hls({ maxBufferLength: 15, maxMaxBufferLength: 30 });
       hls.loadSource(STREAM_URL);
@@ -809,10 +804,12 @@
 
   function streamEnded() {
     playerActive = false;
+    if (viewerPoller) { clearInterval(viewerPoller); viewerPoller = null; }
     showLiveBadge(false);
     document.getElementById('errorMsg').textContent = 'Yayın sona erdi';
     showOverlay('errorOverlay');
     setStatus('Yayın sona erdi');
+    updateViewers({live: false, viewers: 0});
     startPolling();
   }
 
@@ -835,7 +832,6 @@
   }
 
   /* ── BAŞLAT ── */
-  // Sayfa açılınca anında bir kez kontrol et, canlıysa direkt başlat
   fetch('/stream/status')
     .then(function(r){ return r.json(); })
     .then(function(d){
@@ -844,16 +840,6 @@
     })
     .catch(function(){ startPolling(); });
 
-  function updateViewers(d) {
-    var el = document.getElementById('viewerCount');
-    if (d.live && d.viewers > 0) {
-      document.getElementById('viewerNum').textContent = d.viewers;
-      el.style.display = 'block';
-    } else {
-      el.style.display = 'none';
-    }
-  }
-  
   function startPolling() {
     if (playerActive) return;
     if (poller) clearInterval(poller);
@@ -895,7 +881,6 @@
     video.muted = (val == 0);
     document.getElementById('iconVolume').style.display = (val == 0) ? 'none'  : 'block';
     document.getElementById('iconMuted').style.display  = (val == 0) ? 'block' : 'none';
-    // slider dolgu rengini güncelle
     var pct = val * 100;
     document.getElementById('volumeSlider').style.backgroundSize = pct + '% 100%';
   }
@@ -919,19 +904,19 @@
 
   // Mobil: dokunuşta controls'ü kısa süreliğine göster
   (function() {
-      var pc = document.getElementById('playerContainer');
-      if (!pc) return;
-      var hideTimer;
-      pc.addEventListener('touchstart', function() {
-          pc.classList.add('controls-visible');
-          clearTimeout(hideTimer);
-          hideTimer = setTimeout(function() { pc.classList.remove('controls-visible'); }, 3000);
-      });
+    var pc = document.getElementById('playerContainer');
+    if (!pc) return;
+    var hideTimer;
+    pc.addEventListener('touchstart', function() {
+      pc.classList.add('controls-visible');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function() { pc.classList.remove('controls-visible'); }, 3000);
+    });
   })();
 
   // Çift tıkla tam ekran
   document.getElementById('playerContainer').addEventListener('dblclick', function() {
-      toggleFullscreen();
+    toggleFullscreen();
   });
 
   /* ── BAŞLAT ── */
