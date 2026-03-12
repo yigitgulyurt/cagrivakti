@@ -142,7 +142,7 @@ def serve_sitemap():
         'views.neden_biz', 'views.indir', 'views.konum_bul', 
         'views.iletisim', 'views.ilkelerimiz',
         'views.bilgi_kosesi_liste','views.prime_number','views.qr_okuyucu',
-        'views.asal_sayi', 'views.under_the_red_sky'
+        'views.under_the_red_sky'
     ]
     
     for rule in static_urls:
