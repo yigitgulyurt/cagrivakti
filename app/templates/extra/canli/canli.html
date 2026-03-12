@@ -820,7 +820,10 @@
   // Sayfa açılınca anında bir kez kontrol et, canlıysa direkt başlat
   fetch('/stream/status')
     .then(function(r){ return r.json(); })
-    .then(function(d){ if (d.live) startPlayer(); else startPolling(); })
+    .then(function(d){
+      updateViewers(d);
+      if (d.live) startPlayer(); else startPolling();
+    })
     .catch(function(){ startPolling(); });
 
   function updateViewers(d) {
