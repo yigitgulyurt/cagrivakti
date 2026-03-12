@@ -873,14 +873,18 @@ def stream_ping():
 def stream_status():
     key = current_app.config.get('STREAM_KEY', '')
     path_name = f'canli/{key}'
-    now = time.time()
-    active_viewers = sum(1 for v in _viewers.values() if now - v <= _VIEWER_TIMEOUT)
     try:
         r = requests.get('http://localhost:9997/v3/paths/list', timeout=2)
         items = r.json().get('items', [])
         path = next((p for p in items if p.get('name') == path_name), None)
         live = bool(path and path.get('ready'))
-        return jsonify({'live': live, 'viewers': active_viewers})
+        return jsonify({'live': live})
     except:
         fallback = current_app.config.get('STREAM_LIVE_FALLBACK', 'false').lower() == 'true'
-        return jsonify({'live': fallback, 'viewers': active_viewers})
+        return jsonify({'live': fallback    })
+        
+@views_bp.route('/stream/viewers')
+def stream_viewers():
+    now = time.time()
+    active = sum(1 for v in _viewers.values() if now - v <= _VIEWER_TIMEOUT)
+    return jsonify({'viewers': active})
