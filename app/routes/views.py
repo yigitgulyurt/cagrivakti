@@ -856,8 +856,10 @@ def stream_status():
     try:
         r = requests.get('http://localhost:9997/v3/paths/list', timeout=2)
         items = r.json().get('items', [])
-        live = any(p.get('name') == path_name and p.get('ready') for p in items)
-        return jsonify({'live': live})
+        path = next((p for p in items if p.get('name') == path_name), None)
+        live = bool(path and path.get('ready'))
+        readers = path.get('readers', []) if path else []
+        return jsonify({'live': live, 'viewers': len(readers)})
     except:
         fallback = current_app.config.get('STREAM_LIVE_FALLBACK', 'false').lower() == 'true'
-        return jsonify({'live': fallback})
+        return jsonify({'live': fallback, 'viewers': 0})

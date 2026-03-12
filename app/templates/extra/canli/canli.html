@@ -663,6 +663,7 @@
 
   <div class="info-bar">
     <div class="status-text" id="statusText">Yayın bekleniyor...</div>
+    <div class="status-text" id="viewerCount" style="display:none;"> <span id="viewerNum">0</span> izleyici </div>
     <div class="live-badge" id="liveBadge" style="display:none; visibility:hidden; position:absolute; pointer-events:none;">
       <div class="live-dot"></div>
       Canlı
@@ -834,6 +835,15 @@
         })
         .catch(function(){});
     }, 5000);
+  function updateViewers(d) {
+  var el = document.getElementById('viewerCount');
+  if (d.live && d.viewers > 0) {
+    document.getElementById('viewerNum').textContent = d.viewers;
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+  }
   }
 
   /* ── CUSTOM CONTROLS ── */
