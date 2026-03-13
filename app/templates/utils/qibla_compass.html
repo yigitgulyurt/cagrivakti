@@ -623,7 +623,7 @@
 
 {% block content %}
 <!-- Masaüstü Uyarı Ekranı -->
-<div id="mobile-only-warning">
+<div id="mobile-only--warning">
     <div class="desktop-single-card">
         <div class="qr-card">
             <div class="card-icon">
@@ -637,6 +637,24 @@
                 </div>
             </div>
             <p class="qr-link">Telefondan taratın ve açın</p>
+        </div>
+    </div>
+</div>
+        <!-- Masaüstü İçeriği -->
+<div id="desktop-content" class="platform-section" style="display: none;">
+    <div class="desktop-single-card">
+        <div class="qr-card">
+            <div class="card-icon">
+                <svg class="icon"><use xlink:href="#fa-mobile-screen-button"></use></svg>
+            </div>
+            <h3>Telefona Yükle</h3>
+            <p>Telefonunuzun kamerasını kullanarak QR kodu okutun ve hemen yükleyin.</p>
+            <div class="qr-wrapper">
+                <div class="qr-background">
+            <img src="{{ url_for('static', filename='image/qr/download-qr.webp') }}" alt="İndirme QR Kodu" style="width: 200px; height: 200px; object-fit: contain;">
+        </div>
+            </div>
+            <p class="qr-link">cagrivakti.com.tr</p>
         </div>
     </div>
 </div>
@@ -1054,7 +1072,12 @@
             }
         });
     }
-
+    const isAndroid = /android/i.test(userAgent);
+    const isIOS = /iphone|ipad|ipod/i.test(userAgent);
+    const isMobile = isAndroid || isIOS;
+    if (!isMobile) {
+        document.getElementById('desktop-content').style.display = 'block';
+    }
     initPage();
 </script>
 {% endblock %}
