@@ -121,7 +121,7 @@ self.addEventListener('fetch', (event) => {
                     // Sadece başarılı ve geçerli yanıtları önbelleğe al
                     if (response.ok && response.status === 200 && 
                         !response.url.includes('/offline') && 
-                        //!response.url.includes('/canli/') &&
+                        !response.url.includes('/kaynak/') &&
                         !response.url.includes('/canli-kaynak/')) { 
                         const responseClone = response.clone();
                         caches.open(CACHE_NAME).then((cache) => {
