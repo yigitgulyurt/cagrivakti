@@ -129,9 +129,6 @@
 
     <section class="info-card daily-content-card fade-in" id="daily-content" title="Günün Dini İçeriği">
         {% if ramadan_info.is_ramadan %}
-        <div class="daily-icon">
-            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-moon"></use></svg>
-        </div>
         <div class="daily-text">
             <span class="daily-label">Günün Ramazan İletisi</span>
             <p id="ramadan-message">{{ ramadan_info.ramadan_content }}</p>
@@ -939,9 +936,6 @@
         const dailyCard = document.getElementById('daily-content');
         if (dailyCard) {
             dailyCard.innerHTML = `
-                <div class="daily-icon">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-moon"></use></svg>
-                </div>
                 <div class="daily-text">
                     <span class="daily-label">Kadir Geceniz Kutlu Olsun</span>
                     <p>Bu gece, bin aydan daha yararlı olan Kadir Gecesi'dir. Bu kutlu geceyi dua, yakarış ve tövbe ile yerine getirmeniz salık verilir.</p>
