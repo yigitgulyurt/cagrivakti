@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}Çağrı Vakti | Çağdaş, Hızlı ve Doğru{% endblock %}</title>
 
+    {# Detect Firefox early (before render) so CSS can target .firefox-user #}
     <script>
     (function () {
         const ua = navigator.userAgent;
@@ -14,29 +15,29 @@
     })();
     </script>
 
-    <!-- SEO Meta Etiketleri -->
+    {# ---- SEO ---- #}
     <meta name="description" content="{% block description %}Dünya genelinde ezan vakitleri, imsakiye ve dini içerikler. Çağdaş arayüz ve doğru verilerle yanınızdayız.{% endblock %}">
-    <meta name="keywords" content="{% block keywords %}ramazan, imsakiye, ezan vakitleri, iftar ve sahur vakitleri{% endblock %}">
-    <meta name="author" content="Çağrı Vakti">
-    <link rel="canonical" href="{% block canonical %}https://cagrivakti.com.tr{{ request.path }}{% endblock %}">
+    <meta name="keywords"    content="{% block keywords %}ramazan, imsakiye, ezan vakitleri, iftar ve sahur vakitleri{% endblock %}">
+    <meta name="author"      content="Çağrı Vakti">
+    <link rel="canonical"    href="{% block canonical %}https://cagrivakti.com.tr{{ request.path }}{% endblock %}">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://cagrivakti.com.tr{{ request.path }}" />
-    <meta property="og:title" content="Çağrı Vakti" />
-    <meta property="og:description" content="Namaz Vakitlerine anında eriş " />
-    <meta property="og:image" content="https://cagrivakti.com.tr/static/icons/og-image.png" />
-    <meta property="og:image:width" content="1200" />
+    {# ---- Open Graph ---- #}
+    <meta property="og:type"        content="website" />
+    <meta property="og:url"         content="https://cagrivakti.com.tr{{ request.path }}" />
+    <meta property="og:title"       content="{% block og_title %}Çağrı Vakti{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}Namaz Vakitlerine anında eriş{% endblock %}" />
+    <meta property="og:image"       content="https://cagrivakti.com.tr/static/icons/og-image.png" />
+    <meta property="og:image:width"  content="1200" />
     <meta property="og:image:height" content="630" />
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://cagrivakti.com.tr{{ request.path }}" />
-    <meta name="twitter:title" content="Çağrı Vakti" />
-    <meta name="twitter:description" content="Namaz Vakitlerine anında eriş " />
-    <meta name="twitter:image" content="https://cagrivakti.com.tr/static/icons/og-image.png" />
-    
-    <!-- JSON-LD Structured Data -->
+    {# ---- Twitter Card ---- #}
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:url"         content="https://cagrivakti.com.tr{{ request.path }}" />
+    <meta name="twitter:title"       content="Çağrı Vakti" />
+    <meta name="twitter:description" content="Namaz Vakitlerine anında eriş" />
+    <meta name="twitter:image"       content="https://cagrivakti.com.tr/static/icons/og-image.png" />
+
+    {# ---- JSON-LD Structured Data ---- #}
     <script type="application/ld+json">
     {% block json_ld %}
     {
@@ -51,146 +52,184 @@
       }
     }
     {% endblock %}
-    
     {% block breadcrumb_json_ld %}{% endblock %}
     </script>
 
-    <!-- Favicon ve App Icons -->
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/ios/180.png') }}">
-    <link rel="mask-icon" href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}" color="#FFC107">
+    {# ---- Favicons & App Icons ---- #}
+    <link rel="icon"             type="image/x-icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180"     href="{{ url_for('static', filename='icons/ios/180.png') }}">
+    <link rel="mask-icon"
+          href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}"
+          color="#FFC107">
 
-    <!-- PWA Meta Etiketleri -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#121212">
-    <meta name="msapplication-TileColor" content="#121212">
-    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='icons/windows11/Square150x150Logo.scale-100.png') }}">
+    {# ---- PWA ---- #}
+    <link rel="manifest"    href="/manifest.json">
+    <meta name="theme-color"                          content="#121212">
+    <meta name="msapplication-TileColor"              content="#121212">
+    <meta name="msapplication-TileImage"              content="{{ url_for('static', filename='icons/windows11/Square150x150Logo.scale-100.png') }}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Çağrı">
-    
-    <!-- iOS Splash Screens -->
-    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}">
+    <meta name="mobile-web-app-capable"               content="yes">
+    <meta name="apple-mobile-web-app-capable"         content="yes">
+    <meta name="apple-mobile-web-app-title"           content="Çağrı">
+    <link rel="apple-touch-startup-image"             href="{{ url_for('static', filename='icons/android/android-launchericon-512-512.png') }}">
 
-    <!-- CSS Dosyaları -->
+    {# ---- Main CSS bundle ---- #}
     {% assets "css_main" %}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
     {% endassets %}
 
-    <!-- API Preconnect -->
+    {# ---- Preconnect to API ---- #}
     <link rel="preconnect" href="https://api.cagrivakti.com.tr">
 
     {% block extra_css %}{% endblock %}
 
+    {# ---- PWA Service Worker registration ---- #}
     <script>
-        // PWA Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => {
-                        //console.log('SW Registered');
-                        
-                        // Periyodik Arka Plan Senkronizasyonu (Destekleyen tarayıcılar için)
-                        if ('periodicSync' in reg) {
-                            reg.periodicSync.register('refresh-vakitler', {
-                                minInterval: 24 * 60 * 60 * 1000 // 24 saatte bir
-                            }).catch(err => console.log('Periodic Sync failed', err));
-                        }
-                    })
-                    .catch(err => console.log('SW Failed', err));
-            });
-        }
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => {
+                    // Periodic Background Sync (where supported)
+                    if ('periodicSync' in reg) {
+                        reg.periodicSync.register('refresh-vakitler', {
+                            minInterval: 24 * 60 * 60 * 1000 // 24 hours
+                        }).catch(err => console.log('Periodic Sync failed', err));
+                    }
+                })
+                .catch(err => console.log('SW Failed', err));
+        });
+    }
     </script>
 </head>
+
 <body>
+
+    {# ================================================================
+       INLINE SCRIPT: localStorage hygiene
+       Runs before anything renders to avoid stale cache reads.
+       - Clears prayer-time data when the date changes
+       - Clears versioned cache entries when app_version changes
+       ================================================================ #}
     <script>
-        (function(){
-            var v = "{{ app_version }}";
-            try {
-                var now = new Date();
-                var cur = now.toLocaleDateString('en-CA');
-                var prevDate = localStorage.getItem('LAST_VISIT_DATE');
-                if (prevDate && prevDate !== cur) {
-                    var keep = ['user_city','tour_shown','introSectionsHidden','guidesSectionHidden','APP_VERSION'];
-                    var backup = {};
-                    for (var i = 0; i < keep.length; i++) {
-                        var k = keep[i];
-                        var val = localStorage.getItem(k);
-                        if (val !== null) backup[k] = val;
-                    }
-                    localStorage.clear();
-                    for (var key in backup) {
-                        localStorage.setItem(key, backup[key]);
-                    }
-                }
-                localStorage.setItem('LAST_VISIT_DATE', cur);
-                var s = localStorage.getItem('APP_VERSION');
-                if (!s || s !== v) {
-                    var keysToKeep = ['guidesSectionHidden', 'introSectionsHidden', 'tour_shown', 'user_city','APP_VERSION' ];
-                    var backup2 = {};
-                    keysToKeep.forEach(function(key){
-                        var val2 = localStorage.getItem(key);
-                        if (val2 !== null) backup2[key] = val2;
-                    });
-                    localStorage.clear();
-                    Object.keys(backup2).forEach(function(key){
-                        localStorage.setItem(key, backup2[key]);
-                    });
-                    localStorage.setItem('APP_VERSION', v);
-                    localStorage.setItem('LAST_VISIT_DATE', cur);
-                }
-            } catch (e) {}
-        })();
+    (function () {
+        var APP_VERSION = "{{ app_version }}";
+
+        // Keys that must survive any cache-clear operation
+        var PERSISTENT_KEYS = [
+            'user_city',
+            'user_country',
+            'tour_shown',
+            'introSectionsHidden',
+            'guidesSectionHidden',
+            'APP_VERSION',
+        ];
+
+        function backupAndClear(extraKey) {
+            var keys = PERSISTENT_KEYS.concat(extraKey ? [extraKey] : []);
+            var backup = {};
+            for (var i = 0; i < keys.length; i++) {
+                var val = localStorage.getItem(keys[i]);
+                if (val !== null) backup[keys[i]] = val;
+            }
+            localStorage.clear();
+            for (var k in backup) localStorage.setItem(k, backup[k]);
+        }
+
+        try {
+            var today = new Date().toLocaleDateString('en-CA');
+
+            // 1. Clear prayer-time cache when the calendar date rolls over
+            var lastVisit = localStorage.getItem('LAST_VISIT_DATE');
+            if (lastVisit && lastVisit !== today) {
+                backupAndClear();
+            }
+            localStorage.setItem('LAST_VISIT_DATE', today);
+
+            // 2. Clear versioned cache when the app ships a new version
+            var storedVersion = localStorage.getItem('APP_VERSION');
+            if (!storedVersion || storedVersion !== APP_VERSION) {
+                backupAndClear();
+                localStorage.setItem('APP_VERSION',    APP_VERSION);
+                localStorage.setItem('LAST_VISIT_DATE', today);
+            }
+        } catch (e) { /* localStorage not available — silently ignore */ }
+    })();
     </script>
-    <!-- SVG Sprite -->
+
+    {# ---- SVG icon sprite (hidden) ---- #}
     <div style="display: none;">
         {% include 'img/icons.svg' %}
     </div>
 
+    {# ================================================================
+       NAVBAR
+       ================================================================ #}
     <nav class="navbar">
-        <a href="{{ url_for('views.index') }}" class="nav-brand" title="Ana Sayfa">{% block brand_text %}ÇAĞRI{% endblock %}</a>
-        <div id="navbar-vakit-countdown" class="fade-in" style="display: none; margin-left: 15px; font-size: 0.85rem; font-weight: 600; color: var(--primary); white-space: nowrap;"></div>
+        <a href="{{ url_for('views.index') }}" class="nav-brand" title="Ana Sayfa">
+            {% block brand_text %}ÇAĞRI{% endblock %}
+        </a>
+
+        {# Inline countdown shown when a city is saved #}
+        <div id="navbar-vakit-countdown"
+             class="fade-in"
+             style="display: none; margin-left: 15px; font-size: 0.85rem; font-weight: 600;
+                    color: var(--primary); white-space: nowrap;"></div>
+
         <button class="nav-toggle" id="navToggle" aria-label="Menüyü Aç/Kapat">
             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-bars"></use></svg>
         </button>
+
         <div class="nav-links" id="navLinks">
-            <a href="{{ url_for('views.sehir_secimi') }}" class="nav-link" title="İl ve İlçe Seçerek Namaz Vakitlerini Öğrenin">İl Seçimi</a>
-            <a href="{{ url_for('views.imsakiye_secimi') }}" class="nav-link" title="{{ current_year }} Ramazan İmsakiye Çizelgesi ve İftar Vakitleri">İmsakiye</a>
-            <a href="{{ url_for('views.kible_pusulasi') }}" class="nav-link" title="Harita Üzerinden Kıble Yönünü Bulun">Kıble</a>
-            <a href="{{ url_for('views.ramazan_nedir') }}" class="nav-link" title="Ramazan Ayı Hakkında Merak Edilenler">Ramazan?</a>
-            <a href="{{ url_for('views.orucu_bozan_durumlar') }}" class="nav-link" title="Orucu Bozan ve Bozmayan Durumlar Rehberi">Oruç Bozan Durumlar?</a>
-            <a href="{{ url_for('views.bilgi_kosesi_liste') }}" class="nav-link" title="İslam ve Dini Konularda Yararlı Bilgiler">Bilgi Köşesi</a>
-            <a href="{{ url_for('views.neden_biz') }}" class="nav-link" title="Neden Çağrı Vakti'ni Tercih Etmelisiniz?">Neden Biz?</a>
-            <a href="{{ url_for('views.indir') }}" class="nav-link" title="Çağrı Vakti Mobil Uygulamasını Ücretsiz İndirin">Uygulamayı İndir</a>
-            <a href="{{ url_for('views.ilkelerimiz') }}" class="nav-link" title="Yayın İlkelerimiz ve Değerlerimiz">İlkelerimiz</a>
-            <a href="{{ url_for('views.iletisim') }}" class="nav-link" title="Görüş, Öneri ve İletişim">İletişim</a>
-            <a href="{{ url_for('views.under_the_red_sky') }}" class="nav-link" title="Oyun">Oyun</a>
-            <a href="{{ url_for('views.ataturk') }}" class="nav-link nav-link-ataturk" title="Ulu Önder Mustafa Kemal Atatürk'ü Saygıyla Anıyoruz" style="color: #ff5252 !important; font-weight: 600;">Atatürk</a>
+            <a href="{{ url_for('views.sehir_secimi') }}"          class="nav-link" title="İl ve İlçe Seçerek Namaz Vakitlerini Öğrenin">İl Seçimi</a>
+            <a href="{{ url_for('views.imsakiye_secimi') }}"        class="nav-link" title="{{ current_year }} Ramazan İmsakiye Çizelgesi ve İftar Vakitleri">İmsakiye</a>
+            <a href="{{ url_for('views.kible_pusulasi') }}"         class="nav-link" title="Harita Üzerinden Kıble Yönünü Bulun">Kıble</a>
+            <a href="{{ url_for('views.ramazan_nedir') }}"          class="nav-link" title="Ramazan Ayı Hakkında Merak Edilenler">Ramazan?</a>
+            <a href="{{ url_for('views.orucu_bozan_durumlar') }}"   class="nav-link" title="Orucu Bozan ve Bozmayan Durumlar Rehberi">Oruç Bozan Durumlar?</a>
+            <a href="{{ url_for('views.bilgi_kosesi_liste') }}"     class="nav-link" title="İslam ve Dini Konularda Yararlı Bilgiler">Bilgi Köşesi</a>
+            <a href="{{ url_for('views.neden_biz') }}"              class="nav-link" title="Neden Çağrı Vakti'ni Tercih Etmelisiniz?">Neden Biz?</a>
+            <a href="{{ url_for('views.indir') }}"                  class="nav-link" title="Çağrı Vakti Mobil Uygulamasını Ücretsiz İndirin">Uygulamayı İndir</a>
+            <a href="{{ url_for('views.ilkelerimiz') }}"            class="nav-link" title="Yayın İlkelerimiz ve Değerlerimiz">İlkelerimiz</a>
+            <a href="{{ url_for('views.iletisim') }}"               class="nav-link" title="Görüş, Öneri ve İletişim">İletişim</a>
+            <a href="{{ url_for('views.under_the_red_sky') }}"      class="nav-link" title="Oyun">Oyun</a>
+            <a href="{{ url_for('views.ataturk') }}"
+               class="nav-link nav-link-ataturk"
+               title="Ulu Önder Mustafa Kemal Atatürk'ü Saygıyla Anıyoruz"
+               style="color: #ff5252 !important; font-weight: 600;">Atatürk</a>
         </div>
     </nav>
 
+    {# ================================================================
+       MAIN CONTENT
+       ================================================================ #}
     <main id="main-content">
         {% block content %}{% endblock %}
     </main>
 
+    {# ================================================================
+       FOOTER
+       ================================================================ #}
     <footer class="landing-footer fade-in">
         <div class="footer-content">
+
             <div class="footer-brand">
                 <svg class="icon"><use xlink:href="#fa-mosque"></use></svg>
                 <span>Çağrı Vakti</span>
             </div>
+
+            {# Popular city shortcuts #}
             <div class="footer-popular-cities">
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Istanbul', country='TR') }}">İstanbul</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Ankara', country='TR') }}">Ankara</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Izmir', country='TR') }}">İzmir</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Antalya', country='TR') }}">Antalya</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Trabzon', country='TR') }}">Trabzon</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Erzurum', country='TR') }}">Erzurum</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Istanbul',   country='TR') }}">İstanbul</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Ankara',     country='TR') }}">Ankara</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Izmir',      country='TR') }}">İzmir</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Antalya',    country='TR') }}">Antalya</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Trabzon',    country='TR') }}">Trabzon</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Erzurum',    country='TR') }}">Erzurum</a>
                 <a href="{{ url_for('views.sehir_sayfasi', sehir='Diyarbakir', country='TR') }}">Diyarbakır</a>
             </div>
+
+            {# Site-wide links #}
             <div class="footer-links">
-                <a href="{{ url_for('views.ataturk') }}" class="footer-link-ataturk">Atatürk</a>
+                <a href="{{ url_for('views.ataturk') }}"          class="footer-link-ataturk">Atatürk</a>
                 <a href="{{ url_for('views.sehir_secimi') }}">Vakitler</a>
                 <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye {{ current_year }}</a>
                 <a href="{{ url_for('views.kible_pusulasi') }}">Kıble</a>
@@ -201,64 +240,76 @@
                 <a href="{{ url_for('views.sitene_ekle') }}">Sitene Ekle</a>
                 <a href="{{ url_for('views.rainmeter_guide') }}">Masaüstü Widget</a>
                 <a href="{{ url_for('views.qr_okuyucu') }}">QR Okuyucu</a>
-                <a href="{{ url_for('views.prime_number') }}">Asal Sayı(20000 Basamak)</a>
-                <a href="{{ url_for('views.under_the_red_sky') }}">Oyun></a>
+                <a href="{{ url_for('views.prime_number') }}">Asal Sayı (20000 Basamak)</a>
+                <a href="{{ url_for('views.under_the_red_sky') }}">Oyun</a>
             </div>
+
             <div class="footer-creator">
-                <a href="https://www.instagram.com/yigitgulyurt/" target="_blank" rel="noopener noreferrer" style="color: var(--text); font-weight: 600;">BİR YİĞİT GÜLYURT PROJESİ</a>
+                <a href="https://www.instagram.com/yigitgulyurt/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color: var(--text); font-weight: 600;">BİR YİĞİT GÜLYURT PROJESİ</a>
             </div>
-            
+
             <div class="national-identity" title="Varlığım Türk varlığına armağan olsun.">
-                <svg class="icon left" aria-hidden="true">
-                    <use xlink:href="#icon-turk-bayragi"></use>
-                </svg>
-            
+                <svg class="icon left"  aria-hidden="true"><use xlink:href="#icon-turk-bayragi"></use></svg>
                 <span class="text">NE MUTLU TÜRKÜM DİYENE</span>
-            
-                <svg class="icon right" aria-hidden="true">
-        <use xlink:href="#icon-turk-bayragi"></use>
-                </svg>
+                <svg class="icon right" aria-hidden="true"><use xlink:href="#icon-turk-bayragi"></use></svg>
             </div>
 
             <div class="footer-copy" style="color: var(--gray);">
                 &copy; {{ current_year }} Çağrı Vakti. Bütün hakları saklıdır.
                 <br><small style="opacity: 0.8;">Sürüm {{ app_version }}</small>
             </div>
+
         </div>
     </footer>
 
-    {% block modals %}
-    {% endblock %}
+    {# ================================================================
+       PAGE-LEVEL MODALS  (overridden per page)
+       ================================================================ #}
+    {% block modals %}{% endblock %}
 
-    {% set is_mobile = request.user_agent and (request.user_agent.platform in ['android', 'iphone', 'ipad'] or 'mobile' in request.user_agent.string.lower()) %}
+    {# ================================================================
+       MOBILE-ONLY UI  (location modal, toast, PWA banner)
+       ================================================================ #}
+    {% set is_mobile = request.user_agent and (
+        request.user_agent.platform in ['android', 'iphone', 'ipad']
+        or 'mobile' in request.user_agent.string.lower()
+    ) %}
+
     {% if is_mobile %}
-    <!-- Custom Location Permission Modal -->
+
+    {# ---- Location permission modal ---- #}
     <div id="locationPermissionModal" class="custom-modal-overlay">
         <div class="custom-modal">
             <div class="modal-icon">
                 <svg class="icon"><use xlink:href="#fa-map-marker-alt"></use></svg>
             </div>
             <h3>Size Özel Vakitler</h3>
-            <p>Doğru ezan vakitlerini hesaplayabilmemiz için konum bilginize ihtiyacımız var. İzin verdiğinizde konumunuz anlık olarak alınacak ve cihazınıza kaydedilecektir.</p>
+            <p>Doğru ezan vakitlerini hesaplayabilmemiz için konum bilginize ihtiyacımız var.
+               İzin verdiğinizde konumunuz anlık olarak alınacak ve cihazınıza kaydedilecektir.</p>
             <div class="modal-actions">
-                <button id="denyLocationBtn" class="btn btn-secondary">Daha Sonra</button>
+                <button id="denyLocationBtn"  class="btn btn-secondary">Daha Sonra</button>
                 <button id="allowLocationBtn" class="btn btn-primary">Konumu Paylaş</button>
             </div>
         </div>
     </div>
 
-    <!-- Process Toast -->
+    {# ---- Process toast ---- #}
     <div id="processToast" class="process-toast">
         <div class="toast-spinner"></div>
         <svg class="icon toast-success-icon"><use xlink:href="#fa-check-circle"></use></svg>
         <span id="toastMessage">İşlem yapılıyor...</span>
     </div>
 
-    <!-- PWA Kurulum Banner'ı -->
+    {# ---- PWA install banner ---- #}
     <div id="pwaInstallBanner" class="pwa-install-banner" title="Çağrı Vakti'ni Yükle">
         <div class="pwa-content">
             <div class="pwa-icon">
-                <img src="{{ url_for('static', filename='icons/android/android-launchericon-96-96.png') }}" alt="Çağrı Vakti Uygulama İkonu" loading="lazy">
+                <img src="{{ url_for('static', filename='icons/android/android-launchericon-96-96.png') }}"
+                     alt="Çağrı Vakti Uygulama İkonu"
+                     loading="lazy">
             </div>
             <div class="pwa-text">
                 <h3>Çağrı Vakti'ni Yükleyin</h3>
@@ -267,360 +318,346 @@
         </div>
         <div class="pwa-actions">
             <button id="pwaInstallBtn" class="btn btn-primary btn-sm" title="Uygulamayı Cihaza Yükle">
-                <svg class="icon" aria-hidden="true" style="margin-right: 4px;"><use xlink:href="#fa-download-solid-full"></use></svg> Yükle
+                <svg class="icon" aria-hidden="true" style="margin-right: 4px;">
+                    <use xlink:href="#fa-download-solid-full"></use>
+                </svg>
+                Yükle
             </button>
             <button id="pwaCloseBtn" class="btn-close-pwa" title="Kapat">
                 <svg class="icon" aria-hidden="true"><use xlink:href="#fa-xmark"></use></svg>
             </button>
         </div>
     </div>
-    {% endif %}
+
+    {% endif %}{# /is_mobile #}
 
     {% block extra_js %}{% endblock %}
-    
-    <!-- Scripts -->
+
+    {# ---- Main JS bundle ---- #}
     {% assets "js_main" %}
     <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
 
-    <!-- Global Scripts -->
+    {# ================================================================
+       GLOBAL SCRIPTS
+       ================================================================ #}
     <script>
-        function updateOnlineStatus() {
-            // Sadece bağlantı koptuğunda offline sayfasına yönlendirilebilir 
-            // ya da uygulama genelinde sessizce yönetilebilir.
-            // Kullanıcının bahsettiği "kırmızı kutu" uyarısı burada tetiklenmiyor.
-            console.log(navigator.onLine ? "Çevrimiçi" : "Çevrimdışı");
+    /* ----------------------------------------------------------------
+       Online / offline status logging
+       ---------------------------------------------------------------- */
+    function updateOnlineStatus() {
+        console.log(navigator.onLine ? 'Çevrimiçi' : 'Çevrimdışı');
+    }
+    window.addEventListener('online',  updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+
+    /* ----------------------------------------------------------------
+       City-aware manifest URL
+       Appends ?city=<saved-city> for targeted caching / shortcuts.
+       ---------------------------------------------------------------- */
+    window.addEventListener('DOMContentLoaded', () => {
+        const cityMatch = document.cookie.match(/user_city=([^;]+)/);
+        if (cityMatch && cityMatch[1]) {
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            if (manifestLink) {
+                const url = new URL(manifestLink.href, window.location.origin);
+                url.searchParams.set('city', cityMatch[1]);
+                manifestLink.href = url.toString();
+            }
+        }
+    });
+
+
+    /* ----------------------------------------------------------------
+       City name helpers  (Turkish display ↔ Latin API name)
+       ---------------------------------------------------------------- */
+    const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse(
+        '{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}'
+    );
+    const REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
+        Object.entries(CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
+    );
+
+    function getLatinNameGlobal(turkishName) {
+        if (REVERSE_CITY_MAPPING_GLOBAL[turkishName]) {
+            return REVERSE_CITY_MAPPING_GLOBAL[turkishName];
+        }
+        const charMap = {
+            'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G',
+            'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O',
+            'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U',
+        };
+        return turkishName
+            .split('').map(c => charMap[c] || c).join('')
+            .replace(/\s+/g, '-')
+            .replace(/[^A-Za-z0-9\-]/g, '');
+    }
+
+
+    /* ----------------------------------------------------------------
+       PWA install banner
+       ---------------------------------------------------------------- */
+    window.deferredPrompt = null;
+
+    const pwaBanner   = document.getElementById('pwaInstallBanner');
+    const installBtn  = document.getElementById('pwaInstallBtn');
+    const closeBtn    = document.getElementById('pwaCloseBtn');
+
+    function closePwaBanner() {
+        if (pwaBanner) {
+            pwaBanner.classList.remove('active', 'ready');
+            sessionStorage.setItem('pwaBannerDismissed', 'true');
+        }
+    }
+
+    /* Show banner helper — centralises the repeated "activate" pattern */
+    function showPwaBanner(ready) {
+        if (!pwaBanner) return;
+        pwaBanner.classList.add('active');
+        if (ready) pwaBanner.classList.add('ready');
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        const isMobile       = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isDownloadPage = window.location.pathname.includes('/indir') || window.location.pathname.includes('/uygulamayi-indir');
+
+        // Never show the install prompt on desktop
+        if (!isMobile) {
+            e.preventDefault();
+            return;
         }
 
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
+        // On the download page let the browser's native prompt surface naturally
+        if (!isDownloadPage) {
+            e.preventDefault();
+        }
 
-        // Manifest URL'ini kullanıcı şehrine göre güncelle (Cache busting ve Parametre)
-        window.addEventListener('DOMContentLoaded', () => {
-            const userCityMatch = document.cookie.match(/user_city=([^;]+)/);
-            if (userCityMatch && userCityMatch[1]) {
-                const city = userCityMatch[1];
-                const manifestLink = document.querySelector('link[rel="manifest"]');
-                if (manifestLink) {
-                    const url = new URL(manifestLink.href, window.location.origin);
-                    url.searchParams.set('city', city);
-                    // Tarayıcının cache'ini zorlamak için versiyon ekle
-                    // url.searchParams.set('v', '2.11'); 
-                    manifestLink.href = url.toString();
-                    // console.log('Manifest updated for:', city);
+        window.deferredPrompt = e;
+
+        if (isDownloadPage) {
+            // Wire up the dedicated install button on /indir if present
+            const downloadPageBtn = document.getElementById('pwa-install-btn-main');
+            if (downloadPageBtn) {
+                downloadPageBtn.style.display = 'inline-block';
+                downloadPageBtn.addEventListener('click', async () => {
+                    if (window.deferredPrompt) {
+                        window.deferredPrompt.prompt();
+                        const { outcome } = await window.deferredPrompt.userChoice;
+                        console.log(`Install prompt outcome: ${outcome}`);
+                        window.deferredPrompt = null;
+                        downloadPageBtn.style.display = 'none';
+                    }
+                });
+            }
+            return; // No custom banner on download page
+        }
+
+        // Post-reload: show the "ready to install" variant of the banner
+        if (sessionStorage.getItem('reloadingForPWA')) {
+            const pwaTitle  = document.querySelector('.pwa-text h3');
+            const pwaText   = document.querySelector('.pwa-text p');
+
+            if (pwaTitle)  pwaTitle.textContent = 'Kuruluma Hazır';
+            if (pwaText)   pwaText.textContent  = 'Her şey hazır, şimdi uygulamayı yükleyebilirsin.';
+            if (installBtn) {
+                installBtn.innerHTML = '<svg class="icon" style="font-size:1.2em;margin-right:8px;"><use xlink:href="#fa-download-solid-full"></use></svg> Uygulamayı Yükle';
+                installBtn.classList.add('pulse-animation');
+            }
+
+            showPwaBanner(true);
+            sessionStorage.removeItem('reloadingForPWA');
+
+        } else if (!sessionStorage.getItem('pwaBannerDismissed')) {
+            // Normal first-visit: show banner after a short delay
+            setTimeout(() => showPwaBanner(false), 1000);
+        }
+    });
+
+    /* Fallback for iOS / browsers that never fire beforeinstallprompt */
+    window.addEventListener('load', () => {
+        const isMobile       = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isStandalone   = window.matchMedia('(display-mode: standalone)').matches;
+        const isDismissed    = sessionStorage.getItem('pwaBannerDismissed');
+        const isDownloadPage = window.location.pathname.includes('/indir') || window.location.pathname.includes('/uygulamayi-indir');
+
+        if (isMobile && !isStandalone && !isDismissed && !isDownloadPage) {
+            // Wait to see if beforeinstallprompt fires first
+            setTimeout(() => {
+                if (!window.deferredPrompt && pwaBanner) {
+                    showPwaBanner(false);
                 }
-            }
-        });
-
-        // PWA Kurulum Mantığı
-        window.deferredPrompt = null;
-        const pwaBanner = document.getElementById('pwaInstallBanner');
-        const installBtn = document.getElementById('pwaInstallBtn');
-        const closeBtn = document.getElementById('pwaCloseBtn');
-
-        // Şehir eşleştirme ve normalizasyon fonksiyonları (Global Scope'da tanımlı olabilir, kontrol et)
-        const CITY_DISPLAY_MAPPING_GLOBAL = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else '{}' }};
-        const REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
-            Object.entries(CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
-        );
-
-        function getLatinNameGlobal(turkishName) {
-             if (REVERSE_CITY_MAPPING_GLOBAL[turkishName]) {
-                 return REVERSE_CITY_MAPPING_GLOBAL[turkishName];
-             }
-             const charMap = {
-                 'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G', 'ı': 'i', 'İ': 'I',
-                 'ö': 'o', 'Ö': 'O', 'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U'
-             };
-             let normalized = turkishName.split('').map(char => charMap[char] || char).join('');
-             return normalized.replace(/\s+/g, '-').replace(/[^A-Za-z0-9\-]/g, '');
+            }, 3000);
         }
+    });
 
-        // Banner'ı kapatma fonksiyonu
-        function closePwaBanner() {
-            if (pwaBanner) {
-                pwaBanner.classList.remove('active');
-                pwaBanner.classList.remove('ready');
-                // Bu oturumda tekrar gösterme
-                sessionStorage.setItem('pwaBannerDismissed', 'true');
-            }
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Masaüstü cihazlarda PWA kurulumunu tamamen engelle
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (!isMobile) {
-                e.preventDefault();
-                console.log('PWA prompt suppressed on desktop');
+    /* Install button click handler */
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (!window.deferredPrompt) {
+                // No native prompt available (iOS etc.) — redirect to download page
+                window.location.href = "{{ url_for('views.indir') }}";
                 return;
             }
 
-            // İndir sayfasında ise native banner'ın çıkmasına izin ver (preventDefault yapma)
-            // Diğer sayfalarda otomatik gösterimi engelle
-            const isDownloadPage = window.location.pathname.includes('/indir') || window.location.pathname.includes('/uygulamayi-indir');
-            
-            if (!isDownloadPage) {
-                e.preventDefault();
-            }
-            
-            // Olayı sakla ki daha sonra tetikleyebilelim
-            window.deferredPrompt = e;
-            
-            // Eğer indir sayfasındaysak ve kullanıcı bir butona basarsa tetiklemek için hazır olsun
-            if (isDownloadPage) {
-                console.log('PWA native prompt allowed on download page');
-                // İndir sayfasında özel butonları aktif et (varsa)
-                const downloadPageBtn = document.getElementById('pwa-install-btn-main');
-                if (downloadPageBtn) {
-                    downloadPageBtn.style.display = 'inline-block';
-                    downloadPageBtn.addEventListener('click', async () => {
-                        if (window.deferredPrompt) {
-                            window.deferredPrompt.prompt();
-                            const { outcome } = await window.deferredPrompt.userChoice;
-                            console.log(`User response to the install prompt: ${outcome}`);
-                            window.deferredPrompt = null;
-                            downloadPageBtn.style.display = 'none';
-                        }
-                    });
-                }
-                return; // Custom banner'ı gösterme
-            }
-            
-            // Eğer reload sonrası ise hemen göster
-            if (sessionStorage.getItem('reloadingForPWA')) {
-                pwaBanner.classList.add('active');
-                pwaBanner.classList.add('ready'); // Büyük ve ortalı görünüm
-                
-                const pwaText = document.querySelector('.pwa-text p');
-                const pwaTitle = document.querySelector('.pwa-text h3');
-                const installBtn = document.getElementById('pwaInstallBtn');
-                
-                if (pwaTitle) pwaTitle.textContent = 'Kuruluma Hazır';
-                if (pwaText) pwaText.textContent = 'Her şey hazır, şimdi uygulamayı yükleyebilirsin.';
-                if (installBtn) {
-                    installBtn.innerHTML = '<svg class="icon" style="font-size: 1.2em; margin-right: 8px;"><use xlink:href="#fa-download-solid-full"></use></svg> Uygulamayı Yükle';
-                    installBtn.classList.add('pulse-animation');
-                }
-                
-                sessionStorage.removeItem('reloadingForPWA');
-            } 
-            // Eğer kullanıcı daha önce bu oturumda kapatmadıysa banner'ı göster
-            else if (!sessionStorage.getItem('pwaBannerDismissed')) {
-                setTimeout(() => {
-                    pwaBanner.classList.add('active');
-                }, 1000); // 1 saniye sonra göster
-            }
-        });
+            // If no city is saved yet, ask for location first
+            const hasCity = document.cookie.split('; ').some(row => row.startsWith('user_city='));
+            if (!hasCity) {
+                const permissionModal = document.getElementById('locationPermissionModal');
+                const allowBtn        = document.getElementById('allowLocationBtn');
+                const denyBtn         = document.getElementById('denyLocationBtn');
+                const toast           = document.getElementById('processToast');
+                const toastMsg        = document.getElementById('toastMessage');
 
-        // iOS ve Desteklenmeyen Tarayıcılar İçin Fallback Logic
-        window.addEventListener('load', () => {
-             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-             const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-             const isDismissed = sessionStorage.getItem('pwaBannerDismissed');
-             const isDownloadPage = window.location.pathname.includes('/indir') || window.location.pathname.includes('/uygulamayi-indir');
-             
-             if (isMobile && !isStandalone && !isDismissed && !isDownloadPage) {
-                 // beforeinstallprompt'un tetiklenip tetiklenmediğini kontrol et (Android için biraz bekle)
-                 setTimeout(() => {
-                     if (!window.deferredPrompt) {
-                         // Eğer native prompt yoksa, banner'ı yine de göster (Redirect modu)
-                         if (pwaBanner) {
-                             pwaBanner.classList.add('active');
-                             // Buton metnini gerekirse güncelle (Şimdilik "Yükle" kalabilir)
-                         }
-                     }
-                 }, 3000); // 3 saniye bekle
-             }
-        });
+                if (!permissionModal) return;
+                permissionModal.classList.add('active');
 
-        if (installBtn) {
-            installBtn.addEventListener('click', async () => {
-                if (window.deferredPrompt) {
-                    // 1. Şehir kontrolü (Cookie)
-                    const userCity = document.cookie.split('; ').find(row => row.startsWith('user_city='));
-                    const pwaText = document.querySelector('.pwa-text p');
-                    
-                    if (!userCity) {
-                        // MODAL VE TOAST ELEMENTLERİNİ SEÇ
-                        const permissionModal = document.getElementById('locationPermissionModal');
-                        const allowBtn = document.getElementById('allowLocationBtn');
-                        const denyBtn = document.getElementById('denyLocationBtn');
-                        const toast = document.getElementById('processToast');
-                        const toastMsg = document.getElementById('toastMessage');
+                /* --- Allow button --- */
+                allowBtn.onclick = async () => {
+                    permissionModal.classList.remove('active');
 
-                        // Modalı göster
-                        if (permissionModal) {
-                            permissionModal.classList.add('active');
-                            
-                            // İzin ver butonuna tıklandığında
-                            const handleAllow = async () => {
-                                permissionModal.classList.remove('active');
-                                
-                                // Toast göster
-                                if (toast && toastMsg) {
-                                    toastMsg.textContent = 'Konum uydudan alınıyor...';
-                                    toast.classList.add('active');
-                                    toast.classList.remove('success'); // Reset success state
-                                }
-
-                                try {
-                                    // Konum izni iste
-                                    const position = await new Promise((resolve, reject) => {
-                                        navigator.geolocation.getCurrentPosition(resolve, reject);
-                                    });
-                                    
-                                    // Konum alındı
-                                    if (toastMsg) toastMsg.textContent = 'Şehir bilgisi işleniyor...';
-                                    
-                                    const lat = position.coords.latitude;
-                                    const lon = position.coords.longitude;
-                                    
-                                    // Reverse Geocoding
-                                    let originalCityName = null;
-
-                                    // 1. Deneme: Nominatim (OpenStreetMap)
-                                    try {
-                                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=tr`);
-                                        if (response.ok) {
-                                            const data = await response.json();
-                                            if (data && data.address) {
-                                                originalCityName = data.address.province || data.address.city || data.address.town || data.address.state;
-                                            }
-                                        }
-                                    } catch (err) {
-                                        console.warn('Nominatim failed, trying fallback...');
-                                    }
-
-                                    // 2. Deneme: BigDataCloud (Fallback)
-                                    if (!originalCityName) {
-                                        try {
-                                            if (toastMsg) toastMsg.textContent = 'Alternatif servis deneniyor...';
-                                            const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=tr`);
-                                            if (response.ok) {
-                                                const data = await response.json();
-                                                // BigDataCloud field mapping
-                                                originalCityName = data.city || data.locality || data.principalSubdivision;
-                                            }
-                                        } catch (err) {
-                                            console.error('Fallback geocoding failed:', err);
-                                        }
-                                    }
-
-                                    if (originalCityName) {
-                                        // Başarılı
-                                        originalCityName = originalCityName.replace(" İli", "").replace(" Province", "").trim();
-                                        const latinCityName = getLatinNameGlobal(originalCityName);
-                                        
-                                        // Cookie ve LocalStorage güncelle
-                                        document.cookie = `user_city=${latinCityName}; path=/; max-age=31536000; SameSite=Lax`;
-                                        localStorage.setItem('user_city', latinCityName);
-                                        
-                                        if (toastMsg) toastMsg.textContent = `Şehir bulundu: ${originalCityName}`;
-                                        if (toast) {
-                                            toast.classList.add('success');
-                                            // Başarı ikonunu göster (spinner gizlenir css ile)
-                                            const icon = toast.querySelector('.toast-success-icon use');
-                                            if(icon) icon.setAttribute('xlink:href', '#fa-check-circle');
-                                        }
-                                        
-                                        // Biraz bekle sonra yenile
-                                        setTimeout(() => {
-                                            sessionStorage.setItem('reloadingForPWA', 'true');
-                                            window.location.reload();
-                                        }, 1500);
-                                    } else {
-                                        // Başarısız - Manuel Seçime Yönlendir
-                                        console.error('All reverse geocoding attempts failed.');
-                                        if (toastMsg) toastMsg.textContent = 'Otomatik konum bulunamadı.';
-                                        if (toast) toast.classList.remove('success'); // Hata durumunda success olmamalı
-                                        
-                                        setTimeout(() => {
-                                            if (toastMsg) toastMsg.textContent = 'Manuel seçime yönlendiriliyorsunuz...';
-                                            // Hata durumunda da yönlendir
-                                            window.location.href = "{{ url_for('views.sehir_secimi') }}";
-                                        }, 1500);
-                                    }
-
-                                } catch (error) {
-                                    console.log('Konum hatası:', error);
-                                    if (toastMsg) toastMsg.textContent = 'Konum izni verilmedi.';
-                                    setTimeout(() => {
-                                        if (toast) toast.classList.remove('active');
-                                    }, 2000);
-                                }
-                                
-                                // Event listener'ı temizle (gerekirse)
-                                allowBtn.removeEventListener('click', handleAllow);
-                            };
-
-                            allowBtn.onclick = handleAllow; // onclick kullanarak önceki listenerları ezeriz
-
-                            // Vazgeç butonuna tıklandığında
-                            denyBtn.onclick = () => {
-                                permissionModal.classList.remove('active');
-                            };
-                            
-                            return; // Modal sonucunu bekle
-                        }
+                    // Show loading toast
+                    if (toast && toastMsg) {
+                        toastMsg.textContent = 'Konum uydudan alınıyor...';
+                        toast.classList.add('active');
+                        toast.classList.remove('success');
                     }
 
-                    // 2. Yükleme işlemini başlat (Eğer şehir varsa)
-                    window.deferredPrompt.prompt();
-                    
-                    const { outcome } = await window.deferredPrompt.userChoice;
-                    console.log(`User response to the install prompt: ${outcome}`);
-                    
-                    window.deferredPrompt = null;
-                    closePwaBanner();
-                } else {
-                    // Fallback: Native prompt yoksa (iOS vb.) indir sayfasına yönlendir
-                    window.location.href = "{{ url_for('views.indir') }}";
-                }
-            });
-        }
+                    try {
+                        const position = await new Promise((resolve, reject) => {
+                            navigator.geolocation.getCurrentPosition(resolve, reject);
+                        });
 
-        if (closeBtn) {
-            closeBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                closePwaBanner();
-            });
-        }
+                        if (toastMsg) toastMsg.textContent = 'Şehir bilgisi işleniyor...';
 
-        // Uygulama yüklendiğinde
-        window.addEventListener('appinstalled', (evt) => {
-            console.log('PWA başarıyla yüklendi');
-            pwaBanner.classList.remove('active');
+                        const { latitude: lat, longitude: lon } = position.coords;
+                        let cityName = null;
+
+                        // 1st attempt: Nominatim (OpenStreetMap)
+                        try {
+                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=tr`);
+                            if (res.ok) {
+                                const data = await res.json();
+                                if (data?.address) {
+                                    cityName = data.address.province
+                                            || data.address.city
+                                            || data.address.town
+                                            || data.address.state;
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('Nominatim failed, trying fallback…');
+                        }
+
+                        // 2nd attempt: BigDataCloud
+                        if (!cityName) {
+                            try {
+                                if (toastMsg) toastMsg.textContent = 'Alternatif servis deneniyor...';
+                                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=tr`);
+                                if (res.ok) {
+                                    const data = await res.json();
+                                    cityName = data.city || data.locality || data.principalSubdivision;
+                                }
+                            } catch (err) {
+                                console.error('Fallback geocoding failed:', err);
+                            }
+                        }
+
+                        if (cityName) {
+                            cityName = cityName.replace(' İli', '').replace(' Province', '').trim();
+                            const latinName = getLatinNameGlobal(cityName);
+
+                            document.cookie = `user_city=${latinName}; path=/; max-age=31536000; SameSite=Lax`;
+                            localStorage.setItem('user_city', latinName);
+
+                            if (toastMsg) toastMsg.textContent = `Şehir bulundu: ${cityName}`;
+                            if (toast) {
+                                toast.classList.add('success');
+                                const icon = toast.querySelector('.toast-success-icon use');
+                                if (icon) icon.setAttribute('xlink:href', '#fa-check-circle');
+                            }
+
+                            setTimeout(() => {
+                                sessionStorage.setItem('reloadingForPWA', 'true');
+                                window.location.reload();
+                            }, 1500);
+
+                        } else {
+                            // All geocoding failed — redirect to manual city picker
+                            if (toastMsg) toastMsg.textContent = 'Otomatik konum bulunamadı.';
+                            setTimeout(() => {
+                                window.location.href = "{{ url_for('views.sehir_secimi') }}";
+                            }, 1500);
+                        }
+
+                    } catch (err) {
+                        console.log('Konum hatası:', err);
+                        if (toastMsg) toastMsg.textContent = 'Konum izni verilmedi.';
+                        setTimeout(() => {
+                            if (toast) toast.classList.remove('active');
+                        }, 2000);
+                    }
+                };
+
+                /* --- Deny button --- */
+                denyBtn.onclick = () => permissionModal.classList.remove('active');
+
+                return; // Wait for modal outcome before proceeding
+            }
+
+            // City already stored — go straight to the install prompt
+            window.deferredPrompt.prompt();
+            const { outcome } = await window.deferredPrompt.userChoice;
+            console.log(`Install prompt outcome: ${outcome}`);
+            window.deferredPrompt = null;
+            closePwaBanner();
+        });
+    }
+
+    /* Close button */
+    if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closePwaBanner();
+        });
+    }
+
+    /* Hide banner once installed */
+    window.addEventListener('appinstalled', () => {
+        console.log('PWA başarıyla yüklendi');
+        closePwaBanner();
+    });
+
+
+    /* ----------------------------------------------------------------
+       Navbar hamburger toggle
+       ---------------------------------------------------------------- */
+    const navToggle = document.getElementById('navToggle');
+    const navLinks  = document.getElementById('navLinks');
+
+    if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+            const isOpen = navLinks.classList.toggle('active');
+            navToggle.querySelector('use').setAttribute(
+                'xlink:href',
+                isOpen ? '#fa-xmark' : '#fa-bars'
+            );
+            document.body.style.overflow = isOpen ? 'hidden' : 'auto';
         });
 
-        // Navbar Toggle
-        const navToggle = document.getElementById('navToggle');
-        const navLinks = document.getElementById('navLinks');
-
-        if (navToggle && navLinks) {
-            navToggle.addEventListener('click', () => {
-                navLinks.classList.toggle('active');
-                const icon = navToggle.querySelector('use');
-                if (navLinks.classList.contains('active')) {
-                    icon.setAttribute('xlink:href', '#fa-xmark');
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    icon.setAttribute('xlink:href', '#fa-bars');
-                    document.body.style.overflow = 'auto';
-                }
+        // Close the menu when any nav link is clicked
+        navLinks.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                navToggle.querySelector('use').setAttribute('xlink:href', '#fa-bars');
+                document.body.style.overflow = 'auto';
             });
-
-            // Menü linklerine tıklandığında menüyü kapat
-            navLinks.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinks.classList.remove('active');
-                    navToggle.querySelector('use').setAttribute('xlink:href', '#fa-bars');
-                    document.body.style.overflow = 'auto';
-                });
-            });
-        }
+        });
+    }
     </script>
 
     {% block footer_js %}{% endblock %}
+
 </body>
 </html>
