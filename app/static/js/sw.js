@@ -100,11 +100,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Önbelleğe alınmayacak sayfalar — her zaman ağdan getir
-        event.respondWith(fetch(event.request));
-        return;
-    }
-
     // Oyun dosyaları — ayrı GAME_CACHE, Stale-While-Revalidate
     if (url.pathname.startsWith('/kaynak/under-the-red-sky/')) {
         event.respondWith(
