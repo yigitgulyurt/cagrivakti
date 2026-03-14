@@ -1,328 +1,9 @@
 {% extends "base.html" %}
 
+{# ============================================================
+   SEO & META
+   ============================================================ #}
 {% block title %}{{ seo_title }}{% endblock %}
-
-{% block footer_js %}
-<!-- Tutorial Modal -->
-<div id="tutorialModal" class="tutorial-overlay" style="display: none;">
-    <div class="tutorial-modal">
-        <button class="tutorial-close" onclick="closeTutorialModal()" aria-label="Tanıtımı Kapat">
-            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-xmark"></use></svg>
-        </button>
-        
-        <div class="tutorial-content">
-            <!-- Step 1: Welcome & Logo -->
-            <div id="step-1" class="tutorial-step" style="display: block;">
-                <div class="tutorial-icon-box">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-mosque"></use></svg>
-                </div>
-                <h3>Çağrı Vakti'ne Hoş Geldiniz</h3>
-                <p>Modern ve kullanıcı dostu arayüzümüzle hizmetinizdeyiz. Sol üstteki logoya tıklayarak dilediğiniz zaman ana sayfaya dönebilirsiniz.</p>
-            </div>
-
-            <!-- Step 2: Discover Time -->
-            <div id="step-2" class="tutorial-step" style="display: none;">
-                <div class="tutorial-icon-box">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
-                </div>
-                <h3>Vakitleri Keşfedin</h3>
-                <p>"Vakti Keşfet" özelliğini kullanarak dilediğiniz şehri seçebilir, tüm ezan ve iftar vakitlerine anında ulaşabilirsiniz.</p>
-            </div>
-
-            <!-- Step 3: Find Location -->
-            <div id="step-3" class="tutorial-step" style="display: none;">
-                <div class="tutorial-icon-box">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-location-dot"></use></svg>
-                </div>
-                <h3>Size En Yakın Vakitler</h3>
-                <p>"Konumumu Bul" özelliğiyle bulunduğunuz yeri otomatik tespit ederek, size özel ezan vakitlerini anında sunuyoruz.</p>
-            </div>
-
-            <!-- Step 4: Menu -->
-            <div id="step-4" class="tutorial-step" style="display: none;">
-                <div class="tutorial-icon-box">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-bars"></use></svg>
-                </div>
-                <h3>Faydalı Araçlar</h3>
-                <p>İmsakiye, Kıble Pusulası, Ramazan Rehberi ve çok daha fazlası... Tüm dini araçlarımıza menüden kolayca erişin.</p>
-            </div>
-        </div>
-
-        <div class="tutorial-footer">
-            <div class="tutorial-dots">
-                <span class="step-dot active"></span>
-                <span class="step-dot"></span>
-                <span class="step-dot"></span>
-                <span class="step-dot"></span>
-            </div>
-            <div class="tutorial-actions">
-                <button id="tutorial-prev" class="btn-tutorial-sec" onclick="prevStep()">Geri</button>
-                <button id="tutorial-next" class="btn-tutorial-pri" onclick="nextStep()">İleri</button>
-                <button id="tutorial-finish" class="btn-tutorial-pri" onclick="closeTutorialModal()" style="display: none;">Başla</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-/* Tutorial Modal Styles */
-.tutorial-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    z-index: 10000;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.tutorial-modal {
-    background: #1e1e1e;
-    border: 1px solid rgba(255, 193, 7, 0.2);
-    border-radius: 24px;
-    width: 100%;
-    max-width: 500px;
-    padding: 40px 30px 30px;
-    position: relative;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    animation: modalPop 0.3s ease-out;
-}
-
-@keyframes modalPop {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.tutorial-close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: transparent;
-    border: none;
-    color: var(--gray);
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: color 0.3s;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.tutorial-close:hover {
-    color: var(--text);
-    background: rgba(255,255,255,0.05);
-}
-
-.tutorial-icon-box {
-    width: 80px;
-    height: 80px;
-    background: rgba(255, 193, 7, 0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 25px;
-    color: var(--primary);
-    font-size: 2rem;
-    box-shadow: 0 0 20px rgba(255, 193, 7, 0.1);
-}
-
-.tutorial-content {
-        text-align: center;
-        margin-bottom: 30px;
-        min-height: 250px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .tutorial-step {
-        width: 100%;
-    }
-
-.tutorial-step h3 {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-    color: var(--text);
-}
-
-.tutorial-step p {
-    font-size: 1.1rem;
-    color: var(--gray);
-    line-height: 1.6;
-}
-
-.tutorial-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-}
-
-.tutorial-dots {
-    display: flex;
-    gap: 8px;
-}
-
-.step-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    transition: all 0.3s;
-}
-
-.step-dot.active {
-    background: var(--primary);
-    width: 25px;
-    border-radius: 10px;
-}
-
-.tutorial-actions {
-    display: flex;
-    gap: 15px;
-    width: 100%;
-    justify-content: center;
-}
-
-.btn-tutorial-pri, .btn-tutorial-sec {
-    padding: 12px 30px;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    min-width: 120px;
-}
-
-.btn-tutorial-pri {
-    background: var(--primary);
-    color: #000;
-    border: none;
-}
-
-.btn-tutorial-pri:hover {
-    background: var(--primary-hover);
-    transform: translateY(-2px);
-}
-
-.btn-tutorial-sec {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--text);
-}
-
-.btn-tutorial-sec:hover {
-    background: rgba(255,255,255,0.05);
-    border-color: rgba(255,255,255,0.2);
-}
-
-@media (max-width: 768px) {
-    .tutorial-modal {
-        padding: 30px 20px 20px;
-        max-width: 90%;
-    }
-    .tutorial-step h3 { font-size: 1.5rem; }
-    .tutorial-step p { font-size: 1rem; }
-    .tutorial-icon-box { width: 60px; height: 60px; font-size: 1.5rem; }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if the tour hasn't been shown yet
-    if (!localStorage.getItem('tour_shown')) {
-        openTutorialModal();
-    }
-    
-    // Close modal when clicking outside
-    const modal = document.getElementById('tutorialModal');
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeTutorialModal();
-            }
-        });
-    }
-});
-
-function openTutorialModal() {
-    const modal = document.getElementById('tutorialModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        showStep(1);
-    }
-}
-
-function closeTutorialModal() {
-    const modal = document.getElementById('tutorialModal');
-    if (modal) {
-        modal.style.display = 'none';
-        localStorage.setItem('tour_shown', 'true');
-    }
-}
-
-let currentStep = 1;
-const totalSteps = 4;
-
-function showStep(step) {
-    // Hide all steps
-    document.querySelectorAll('.tutorial-step').forEach(el => el.style.display = 'none');
-    
-    // Show current step
-    const currentStepEl = document.getElementById(`step-${step}`);
-    if (currentStepEl) {
-        currentStepEl.style.display = 'block';
-        currentStep = step;
-        
-        // Update dots
-        document.querySelectorAll('.step-dot').forEach((dot, index) => {
-            if (index + 1 === step) dot.classList.add('active');
-            else dot.classList.remove('active');
-        });
-
-        // Update buttons
-        const prevBtn = document.getElementById('tutorial-prev');
-        const nextBtn = document.getElementById('tutorial-next');
-        const finishBtn = document.getElementById('tutorial-finish');
-
-        if (step === 1) {
-            prevBtn.style.visibility = 'hidden';
-        } else {
-            prevBtn.style.visibility = 'visible';
-        }
-
-        if (step === totalSteps) {
-            nextBtn.style.display = 'none';
-            finishBtn.style.display = 'inline-block';
-        } else {
-            nextBtn.style.display = 'inline-block';
-            finishBtn.style.display = 'none';
-        }
-    }
-}
-
-function nextStep() {
-    if (currentStep < totalSteps) {
-        showStep(currentStep + 1);
-    }
-}
-
-function prevStep() {
-    if (currentStep > 1) {
-        showStep(currentStep - 1);
-    }
-}
-</script>
-{% endblock %}
 {% block description %}{{ seo_description }}{% endblock %}
 {% block og_title %}{{ seo_title }}{% endblock %}
 {% block og_description %}{{ seo_description }}{% endblock %}
@@ -344,48 +25,380 @@ function prevStep() {
 
 {% block brand_text %}ANA SAYFA{% endblock %}
 
+
+{# ============================================================
+   FOOTER JS  (Tutorial Modal)
+   ============================================================ #}
+{% block footer_js %}
+
+{# ---- Tutorial Modal Markup ---- #}
+<div id="tutorialModal" class="tutorial-overlay" style="display: none;">
+    <div class="tutorial-modal">
+
+        <button class="tutorial-close" onclick="closeTutorialModal()" aria-label="Tanıtımı Kapat">
+            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-xmark"></use></svg>
+        </button>
+
+        <div class="tutorial-content">
+
+            {# Step 1 #}
+            <div id="step-1" class="tutorial-step" style="display: block;">
+                <div class="tutorial-icon-box">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-mosque"></use></svg>
+                </div>
+                <h3>Çağrı Vakti'ne Hoş Geldiniz</h3>
+                <p>Modern ve kullanıcı dostu arayüzümüzle hizmetinizdeyiz.
+                   Sol üstteki logoya tıklayarak dilediğiniz zaman ana sayfaya dönebilirsiniz.</p>
+            </div>
+
+            {# Step 2 #}
+            <div id="step-2" class="tutorial-step" style="display: none;">
+                <div class="tutorial-icon-box">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
+                </div>
+                <h3>Vakitleri Keşfedin</h3>
+                <p>"Vakti Keşfet" özelliğini kullanarak dilediğiniz şehri seçebilir,
+                   tüm ezan ve iftar vakitlerine anında ulaşabilirsiniz.</p>
+            </div>
+
+            {# Step 3 #}
+            <div id="step-3" class="tutorial-step" style="display: none;">
+                <div class="tutorial-icon-box">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-location-dot"></use></svg>
+                </div>
+                <h3>Size En Yakın Vakitler</h3>
+                <p>"Konumumu Bul" özelliğiyle bulunduğunuz yeri otomatik tespit ederek,
+                   size özel ezan vakitlerini anında sunuyoruz.</p>
+            </div>
+
+            {# Step 4 #}
+            <div id="step-4" class="tutorial-step" style="display: none;">
+                <div class="tutorial-icon-box">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-bars"></use></svg>
+                </div>
+                <h3>Faydalı Araçlar</h3>
+                <p>İmsakiye, Kıble Pusulası, Ramazan Rehberi ve çok daha fazlası...
+                   Tüm dini araçlarımıza menüden kolayca erişin.</p>
+            </div>
+
+        </div>{# /.tutorial-content #}
+
+        <div class="tutorial-footer">
+            <div class="tutorial-dots">
+                <span class="step-dot active"></span>
+                <span class="step-dot"></span>
+                <span class="step-dot"></span>
+                <span class="step-dot"></span>
+            </div>
+            <div class="tutorial-actions">
+                <button id="tutorial-prev"   class="btn-tutorial-sec" onclick="prevStep()">Geri</button>
+                <button id="tutorial-next"   class="btn-tutorial-pri" onclick="nextStep()">İleri</button>
+                <button id="tutorial-finish" class="btn-tutorial-pri" onclick="closeTutorialModal()" style="display: none;">Başla</button>
+            </div>
+        </div>
+
+    </div>{# /.tutorial-modal #}
+</div>{# /#tutorialModal #}
+
+
+{# ---- Tutorial Modal Styles ---- #}
+<style>
+/* === Overlay === */
+.tutorial-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* === Modal box === */
+.tutorial-modal {
+    background: #1e1e1e;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 500px;
+    padding: 40px 30px 30px;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    animation: modalPop 0.3s ease-out;
+}
+
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: scale(1);   }
+}
+
+/* === Close button === */
+.tutorial-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--gray);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+.tutorial-close:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* === Icon box === */
+.tutorial-icon-box {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    color: var(--primary);
+    font-size: 2rem;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.1);
+}
+
+/* === Content area === */
+.tutorial-content {
+    text-align: center;
+    margin-bottom: 30px;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.tutorial-step { width: 100%; }
+.tutorial-step h3 { font-size: 1.8rem; margin-bottom: 15px; color: var(--text); }
+.tutorial-step p  { font-size: 1.1rem; color: var(--gray); line-height: 1.6; }
+
+/* === Footer: dots + buttons === */
+.tutorial-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+.tutorial-dots { display: flex; gap: 8px; }
+
+.step-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
+}
+.step-dot.active {
+    background: var(--primary);
+    width: 25px;
+    border-radius: 10px;
+}
+
+.tutorial-actions {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-tutorial-pri,
+.btn-tutorial-sec {
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+.btn-tutorial-pri {
+    background: var(--primary);
+    color: #000;
+    border: none;
+}
+.btn-tutorial-pri:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+.btn-tutorial-sec {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text);
+}
+.btn-tutorial-sec:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    .tutorial-modal   { padding: 30px 20px 20px; max-width: 90%; }
+    .tutorial-step h3 { font-size: 1.5rem; }
+    .tutorial-step p  { font-size: 1rem; }
+    .tutorial-icon-box { width: 60px; height: 60px; font-size: 1.5rem; }
+}
+</style>
+
+
+{# ---- Tutorial Modal Script ---- #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Show tutorial only on first visit
+    if (!localStorage.getItem('tour_shown')) {
+        openTutorialModal();
+    }
+
+    // Close when clicking the backdrop
+    const modal = document.getElementById('tutorialModal');
+    if (modal) {
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeTutorialModal();
+        });
+    }
+});
+
+/* ---- Public API ---- */
+function openTutorialModal() {
+    const modal = document.getElementById('tutorialModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        showStep(1);
+    }
+}
+
+function closeTutorialModal() {
+    const modal = document.getElementById('tutorialModal');
+    if (modal) {
+        modal.style.display = 'none';
+        localStorage.setItem('tour_shown', 'true');
+    }
+}
+
+/* ---- Step navigation ---- */
+let currentStep = 1;
+const TOTAL_STEPS = 4;
+
+function showStep(step) {
+    // Hide all steps
+    document.querySelectorAll('.tutorial-step').forEach(el => {
+        el.style.display = 'none';
+    });
+
+    // Show the requested step
+    const stepEl = document.getElementById(`step-${step}`);
+    if (!stepEl) return;
+
+    stepEl.style.display = 'block';
+    currentStep = step;
+
+    // Sync dots
+    document.querySelectorAll('.step-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i + 1 === step);
+    });
+
+    // Sync buttons
+    const prevBtn   = document.getElementById('tutorial-prev');
+    const nextBtn   = document.getElementById('tutorial-next');
+    const finishBtn = document.getElementById('tutorial-finish');
+
+    prevBtn.style.visibility = step === 1 ? 'hidden' : 'visible';
+
+    const isLast = step === TOTAL_STEPS;
+    nextBtn.style.display   = isLast ? 'none'         : 'inline-block';
+    finishBtn.style.display = isLast ? 'inline-block' : 'none';
+}
+
+function nextStep() {
+    if (currentStep < TOTAL_STEPS) showStep(currentStep + 1);
+}
+
+function prevStep() {
+    if (currentStep > 1) showStep(currentStep - 1);
+}
+</script>
+
+{% endblock %}{# /footer_js #}
+
+
+{# ============================================================
+   MAIN CONTENT
+   ============================================================ #}
 {% block content %}
 <div class="landing-wrapper">
+
+    {# --------------------------------------------------------
+       HERO
+       -------------------------------------------------------- #}
     <section class="hero">
         <div class="hero-content">
+
+            {# --- Status badges --- #}
             <div class="hero-badges">
-                <a href="{{ url_for('views.imsakiye_secimi') }}" class="status-badge update" title="{{ current_year }} Güncel İmsakiye Verileri">
+                <a href="{{ url_for('views.imsakiye_secimi') }}"
+                   class="status-badge update"
+                   title="{{ current_year }} Güncel İmsakiye Verileri">
                     <svg class="icon" aria-hidden="true"><use xlink:href="#fa-check-circle"></use></svg>
                     <span>{{ current_year }} Güncel Veriler</span>
                     <svg class="icon-sm" aria-hidden="true"><use xlink:href="#fa-chevron-right"></use></svg>
                 </a>
-                
+
                 {% if ramadan_info.status != 'none' and ramadan_info.status != 'finished' %}
-                <a href="{{ url_for('views.ramazan_nedir') }}" class="status-badge ramadan" title="Ramazan Bilgileri">
+                <a href="{{ url_for('views.ramazan_nedir') }}"
+                   class="status-badge ramadan"
+                   title="Ramazan Bilgileri">
                     <svg class="icon" aria-hidden="true"><use xlink:href="#fa-moon"></use></svg>
-                    <span>{% if ramadan_info.status == 'upcoming' %}    Ramazan'a {{ ramadan_info.days_to_start }} Gün{% elif ramadan_info.status == 'active' %}    Ramazan {{ ramadan_info.current_day }}. Gün{% endif %}
+                    <span>
+                        {% if ramadan_info.status == 'upcoming' %}
+                            Ramazan'a {{ ramadan_info.days_to_start }} Gün
+                        {% elif ramadan_info.status == 'active' %}
+                            Ramazan {{ ramadan_info.current_day }}. Gün
+                        {% endif %}
                     </span>
                     <svg class="icon-sm"><use xlink:href="#fa-chevron-right"></use></svg>
                 </a>
                 {% endif %}
-            </div>
+            </div>{# /.hero-badges #}
+
             <h1 class="btn-label">ÇAĞRI VAKTİ</h1>
-            <p>Dünya genelinde ezan vakitleri, imsakiye ve dini içerikler. Çağdaş arayüz ve doğru verilerle her an yanınızdayız.</p>
-            
-            <!-- Geri Sayım Kapsayıcı (Layout Shift'i önlemek için sabit alan) -->
+            <p>Dünya genelinde ezan vakitleri, imsakiye ve dini içerikler.
+               Çağdaş arayüz ve doğru verilerle her an yanınızdayız.</p>
+
+            {# --- Countdown wrapper (shown only when a city is saved) --- #}
             <div class="home-countdown-fixed-height" id="main-countdown-container" style="display: none;">
-                <!-- Canlı Geri Sayım Bölümü (Yüklendikten sonra görünür) -->
                 <div id="home-countdown-wrapper" class="home-countdown-container" style="display: none; opacity: 0;">
                     <div class="countdown-card">
-                        <div class="countdown-label" id="next-vakit-name">...</div>
-                        <div class="countdown-time" id="home-countdown-timer">00:00:00</div>
+                        <div class="countdown-label"   id="next-vakit-name">...</div>
+                        <div class="countdown-time"    id="home-countdown-timer">00:00:00</div>
                         <div class="countdown-location" id="active-city-name">...</div>
                     </div>
                 </div>
             </div>
+            {# Reveal the countdown container immediately if a city is already stored #}
             <script>
                 if (localStorage.getItem('user_city')) {
                     document.getElementById('main-countdown-container').style.display = 'block';
                 }
             </script>
-            
+
+            {# --- CTA buttons --- #}
             <div class="cta-buttons">
-                <a href="{{ url_for('views.sehir_secimi') }}" id="btn-discover-time" class="btn-ultra-hero" title="Şehir Seçimi Yap">
+                <a href="{{ url_for('views.sehir_secimi') }}"
+                   id="btn-discover-time"
+                   class="btn-ultra-hero"
+                   title="Şehir Seçimi Yap">
                     <div class="btn-inner">
                         <div class="btn-icon-box">
                             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-sun"></use></svg>
@@ -400,11 +413,14 @@ function prevStep() {
                     </div>
                 </a>
 
-                <a href="{{ url_for('views.konum_bul') }}" class="btn-ultra-hero" id="location-button" title="Otomatik Konum Bul">
+                <a href="{{ url_for('views.konum_bul') }}"
+                   class="btn-ultra-hero"
+                   id="location-button"
+                   title="Otomatik Konum Bul">
                     <div class="btn-inner">
                         <div class="btn-icon-box">
-                             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-map-marker-alt"></use></svg>
-                         </div>
+                            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-map-marker-alt"></use></svg>
+                        </div>
                         <div class="btn-text-content">
                             <span class="btn-label">KONUMUMU BUL</span>
                             <span id="location-desc" class="btn-desc fade-in">Şehrini Otomatik Belirle</span>
@@ -414,58 +430,32 @@ function prevStep() {
                         </div>
                     </div>
                 </a>
-            </div>
-        </div>
+            </div>{# /.cta-buttons #}
+
+        </div>{# /.hero-content #}
+
         <button class="hero-scroll" id="scroll-to-features" aria-label="Aşağı Kaydır">
             <svg class="icon"><use xlink:href="#fa-chevron-down"></use></svg>
         </button>
-    </section>
+    </section>{# /hero #}
 
+
+    {# --------------------------------------------------------
+       WHY ÇAĞRI VAKTİ  (Features)
+       -------------------------------------------------------- #}
     <section class="features fade-in" id="features-section" style="position: relative;">
-        <style>
-            .close-intro-btn {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                background: rgba(255, 255, 255, 0.9);
-                border: none;
-                border-radius: 50%;
-                width: 32px;
-                height: 32px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                transition: all 0.3s ease;
-                z-index: 10;
-                color: #666;
-            }
-            .close-intro-btn:hover {
-                background: #fff;
-                transform: rotate(90deg);
-                color: #e74c3c;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            }
-            .close-intro-btn svg {
-                width: 14px;
-                height: 14px;
-            }
-            /* Add transitions for smooth hiding */
-            #features-section, #how-it-works-section, #rainmeter-section, #telegram-section, #stats-section, #guides-section {
-                transition: opacity 0.3s ease;
-            }
-
-        </style>
 
         <div class="section-header">
             <h2>Neden Çağrı Vakti?</h2>
             <p>En doğru veriye en hızlı şekilde ulaşmanız için tasarlandı.</p>
-            <button id="close-intro-sections" class="close-intro-btn" aria-label="Tanıtımı Gizle" title="Bu bölümleri kalıcı olarak gizle">
-            <svg class="icon"><use xlink:href="#fa-xmark-custom"></use></svg>
+            <button id="close-intro-sections"
+                    class="close-intro-btn"
+                    aria-label="Tanıtımı Gizle"
+                    title="Bu bölümleri kalıcı olarak gizle">
+                <svg class="icon"><use xlink:href="#fa-xmark-custom"></use></svg>
             </button>
         </div>
-        
+
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon-wrapper">
@@ -476,7 +466,7 @@ function prevStep() {
                 <h3>Doğru Veri</h3>
                 <p>T.C. Diyanet İşleri Başkanlığı'ndan alınan resmi ve güncel vakitler.</p>
             </div>
-            
+
             <div class="feature-card">
                 <div class="feature-icon-wrapper">
                     <div class="feature-icon">
@@ -486,7 +476,7 @@ function prevStep() {
                 <h3>Hızlı Ulaşım</h3>
                 <p>Tek tıkla konumunuzu bulun ve vakitlere anında erişin.</p>
             </div>
-            
+
             <div class="feature-card">
                 <div class="feature-icon-wrapper">
                     <div class="feature-icon">
@@ -496,7 +486,7 @@ function prevStep() {
                 <h3>PWA Desteği</h3>
                 <p>Uygulamayı ana ekranınıza ekleyerek uygulama gibi kullanın.</p>
             </div>
-            
+
             <div class="feature-card">
                 <div class="feature-icon-wrapper">
                     <div class="feature-icon">
@@ -507,7 +497,9 @@ function prevStep() {
                 <p>Bir sonraki vakte ne kadar kaldığını saniyelik takip edin.</p>
             </div>
 
-            <a href="{{ url_for('views.sitene_ekle') }}" class="feature-card" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <a href="{{ url_for('views.sitene_ekle') }}"
+               class="feature-card"
+               style="text-decoration: none; color: inherit; cursor: pointer;">
                 <div class="feature-icon-wrapper">
                     <div class="feature-icon">
                         <svg class="icon"><use xlink:href="#fa-file-code"></use></svg>
@@ -517,8 +509,13 @@ function prevStep() {
                 <p>Ücretsiz ezan vakitleri widget'ını sitenize kolayca entegre edin.</p>
             </a>
         </div>
-    </section>
 
+    </section>{# /features #}
+
+
+    {# --------------------------------------------------------
+       HOW IT WORKS
+       -------------------------------------------------------- #}
     <section class="how-it-works fade-in" id="how-it-works-section">
         <div class="section-header">
             <h2>Nasıl Çalışır?</h2>
@@ -533,7 +530,7 @@ function prevStep() {
                 <h3>İlini Seç</h3>
                 <p>Dünya genelindeki binlerce il arasından konumunu bul.</p>
             </div>
-            
+
             <div class="step-card">
                 <div class="step-number-badge">02</div>
                 <div class="step-icon">
@@ -542,7 +539,7 @@ function prevStep() {
                 <h3>Onayla</h3>
                 <p>Seçtiğin konumu doğrula ve vakitleri yükle.</p>
             </div>
-            
+
             <div class="step-card">
                 <div class="step-number-badge">03</div>
                 <div class="step-icon">
@@ -552,20 +549,29 @@ function prevStep() {
                 <p>Vakitleri, geri sayımı ve günlük içerikleri görüntüle.</p>
             </div>
         </div>
-    </section>
-{% if guides %}
-    <section class="home-guides fade-in" id="guides-section" style="position: relative;">
+    </section>{# /how-it-works #}
 
+
+    {# --------------------------------------------------------
+       GUIDES  (conditional)
+       -------------------------------------------------------- #}
+    {% if guides %}
+    <section class="home-guides fade-in" id="guides-section" style="position: relative;">
         <div class="section-header">
             <h2>Bilgi Köşesi</h2>
             <p>Dini konular ve namaz kılavuzları hakkında derinlemesine bilgiler.</p>
-            <button id="close-guides-section" class="close-intro-btn" aria-label="Bilgi Köşesini Gizle" title="Bu bölümü kalıcı olarak gizle">
-            <svg class="icon"><use xlink:href="#fa-xmark-custom"></use></svg>
+            <button id="close-guides-section"
+                    class="close-intro-btn"
+                    aria-label="Bilgi Köşesini Gizle"
+                    title="Bu bölümü kalıcı olarak gizle">
+                <svg class="icon"><use xlink:href="#fa-xmark-custom"></use></svg>
             </button>
         </div>
+
         <div class="guides-preview-grid">
             {% for guide in guides %}
-            <a href="{{ url_for('views.bilgi_kosesi_detay', slug=guide.slug) }}" class="guide-preview-card">
+            <a href="{{ url_for('views.bilgi_kosesi_detay', slug=guide.slug) }}"
+               class="guide-preview-card">
                 <div class="guide-card-content">
                     <div class="guide-category">
                         <svg class="icon"><use xlink:href="#fa-tag-solid"></use></svg>
@@ -575,16 +581,25 @@ function prevStep() {
                     <p>{{ get_display_name(guide.description[:100] if guide.description else "") }}...</p>
                 </div>
                 <div class="guide-card-footer">
-                    <span class="read-btn">İncele <svg class="icon"><use xlink:href="#fa-chevron-right-solid"></use></svg></span>
+                    <span class="read-btn">
+                        İncele
+                        <svg class="icon"><use xlink:href="#fa-chevron-right-solid"></use></svg>
+                    </span>
                 </div>
             </a>
             {% endfor %}
         </div>
+
         <div class="section-footer">
             <a href="{{ url_for('views.bilgi_kosesi_liste') }}" class="btn-secondary">Tüm Yazıları Gör</a>
         </div>
-    </section>
-{% endif %}
+    </section>{# /guides #}
+    {% endif %}
+
+
+    {# --------------------------------------------------------
+       RAINMETER PROMO
+       -------------------------------------------------------- #}
     <section class="telegram-bot-promo rainmeter-promo" id="rainmeter-section">
         <div class="promo-container">
             <div class="promo-icon">
@@ -593,9 +608,11 @@ function prevStep() {
             <div class="promo-content">
                 <div class="guide-category" style="margin-bottom: 10px;">YENİ</div>
                 <h2>Masaüstü Widget'ımız Yayında!</h2>
-                <p>Namaz vakitlerini Rainmeter ile doğrudan Windows masaüstünüzde takip edin. Şık tasarımı, otomatik güncellemeleri ve düşük sistem kullanımıyla her an gözünüzün önünde.</p>
-                
-                <ul style="list-style: none; padding: 0; margin-bottom: 25px; color: var(--gray); display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <p>Namaz vakitlerini Rainmeter ile doğrudan Windows masaüstünüzde takip edin.
+                   Şık tasarımı, otomatik güncellemeleri ve düşük sistem kullanımıyla her an gözünüzün önünde.</p>
+
+                <ul style="list-style: none; padding: 0; margin-bottom: 25px; color: var(--gray);
+                           display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <li style="display: flex; align-items: center; gap: 8px;">
                         <svg class="icon" style="width: 16px; height: 16px; color: var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
                         Şık Tasarım
@@ -622,8 +639,12 @@ function prevStep() {
                 </div>
             </div>
         </div>
-    </section>
+    </section>{# /rainmeter #}
 
+
+    {# --------------------------------------------------------
+       TELEGRAM BOT PROMO
+       -------------------------------------------------------- #}
     <section class="telegram-bot-promo" id="telegram-section">
         <div class="promo-container">
             <div class="promo-icon">
@@ -631,7 +652,8 @@ function prevStep() {
             </div>
             <div class="promo-content">
                 <h2>Telegram Botumuz Yayında!</h2>
-                <p>Namaz vakitlerini Telegram üzerinden anlık takip edebilir, vakitlerden önce bildirim alabilirsiniz.</p>
+                <p>Namaz vakitlerini Telegram üzerinden anlık takip edebilir,
+                   vakitlerden önce bildirim alabilirsiniz.</p>
                 <div class="promo-actions">
                     <a href="https://t.me/cagrivaktibot" target="_blank" class="btn btn-primary promo-btn">
                         <svg class="icon"><use xlink:href="#fa-telegram"></use></svg>
@@ -640,8 +662,12 @@ function prevStep() {
                 </div>
             </div>
         </div>
-    </section>
+    </section>{# /telegram #}
 
+
+    {# --------------------------------------------------------
+       STATS
+       -------------------------------------------------------- #}
     <section class="stats-overview" id="stats-section">
         <div class="stats-container">
             <div class="stat-item">
@@ -657,7 +683,12 @@ function prevStep() {
                 <span class="stat-lbl">Ücretsiz</span>
             </div>
         </div>
-    </section>
+    </section>{# /stats #}
+
+
+    {# --------------------------------------------------------
+       LIVE BROADCAST PROMO  (conditional)
+       -------------------------------------------------------- #}
     {% if SHOW_LIVE_SECTION %}
     <section class="live-broadcast-promo fade-in" id="live-broadcast-section">
         <div class="promo-container">
@@ -666,362 +697,374 @@ function prevStep() {
             </div>
             <div class="promo-content">
                 <div class="guide-category" style="margin-bottom: 10px;">
-                    <svg class="icon" style="width:10px;height:10px;fill:#ef4444;animation:badgePulse 1.5s infinite;"></svg>
+                    <svg class="icon" style="width:10px; height:10px; fill:#ef4444; animation:badgePulse 1.5s infinite;"></svg>
                     CANLI YAYIN
                 </div>
                 <h2>Canlı Yayın Desteği</h2>
-                <p>Camilerden ve özel törenlere ait canlı yayınları kesintisiz izleyin. Tören ve etkinlikleri kaçırmayın, akıllı ekranlarda, telefonunuzda veya bilgisayarınızda anında açın.</p>
-                <ul style="list-style:none;padding:0;margin-bottom:25px;color:var(--gray);display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                    <li style="display:flex;align-items:center;gap:8px;">
-                        <svg class="icon" style="width:16px;height:16px;color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                <p>Camilerden ve özel törenlere ait canlı yayınları kesintisiz izleyin.
+                   Tören ve etkinlikleri kaçırmayın, akıllı ekranlarda, telefonunuzda
+                   veya bilgisayarınızda anında açın.</p>
+                <ul style="list-style: none; padding: 0; margin-bottom: 25px; color: var(--gray);
+                           display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" style="width:16px; height:16px; color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
                         Kesintisiz HLS Yayın
                     </li>
-                    <li style="display:flex;align-items:center;gap:8px;">
-                        <svg class="icon" style="width:16px;height:16px;color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" style="width:16px; height:16px; color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
                         Akıllı Tahta Uyumlu
                     </li>
-                    <li style="display:flex;align-items:center;gap:8px;">
-                        <svg class="icon" style="width:16px;height:16px;color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" style="width:16px; height:16px; color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
                         Şifreli Erişim
                     </li>
-                    <li style="display:flex;align-items:center;gap:8px;">
-                        <svg class="icon" style="width:16px;height:16px;color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" style="width:16px; height:16px; color:var(--primary);"><use xlink:href="#fa-circle-check"></use></svg>
                         Ücretsiz
                     </li>
                 </ul>
                 <div class="promo-actions">
-                    <a href="{{ url_for('views.canli', key=STREAM_KEY) }}" class="btn btn-primary promo-btn pulse-animation">
+                    <a href="{{ url_for('views.canli', key=STREAM_KEY) }}"
+                       class="btn btn-primary promo-btn pulse-animation">
                         <svg class="icon"><use xlink:href="#fa-circle-play"></use></svg>
                         Yayını İzle
                     </a>
                 </div>
             </div>
         </div>
-    </section>
+    </section>{# /live-broadcast #}
     {% endif %}
-</div>
-{% endblock %}
 
+</div>{# /.landing-wrapper #}
+{% endblock %}{# /content #}
+
+
+{# ============================================================
+   EXTRA JS
+   ============================================================ #}
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if sections are hidden
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* --------------------------------------------------------
+       Restore hidden-section state from localStorage
+       -------------------------------------------------------- */
+    const INTRO_SECTION_IDS = [
+        'features-section',
+        'how-it-works-section',
+        'rainmeter-section',
+        'telegram-section',
+        'stats-section',
+    ];
+
+    function hideElementById(id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    }
+
+    function fadeOutAndHide(id, delay = 300) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.opacity = '0';
+        setTimeout(() => { el.style.display = 'none'; }, delay);
+    }
+
+    // Re-hide intro sections if user dismissed them before
     if (localStorage.getItem('introSectionsHidden') === 'true') {
-        const sectionsToHide = [
-            'features-section',
-            'how-it-works-section',
-            'rainmeter-section',
-            'telegram-section',
-            'stats-section'
-        ];
-        
-        sectionsToHide.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = 'none';
-        });
-        
-        // Remove scroll button if sections are hidden
-        const scrollBtn = document.getElementById('scroll-to-features');
-        if (scrollBtn) scrollBtn.style.display = 'none';
+        INTRO_SECTION_IDS.forEach(hideElementById);
+        hideElementById('scroll-to-features');
     }
 
-    // Check if guides section is hidden
+    // Re-hide guides section if user dismissed it before
     if (localStorage.getItem('guidesSectionHidden') === 'true') {
-        const guidesSection = document.getElementById('guides-section');
-        if (guidesSection) guidesSection.style.display = 'none';
+        hideElementById('guides-section');
     }
 
-    // Close button handler for intro sections
-    const closeBtn = document.getElementById('close-intro-sections');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            const sectionsToHide = [
-                'features-section',
-                'how-it-works-section',
-                'rainmeter-section',
-                'telegram-section',
-                'stats-section'
-            ];
-            
-            // Animate hiding
-            sectionsToHide.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.style.opacity = '0';
-                    setTimeout(() => {
-                        el.style.display = 'none';
-                    }, 300); // Wait for transition
-                }
-            });
-            
-            // Hide scroll button
-            const scrollBtn = document.getElementById('scroll-to-features');
-            if (scrollBtn) scrollBtn.style.display = 'none';
 
-            // Save to localStorage
+    /* --------------------------------------------------------
+       "Close intro sections" button
+       -------------------------------------------------------- */
+    const closeIntroBtn = document.getElementById('close-intro-sections');
+    if (closeIntroBtn) {
+        closeIntroBtn.addEventListener('click', function () {
+            INTRO_SECTION_IDS.forEach(id => fadeOutAndHide(id));
+            hideElementById('scroll-to-features');
             localStorage.setItem('introSectionsHidden', 'true');
         });
     }
 
-    // Close button handler for guides section
+    /* --------------------------------------------------------
+       "Close guides section" button
+       -------------------------------------------------------- */
     const closeGuidesBtn = document.getElementById('close-guides-section');
     if (closeGuidesBtn) {
-        closeGuidesBtn.addEventListener('click', function() {
-            const guidesSection = document.getElementById('guides-section');
-            if (guidesSection) {
-                guidesSection.style.opacity = '0';
-                setTimeout(() => {
-                    guidesSection.style.display = 'none';
-                }, 300);
-                
-                localStorage.setItem('guidesSectionHidden', 'true');
-            }
+        closeGuidesBtn.addEventListener('click', function () {
+            fadeOutAndHide('guides-section');
+            localStorage.setItem('guidesSectionHidden', 'true');
         });
     }
 
-    const locationDesc = document.getElementById('location-desc');
-    const savedCity = localStorage.getItem('user_city');
-    const savedCountry = localStorage.getItem('user_country') || 'TR';
-    
-    const CITY_MAPPING = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
+
+    /* --------------------------------------------------------
+       Location button: show saved city name
+       -------------------------------------------------------- */
+    const locationDesc  = document.getElementById('location-desc');
+    const savedCity     = localStorage.getItem('user_city');
+    const savedCountry  = localStorage.getItem('user_country') || 'TR';
+    const CITY_MAPPING  = JSON.parse('{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}');
 
     function getDisplayName(city) {
         return CITY_MAPPING[city] || city;
     }
 
     if (savedCity) {
-        locationDesc.textContent = "Kayıtlı Şehir: " + getDisplayName(savedCity);
+        locationDesc.textContent = 'Kayıtlı Şehir: ' + getDisplayName(savedCity);
         initHomeCountdown(savedCity, savedCountry);
     } else {
-        locationDesc.textContent = "Şehrini Otomatik Belirle";
+        locationDesc.textContent = 'Şehrini Otomatik Belirle';
     }
 
-    // Quad Staged Scroll: Features -> How it Works (500ms) -> Guides (500ms) -> Stats (500ms)
-        document.getElementById('scroll-to-features').addEventListener('click', function() {
-            // 1. Scroll to Features
-            document.getElementById('features-section').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
 
-            // 2. After 500ms, scroll to How it Works
-            setTimeout(() => {
-                document.getElementById('how-it-works-section').scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+    /* --------------------------------------------------------
+       Hero scroll button — cascading auto-scroll tour
+       -------------------------------------------------------- */
+    document.getElementById('scroll-to-features').addEventListener('click', function () {
+        const DELAY = 750;   // ms between each scroll step
+        const FINAL = 1000;  // ms before scrolling back to top
 
-                // 3. After another 500ms, scroll to Guides
-                setTimeout(() => {
-                    const guidesSection = document.getElementById('guides-section');
-                    if (guidesSection) {
-                        guidesSection.scrollIntoView({ 
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
+        scrollToId('features-section');
 
-                    // 4. After another 500ms, scroll to Stats Overview
-                    setTimeout(() => {
-                        document.getElementById('stats-section').scrollIntoView({ 
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
+        setTimeout(() => scrollToId('how-it-works-section'), DELAY);
+        setTimeout(() => {
+            const guidesSection = document.getElementById('guides-section');
+            if (guidesSection) guidesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, DELAY * 2);
+        setTimeout(() => scrollToId('stats-section'), DELAY * 3);
+        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), DELAY * 3 + FINAL);
+    });
 
-                        // 5. Finally, after 800ms, scroll back to Top (Hero)
-                        setTimeout(() => {
-                            window.scrollTo({
-                                top: 0,
-                                behavior: 'smooth'
-                            });
-                        }, 1000);
-                    }, 750);
-                }, 750);
-            }, 750);
-        });
+    function scrollToId(id) {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
+
+    /* --------------------------------------------------------
+       Home countdown
+       -------------------------------------------------------- */
     async function initHomeCountdown(city, country) {
         try {
-            // Versiyon kontrolü: Eski cache'leri temizlemek için suffix ekledik
-            const CACHE_VERSION = 'V{{ app_version }}';
-            const CACHE_KEY = `vakitler_${city}_${country}_${CACHE_VERSION}`;
+            const CACHE_VERSION  = 'V{{ app_version }}';
+            const CACHE_KEY      = `vakitler_${city}_${country}_${CACHE_VERSION}`;
             const DATE_TRACK_KEY = `home_date_track_${city}_${country}`;
-            
-            // Eski cache'i temizle
+
+            // Remove stale (un-versioned) cache entry if present
             try {
                 const oldKey = `vakitler_${city}_${country}`;
-                if (localStorage.getItem(oldKey)) {
-                    localStorage.removeItem(oldKey);
-                }
-            } catch (e) { console.error('Eski cache temizleme hatası:', e); }
+                if (localStorage.getItem(oldKey)) localStorage.removeItem(oldKey);
+            } catch (e) {
+                console.error('Eski cache temizleme hatası:', e);
+            }
 
-            const cached = localStorage.getItem(CACHE_KEY);
+            /* --- Try cache first --- */
             let data = null;
+            const cached = localStorage.getItem(CACHE_KEY);
 
             if (cached) {
                 const parsed = JSON.parse(cached);
-                let correctDate = null;
-                // Cache'teki timezone'a göre tarihi hesapla
-                if (parsed.data && parsed.data.timezone) {
-                     const tz = parsed.data.timezone;
-                     const now = new Date();
-                     const cityNowStr = now.toLocaleString("en-US", {timeZone: tz});
-                     const cityNow = new Date(cityNowStr);
-                     const y = cityNow.getFullYear();
-                     const m = String(cityNow.getMonth() + 1).padStart(2, '0');
-                     const d = String(cityNow.getDate()).padStart(2, '0');
-                     correctDate = `${y}-${m}-${d}`;
-                } else {
-                     // Fallback: Yerel tarih (UTC değil)
-                     correctDate = new Date().toLocaleDateString('en-CA');
-                }
-                
+                const correctDate = parsed.data?.timezone
+                    ? getCityDateStr(parsed.data.timezone)
+                    : new Date().toLocaleDateString('en-CA');
+
                 if (parsed.tarih === correctDate) {
                     data = { vakitler: parsed.data };
                 }
             }
 
+            /* --- Fetch from API if cache miss --- */
             if (!data) {
-                const response = await fetch(`https://api.cagrivakti.com.tr/ezan_vakitleri-V{{ app_version }}?sehir=${city}&country=${country}`);
+                const response     = await fetch(`https://api.cagrivakti.com.tr/ezan_vakitleri-V{{ app_version }}?sehir=${city}&country=${country}`);
                 const responseData = await response.json();
-                
+
                 if (responseData.vakitler) {
-                    // API'den gelen timezone'a göre TODAY belirle
-                    const tz = responseData.timezone || (responseData.vakitler && responseData.vakitler.timezone) || 'Europe/Istanbul';
-                    const now = new Date();
-                    const cityNowStr = now.toLocaleString("en-US", {timeZone: tz});
-                    const cityNow = new Date(cityNowStr);
-                    const y = cityNow.getFullYear();
-                    const m = String(cityNow.getMonth() + 1).padStart(2, '0');
-                    const d = String(cityNow.getDate()).padStart(2, '0');
-                    const TODAY = `${y}-${m}-${d}`;
-                    
+                    const tz    = responseData.timezone
+                               || responseData.vakitler?.timezone
+                               || 'Europe/Istanbul';
+                    const today = getCityDateStr(tz);
+
                     localStorage.setItem(CACHE_KEY, JSON.stringify({
-                        tarih: TODAY,
-                        data: responseData.vakitler
+                        tarih: today,
+                        data: responseData.vakitler,
                     }));
+
                     data = responseData;
                 }
             }
-            
-            if (!data || !data.vakitler) {
-                return;
-            }
-            
-            if (data && data.vakitler) {
-                const wrapper = document.getElementById('home-countdown-wrapper');
-                const timerEl = document.getElementById('home-countdown-timer');
-                const labelEl = document.getElementById('next-vakit-name');
-                const cityEl = document.getElementById('active-city-name');
-                
-                if (wrapper) {
-                        wrapper.style.display = 'block';
-                        setTimeout(() => {
-                            wrapper.style.opacity = '1';
-                        }, 50);
-                    }
-                cityEl.textContent = getDisplayName(city);
-                
-                const vakitler = data.vakitler;
-                const tz = data.timezone || 'Europe/Istanbul';
-                const vakitSirasi = [
-                    {id: 'imsak', label: 'İmsak'},
-                    {id: 'gunes', label: 'Güneş'},
-                    {id: 'ogle', label: 'Öğle'},
-                    {id: 'ikindi', label: 'İkindi'},
-                    {id: 'aksam', label: 'Akşam'},
-                    {id: 'yatsi', label: 'Yatsı'}
-                ];
 
-                function update() {
-                    const now = new Date();
-                    const cityNow = new Date(now.toLocaleString("en-US", {timeZone: tz}));
-                    
-                    let nextVakit = null;
-                    
-                    for (let v of vakitSirasi) {
-                        const [h, m] = vakitler[v.id].split(':').map(Number);
-                        const vDate = new Date(cityNow);
-                        vDate.setHours(h, m, 0, 0);
-                        
-                        if (vDate > cityNow) {
-                            nextVakit = { ...v, date: vDate };
-                            break;
-                        }
-                    }
-                    
-                    // Eğer bugün vakit kalmadıysa yarın imsak
-                    if (!nextVakit) {
-                        const [h, m] = vakitler['imsak'].split(':').map(Number);
-                        const vDate = new Date(cityNow);
-                        vDate.setDate(vDate.getDate() + 1);
-                        vDate.setHours(h, m, 0, 0);
-                        nextVakit = { id: 'imsak', label: 'İmsak', date: vDate };
-                    }
-                    
-                    const diff = nextVakit.date - cityNow;
-                    const hours = Math.floor(diff / 3600000);
-                    const mins = Math.floor((diff % 3600000) / 60000);
-                    const secs = Math.floor((diff % 60000) / 1000);
-                    
-                    labelEl.textContent = nextVakit.label + " Vaktine Kalan";
-                    timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-                }
-                
-                update();
-                setInterval(update, 1000);
-                
-                try {
-                    function getCityDateStr(tz) {
-                        const now = new Date();
-                        const s = now.toLocaleString("en-US", { timeZone: tz });
-                        const d = new Date(s);
-                        const y = d.getFullYear();
-                        const m = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
-                        return `${y}-${m}-${day}`;
-                    }
-                    if (!sessionStorage.getItem(DATE_TRACK_KEY)) {
-                        sessionStorage.setItem(DATE_TRACK_KEY, getCityDateStr(tz));
-                    }
-                    setInterval(() => {
-                        const cur = getCityDateStr(tz);
-                        const prev = sessionStorage.getItem(DATE_TRACK_KEY);
-                        if (prev && cur !== prev) {
-                            sessionStorage.setItem(DATE_TRACK_KEY, cur);
-                            try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
-                            initHomeCountdown(city, country);
-                        }
-                    }, 60000);
-                } catch(e) {}
+            if (!data?.vakitler) return;
+
+            /* --- Show the countdown widget --- */
+            const wrapper  = document.getElementById('home-countdown-wrapper');
+            const timerEl  = document.getElementById('home-countdown-timer');
+            const labelEl  = document.getElementById('next-vakit-name');
+            const cityEl   = document.getElementById('active-city-name');
+
+            if (wrapper) {
+                wrapper.style.display = 'block';
+                setTimeout(() => { wrapper.style.opacity = '1'; }, 50);
             }
+
+            cityEl.textContent = getDisplayName(city);
+
+            const vakitler = data.vakitler;
+            const tz       = data.timezone || 'Europe/Istanbul';
+
+            const VAKIT_SIRASI = [
+                { id: 'imsak',  label: 'İmsak'  },
+                { id: 'gunes',  label: 'Güneş'  },
+                { id: 'ogle',   label: 'Öğle'   },
+                { id: 'ikindi', label: 'İkindi' },
+                { id: 'aksam',  label: 'Akşam'  },
+                { id: 'yatsi',  label: 'Yatsı'  },
+            ];
+
+            function tick() {
+                const now     = new Date();
+                const cityNow = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+
+                // Find the next upcoming prayer time
+                let nextVakit = null;
+                for (const v of VAKIT_SIRASI) {
+                    const [h, m] = vakitler[v.id].split(':').map(Number);
+                    const vDate  = new Date(cityNow);
+                    vDate.setHours(h, m, 0, 0);
+
+                    if (vDate > cityNow) {
+                        nextVakit = { ...v, date: vDate };
+                        break;
+                    }
+                }
+
+                // If no prayer remains today, use tomorrow's Imsak
+                if (!nextVakit) {
+                    const [h, m] = vakitler['imsak'].split(':').map(Number);
+                    const vDate  = new Date(cityNow);
+                    vDate.setDate(vDate.getDate() + 1);
+                    vDate.setHours(h, m, 0, 0);
+                    nextVakit = { id: 'imsak', label: 'İmsak', date: vDate };
+                }
+
+                const diff  = nextVakit.date - cityNow;
+                const hours = Math.floor(diff / 3_600_000);
+                const mins  = Math.floor((diff % 3_600_000) / 60_000);
+                const secs  = Math.floor((diff % 60_000) / 1_000);
+
+                labelEl.textContent = nextVakit.label + ' Vaktine Kalan';
+                timerEl.textContent = [hours, mins, secs]
+                    .map(n => String(n).padStart(2, '0'))
+                    .join(':');
+            }
+
+            tick();
+            setInterval(tick, 1000);
+
+            /* --- Invalidate cache at midnight (city-local time) --- */
+            try {
+                if (!sessionStorage.getItem(DATE_TRACK_KEY)) {
+                    sessionStorage.setItem(DATE_TRACK_KEY, getCityDateStr(tz));
+                }
+
+                setInterval(() => {
+                    const current  = getCityDateStr(tz);
+                    const previous = sessionStorage.getItem(DATE_TRACK_KEY);
+
+                    if (previous && current !== previous) {
+                        sessionStorage.setItem(DATE_TRACK_KEY, current);
+                        try { localStorage.removeItem(CACHE_KEY); } catch (e) { /* ignore */ }
+                        initHomeCountdown(city, country);
+                    }
+                }, 60_000);
+            } catch (e) { /* session storage not available */ }
+
         } catch (e) {
-            console.error("Home countdown error:", e);
+            console.error('Home countdown error:', e);
         }
     }
-});
-</script>
-{% endblock %}
 
+    /* Helper: returns the current date in city-local time as "YYYY-MM-DD" */
+    function getCityDateStr(tz) {
+        const now = new Date();
+        const d   = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+        const y   = d.getFullYear();
+        const m   = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+}); // end DOMContentLoaded
+</script>
+{% endblock %}{# /extra_js #}
+
+
+{# ============================================================
+   EXTRA CSS
+   ============================================================ #}
 {% block extra_css %}
 <style>
-/* Layout Stability */
+/* ============================================================
+   Close intro button  (shared by features & guides sections)
+   ============================================================ */
+.close-intro-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 10;
+    color: #666;
+}
+.close-intro-btn:hover {
+    background: #fff;
+    transform: rotate(90deg);
+    color: #e74c3c;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.close-intro-btn svg { width: 14px; height: 14px; }
+
+/* Fade-out transition support for all dismissable sections */
+#features-section,
+#how-it-works-section,
+#rainmeter-section,
+#telegram-section,
+#stats-section,
+#guides-section {
+    transition: opacity 0.3s ease;
+}
+
+
+/* ============================================================
+   Countdown widget
+   ============================================================ */
 .home-countdown-fixed-height {
-    min-height: 180px; /* Mobil için tahmini yükseklik */
+    min-height: 180px; /* Reserve space to prevent layout shift on mobile */
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     margin-bottom: 40px;
 }
-
 @media (min-width: 992px) {
-    .home-countdown-fixed-height {
-        min-height: 280px; /* Masaüstü için tahmini yükseklik */
-    }
+    .home-countdown-fixed-height { min-height: 280px; }
 }
-
-
 
 .home-countdown-container {
     margin: 0 auto;
@@ -1029,30 +1072,19 @@ document.addEventListener('DOMContentLoaded', function() {
     max-width: 400px;
     transition: opacity 1s ease;
 }
-
 @media (min-width: 992px) {
     .home-countdown-container {
         width: 50%;
         max-width: 600px;
-        margin: 0 auto;
     }
-    
     .countdown-card {
         padding: 45px;
         border-width: 2px;
         background: rgba(255, 255, 255, 0.07);
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
     }
-    
-    .countdown-time {
-        font-size: 5.5rem;
-        letter-spacing: -2px;
-    }
-    
-    .countdown-label {
-        font-size: 1.2rem;
-        margin-bottom: 15px;
-    }
+    .countdown-time  { font-size: 5.5rem; letter-spacing: -2px; }
+    .countdown-label { font-size: 1.2rem; margin-bottom: 15px; }
 }
 
 .countdown-card {
@@ -1063,7 +1095,6 @@ document.addEventListener('DOMContentLoaded', function() {
     backdrop-filter: blur(10px);
     transition: var(--transition);
 }
-
 .countdown-card:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--primary);
@@ -1082,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: clamp(2.5rem, 10vw, 3.5rem);
     font-weight: 800;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace; /* Eğer yüklüyse daha iyi durur, değilse monospace */
+    font-family: 'JetBrains Mono', monospace;
     line-height: 1.2;
     margin-bottom: 10px;
     white-space: nowrap;
@@ -1096,7 +1127,6 @@ document.addEventListener('DOMContentLoaded', function() {
     justify-content: center;
     gap: 6px;
 }
-
 .countdown-location::before {
     content: '';
     display: inline-block;
@@ -1107,6 +1137,10 @@ document.addEventListener('DOMContentLoaded', function() {
     box-shadow: 0 0 10px #10b981;
 }
 
+
+/* ============================================================
+   Hero section
+   ============================================================ */
 .landing-wrapper {
     overflow-x: hidden;
     user-select: none;
@@ -1120,26 +1154,12 @@ document.addEventListener('DOMContentLoaded', function() {
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 80px 20px 160px; /* Alt boşluk 120px'den 160px'e çıkarıldı */
+    padding: 80px 20px 160px;
     background: radial-gradient(circle at center, #333438 0%, #121212 100%);
     position: relative;
 }
-
-/* Hero responsive styles moved to consolidated media query at bottom */
-
-@media (max-width: 480px) {
-    .hero {
-        padding-top: 80px;
-        padding-bottom: 240px;
-    }
-}
-
-@media (min-width: 992px) {
-    .hero {
-        height: 96vh;
-        padding: 20px;
-    }
-}
+@media (max-width: 480px) { .hero { padding-top: 80px; padding-bottom: 240px; } }
+@media (min-width: 992px) { .hero { height: 96vh; padding: 20px; } }
 
 .hero-badges {
     display: flex;
@@ -1168,23 +1188,19 @@ document.addEventListener('DOMContentLoaded', function() {
     flex-shrink: 0;
     cursor: pointer;
 }
-
 .status-badge.update {
     border-color: rgba(34, 197, 94, 0.3);
     background: rgba(34, 197, 94, 0.05);
 }
-
 .status-badge.update:hover {
     background: rgba(34, 197, 94, 0.1);
     transform: translateY(-2px);
     border-color: rgba(34, 197, 94, 0.5);
 }
-
 .status-badge.ramadan {
     border-color: rgba(255, 193, 7, 0.3);
     background: rgba(255, 193, 7, 0.05);
 }
-
 .status-badge.ramadan:hover {
     background: rgba(255, 193, 7, 0.1);
     transform: translateY(-2px);
@@ -1212,6 +1228,7 @@ document.addEventListener('DOMContentLoaded', function() {
     line-height: 1.6;
 }
 
+/* ---- CTA buttons ---- */
 .cta-buttons {
     display: flex;
     gap: 20px;
@@ -1223,17 +1240,15 @@ document.addEventListener('DOMContentLoaded', function() {
     position: relative;
     padding: 3px;
     border-radius: 24px;
-    /*background: linear-gradient(135deg, var(--primary), #fbbf24, var(--primary));*/
     background-size: 200% auto;
     text-decoration: none;
     display: inline-block;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     animation: shine 3s linear infinite;
     box-shadow: 0 4px 15px rgba(255, 193, 7, 0.15);
-    width: 360px; /* Genişliği biraz daha artırdım */
-    border: 2px solid var(--primary) !important
+    width: 360px;
+    border: 2px solid var(--primary) !important;
 }
-
 .btn-ultra-hero:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 30px rgba(255, 193, 7, 0.3);
@@ -1241,7 +1256,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .btn-inner {
     background: #1a1b1e;
-    padding: 18px 28px; /* Padding artırılarak boyu uzatıldı */
+    padding: 18px 28px;
     border-radius: 21px;
     display: flex;
     align-items: center;
@@ -1250,12 +1265,9 @@ document.addEventListener('DOMContentLoaded', function() {
     position: relative;
     z-index: 1;
     transition: background 0.4s ease;
-    height: 90px; /* Sabit yükseklik ile ikisi de aynı boyda */
+    height: 90px;
 }
-
-.btn-ultra-hero:hover .btn-inner {
-    background: #232429;
-}
+.btn-ultra-hero:hover .btn-inner { background: #232429; }
 
 .btn-icon-box {
     width: 48px;
@@ -1269,37 +1281,28 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
-
 .btn-icon-box .icon {
     width: 24px;
     height: 24px;
     filter: drop-shadow(0 0 5px rgba(255, 193, 7, 0.2));
-    /* animation: sunRotate 15s linear infinite; */
     transition: all 0.4s ease;
 }
-
 .btn-ultra-hero:hover .btn-icon-box {
     background: var(--primary);
     color: #1a1b1e;
     transform: scale(1.1) rotate(8deg);
     box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
 }
-
 .btn-ultra-hero:hover .btn-icon-box .icon {
     filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.15));
     animation: sunRotate 4s linear infinite;
 }
-
 @keyframes sunRotate {
     from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    to   { transform: rotate(360deg); }
 }
 
-.btn-text-content {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
+.btn-text-content { display: flex; flex-direction: column; gap: 2px; }
 
 .btn-label {
     font-size: 1.1rem;
@@ -1310,153 +1313,23 @@ document.addEventListener('DOMContentLoaded', function() {
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
 @media (max-width: 768px) {
-    .btn-ultra-hero {
-        width: 100%;
-        max-width: 350px;
-    }
+    .btn-ultra-hero { width: 100%; max-width: 350px; }
 }
 
-.btn-desc {
-    font-size: 0.8rem;
-    color: var(--gray);
-    font-weight: 500;
-}
+.btn-desc   { font-size: 0.8rem; color: var(--gray); font-weight: 500; }
 
-.btn-arrow {
-    margin-left: 10px;
-    color: var(--primary);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
+.btn-arrow  { margin-left: 10px; color: var(--primary); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.btn-ultra-hero:hover .btn-arrow { transform: translateX(8px) scale(1.2); }
 
-.btn-ultra-hero:hover .btn-arrow {
-    transform: translateX(8px) scale(1.2);
-}
+.btn-ultra-hero.secondary-hero { background: linear-gradient(135deg, #4b5563, #1f2937, #4b5563); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+.btn-ultra-hero.secondary-hero .btn-icon-box { background: rgba(255,255,255,0.05); color: var(--gray); }
+.btn-ultra-hero.secondary-hero:hover .btn-icon-box { background: var(--gray); color: var(--dark); }
+.btn-ultra-hero.secondary-hero .btn-label { background: linear-gradient(to right, #fff, var(--gray)); -webkit-background-clip: text; background-clip: text; }
 
-.btn-ultra-hero.secondary-hero {
-    background: linear-gradient(135deg, #4b5563, #1f2937, #4b5563);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
+@keyframes shine { to { background-position: 200% center; } }
 
-.btn-ultra-hero.secondary-hero .btn-icon-box {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--gray);
-}
-
-.btn-ultra-hero.secondary-hero:hover .btn-icon-box {
-    background: var(--gray);
-    color: var(--dark);
-}
-
-.btn-ultra-hero.secondary-hero .btn-label {
-    background: linear-gradient(to right, #fff, var(--gray));
-    -webkit-background-clip: text;
-    background-clip: text;
-}
-
-@keyframes shine {
-    to { background-position: 200% center; }
-}
-
-/* How It Works Section */
-.how-it-works {
-    padding: 120px 20px;
-    background: rgba(0, 0, 0, 0.2);
-    position: relative;
-}
-
-.steps-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 40px;
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
-}
-
-@media (min-width: 992px) {
-    .steps-grid::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 10%;
-        right: 10%;
-        height: 2px;
-        background: linear-gradient(to right, transparent, rgba(255, 193, 7, 0.3), transparent);
-        z-index: 0;
-    }
-}
-
-.step-card {
-    position: relative;
-    padding: 50px 40px;
-    background: var(--card-bg);
-    border-radius: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
-    text-align: center;
-}
-
-.step-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--primary);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-}
-
-.step-number-badge {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary);
-    color: var(--dark);
-    padding: 8px 20px;
-    border-radius: 100px;
-    font-weight: 900;
-    font-size: 1rem;
-    box-shadow: 0 10px 20px rgba(255, 193, 7, 0.3);
-}
-
-.step-icon {
-    width: 70px;
-    height: 70px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 25px;
-    color: var(--primary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.4s ease;
-}
-
-.step-card:hover .step-icon {
-    transform: scale(1.1);
-    background: rgba(255, 193, 7, 0.1);
-    border-color: var(--primary);
-}
-
-.step-icon .icon {
-    width: 28px;
-    height: 28px;
-}
-
-.step-card h3 {
-    font-size: 1.6rem;
-    margin-bottom: 15px;
-    color: var(--text);
-    font-weight: 800;
-}
-
-.step-card p {
-    color: var(--gray);
-    line-height: 1.7;
-    font-size: 1.05rem;
-}
-
+/* ---- Hero scroll indicator ---- */
 .hero-scroll {
     position: absolute;
     bottom: 40px;
@@ -1475,7 +1348,6 @@ document.addEventListener('DOMContentLoaded', function() {
     padding: 10px;
     z-index: 10;
 }
-
 .hero-scroll::before {
     content: 'Keşfet';
     font-size: 0.85rem;
@@ -1486,35 +1358,21 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: color 0.3s;
     animation: fadeInOpacity 0.5s ease-in;
 }
-
-.hero-scroll:hover {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-5px);
-}
-
-.hero-scroll:hover::before {
-    color: var(--primary);
-}
-
-.hero-scroll svg {
-    width: 20px;
-    height: 20px;
-    fill: #fff;
-    transition: fill 0.3s;
-    animation: fadeInOpacity 0.5s ease-in;
-}
-
-.hero-scroll:hover svg {
-    fill: var(--primary);
-}
+.hero-scroll:hover                  { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+.hero-scroll:hover::before          { color: var(--primary); }
+.hero-scroll svg                    { width: 20px; height: 20px; fill: #fff; transition: fill 0.3s; animation: fadeInOpacity 0.5s ease-in; }
+.hero-scroll:hover svg              { fill: var(--primary); }
 
 @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-    40% { transform: translateX(-50%) translateY(-10px); }
-    60% { transform: translateX(-50%) translateY(-5px); }
+    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0);     }
+    40%                      { transform: translateX(-50%) translateY(-10px); }
+    60%                      { transform: translateX(-50%) translateY(-5px);  }
 }
 
-/* Features Section */
+
+/* ============================================================
+   Features section
+   ============================================================ */
 .features {
     padding: 120px 20px;
     max-width: 1500px;
@@ -1522,12 +1380,7 @@ document.addEventListener('DOMContentLoaded', function() {
     position: relative;
 }
 
-.section-header {
-    text-align: center;
-    margin-bottom: 70px;
-    position: relative;
-}
-
+.section-header { text-align: center; margin-bottom: 70px; position: relative; }
 .section-header h2 {
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 800;
@@ -1535,7 +1388,6 @@ document.addEventListener('DOMContentLoaded', function() {
     margin-bottom: 20px;
     letter-spacing: -1px;
 }
-
 .section-header h2::after {
     content: '';
     display: block;
@@ -1545,31 +1397,16 @@ document.addEventListener('DOMContentLoaded', function() {
     margin: 15px auto 0;
     border-radius: 2px;
 }
+.section-header p { color: var(--gray); font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
 
-.section-header p {
-    color: var(--gray);
-    font-size: 1.2rem;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
-}
-
+.features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
 @media (max-width: 1100px) {
-    .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .features {
-        max-width: 1240px;
-    }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .features      { max-width: 1240px; }
 }
 
 .feature-card {
-    background: linear-gradient(145deg, rgba(30, 30, 30, 0.6), rgba(20, 20, 20, 0.8));
+    background: linear-gradient(145deg, rgba(30,30,30,0.6), rgba(20,20,20,0.8));
     padding: 50px 30px;
     border-radius: 40px;
     text-align: center;
@@ -1582,34 +1419,22 @@ document.addEventListener('DOMContentLoaded', function() {
     position: relative;
     overflow: hidden;
 }
-
 .feature-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    background: radial-gradient(circle at top right, rgba(255, 193, 7, 0.05), transparent 70%);
+    top: 0; left: 0; right: 0; height: 100%;
+    background: radial-gradient(circle at top right, rgba(255,193,7,0.05), transparent 70%);
     opacity: 0;
     transition: opacity 0.5s ease;
 }
-
 .feature-card:hover {
     transform: translateY(-15px);
     border-color: rgba(255, 193, 7, 0.4);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 193, 7, 0.05);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 30px rgba(255,193,7,0.05);
 }
+.feature-card:hover::before { opacity: 1; }
 
-.feature-card:hover::before {
-    opacity: 1;
-}
-
-.feature-icon-wrapper {
-    position: relative;
-    margin-bottom: 35px;
-    z-index: 2;
-}
+.feature-icon-wrapper { position: relative; margin-bottom: 35px; z-index: 2; }
 
 .feature-icon {
     width: 90px;
@@ -1624,87 +1449,117 @@ document.addEventListener('DOMContentLoaded', function() {
     border: 1px solid rgba(255, 193, 7, 0.15);
     position: relative;
 }
-
 .feature-card:hover .feature-icon {
     background: var(--primary);
     color: var(--dark);
     transform: rotate(12deg) scale(1.1);
-    box-shadow: 0 15px 30px rgba(255, 193, 7, 0.3);
+    box-shadow: 0 15px 30px rgba(255,193,7,0.3);
 }
+.feature-icon .icon  { width: 36px; height: 36px; }
+.feature-card h3     { font-size: 1.7rem; margin-bottom: 18px; color: var(--text); font-weight: 800; z-index: 2; }
+.feature-card p      { color: var(--gray); line-height: 1.8; font-size: 1.05rem; z-index: 2; }
 
-.feature-icon .icon {
-    width: 36px;
-    height: 36px;
-}
 
-.feature-card h3 {
-    font-size: 1.7rem;
-    margin-bottom: 18px;
-    color: var(--text);
-    font-weight: 800;
-    z-index: 2;
-}
+/* ============================================================
+   How It Works section
+   ============================================================ */
+.how-it-works { padding: 120px 20px; background: rgba(0,0,0,0.2); position: relative; }
 
-.feature-card p {
-    color: var(--gray);
-    line-height: 1.8;
-    font-size: 1.05rem;
-    z-index: 2;
-}
-
-/* Stats Section */
-.stats-overview {
-    padding: 100px 20px;
-    background: radial-gradient(circle at center, rgba(255, 193, 7, 0.03) 0%, transparent 70%);
-    position: relative;
-    overflow: hidden;
-}
-
-/* Home Guides Section */
-.home-guides {
-    padding: 120px 20px;
-    max-width: 1240px;
-    margin: 0 auto;
-}
-
-.guides-preview-grid {
+.steps-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
-    margin-bottom: 50px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
 }
+@media (min-width: 992px) {
+    .steps-grid::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: linear-gradient(to right, transparent, rgba(255,193,7,0.3), transparent);
+        z-index: 0;
+    }
+}
+
+.step-card {
+    position: relative;
+    padding: 50px 40px;
+    background: var(--card-bg);
+    border-radius: 40px;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    text-align: center;
+}
+.step-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+}
+
+.step-number-badge {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: var(--dark);
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-weight: 900;
+    font-size: 1rem;
+    box-shadow: 0 10px 20px rgba(255,193,7,0.3);
+}
+
+.step-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    color: var(--primary);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.4s ease;
+}
+.step-card:hover .step-icon { transform: scale(1.1); background: rgba(255,193,7,0.1); border-color: var(--primary); }
+.step-icon .icon { width: 28px; height: 28px; }
+.step-card h3    { font-size: 1.6rem; margin-bottom: 15px; color: var(--text); font-weight: 800; }
+.step-card p     { color: var(--gray); line-height: 1.7; font-size: 1.05rem; }
+
+
+/* ============================================================
+   Guides section
+   ============================================================ */
+.home-guides { padding: 120px 20px; max-width: 1240px; margin: 0 auto; }
+
+.guides-preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 50px; }
 
 .guide-preview-card {
     background: var(--card-bg);
     border-radius: 32px;
     padding: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.05);
     text-decoration: none;
     transition: all 0.4s ease;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
-
 .guide-preview-card:hover {
     transform: translateY(-10px);
     border-color: var(--primary);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
-
-.guide-preview-card h3 {
-    font-size: 1.5rem;
-    color: #fff;
-    margin-bottom: 15px;
-    font-weight: 700;
-}
-
-.guide-preview-card p {
-    color: var(--gray);
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 25px;
-}
+.guide-preview-card h3 { font-size: 1.5rem; color: #fff; margin-bottom: 15px; font-weight: 700; }
+.guide-preview-card p  { color: var(--gray); font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
 
 .guide-category {
     display: inline-flex;
@@ -1717,20 +1572,21 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 0.85rem;
     font-weight: 700;
     margin-bottom: 20px;
-    border: 1px solid rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255,193,7,0.1);
 }
 
-.read-btn {
-    color: var(--primary);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
-}
+.read-btn { color: var(--primary); font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+.section-footer { text-align: center; }
 
-.section-footer {
-    text-align: center;
+
+/* ============================================================
+   Stats section
+   ============================================================ */
+.stats-overview {
+    padding: 100px 20px;
+    background: radial-gradient(circle at center, rgba(255,193,7,0.03) 0%, transparent 70%);
+    position: relative;
+    overflow: hidden;
 }
 
 .stats-container {
@@ -1742,46 +1598,23 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .stat-item {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255,255,255,0.02);
     padding: 40px;
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.05);
     text-align: center;
     transition: all 0.3s ease;
 }
+.stat-item:hover { background: rgba(255,255,255,0.04); transform: translateY(-5px); border-color: rgba(255,193,7,0.2); }
 
-.stat-item:hover {
-    background: rgba(255, 255, 255, 0.04);
-    transform: translateY(-5px);
-    border-color: rgba(255, 193, 7, 0.2);
-}
+.stat-val { display: block; font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 900; color: var(--primary); margin-bottom: 10px; line-height: 1; font-family: 'Inter', sans-serif; }
+.stat-lbl { color: var(--gray); text-transform: uppercase; letter-spacing: 3px; font-size: 0.85rem; font-weight: 600; }
 
-.stat-val {
-    display: block;
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    font-weight: 900;
-    color: var(--primary);
-    margin-bottom: 10px;
-    line-height: 1;
-    font-family: 'Inter', sans-serif;
-}
 
-.stat-lbl {
-    color: var(--gray);
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.hero-badges {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
+/* ============================================================
+   Hero badge overrides (re-declared for specificity)
+   ============================================================ */
+.hero-badges { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
 
 .status-badge {
     display: inline-flex;
@@ -1792,134 +1625,141 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 0.9rem;
     font-weight: 600;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255,255,255,0.08);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: default;
 }
+.status-badge.update { background: rgba(16,185,129,0.08); color: #10b981; }
+.status-badge.ramadan { background: rgba(245,158,11,0.08); color: #f59e0b; text-decoration: none; cursor: pointer; }
+.status-badge.ramadan:hover { background: rgba(245,158,11,0.15); transform: translateY(-2px); border-color: rgba(245,158,11,0.3); }
 
-.status-badge.update {
-    background: rgba(16, 185, 129, 0.08);
-    color: #10b981;
-}
-
-.status-badge.ramadan {
-    background: rgba(245, 158, 11, 0.08);
-    color: #f59e0b;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.status-badge.ramadan:hover {
-    background: rgba(245, 158, 11, 0.15);
-    transform: translateY(-2px);
-    border-color: rgba(245, 158, 11, 0.3);
-}
-
-.status-badge .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-    animation: badgePulse 2s infinite;
-}
-
-.status-badge .icon {
-    width: 16px;
-    height: 16px;
-}
-
-.status-badge .icon-sm {
-    width: 12px;
-    height: 12px;
-    opacity: 0.6;
-    transition: transform 0.3s ease;
-}
-
-.status-badge.ramadan:hover .icon-sm {
-    transform: translateX(3px);
-    opacity: 1;
-}
+.status-badge .dot    { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.5); animation: badgePulse 2s infinite; }
+.status-badge .icon   { width: 16px; height: 16px; }
+.status-badge .icon-sm { width: 12px; height: 12px; opacity: 0.6; transition: transform 0.3s ease; }
+.status-badge.ramadan:hover .icon-sm { transform: translateX(3px); opacity: 1; }
 
 @keyframes badgePulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.7; }
-    100% { transform: scale(1); opacity: 1; }
+    0%   { transform: scale(1);   opacity: 1;   }
+    50%  { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1);   opacity: 1;   }
 }
 
+
+/* ============================================================
+   Promo sections  (Rainmeter + Telegram)
+   ============================================================ */
+.telegram-bot-promo {
+    padding: 60px 20px;
+    background: rgba(0,0,0,0.2);
+    border-top: 1px solid rgba(255,193,7,0.1);
+    border-bottom: 1px solid rgba(255,193,7,0.1);
+    margin: 40px 0;
+}
+
+.promo-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    background: rgba(255,255,255,0.03);
+    padding: 40px;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.promo-icon {
+    font-size: 4rem;
+    color: var(--primary);
+    background: rgba(255,193,7,0.1);
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 30px;
+    flex-shrink: 0;
+    animation: promoFloat 3s ease-in-out infinite;
+}
+
+.promo-content h2 { font-size: 2rem; margin-bottom: 16px; color: var(--text); }
+.promo-content p  { font-size: 1.1rem; color: var(--gray); margin-bottom: 32px; line-height: 1.6; }
+.promo-btn        { padding: 16px 32px; font-size: 1.1rem; border-radius: 16px; }
+
+@keyframes promoFloat {
+    0%, 100% { transform: translateY(0);     }
+    50%       { transform: translateY(-10px); }
+}
+
+@keyframes pulse-animation {
+    0%  { transform: scale(1);    box-shadow: 0 10px 20px rgba(255,193,7,0.2), 0 0 0 0   rgba(255,193,7,0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 10px 20px rgba(255,193,7,0.2), 0 0 0 10px rgba(255,193,7,0);  }
+}
+.pulse-animation {
+    animation: pulse-animation 2s infinite;
+    background-color: var(--primary-hover) !important;
+    color: #000 !important;
+    font-weight: bold;
+}
+
+
+/* ============================================================
+   Responsive overrides
+   ============================================================ */
 @media (max-width: 992px) {
-    .steps-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
-        max-width: 500px;
-    }
-    
-    .stats-container {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        max-width: 500px;
-    }
+    .steps-grid     { grid-template-columns: 1fr; gap: 30px; max-width: 500px; }
+    .stats-container { grid-template-columns: 1fr; gap: 20px; max-width: 500px; }
 }
 
 @media (max-width: 768px) {
-    .hero { 
-        height: auto; 
-        min-height: 90vh; 
-        padding: 100px 20px 120px; 
-        justify-content: flex-start;
-    }
-    .hero h1 { font-size: clamp(2.2rem, 10vw, 3rem); }
-    .hero p { font-size: 1rem; margin-bottom: 30px; }
-    
+    /* Hero */
+    .hero          { height: auto; min-height: 90vh; padding: 100px 20px 120px; justify-content: flex-start; }
+    .hero h1       { font-size: clamp(2.2rem, 10vw, 3rem); }
+    .hero p        { font-size: 1rem; margin-bottom: 30px; }
+
+    /* CTA buttons */
     .btn-ultra-hero { width: 100%; max-width: 350px; }
-    .btn-inner { padding: 12px 20px; gap: 12px; }
-    .btn-icon-box { width: 40px; height: 40px; border-radius: 12px; }
+    .btn-inner      { padding: 12px 20px; gap: 12px; }
+    .btn-icon-box   { width: 40px; height: 40px; border-radius: 12px; }
     .btn-icon-box .icon { width: 20px; height: 20px; }
-    .btn-label { font-size: 1rem; letter-spacing: 1px; }
-    .btn-desc { font-size: 0.75rem; }
-    
-    .features { padding: 80px 15px; }
-    .section-header { margin-bottom: 50px; }
+    .btn-label      { font-size: 1rem; letter-spacing: 1px; }
+    .btn-desc       { font-size: 0.75rem; }
+
+    /* Features */
+    .features          { padding: 80px 15px; }
+    .section-header    { margin-bottom: 50px; }
     .section-header h2 { font-size: 2rem; }
-    .section-header p { font-size: 1rem; }
-    .features-grid { grid-template-columns: 1fr; gap: 20px; }
-    .feature-card { padding: 40px 25px; border-radius: 24px; }
+    .section-header p  { font-size: 1rem; }
+    .features-grid     { grid-template-columns: 1fr; gap: 20px; }
+    .feature-card      { padding: 40px 25px; border-radius: 24px; }
 
-    .how-it-works { padding: 80px 15px; }
-    .step-card { padding: 50px 30px 30px; border-radius: 24px; }
+    /* Steps */
+    .how-it-works      { padding: 80px 15px; }
+    .step-card         { padding: 50px 30px 30px; border-radius: 24px; }
     .step-number-badge { font-size: 0.85rem; padding: 6px 16px; top: -15px; }
-    .step-icon { width: 60px; height: 60px; margin-bottom: 20px; }
-    .step-icon .icon { width: 24px; height: 24px; }
+    .step-icon         { width: 60px; height: 60px; margin-bottom: 20px; }
+    .step-icon .icon   { width: 24px; height: 24px; }
 
+    /* Stats */
     .stats-overview { padding: 60px 15px; }
-    .stat-item { padding: 30px; border-radius: 20px; }
-    .stat-val { font-size: 2.8rem; }
+    .stat-item      { padding: 30px; border-radius: 20px; }
+    .stat-val       { font-size: 2.8rem; }
 
-    .home-guides { padding: 80px 15px; }
-    .guide-preview-card { padding: 30px 20px; border-radius: 24px; }
-    .guides-preview-grid { grid-template-columns: 1fr; gap: 20px; }
+    /* Guides */
+    .home-guides          { padding: 80px 15px; }
+    .guide-preview-card   { padding: 30px 20px; border-radius: 24px; }
+    .guides-preview-grid  { grid-template-columns: 1fr; gap: 20px; }
+
+    /* Promo */
+    .promo-container { flex-direction: column; text-align: center; padding: 30px 20px; }
+    .promo-icon      { width: 100px; height: 100px; font-size: 3rem; }
+    .promo-content h2 { font-size: 1.5rem; }
+    .promo-content p  { font-size: 1rem; }
 }
 
 @media (max-width: 480px) {
-    .hero h1 { font-size: 2rem; }
-    .status-badge { font-size: 0.8rem; padding: 6px 12px; }
-}
-
-.telegram-bot-promo {padding:60px 20px;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,193,7,0.1);border-bottom:1px solid rgba(255,193,7,0.1);margin:40px 0}
-.promo-container {max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:40px;background:rgba(255,255,255,0.03);padding:40px;border-radius:24px;border:1px solid rgba(255,255,255,0.05)}
-.promo-icon {font-size:4rem;color:var(--primary);background:rgba(255,193,7,0.1);width:120px;height:120px;display:flex;align-items:center;justify-content:center;border-radius:30px;flex-shrink:0;animation:promoFloat 3s ease-in-out infinite}
-.promo-content h2 {font-size:2rem;margin-bottom:16px;color:var(--text)}
-.promo-content p {font-size:1.1rem;color:var(--gray);margin-bottom:32px;line-height:1.6}
-.promo-btn {padding:16px 32px;font-size:1.1rem;border-radius:16px}
-@keyframes promoFloat {0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes pulse-animation {0%{transform:scale(1);box-shadow:0 10px 20px rgba(255,193,7,0.2),0 0 0 0 rgba(255,193,7,0.7)}70%{transform:scale(1.05);box-shadow:0 10px 20px rgba(255,193,7,0.2),0 0 0 10px rgba(255,193,7,0)}}
-.pulse-animation {animation:pulse-animation 2s infinite;background-color:var(--primary-hover) !important;color:#000 !important;font-weight:bold}
-
-@media (max-width: 768px) {
-    .promo-container {flex-direction:column;text-align:center;padding:30px 20px}
-    .promo-icon {width:100px;height:100px;font-size:3rem}
-    .promo-content h2 {font-size:1.5rem}
-    .promo-content p {font-size:1rem}
+    .hero h1       { font-size: 2rem; }
+    .status-badge  { font-size: 0.8rem; padding: 6px 12px; }
 }
 </style>
-{% endblock %}
+{% endblock %}{# /extra_css #}
