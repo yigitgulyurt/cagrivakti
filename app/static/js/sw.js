@@ -1,38 +1,38 @@
 // Service Worker - Ezan Vakitleri
-const CACHE_NAME = `ezan-vakitleri-VX.xx`;
+const CACHE_NAME = `ezan-vakitleri-V${VERSION}`;
 
 // API istekleri için Cache-First, sonra Network (Offline için)
-const API_CACHE_NAME = `api-cache-VX.xx`;
+const API_CACHE_NAME = `api-cache-V${VERSION}`;
 
 // Önbelleğe alınacak statik dosyalar ve sayfalar
 const PRECACHE_ASSETS = [
     '/',
-    '/offline',
-    '/sehir',
-    '/imsakiye',
-    '/ramazan',
-    '/neden-biz',
     '/indir',
-    '/bilgi-kosesi',
-    '/konum-bul',
+    '/sehir',
+    '/offline',
+    '/ramazan',
     '/iletisim',
+    '/imsakiye',
+    '/konum-bul',
+    '/neden-biz',
+    '/asal-sayi',
+    '/qr-okuyucu',
     '/ilkelerimiz',
+    '/bilgi-kosesi',
+    '/kible-pusulasi',
     '/Mustafa-Kemal-Ataturk',
-    '/static/js/jquery-cagrivakti.js',
     '/static/js/city-data.js',
-    '/static/js/html5-qrcode.min.js',
     '/static/icons/favicon.ico',
+    '/static/icons/ios/180.png',
+    '/static/js/html5-qrcode.min.js',
+    '/static/js/jquery-cagrivakti.js',
     '/static/icons/android/android-launchericon-192-192.png',
     '/static/icons/android/android-launchericon-512-512.png',
-    '/static/icons/ios/180.png',
-    '/static/icons/windows11/Square150x150Logo.scale-100.png'
+    '/static/icons/windows11/Square150x150Logo.scale-100.png',
 ];
 
 // SW tarafından hiç önbelleğe alınmayacak sayfalar
 const NO_CACHE_PAGES = [
-    '/kible-pusulasi',
-    '/asal-sayi',
-    '/qr-okuyucu',
     '/oyunlar/under-the-red-sky',
 ];
 
