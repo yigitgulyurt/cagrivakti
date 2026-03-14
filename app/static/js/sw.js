@@ -1,5 +1,5 @@
 // Service Worker - Ezan Vakitleri
-const VERSION = `V${Config.APP_VERSION}`;
+const VERSION = `V1.0`;
 
 const PAGE_CACHE    = `page-cache-${VERSION}`;    // HTML sayfaları (navigate istekleri)
 const STATIC_CACHE  = `static-cache-${VERSION}`;  // JS, CSS, resim, ikon gibi statik dosyalar
@@ -94,8 +94,12 @@ self.addEventListener('fetch', (event) => {
             caches.open(FONT_CACHE).then(async (cache) => {
                 const cached = await cache.match(event.request);
                 if (cached) return cached;
-                const response = await fetch(event.request);
-                if (response.ok) cache.put(event.request, response.clone());
+                const corsRequest = new Request(event.request.url, {
+                    mode: 'cors',
+                    credentials: 'omit',
+                });
+                const response = await fetch(corsRequest);
+                if (response.ok) cache.put(corsRequest, response.clone());
                 return response;
             })
         );
