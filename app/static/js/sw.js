@@ -1,6 +1,7 @@
 // Service Worker - Ezan Vakitleri
-const CACHE_NAME = `static-cache-V${VERSION}`;
+const CACHE_NAME = `ezan-vakitleri-V${VERSION}`;
 const API_CACHE_NAME = `api-cache-V${VERSION}`;
+const GAME_CACHE_NAME = `game-cache-V${VERSION}`;
 
 // ── Statik dosyalar (JS, CSS, ikonlar) ──────────────────────────────────────
 const STATIC_ASSETS = [
@@ -28,14 +29,21 @@ const PAGE_ASSETS = [
     '/ilkelerimiz',
     '/bilgi-kosesi',
     '/asal-sayi',
-    '/kible-pusulasi',
     '/qr-okuyucu',
     '/Mustafa-Kemal-Ataturk',
 ];
 
 // ── SW tarafından hiç önbelleğe alınmayacak sayfalar ────────────────────────
 const NO_CACHE_PAGES = [
+    '/kible-pusulasi',
     '/oyunlar/under-the-red-sky',
+];
+
+// ── Hiç önbelleğe alınmayacak URL'ler (tam eşleşme veya prefix) ─────────────
+const NO_CACHE_URLS = [
+    '/kaynak/under-the-red-sky/jsons/saveState.json',
+    '/stream/viewers',
+    '/stream/ping',
 ];
 
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
@@ -54,7 +62,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME) {
+                    if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME && cacheName !== GAME_CACHE_NAME) {
                         console.log('[SW] Removing old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
@@ -81,9 +89,8 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Oyun dosyaları bypass
+    // Oyun worker dosyaları bypass
     if (
-        url.pathname.startsWith('/oyun') ||
         url.pathname === '/workermain.js' ||
         url.pathname.startsWith('/scripts/jobworker') ||
         url.pathname.startsWith('/scripts/dispatchworker')
@@ -91,9 +98,39 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Hiç cache'lenmeyecek URL'ler — her zaman ağdan getir
+    if (NO_CACHE_URLS.some(p => url.pathname === p)) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
     // Önbelleğe alınmayacak sayfalar — her zaman ağdan getir
     if (NO_CACHE_PAGES.some(p => url.pathname === p || url.pathname.startsWith(p + '/'))) {
         event.respondWith(fetch(event.request));
+        return;
+    }
+
+    // Oyun dosyaları — ayrı GAME_CACHE, Stale-While-Revalidate
+    if (url.pathname.startsWith('/kaynak/under-the-red-sky/')) {
+        event.respondWith(
+            caches.open(GAME_CACHE_NAME).then((cache) => {
+                return cache.match(event.request).then((cachedResponse) => {
+                    const fetchPromise = fetch(event.request).then((networkResponse) => {
+                        if (networkResponse && networkResponse.status === 200) {
+                            cache.put(event.request, networkResponse.clone());
+                        }
+                        return networkResponse;
+                    }).catch((err) => {
+                        if (cachedResponse) {
+                            console.warn('[SW] Game fetch failed, using cache:', event.request.url);
+                            return;
+                        }
+                        throw err;
+                    });
+                    return cachedResponse || fetchPromise;
+                });
+            })
+        );
         return;
     }
 
