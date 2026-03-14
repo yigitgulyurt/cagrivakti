@@ -28,6 +28,14 @@ const PRECACHE_ASSETS = [
     '/static/icons/windows11/Square150x150Logo.scale-100.png'
 ];
 
+// SW tarafından hiç önbelleğe alınmayacak sayfalar
+const NO_CACHE_PAGES = [
+    '/kible-pusulasi',
+    '/asal-sayi',
+    '/qr-okuyucu',
+    '/oyunlar/under-the-red-sky',
+];
+
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -61,7 +69,7 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(event.request.url);
 
-    // ← BURAYA EKLE
+    // Font ve stream bypass
     if (
         url.hostname === 'fonts.googleapis.com' ||
         url.hostname === 'fonts.gstatic.com' ||
@@ -72,6 +80,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Oyun dosyaları bypass
     if (
         url.pathname.startsWith('/oyun') ||
         url.pathname === '/workermain.js' ||
@@ -81,12 +90,17 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Önbelleğe alınmayacak sayfalar — her zaman ağdan getir
+    if (NO_CACHE_PAGES.some(p => url.pathname === p || url.pathname.startsWith(p + '/'))) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
     // API istekleri (Vakitler vb.) - Network-First, ama Cache'e kaydet ve hata durumunda Cache'den getir
     if (url.hostname === 'api.cagrivakti.com.tr' && (url.pathname.startsWith('/ezan_vakitleri') || url.pathname.startsWith('/vakitler/'))) {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
-                    // Sadece başarılı yanıtları önbelleğe al
                     if (response.ok) {
                         const responseClone = response.clone();
                         caches.open(API_CACHE_NAME).then((cache) => {
@@ -96,11 +110,8 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 })
                 .catch(async () => {
-                    // Cache'den önce tam URL ile bak (Query params dahil)
                     const cachedResponse = await caches.match(event.request);
                     if (cachedResponse) return cachedResponse;
-                    
-                    // Eğer cache'de de yoksa, anlamlı bir hata dön (undefined dönmemeli)
                     return new Response(JSON.stringify({
                         durum: "hata",
                         mesaj: "İnternet bağlantısı yok ve veri henüz önbelleğe alınmamış."
@@ -118,7 +129,6 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
-                    // Sadece başarılı ve geçerli yanıtları önbelleğe al
                     if (response.ok && response.status === 200 && 
                         !response.url.includes('/offline') && 
                         !response.url.includes('/kaynak/') &&
@@ -131,17 +141,13 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 })
                 .catch(async () => {
-                        // Çevrimdışı durumunda:
-                        // 1. Önce tam URL ile cache'e bak (Query params dahil)
                         const cachedResponse = await caches.match(event.request);
                         if (cachedResponse) return cachedResponse;
                         
-                        // 2. Query params olmadan bak (Örn: /sehir/Istanbul?country=TR -> /sehir/Istanbul)
                         const url = new URL(event.request.url);
                         const cleanResponse = await caches.match(url.pathname, { ignoreSearch: true });
                         if (cleanResponse) return cleanResponse;
 
-                        // 3. Eğer bir alt sayfa ise (Örn: /sehir/Istanbul), ana route'u dene (/sehir)
                         if (url.pathname.startsWith('/sehir/')) {
                             const sehirResponse = await caches.match('/sehir');
                             if (sehirResponse) return sehirResponse;
@@ -152,7 +158,6 @@ self.addEventListener('fetch', (event) => {
                             if (imsakiyeResponse) return imsakiyeResponse;
                         }
 
-                        // 4. Hiçbiri yoksa offline fallback
                         return caches.match('/offline');
                     })
         );
@@ -164,7 +169,6 @@ self.addEventListener('fetch', (event) => {
         caches.match(event.request).then((cachedResponse) => {
             const fetchPromise = fetch(event.request)
                 .then((networkResponse) => {
-                    // Geçerli bir yanıt aldığımızda önbelleği güncelle
                     if (networkResponse && networkResponse.status === 200) {
                         const responseToCache = networkResponse.clone();
                         caches.open(CACHE_NAME).then((cache) => {
@@ -174,16 +178,13 @@ self.addEventListener('fetch', (event) => {
                     return networkResponse;
                 })
                 .catch((err) => {
-                    // Eğer önbellekte veri varsa, arka plan güncelleme hatasını yut (Sessizce logla)
                     if (cachedResponse) {
                         console.warn('[SW] Background fetch failed for ' + event.request.url);
                         return;
                     }
-                    // Önbellek yoksa hatayı fırlat (Offline sayfasına düşmesi veya tarayıcının hatayı göstermesi için)
                     throw err;
                 });
 
-            // Önbellekte varsa hemen döndür, yoksa ağı bekle
             return cachedResponse || fetchPromise;
         })
     );
