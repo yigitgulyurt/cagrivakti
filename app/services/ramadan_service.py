@@ -112,17 +112,17 @@ class RamadanService:
             start_date = cls.hijri_to_gregorian(h_year, 9, 1)
             # Ramazan'ın bitişi (Hicri Yıl, 9, 30)
             end_date = cls.hijri_to_gregorian(h_year, 9, 30)
-            
+
             current_day = h_day
             days_remaining = 30 - current_day
-            is_laylat_al_qadr = (h_day == 26 or h_day == 27)
-            
+            is_laylat_al_qadr_day = (h_day == 26)
+
             res = {
                 "is_ramadan": True,
                 "status": "active",
                 "current_day": current_day,
+                "is_laylat_al_qadr_day": is_laylat_al_qadr_day,
                 "days_remaining": days_remaining,
-                "is_laylat_al_qadr": is_laylat_al_qadr,
                 "end_date": end_date,
                 "ramadan_content": cls.get_ramadan_content(current_day)
             }

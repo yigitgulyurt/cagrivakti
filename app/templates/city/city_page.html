@@ -117,8 +117,7 @@
     </span>
     </div> -->
 
-    {% if ramadan_info.is_laylat_al_qadr %}
-    <div class="qadr-night-alert">
+    <div class="qadr-night-alert" style="display: none;">
         <div class="qadr-icon">
             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-star-and-crescent"></use></svg>
         </div>
@@ -127,7 +126,6 @@
             <p>Bu gece, bin aydan daha yararlı olan Kadir Gecesi'dir. Bu kutlu geceyi dua, yakarış ve tövbe ile yerine getirmeniz salık verilir.</p>
         </div>
     </div>
-    {% endif %}
 
     <section class="daily-content-card fade-in" id="daily-content" title="Günün Dini İçeriği">
         {% if ramadan_info.is_ramadan %}
@@ -906,6 +904,7 @@
         await ezanVakitleriniYukle();
         await dailyContentYukle();
         updateCountdowns();
+        checkLaylatAlQadr();
         setInterval(updateCountdowns, 1000);
         // Sayfa açıkken 30 dakikada bir kontrol et (eskiden 1 dakikaydı)
         setInterval(() => {
@@ -939,5 +938,38 @@
             }, 60000);
         } catch(e) {}
     });
+
+    function checkLaylatAlQadr() {
+    const isQadrDay = {{ 'true' if ramadan_info.is_laylat_al_qadr_day else 'false' }};
+    const isNextDay = {{ 'true' if ramadan_info.current_day == 27 else 'false' }};
+    
+    if (!isQadrDay && !isNextDay) return;
+    
+    const aksam = ezanVakitleri.aksam; // "18:32" gibi
+    if (!aksam) return;
+    
+    const tz = ezanVakitleri.timezone || 'Europe/Istanbul';
+    const now = new Date();
+    const cityNowStr = now.toLocaleString("en-US", {timeZone: tz});
+    const cityNow = new Date(cityNowStr);
+    
+    const [h, m] = aksam.split(":").map(Number);
+    const aksamDate = new Date(cityNow);
+    aksamDate.setHours(h, m, 0, 0);
+    
+    // 26. günün akşamından 27. günün fecrine kadar göster
+    const imsak = ezanVakitleri.imsak;
+    const [ih, im] = imsak.split(":").map(Number);
+    const imsakDate = new Date(cityNow);
+    imsakDate.setHours(ih, im, 0, 0);
+    
+    let show = false;
+    if (isQadrDay && cityNow >= aksamDate) show = true;      // 26. gün akşamdan sonra
+    if (isNextDay && cityNow < imsakDate) show = true;        // 27. gün fecre kadar
+    
+    if (show) {
+        document.querySelector('.qadr-night-alert').style.display = 'flex';
+    }
+}
 </script>
 {% endblock %}
