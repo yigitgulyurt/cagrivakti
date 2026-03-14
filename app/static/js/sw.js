@@ -1,13 +1,11 @@
 // Service Worker - Ezan Vakitleri
-const VERSION = `V1.0`;
+const VERSION = `V${APP_VERSION}`;
 
 const PAGE_CACHE    = `page-cache-${VERSION}`;    // HTML sayfaları (navigate istekleri)
 const STATIC_CACHE  = `static-cache-${VERSION}`;  // JS, CSS, resim, ikon gibi statik dosyalar
 const API_CACHE     = `api-cache-${VERSION}`;      // Dış API yanıtları (ezan vakitleri)
 
-const FONT_CACHE    = `font-cache-${VERSION}`;    // fonts.cagrivakti.com.tr fontları
-
-const ALL_CACHES = [PAGE_CACHE, STATIC_CACHE, API_CACHE, FONT_CACHE];
+const ALL_CACHES = [PAGE_CACHE, STATIC_CACHE, API_CACHE];
 
 // Önbelleğe alınacak HTML sayfaları
 const PRECACHE_PAGES = [
@@ -22,6 +20,9 @@ const PRECACHE_PAGES = [
     '/konum-bul',
     '/iletisim',
     '/ilkelerimiz',
+    '/kible-pusulasi',
+    '/asal-sayi',
+    '/qr-okuyucu',
     '/Mustafa-Kemal-Ataturk',
 ];
 
@@ -39,9 +40,6 @@ const PRECACHE_STATIC = [
 
 // SW tarafından hiç önbelleğe alınmayacak sayfalar
 const NO_CACHE_PAGES = [
-    '/kible-pusulasi',
-    '/asal-sayi',
-    '/qr-okuyucu',
     '/oyunlar/under-the-red-sky',
 ];
 
@@ -84,25 +82,12 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(event.request.url);
 
-    // Fontlar — Cache-First (fontlar değişmez, önce cache'e bak, yoksa indir ve kaydet)
+    // Fontlar — SW bypass (nginx tarafında Cache-Control: immutable ile cache yapılıyor)
     if (
         url.hostname === 'fonts.googleapis.com' ||
         url.hostname === 'fonts.gstatic.com' ||
         url.hostname === 'fonts.cagrivakti.com.tr'
     ) {
-        event.respondWith(
-            caches.open(FONT_CACHE).then(async (cache) => {
-                const cached = await cache.match(event.request);
-                if (cached) return cached;
-                const corsRequest = new Request(event.request.url, {
-                    mode: 'cors',
-                    credentials: 'omit',
-                });
-                const response = await fetch(corsRequest);
-                if (response.ok) cache.put(corsRequest, response.clone());
-                return response;
-            })
-        );
         return;
     }
 
