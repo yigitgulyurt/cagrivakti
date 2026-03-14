@@ -117,17 +117,17 @@
     </span>
     </div> -->
 
-    <div class="qadr-night-alert" style="display: none;">
-        <div class="qadr-icon">
+    <section class="info-card qadr-night-alert fade-in" id="qadr-night-alert" style="display: none;" title="Kadir Gecesi">
+        <div class="daily-icon">
             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-star-and-crescent"></use></svg>
         </div>
-        <div class="qadr-text">
-            <h3>Kadir Geceniz Kutlu Olsun</h3>
+        <div class="daily-text">
+            <span class="daily-label">Kadir Geceniz Kutlu Olsun</span>
             <p>Bu gece, bin aydan daha yararlı olan Kadir Gecesi'dir. Bu kutlu geceyi dua, yakarış ve tövbe ile yerine getirmeniz salık verilir.</p>
         </div>
-    </div>
+    </section>
 
-    <section class="daily-content-card fade-in" id="daily-content" title="Günün Dini İçeriği">
+    <section class="info-card daily-content-card fade-in" id="daily-content" title="Günün Dini İçeriği">
         {% if ramadan_info.is_ramadan %}
         <div class="daily-icon">
             <svg class="icon" aria-hidden="true"><use xlink:href="#fa-moon"></use></svg>
@@ -246,17 +246,24 @@
     color: var(--primary);
 }
 
-/* Kadir Gecesi Uyarısı */
-.qadr-night-alert {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+/* Ortak Kart Yapısı */
+.info-card {
     border-radius: 20px;
     padding: 25px;
     margin-bottom: 25px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    user-select: text;
+}
+
+/* Kadir Gecesi Uyarısı */
+.qadr-night-alert {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
     display: flex;
     align-items: center;
     gap: 20px;
-    color: white;
-    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
 }
 
 .qadr-icon {
@@ -271,40 +278,12 @@
     flex-shrink: 0;
 }
 
-.qadr-text h3 {
-    margin: 0 0 5px 0;
-    font-size: 1.4rem;
-    font-weight: 700;
-}
-
-.qadr-text p {
-    margin: 0;
-    font-size: 1rem;
-    opacity: 0.9;
-    line-height: 1.4;
-}
-
 /* Günlük İçerik Kartı */
 .daily-content-card {
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    color: white;
-    padding: 25px;
-    border-radius: 20px;
-    margin-bottom: 30px;
     box-shadow: 0 0 15px #244786;
-    position: relative;
-    overflow: hidden;
-    user-select: text;
+    margin-bottom: 30px;
 }
-
-/*.daily-content-card::after {
-    position: absolute;
-    right: -10px;
-    bottom: -10px;
-    font-size: 8rem;
-    opacity: 0.1;
-    transform: rotate(-15deg);
-}*/
 
 .daily-type {
     font-size: 0.85rem;
@@ -320,6 +299,16 @@
     line-height: 1.6;
     margin-bottom: 15px;
     font-family: 'Amiri', serif;
+}
+
+.daily-label {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 10px;
 }
 
 .daily-source {
@@ -968,8 +957,8 @@
     if (isNextDay && cityNow < imsakDate) show = true;        // 27. gün fecre kadar
     
     if (show) {
-        document.querySelector('.qadr-night-alert').style.display = 'flex';
-        const dailyCard = document.querySelector('.daily-content-card');
+        document.getElementById('qadr-night-alert').style.display = 'flex';
+        const dailyCard = document.getElementById('daily-content');
         if (dailyCard) dailyCard.style.display = 'none';
     }
 }
