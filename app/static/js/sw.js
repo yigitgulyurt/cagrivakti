@@ -1,4 +1,5 @@
 // Service Worker - Ezan Vakitleri
+/* global VERSION */
 const CACHE_NAME = `ezan-vakitleri-V${VERSION}`;
 const API_CACHE_NAME = `api-cache-V${VERSION}`;
 const GAME_CACHE_NAME = `game-cache-V${VERSION}`;
@@ -33,11 +34,6 @@ const PAGE_ASSETS = [
     '/Mustafa-Kemal-Ataturk',
 ];
 
-// ── SW tarafından hiç önbelleğe alınmayacak sayfalar ────────────────────────
-const NO_CACHE_PAGES = [
-    '/kible-pusulasi',
-    '/oyunlar/under-the-red-sky',
-];
 
 // ── Hiç önbelleğe alınmayacak URL'ler (tam eşleşme veya prefix) ─────────────
 const NO_CACHE_URLS = [
@@ -105,7 +101,6 @@ self.addEventListener('fetch', (event) => {
     }
 
     // Önbelleğe alınmayacak sayfalar — her zaman ağdan getir
-    if (NO_CACHE_PAGES.some(p => url.pathname === p || url.pathname.startsWith(p + '/'))) {
         event.respondWith(fetch(event.request));
         return;
     }
