@@ -1,5 +1,5 @@
 // Service Worker - Ezan Vakitleri
-const CACHE_NAME = `ezan-vakitleri-V${VERSION}`;
+const CACHE_NAME = `static-cache-V${VERSION}`;
 const API_CACHE_NAME = `api-cache-V${VERSION}`;
 
 // ── Statik dosyalar (JS, CSS, ikonlar) ──────────────────────────────────────
