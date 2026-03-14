@@ -1,11 +1,13 @@
 // Service Worker - Ezan Vakitleri
-const VERSION = `V1.0`;
+const VERSION = `V${Config.APP_VERSION}`;
 
 const PAGE_CACHE    = `page-cache-${VERSION}`;    // HTML sayfaları (navigate istekleri)
 const STATIC_CACHE  = `static-cache-${VERSION}`;  // JS, CSS, resim, ikon gibi statik dosyalar
 const API_CACHE     = `api-cache-${VERSION}`;      // Dış API yanıtları (ezan vakitleri)
 
-const ALL_CACHES = [PAGE_CACHE, STATIC_CACHE, API_CACHE];
+const FONT_CACHE    = `font-cache-${VERSION}`;    // fonts.cagrivakti.com.tr fontları
+
+const ALL_CACHES = [PAGE_CACHE, STATIC_CACHE, API_CACHE, FONT_CACHE];
 
 // Önbelleğe alınacak HTML sayfaları
 const PRECACHE_PAGES = [
@@ -82,11 +84,26 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(event.request.url);
 
-    // Font ve stream bypass
+    // Fontlar — Cache-First (fontlar değişmez, önce cache'e bak, yoksa indir ve kaydet)
     if (
         url.hostname === 'fonts.googleapis.com' ||
         url.hostname === 'fonts.gstatic.com' ||
-        url.hostname === 'fonts.cagrivakti.com.tr' ||
+        url.hostname === 'fonts.cagrivakti.com.tr'
+    ) {
+        event.respondWith(
+            caches.open(FONT_CACHE).then(async (cache) => {
+                const cached = await cache.match(event.request);
+                if (cached) return cached;
+                const response = await fetch(event.request);
+                if (response.ok) cache.put(event.request, response.clone());
+                return response;
+            })
+        );
+        return;
+    }
+
+    // Stream bypass — hiç önbelleğe alma
+    if (
         url.pathname.startsWith('/canli-kaynak/') ||
         url.pathname === '/stream/status'
     ) {
