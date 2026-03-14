@@ -259,24 +259,6 @@
     box-sizing: border-box;
 }
 
-/* Kadir Gecesi Uyarısı */
-.qadr-night-alert {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
-}
-
-.qadr-icon {
-    font-size: 2.5rem;
-    background: rgba(255, 255, 255, 0.2);
-    width: 70px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
 /* Günlük İçerik Kartı */
 .daily-content-card {
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -958,7 +940,7 @@
         if (dailyCard) {
             dailyCard.innerHTML = `
                 <div class="daily-icon">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-star-and-crescent"></use></svg>
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-moon"></use></svg>
                 </div>
                 <div class="daily-text">
                     <span class="daily-label">Kadir Geceniz Kutlu Olsun</span>
