@@ -512,7 +512,7 @@
 <script>
     let mevcutSehir = "{{ sehir }}";
     let mevcutUlke = "{{ country_code }}";
-    let ezanVakitleri = JSON.parse('{{ vakitler|tojson|safe }}');
+    let ezanVakitleri = {{ vakitler | tojson }};
 
     // LocalStorage Önbellek Yönetimi
     // Versiyon kontrolü: Eski cache'leri temizlemek için suffix ekledik

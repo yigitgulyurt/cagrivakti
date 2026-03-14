@@ -348,7 +348,7 @@
     </div>
 
     <script>
-        const ezanVakitleri = JSON.parse('{{ vakitler | tojson | safe }}');
+        const ezanVakitleri = {{ vakitler | tojson | safe }};
         const displayCityName = "{{ display_name }}";
         const bgColor = "{{ bg_color }}";
         const textColor = "{{ text_color }}";
