@@ -1,8 +1,11 @@
 // Service Worker - Ezan Vakitleri
-const CACHE_NAME = `ezan-vakitleri-VX.xx`;
+const VERSION = `VX.xx`;
 
-// API istekleri için Cache-First, sonra Network (Offline için)
-const API_CACHE_NAME = `api-cache-VX.xx`;
+const PAGE_CACHE    = `page-cache-${VERSION}`;    // HTML sayfaları (navigate istekleri)
+const STATIC_CACHE  = `static-cache-${VERSION}`;  // JS, CSS, resim, ikon gibi statik dosyalar
+const API_CACHE     = `api-cache-${VERSION}`;      // Dış API yanıtları (ezan vakitleri)
+
+const ALL_CACHES = [PAGE_CACHE, STATIC_CACHE, API_CACHE];
 
 // Önbelleğe alınacak statik dosyalar ve sayfalar
 const PRECACHE_ASSETS = [
@@ -39,7 +42,7 @@ const NO_CACHE_PAGES = [
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
+        caches.open(STATIC_CACHE).then((cache) => {
             console.log('[SW] Pre-caching critical assets');
             return cache.addAll(PRECACHE_ASSETS);
         }).then(() => self.skipWaiting())
@@ -52,7 +55,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME) {
+                    if (!ALL_CACHES.includes(cacheName)) {
                         console.log('[SW] Removing old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
@@ -103,7 +106,7 @@ self.addEventListener('fetch', (event) => {
                 .then((response) => {
                     if (response.ok) {
                         const responseClone = response.clone();
-                        caches.open(API_CACHE_NAME).then((cache) => {
+                        caches.open(API_CACHE).then((cache) => {
                             cache.put(event.request, responseClone);
                         });
                     }
@@ -129,37 +132,37 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
-                    if (response.ok && response.status === 200 && 
-                        !response.url.includes('/offline') && 
+                    if (response.ok && response.status === 200 &&
+                        !response.url.includes('/offline') &&
                         !response.url.includes('/kaynak/') &&
-                        !response.url.includes('/canli-kaynak/')) { 
+                        !response.url.includes('/canli-kaynak/')) {
                         const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
+                        caches.open(PAGE_CACHE).then((cache) => {
                             cache.put(event.request, responseClone);
                         });
                     }
                     return response;
                 })
                 .catch(async () => {
-                        const cachedResponse = await caches.match(event.request);
-                        if (cachedResponse) return cachedResponse;
-                        
-                        const url = new URL(event.request.url);
-                        const cleanResponse = await caches.match(url.pathname, { ignoreSearch: true });
-                        if (cleanResponse) return cleanResponse;
+                    const cachedResponse = await caches.match(event.request);
+                    if (cachedResponse) return cachedResponse;
 
-                        if (url.pathname.startsWith('/sehir/')) {
-                            const sehirResponse = await caches.match('/sehir');
-                            if (sehirResponse) return sehirResponse;
-                        }
-                        
-                        if (url.pathname.startsWith('/imsakiye/')) {
-                            const imsakiyeResponse = await caches.match('/imsakiye');
-                            if (imsakiyeResponse) return imsakiyeResponse;
-                        }
+                    const url = new URL(event.request.url);
+                    const cleanResponse = await caches.match(url.pathname, { ignoreSearch: true });
+                    if (cleanResponse) return cleanResponse;
 
-                        return caches.match('/offline');
-                    })
+                    if (url.pathname.startsWith('/sehir/')) {
+                        const sehirResponse = await caches.match('/sehir');
+                        if (sehirResponse) return sehirResponse;
+                    }
+
+                    if (url.pathname.startsWith('/imsakiye/')) {
+                        const imsakiyeResponse = await caches.match('/imsakiye');
+                        if (imsakiyeResponse) return imsakiyeResponse;
+                    }
+
+                    return caches.match('/offline');
+                })
         );
         return;
     }
@@ -171,7 +174,7 @@ self.addEventListener('fetch', (event) => {
                 .then((networkResponse) => {
                     if (networkResponse && networkResponse.status === 200) {
                         const responseToCache = networkResponse.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
+                        caches.open(STATIC_CACHE).then((cache) => {
                             cache.put(event.request, responseToCache);
                         });
                     }
