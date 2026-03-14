@@ -36,7 +36,7 @@ class RamadanService:
 
         jd = RamadanService._int_part(365.25 * (y + 4716)) + \
              RamadanService._int_part(30.6001 * (m + 1)) + \
-             d + b - 1524
+             d + b - 1524 - 1
 
         z = jd - 1948440 + 10632
         n = RamadanService._int_part((z - 1) / 10631.0)
@@ -113,11 +113,11 @@ class RamadanService:
             # Ramazan'ın bitişi (Hicri Yıl, 9, 30) - Tabular takvimde 9. ay 30 çeker
             end_date = cls.hijri_to_gregorian(h_year, 9, 30)
             # Kadir Gecesi (27. Gece - 26. günün akşamı başlar ama genellikle 27. gün olarak işaretlenir)
-            laylat_al_qadr = cls.hijri_to_gregorian(h_year, 9, 26)
+            laylat_al_qadr = cls.hijri_to_gregorian(h_year, 9, 27)
             
             current_day = h_day
-            days_remaining = 31 - current_day # Basit hesap
-            is_laylat_al_qadr = (h_day == 26)
+            days_remaining = 30 - current_day # Basit hesap
+            is_laylat_al_qadr = (h_day == 27)
 
             res = {
                 "is_ramadan": True,
