@@ -255,6 +255,8 @@
     position: relative;
     overflow: hidden;
     user-select: text;
+    min-height: 100px; /* ikisi de aynı minimum yükseklikte */
+    box-sizing: border-box;
 }
 
 /* Kadir Gecesi Uyarısı */
@@ -283,6 +285,9 @@
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     box-shadow: 0 0 15px #244786;
     margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px; 
 }
 
 .daily-type {
