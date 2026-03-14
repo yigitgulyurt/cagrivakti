@@ -119,7 +119,7 @@
 
     <section class="info-card qadr-night-alert fade-in" id="qadr-night-alert" style="display: none;" title="Kadir Gecesi">
         <div class="daily-icon">
-            <svg class="icon" aria-hidden="true"><use xlink:href="#fa-star-and-crescent"></use></svg>
+            <svg class="icon" aria-hidden="true"><use xlink:href="#icon-turk-bayragi"></use></svg>
         </div>
         <div class="daily-text">
             <span class="daily-label">Kadir Geceniz Kutlu Olsun</span>
@@ -956,7 +956,7 @@
     if (isNextDay && cityNow < imsakDate) show = true;        // 27. gün fecre kadar
     
     if (show) {
-        document.getElementById('qadr-night-alert').style.display = 'flex';
+        document.getElementById('qadr-night-alert').style.display = 'block';
         const dailyCard = document.getElementById('daily-content');
         if (dailyCard) dailyCard.style.display = 'none';
     }
