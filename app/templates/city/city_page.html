@@ -969,6 +969,8 @@
     
     if (show) {
         document.querySelector('.qadr-night-alert').style.display = 'flex';
+        const dailyCard = document.getElementById('daily-content-card');
+        if (dailyCard) dailyCard.style.display = 'none';
     }
 }
 </script>
