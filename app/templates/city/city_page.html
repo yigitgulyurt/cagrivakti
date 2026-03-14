@@ -929,36 +929,43 @@
 
     function checkLaylatAlQadr() {
     const isQadrDay = {{ 'true' if ramadan_info.is_laylat_al_qadr_day else 'false' }};
-    const isNextDay = {{ 'true' if ramadan_info.current_day == 27 else 'false' }};
+    const isNextDay = {{ 'true' if ramadan_info.is_laylat_al_qadr_next_day else 'false' }};
     
     if (!isQadrDay && !isNextDay) return;
     
-    const aksam = ezanVakitleri.aksam; // "18:32" gibi
-    if (!aksam) return;
+    const aksam = ezanVakitleri.aksam;
+    const imsak = ezanVakitleri.imsak;
+    if (!aksam || !imsak) return;
     
     const tz = ezanVakitleri.timezone || 'Europe/Istanbul';
     const now = new Date();
-    const cityNowStr = now.toLocaleString("en-US", {timeZone: tz});
-    const cityNow = new Date(cityNowStr);
+    const cityNow = new Date(now.toLocaleString("en-US", {timeZone: tz}));
     
-    const [h, m] = aksam.split(":").map(Number);
+    const [ah, am] = aksam.split(":").map(Number);
     const aksamDate = new Date(cityNow);
-    aksamDate.setHours(h, m, 0, 0);
+    aksamDate.setHours(ah, am, 0, 0);
     
-    // 26. günün akşamından 27. günün fecrine kadar göster
-    const imsak = ezanVakitleri.imsak;
     const [ih, im] = imsak.split(":").map(Number);
     const imsakDate = new Date(cityNow);
     imsakDate.setHours(ih, im, 0, 0);
     
     let show = false;
-    if (isQadrDay && cityNow >= aksamDate) show = true;      // 26. gün akşamdan sonra
-    if (isNextDay && cityNow < imsakDate) show = true;        // 27. gün fecre kadar
+    if (isQadrDay && cityNow >= aksamDate) show = true;
+    if (isNextDay && cityNow < imsakDate) show = true;
     
     if (show) {
-        document.getElementById('qadr-night-alert').style.display = 'block';
         const dailyCard = document.getElementById('daily-content');
-        if (dailyCard) dailyCard.style.display = 'none';
+        if (dailyCard) {
+            dailyCard.innerHTML = `
+                <div class="daily-icon">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-star-and-crescent"></use></svg>
+                </div>
+                <div class="daily-text">
+                    <span class="daily-label">Kadir Geceniz Kutlu Olsun</span>
+                    <p>Bu gece, bin aydan daha yararlı olan Kadir Gecesi'dir. Bu kutlu geceyi dua, yakarış ve tövbe ile yerine getirmeniz salık verilir.</p>
+                </div>
+            `;
+        }
     }
 }
 </script>
