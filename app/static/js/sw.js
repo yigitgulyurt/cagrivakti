@@ -1,5 +1,5 @@
 // Service Worker - Ezan Vakitleri
-const VERSION = `VX.xx`;
+const VERSION = `V1.0`;
 
 const PAGE_CACHE    = `page-cache-${VERSION}`;    // HTML sayfaları (navigate istekleri)
 const STATIC_CACHE  = `static-cache-${VERSION}`;  // JS, CSS, resim, ikon gibi statik dosyalar
@@ -7,8 +7,8 @@ const API_CACHE     = `api-cache-${VERSION}`;      // Dış API yanıtları (eza
 
 const ALL_CACHES = [PAGE_CACHE, STATIC_CACHE, API_CACHE];
 
-// Önbelleğe alınacak statik dosyalar ve sayfalar
-const PRECACHE_ASSETS = [
+// Önbelleğe alınacak HTML sayfaları
+const PRECACHE_PAGES = [
     '/',
     '/offline',
     '/sehir',
@@ -21,6 +21,10 @@ const PRECACHE_ASSETS = [
     '/iletisim',
     '/ilkelerimiz',
     '/Mustafa-Kemal-Ataturk',
+];
+
+// Önbelleğe alınacak statik dosyalar
+const PRECACHE_STATIC = [
     '/static/js/jquery-cagrivakti.js',
     '/static/js/city-data.js',
     '/static/js/html5-qrcode.min.js',
@@ -39,13 +43,19 @@ const NO_CACHE_PAGES = [
     '/oyunlar/under-the-red-sky',
 ];
 
-// Yükleme (Install) - Kritik dosyaları önbelleğe al
+// Yükleme (Install) - Sayfaları ve statik dosyaları ayrı cache'lere yaz
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(STATIC_CACHE).then((cache) => {
-            console.log('[SW] Pre-caching critical assets');
-            return cache.addAll(PRECACHE_ASSETS);
-        }).then(() => self.skipWaiting())
+        Promise.all([
+            caches.open(PAGE_CACHE).then((cache) => {
+                console.log('[SW] Pre-caching pages');
+                return cache.addAll(PRECACHE_PAGES);
+            }),
+            caches.open(STATIC_CACHE).then((cache) => {
+                console.log('[SW] Pre-caching static assets');
+                return cache.addAll(PRECACHE_STATIC);
+            }),
+        ]).then(() => self.skipWaiting())
     );
 });
 
