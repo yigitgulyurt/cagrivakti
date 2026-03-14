@@ -35,9 +35,7 @@ def create_app(config_class=Config):
     app.json.sort_keys = False
 
     # Extensions
-    # CORS ayarlarını özelleştiriyoruz: Sadece ana domain ve subdomainlerine izin ver
     CORS(app, resources={
-        # Ana domain altındaki klasik API dokümanı ve eski uçlar
         r"/api/*": {
             "origins": [
                 "https://cagrivakti.com.tr",
@@ -46,7 +44,6 @@ def create_app(config_class=Config):
                 "http://127.0.0.1:*",
             ]
         },
-        # Public API v1 (ana domainde yayınlanan uç)
         r"/vakitler*": {
             "origins": [
                 "https://cagrivakti.com.tr",
@@ -55,7 +52,6 @@ def create_app(config_class=Config):
                 "http://127.0.0.1:*"
             ]
         },
-        # Subdomain: api.cagrivakti.com.tr altında çalışan modern uçlar
         r"/ezan_vakitleri-V2*": {
             "origins": [
                 "https://cagrivakti.com.tr",
@@ -103,10 +99,8 @@ def create_app(config_class=Config):
     )
     assets.register('js_main', js_bundle)
 
-    # Jinja2'ye webassets ekleme
     app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
     app.jinja_env.assets_environment = assets                          
-    # Compress(app)
     db.init_app(app)
     migrate.init_app(app, db)
     cache.init_app(app)
@@ -114,44 +108,33 @@ def create_app(config_class=Config):
     limiter.init_app(app)
     Minify(app=app, html=True, js=True, cssless=True)
 
-    # Logging
     setup_logging(app)
 
-    # Kullanıcı UID'si (cookie) - middleware'den önce kaydet
     @app.before_request
     def ensure_uid():
         try:
             uid = request.cookies.get('cv_uid')
             if not uid:
                 uid = uuid.uuid4().hex[:16]
-                # after_request'te set edebilmek için işaret bırak
                 g._set_uid_cookie = uid
             g.user_uid = uid
         except Exception:
             g.user_uid = '-'
 
-    # Middleware
     setup_middleware(app)
-
-    # Error Handlers
     register_error_handlers(app)
 
-    # Blueprints
     from app.routes.views import views_bp
     from app.routes.api import api_bp
     
     app.register_blueprint(views_bp)
     app.register_blueprint(api_bp)
 
-    # API Kullanım Loglaması
     setup_api_logging(app)
-    # Güvenlik Loglaması
     setup_security_logging(app)
     
-    # Statik Dosyalar İçin Cache-Control (1 Yıl)
     @app.after_request
     def add_header(response):
-        # Yeni UID üretildiyse cookie olarak ekle
         try:
             if getattr(g, '_set_uid_cookie', None):
                 response.set_cookie(
@@ -160,53 +143,35 @@ def create_app(config_class=Config):
                     max_age=60*60*24*365,
                     samesite='Lax',
                     path='/',
-                    secure=True,    # <-- ekle
-                    httponly=True   # <-- ekle
+                    secure=True,
+                    httponly=True
                 )
         except Exception:
             pass
-            # Tüm response'lara güvenlik header'ları ekle  <-- bunu ekle
         response.headers.setdefault('X-Content-Type-Options', 'nosniff')
-        # Statik dosyalar için uzun süreli cache (Daima overwrite)
-        # request.endpoint == 'static' kontrolü Flask'ın kendi static handler'ını yakalar
         if request.endpoint == 'static' or request.path.startswith('/static/'):
-            # Cache-Control: 1 Yıl, Immutable
             response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
-            
-            # Expires header ekle (PageSpeed bazen bunu da kontrol eder)
             from datetime import datetime, timedelta
             expires = datetime.now() + timedelta(days=365)
             response.headers['Expires'] = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            
-            # Vary header (CDN ve Proxy'ler için)
             response.headers['Vary'] = 'Accept-Encoding'
-            
-            # Access-Control-Allow-Origin (CORS - Fontlar vb. için gerekebilir)
             response.headers['Access-Control-Allow-Origin'] = '*'
-        
-        # Diğer route'lar için mevcut header'ları koru
         elif 'Cache-Control' not in response.headers:
              response.headers['Cache-Control'] = 'no-cache'
-
         return response
 
-    # Cache Busting (Versiyonlama)
     @app.url_defaults
     def hashed_url_for_static_file(endpoint, values):
         if 'static' == endpoint or endpoint.endswith('.static'):
             filename = values.get('filename')
             if filename:
                 if '.' in filename:
-                    # Global versiyon numarası: Tek kaynak APP_VERSION
                     version = app.config.get('APP_VERSION') or '1.0'
-                    
                     param_name = 'v'
                     while param_name in values:
                         param_name = '_' + param_name
-                    
                     values[param_name] = version
 
-    # Context Processors
     from app.services.ramadan_service import RamadanService
     from app.services import CITY_DISPLAY_NAME_MAPPING
     
@@ -224,12 +189,35 @@ def create_app(config_class=Config):
             CITY_DISPLAY_NAME_MAPPING=CITY_DISPLAY_NAME_MAPPING
         )
 
+    # ── Versiyon değişince Flask cache'ini otomatik temizle ──
+    with app.app_context():
+        _clear_cache_on_version_change(app)
+
     return app
 
+
+def _clear_cache_on_version_change(app):
+    """Redis'e kaydedilen son versiyonla mevcut versiyonu karşılaştırır.
+    Farklıysa Flask cache'ini temizler ve yeni versiyonu kaydeder."""
+    try:
+        import redis as redis_lib
+        r = redis_lib.from_url(
+            os.environ.get('REDIS_URL', 'redis://localhost:6379/0'),
+            decode_responses=True
+        )
+        current_version = app.config.get('APP_VERSION', '')
+        stored_version = r.get('app:deployed_version')
+        if stored_version != current_version:
+            cache.clear()
+            r.set('app:deployed_version', current_version)
+            app.logger.info(
+                f'[version] {stored_version} → {current_version} — Flask cache temizlendi.'
+            )
+    except Exception as e:
+        app.logger.warning(f'[version] Cache temizleme kontrolü başarısız: {e}')
+
+
 class IstanbulFormatter(logging.Formatter):
-    """
-    Log zaman damgalarını Europe/Istanbul saat dilimine dönüştüren formatter.
-    """
     def converter(self, timestamp):
         dt = datetime.fromtimestamp(timestamp, pytz.utc)
         return dt.astimezone(pytz.timezone('Europe/Istanbul'))
@@ -246,52 +234,31 @@ class IstanbulFormatter(logging.Formatter):
         return s
 
 def compress_rotator(source, dest):
-    """Log dosyası rotasyona girdiğinde gzip ile sıkıştır."""
     with open(source, 'rb') as f_in:
         with gzip.open(dest + '.gz', 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
     os.remove(source)
 
 def setup_logging(app):
-    """
-    Uygulama loglama yapılandırması.
-    TimedRotatingFileHandler (Günlük) ve Istanbul timezone kullanılır.
-    """
     log_file = app.config['LOG_FILE']
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    
-    # Mevcut handlerları temizle
     app.logger.handlers = []
-    
-    # Log seviyesini ayarla
     level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
     app.logger.setLevel(getattr(logging, level_name, logging.INFO))
-    
-    # Formatter oluştur
     default_formatter = IstanbulFormatter(
         '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-    
     clean_formatter = IstanbulFormatter(
         '[%(asctime)s] %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-    
-    # Ana log dosyası (INFO ve üzeri) - Günlük Rotasyonlu
-    # when='midnight': Gece yarısı döndür
-    # interval=1: Her 1 günde bir
-    # backupCount=30: 30 günlük yedek sakla
     file_handler = TimedRotatingFileHandler(
         log_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
     )
     file_handler.setFormatter(clean_formatter)
     file_handler.setLevel(logging.INFO)
-    
-    # Günlük rotasyonda otomatik sıkıştırma kaldırıldı
-    # Sıkıştırılmış dosya isimlendirmesi (log.2023-01-01.gz gibi olması için namer gerekebilir ama varsayılan + .gz yeterli)
-    
-    # Request context filter (request_id)
+
     class RequestContextFilter(logging.Filter):
         def filter(self, record):
             try:
@@ -303,8 +270,6 @@ def setup_logging(app):
     ctx_filter = RequestContextFilter()
     file_handler.addFilter(ctx_filter)
     app.logger.addHandler(file_handler)
-    
-    # Hata log dosyası (Sadece ERROR)
     error_log_file = os.path.join(os.path.dirname(log_file), 'error.log')
     error_handler = RotatingFileHandler(
         error_log_file, maxBytes=10*1024*1024, backupCount=10, encoding='utf-8'
@@ -313,36 +278,26 @@ def setup_logging(app):
     error_handler.addFilter(ctx_filter)
     error_handler.setLevel(logging.ERROR)
     app.logger.addHandler(error_handler)
-    
-    # Werkzeug loglarını sessize al (veya dosyaya yönlendir)
     werkzeug_logger = logging.getLogger('werkzeug')
     werkzeug_logger.setLevel(logging.ERROR)
     werkzeug_logger.addHandler(error_handler)
 
 def setup_api_logging(app):
-    """
-    API istekleri için ayrı loglama yapılandırması.
-    """
     api_log_file = app.config['API_LOG_FILE']
     os.makedirs(os.path.dirname(api_log_file), exist_ok=True)
-    
-    # API logger oluştur
     api_logger = logging.getLogger('api_logger')
     level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
     api_logger.setLevel(getattr(logging, level_name, logging.INFO))
-    api_logger.propagate = False  # Ana loga düşmesini engelle
-    
+    api_logger.propagate = False
     formatter = IstanbulFormatter(
         '[%(asctime)s] %(remote_addr)s - %(method)s %(path)s %(status)s %(duration_ms)sms rid=%(request_id)s uid=%(user_id)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-    
-    # API Logları da günlük rotasyonlu olsun
     handler = TimedRotatingFileHandler(
         api_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
     )
     handler.setFormatter(formatter)
-    # Aynı context filter'ı ekle
+
     class RequestContextFilter(logging.Filter):
         def filter(self, record):
             try:
@@ -350,29 +305,25 @@ def setup_api_logging(app):
             except Exception:
                 record.request_id = '-'
                 record.user_id = '-'
-            # Optional fields defaults
             if not hasattr(record, 'status'):
                 record.status = '-'
             if not hasattr(record, 'duration_ms'):
                 record.duration_ms = 0
             return True
+
     handler.addFilter(RequestContextFilter())
     api_logger.addHandler(handler)
-    
-    # JSON satırları için ayrı handler (opsiyonel)
     if app.config.get('API_LOG_JSON', True):
         json_file = api_log_file.replace('.log', '.jsonl')
         json_handler = TimedRotatingFileHandler(
             json_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
         )
         json_handler.setLevel(getattr(logging, level_name, logging.INFO))
-        # Ayrı bir JSON logger kullan (text handler'a düşmesin)
         json_logger = logging.getLogger('api_logger.json')
         json_logger.setLevel(getattr(logging, level_name, logging.INFO))
         json_logger.propagate = False
         json_logger.addHandler(json_handler)
         json_handler.addFilter(RequestContextFilter())
-        # format not used; we will emit pre-formatted JSON strings
         json_handler.setFormatter(logging.Formatter('%(message)s'))
 
     @app.before_request
@@ -415,16 +366,12 @@ def setup_api_logging(app):
                         'ua': ua,
                         'referer': referer
                     }
-                    # Emit JSON to the dedicated json logger
                     logging.getLogger('api_logger.json').info(json.dumps(payload, ensure_ascii=False))
         except Exception:
             pass
         return response
 
 def setup_security_logging(app):
-    """
-    Güvenlik olayları/logları için ayrı logger (örn. engellenen istekler).
-    """
     sec_log_file = app.config.get('SECURITY_LOG_FILE')
     os.makedirs(os.path.dirname(sec_log_file), exist_ok=True)
     logger = logging.getLogger('security_logger')

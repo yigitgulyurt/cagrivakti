@@ -53,7 +53,7 @@ class Config:
     CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
     CACHE_DEFAULT_TIMEOUT = 3600
 
-    # Canlı Yayın Secret
+    # Canlı Yayın Secret key
     STREAM_SECRET = os.environ.get('STREAM_SECRET', 'okulcanli2025')
     STREAM_KEY = os.environ.get('STREAM_KEY', 'yayin')
     SHOW_LIVE_SECTION = os.environ.get('SHOW_LIVE_SECTION', 'false').lower() in ('1', 'true', 'yes')
