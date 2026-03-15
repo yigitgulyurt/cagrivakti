@@ -1,72 +1,44 @@
-# 🌙 **[Çağrı Vakti](https://cagrivakti.com.tr)** - Modern Namaz Vakitleri Ekosistemi
+# 🌙 Çağrı Vakti
 
-**Çağrı Vakti**, modern web teknolojileri ve yapay zeka destekli geliştirme süreçleriyle inşa edilmiş, çok platformlu bir ibadet asistanı ekosistemidir. Bu proje, estetik tasarımı güçlü bir teknik altyapıyla birleştirerek kullanıcılara en hızlı ve doğru vakit bilgilerini sunmayı hedefler.
-
----
-
-## 💎 Temel Özellikler
-
-### 🛰️ Akıllı Konum Servisleri
-*   **Hassas Tespit:** Tarayıcı tabanlı konum servisleri ve gelişmiş reverse geocoding ile kullanıcının bulunduğu şehri anında belirler.
-*   **Akıllı Hafıza:** Tercihleri yerel depolamada saklayarak her girişte akıcı ve kesintisiz bir deneyim sunar.
-
-### 📱 Modern Kullanıcı Deneyimi
-*   **PWA Desteği:** Yerleşik uygulama konforu; masaüstü ve mobilde yüklenebilir yapı ve çevrimdışı kullanım kabiliyeti.
-*   **Ultra-Modern Arayüz:** Göz yormayan dinamik temalar, akıcı animasyonlar ve her cihaza tam uyumlu (Responsive) tasarım.
-
-### 🤖 Bot Entegrasyonları
-*   **Telegram & Discord:** Merkezi veri motorundan beslenen, anlık sorgulama ve topluluk bilgilendirme botları ile her platformda erişilebilirlik.
+**[cagrivakti.com.tr](https://cagrivakti.com.tr)** — Namaz vakitleri, imsakiye ve dini içerikler için modern, ücretsiz Türkçe platform.
 
 ---
 
-## 🧠 Geliştirme Vizyonu
+## Ne Sunuyor?
 
-Bu sistem, **AI-Pair Programming** metodolojisiyle hayata geçirilmiştir. Yapay zeka desteği sayesinde:
-*   Karmaşık veri algoritmaları en verimli şekilde optimize edilmiştir.
-*   Hata payı minimize edilmiş, yüksek performanslı ve sürdürülebilir bir kod mimarisi kurulmuştur.
-
----
-
-## 🛠️ Teknik Altyapı
-
-*   **Backend:** Python (Flask) - Modüler App Factory mimarisi.
-*   **Frontend:** HTML5, CSS3 (Modern Variables), Native JavaScript.
-*   **Veri Yönetimi:** SQLAlchemy ORM.
-*   **Performans:** Flask-Compress ve Gelişmiş Önbellekleme (Caching) sistemleri.
+- **Namaz vakitleri** — Türkiye'nin 81 ili ve 200'den fazla ülke için T.C. Diyanet İşleri Başkanlığı kaynaklı resmi veriler
+- **Otomatik konum tespiti** — "Konumumu Bul" ile şehri otomatik belirle; tercihler tarayıcıda saklanır
+- **Geri sayım** — Bir sonraki vakite saniyelik canlı geri sayım
+- **2026 İmsakiye** — Sahur ve iftar vakitleri dahil güncel Ramazan imsakiyesi
+- **Kıble pusulası** — Harita tabanlı anlık kıble yönü tespiti
+- **Bilgi Köşesi** — Abdest, zekat, itikaf gibi konularda rehber içerikler
+- **PWA desteği** — Ana ekrana ekle, uygulama gibi kullan, çevrimdışı çalışır
+- **Telegram botu** — [@cagrivaktibot](https://t.me/cagrivaktibot) üzerinden vakit sorgulama ve bildirim
+- **Windows widget** — Rainmeter ile masaüstünde namaz vakti takibi (`.rmskin` paketi dahil)
+- **Site widget'ı** — Kendi web sitenize entegre edebileceğiniz ücretsiz vakit bileşeni
 
 ---
 
-## ⚙️ Sistem Bileşenleri ve Amaçları
+## Hızlı Erişim
 
-Proje, birbirine entegre ancak bağımsız çalışan üç ana Python tabanlı alt sistemden oluşur:
-
-### 1. Merkezi Web Sistemi (Flask)
-Sistemin kalbidir. Kullanıcıların web üzerinden vakitlere erişmesini, konum tabanlı şehir tespitini ve REST API uç noktalarını yönetir.
-*   **Amacı:** Yüksek performanslı bir kullanıcı arayüzü sunmak ve tüm ekosisteme veri servis etmek.
-
-### 2. Bot Mikro-servisleri (Telegram & Discord)
-Mesajlaşma platformları üzerinden çalışan bağımsız Python süreçleridir.
-*   **Amacı:** Kullanıcıların web sitesine girmesine gerek kalmadan, bulundukları platformda anlık vakit sorgusu yapmalarını ve otomatik hatırlatmalar almalarını sağlamak.
-
-### 3. Veri ve İşlem Otomasyonu (Scripts)
-Arka planda çalışan yardımcı Python betikleridir.
-*   **Amacı:** Diyanet tabanlı verileri işlemek, yıllık imsakiye dosyalarını sisteme aktarmak ve günlük içerikleri (hadis, dua vb.) organize etmek.
+| Özellik | Bağlantı |
+|---|---|
+| Ana Sayfa | [cagrivakti.com.tr](https://cagrivakti.com.tr) |
+| Şehir Seçimi | [/sehir](https://cagrivakti.com.tr/sehir) |
+| İmsakiye | [/imsakiye](https://cagrivakti.com.tr/imsakiye) |
+| Kıble Pusulası | [/kible-pusulasi](https://cagrivakti.com.tr/kible-pusulasi) |
+| Bilgi Köşesi | [/bilgi-kosesi](https://cagrivakti.com.tr/bilgi-kosesi) |
+| Telegram Bot | [@cagrivaktibot](https://t.me/cagrivaktibot) |
+| Rainmeter Widget | [/rainmeter-rehber](https://cagrivakti.com.tr/rainmeter-rehber) |
 
 ---
 
-## 📂 Sistem Yapısı
+## Teknik
 
-```text
-├── app/                  # Uygulama çekirdeği (Routes, Services, Templates)
-├── bots/                 # Çoklu platform bot servisleri
-├── scripts/              # Veri otomasyon betikleri
-└── static/               # PWA Assets ve optimize edilmiş bileşenler
-```
+Python (Flask) tabanlı, Gunicorn + Nginx üzerinde çalışan üretim ortamına sahip bir web uygulaması. Telegram ve Discord bot entegrasyonları bağımsız süreçler olarak çalışmakta; veri işleme ve imsakiye aktarımı betikler aracılığıyla otomatize edilmektedir.
 
 ---
 
-## 📄 Lisans
-Bu proje **Yiğit Gülyurt** tarafından geliştirilmiştir. Tüm hakları saklıdır. Kod yapısı ve tasarım öğeleri şahsi portfolyomun bir parçasıdır; izinsiz kullanımı yasaktır.
+## Lisans
 
----
-**[Canlı Önizleme](https://cagrivakti.com.tr)**
+Bu proje **Yiğit Gülyurt** tarafından geliştirilmiştir. Tüm hakları saklıdır. İzinsiz kullanım yasaktır.
