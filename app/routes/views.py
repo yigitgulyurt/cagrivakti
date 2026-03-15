@@ -828,7 +828,7 @@ def serve_game_files(filename):
 
 # canlı yayın sistemi için gerekli rotalar
 
-_VIEWER_TIMEOUT = 1
+_VIEWER_TIMEOUT = 10
 _VIEWER_KEY_PREFIX = 'viewer:'
 
 def _get_redis():
