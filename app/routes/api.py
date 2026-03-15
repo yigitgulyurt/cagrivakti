@@ -346,3 +346,39 @@ def shorten():
     db.session.commit()
     
     return jsonify({'short_id': short_id})
+
+@api_bp.route('/status')
+def health_check():
+    """
+    Uptime Kuma ve benzeri monitoring servisleri için health check endpoint'i.
+    restrict_to_main_domain kasıtlı olarak uygulanmıyor — harici checker'ların
+    Referer/Origin başlığı göndermediği için 403 alırlardı.
+    """
+    checks = {}
+    http_status = 200
+
+    # 1. Veritabanı bağlantısı
+    try:
+        db.session.execute(db.text('SELECT 1'))
+        checks['database'] = 'ok'
+    except Exception as e:
+        checks['database'] = f'error: {str(e)}'
+        http_status = 503
+
+    # 2. Cache bağlantısı (Redis/SimpleCache vs.)
+    try:
+        cache.set('__healthcheck__', '1', timeout=5)
+        val = cache.get('__healthcheck__')
+        checks['cache'] = 'ok' if val == '1' else 'miss'
+    except Exception as e:
+        checks['cache'] = f'error: {str(e)}'
+        # Cache hatası kritik değil, servisi durdurmuyoruz
+
+    # 3. Genel uygulama durumu
+    checks['app'] = 'ok'
+
+    return jsonify({
+        'status': 'ok' if http_status == 200 else 'degraded',
+        'checks': checks,
+        'timestamp': datetime.utcnow().isoformat() + 'Z'
+    }), http_status
