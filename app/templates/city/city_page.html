@@ -97,7 +97,7 @@
     </header>
 
     {# ---- Kadir Gecesi alert (shown/hidden by JS based on prayer times) ---- #}
-    <section class="info-card qadr-night-alert fade-in" id="qadr-night-alert" style="display: none;" title="Kadir Gecesi">
+    <section class="info-card qadr-night-alert fade-in" id="qadr-night-alert" style="display: block;" title="Kadir Gecesi">
         <div class="daily-icon">
             <svg class="icon" aria-hidden="true"><use xlink:href="#icon-turk-bayragi"></use></svg>
         </div>
@@ -109,7 +109,7 @@
     </section>
 
     {# ---- Daily content card ---- #}
-    <section class="info-card daily-content-card fade-in" id="daily-content" title="Günün Dini İçeriği">
+    <section class="info-card daily-content-card fade-in" id="daily-content" style="display: none;" title="Günün Dini İçeriği">
         {% if ramadan_info.is_ramadan %}
             <div class="daily-text">
                 <span class="daily-label">Günün Ramazan İletisi</span>
