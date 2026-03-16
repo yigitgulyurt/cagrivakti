@@ -11,8 +11,6 @@ import requests
 from threading import Thread
 import re
 import hashlib
-import redis as redis_lib
-import time
 
 views_bp = Blueprint('views', __name__)
 
@@ -825,58 +823,3 @@ def under_the_red_sky():
 def serve_game_files(filename):
     game_dir = os.path.join(current_app.root_path, 'static', 'games', 'under-the-red-sky')
     return send_from_directory(game_dir, filename)
-
-# canlı yayın sistemi için gerekli rotalar
-
-_VIEWER_TIMEOUT = 45
-_VIEWER_KEY_PREFIX = 'viewer:'
-
-def _get_redis():
-    url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
-    return redis_lib.from_url(url, decode_responses=True)
-
-@views_bp.route('/canli/<key>')
-def canli(key):
-    expected_key = current_app.config.get('STREAM_KEY')
-    if key != expected_key:
-        abort(404)
-    stream_url = f'https://cagrivakti.com.tr/canli-kaynak/canli/{key}/index.m3u8'
-    return render_template('extra/canli/canli.html', stream_url=stream_url)
-
-@views_bp.route('/stream/ping', methods=['POST'])
-@csrf.exempt
-def stream_ping():
-    data = request.get_json(silent=True) or {}
-    sid = data.get('sid', '')
-    if not sid:
-        return jsonify({'ok': False}), 400
-    try:
-        r = _get_redis()
-        r.setex(f'{_VIEWER_KEY_PREFIX}{sid}', _VIEWER_TIMEOUT, '1')
-    except Exception as e:
-        current_app.logger.warning(f'Redis ping error: {e}')
-    return jsonify({'ok': True})
-
-@views_bp.route('/stream/status')
-def stream_status():
-    key = current_app.config.get('STREAM_KEY', '')
-    path_name = f'canli/{key}'
-    try:
-        r = requests.get('http://localhost:9997/v3/paths/list', timeout=2)
-        items = r.json().get('items', [])
-        path = next((p for p in items if p.get('name') == path_name), None)
-        live = bool(path and path.get('ready'))
-        return jsonify({'live': live})
-    except:
-        fallback = current_app.config.get('STREAM_LIVE_FALLBACK', 'false').lower() == 'true'
-        return jsonify({'live': fallback})
-
-@views_bp.route('/stream/viewers')
-def stream_viewers():
-    try:
-        r = _get_redis()
-        keys = r.keys(f'{_VIEWER_KEY_PREFIX}*')
-        return jsonify({'viewers': len(keys)})
-    except Exception as e:
-        current_app.logger.warning(f'Redis viewers error: {e}')
-        return jsonify({'viewers': 0})
