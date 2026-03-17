@@ -802,11 +802,6 @@ function checkLaylatAlQadr() {
               || (isNextDay && cityNow  < imsakDate);
 
     if (show) {
-        // Show the dedicated Kadir Gecesi alert section
-        const alertEl = document.getElementById('qadr-night-alert');
-        if (alertEl) alertEl.style.display = 'flex';
-
-        // Replace daily content card with Kadir Gecesi message
         const dailyCard = document.getElementById('daily-content');
         if (dailyCard) {
             dailyCard.innerHTML = `
