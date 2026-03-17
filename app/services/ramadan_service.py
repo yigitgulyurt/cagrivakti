@@ -96,10 +96,10 @@ class RamadanService:
             current_date = datetime.now(tz).date()
         
         # Cache anahtarı: ramadan_info_YYYY-MM-DD
-        cache_key = f"ramadan_info_{current_date.strftime('%Y-%m-%d')}"
-        cached_info = cache.get(cache_key)
-        if cached_info:
-            return cached_info
+        # cache_key = f"ramadan_info_{current_date.strftime('%Y-%m-%d')}"
+        # cached_info = cache.get(cache_key)
+        # if cached_info:
+        #     return cached_info
 
         # Otomatik Hesaplama
         h_year, h_month, h_day = cls.gregorian_to_hijri(current_date)
@@ -114,8 +114,8 @@ class RamadanService:
             end_date = cls.hijri_to_gregorian(h_year, 9, 30)
             current_day = h_day
             days_remaining = 30 - current_day
-            is_laylat_al_qadr_day = (h_day == 13)
-            is_laylat_al_qadr_next_day = (h_day == 14)
+            is_laylat_al_qadr_day = (h_day == 26)
+            is_laylat_al_qadr_next_day = (h_day == 27)
             res = {
                 "is_ramadan": True,
                 "status": "active",
