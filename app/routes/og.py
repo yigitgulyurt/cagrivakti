@@ -28,7 +28,7 @@ from functools import lru_cache
 from flask import Blueprint, request, send_file
 from PIL import Image, ImageDraw, ImageFont
 
-bp = Blueprint('og', __name__)
+og_bp = Blueprint('og', __name__)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # GÖRSEL BOYUTLARI
@@ -312,7 +312,7 @@ def _cached_og(
 # FLASK ROUTE
 # ─────────────────────────────────────────────────────────────────────────────
 
-@bp.route('/og-image')
+@og_bp.route('/og-image')
 def og_image():
     title    = request.args.get('title',    'Çağrı Vakti')[:80]
     subtitle = request.args.get('subtitle', 'Türkiye Namaz Vakitleri')[:120]
