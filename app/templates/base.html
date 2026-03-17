@@ -14,7 +14,7 @@
         if (isFirefox) document.documentElement.classList.add("firefox-user");
     })();
     </script>
-
+    
     {# ---- SEO ---- #}
     <meta name="description" content="{% block description %}Dünya genelinde ezan vakitleri, imsakiye ve dini içerikler. Çağdaş arayüz ve doğru verilerle yanınızdayız.{% endblock %}">
     <meta name="keywords"    content="{% block keywords %}ramazan, imsakiye, ezan vakitleri, iftar ve sahur vakitleri{% endblock %}">
@@ -22,20 +22,24 @@
     <link rel="canonical"    href="{% block canonical %}https://cagrivakti.com.tr{{ request.path }}{% endblock %}">
 
     {# ---- Open Graph ---- #}
-    <meta property="og:type"        content="website" />
-    <meta property="og:url"         content="https://cagrivakti.com.tr{{ request.path }}" />
-    <meta property="og:title"       content="{% block og_title %}Çağrı Vakti{% endblock %}" />
-    <meta property="og:description" content="{% block og_description %}Namaz Vakitlerine anında eriş{% endblock %}" />
-    <meta property="og:image"       content="https://cagrivakti.com.tr/static/icons/og-image.png" />
+    {# og_image_url: route'tan geçirilirse dinamik OG image, yoksa statik fallback #}
+    {% set _og_image = og_image_url if og_image_url is defined and og_image_url else 'https://cagrivakti.com.tr/static/icons/og-image.png' %}
+
+    <meta property="og:type"         content="website" />
+    <meta property="og:url"          content="https://cagrivakti.com.tr{{ request.path }}" />
+    <meta property="og:title"        content="{% block og_title %}Çağrı Vakti{% endblock %}" />
+    <meta property="og:description"  content="{% block og_description %}Namaz Vakitlerine anında eriş{% endblock %}" />
+    <meta property="og:image"        content="{{ _og_image }}" />
     <meta property="og:image:width"  content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:type"   content="image/png" />
 
     {# ---- Twitter Card ---- #}
     <meta name="twitter:card"        content="summary_large_image" />
     <meta name="twitter:url"         content="https://cagrivakti.com.tr{{ request.path }}" />
-    <meta name="twitter:title"       content="Çağrı Vakti" />
-    <meta name="twitter:description" content="Namaz Vakitlerine anında eriş" />
-    <meta name="twitter:image"       content="https://cagrivakti.com.tr/static/icons/og-image.png" />
+    <meta name="twitter:title"       content="{% block twitter_title %}Çağrı Vakti{% endblock %}" />
+    <meta name="twitter:description" content="{% block twitter_description %}Namaz Vakitlerine anında eriş{% endblock %}" />
+    <meta name="twitter:image"       content="{{ _og_image }}" />
 
     {# ---- JSON-LD Structured Data ---- #}
     <script type="application/ld+json">
