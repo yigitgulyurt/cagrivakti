@@ -204,15 +204,27 @@ def _draw_subtitle_multiline(
     font: ImageFont.FreeTypeFont,
     color: tuple[int, int, int],
     max_width: int,
-    line_spacing: int = 8,
+    line_spacing: int = 12,
 ) -> None:
     """
-    Alt başlığı max_width'e göre sözcük başından kaydır.
-    Subtitle'daki '·' ayraçlı vakit listesi için kullanışlı.
+    Alt başlığı çok satırlı çizer.
+
+    İki mod:
+      • '|' içeriyorsa → sabit kırma: her '|' bir satır sonu olur
+        (views.py'den "İmsak · Güneş · Öğle|İkindi · Akşam · Yatsı" şeklinde geçilir)
+      • '|' yoksa     → otomatik sözcük kaydırma (max_width'e göre)
     """
-    words  = text.split(' ')
-    line   = ''
-    cy     = y
+    # ── Mod 1: Sabit satır kırma ('|' ayracı) ───────────────────────────────
+    if '|' in text:
+        line_h = draw.textbbox((0, 0), 'A', font=font)[3] + line_spacing
+        for i, line in enumerate(text.split('|')):
+            draw.text((x, y + i * line_h), line.strip(), font=font, fill=color)
+        return
+
+    # ── Mod 2: Otomatik sözcük kaydırma ─────────────────────────────────────
+    words = text.split(' ')
+    line  = ''
+    cy    = y
 
     for word in words:
         test = (line + ' ' + word).strip()
@@ -222,7 +234,7 @@ def _draw_subtitle_multiline(
         else:
             if line:
                 draw.text((x, cy), line, font=font, fill=color)
-                cy += (bbox[3] - bbox[1]) + line_spacing
+                cy += draw.textbbox((0, 0), line, font=font)[3] + line_spacing
             line = word
 
     if line:

@@ -79,10 +79,11 @@ def sehir_sayfasi(sehir):
 
     # Gösterim adı (örn. "istanbul" → "İstanbul")
     sehir_adi    = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
+
+    # Subtitle: ilk satır İmsak·Güneş·Öğle, ikinci satır İkindi·Akşam·Yatsı
     og_subtitle  = (
-        f"İmsak {vakitler['imsak']} · Güneş {vakitler['gunes']} · "
-        f"Öğle {vakitler['ogle']} · İkindi {vakitler['ikindi']} · "
-        f"Akşam {vakitler['aksam']} · Yatsı {vakitler['yatsi']}"
+        f"İmsak {vakitler['imsak']} · Güneş {vakitler['gunes']} · Öğle {vakitler['ogle']}|"
+        f"İkindi {vakitler['ikindi']} · Akşam {vakitler['aksam']} · Yatsı {vakitler['yatsi']}"
     )
     og_image_url = url_for(
         'og.og_image',
