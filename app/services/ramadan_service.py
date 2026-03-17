@@ -96,10 +96,10 @@ class RamadanService:
             current_date = datetime.now(tz).date()
         
         # Cache anahtarı: ramadan_info_YYYY-MM-DD
-        # cache_key = f"ramadan_info_{current_date.strftime('%Y-%m-%d')}"
-        # cached_info = cache.get(cache_key)
-        # if cached_info:
-        #     return cached_info
+        cache_key = f"ramadan_info_{current_date.strftime('%Y-%m-%d')}"
+        cached_info = cache.get(cache_key)
+        if cached_info:
+            return cached_info
 
         # Otomatik Hesaplama
         h_year, h_month, h_day = cls.gregorian_to_hijri(current_date)
@@ -164,7 +164,7 @@ class RamadanService:
                 }
 
         # Sonucu cache'e kaydet (24 saat)
-        cache.set(cache_key, res, timeout=86400)
+        cache.set(cache_key, res, timeout=3600)
         return res
 
     @classmethod
