@@ -43,7 +43,7 @@ def index():
 
     current_year = datetime.now().year
     title        = f"Çağrı Vakti - Ezan Vakitleri {current_year}"
-    description  = f"{sehir} için bugün imsak: {vakitler['imsak']}, akşam: {vakitler['aksam']}. En doğru ve güncel {sehir} ezan vakitleri ve imsakiye."
+    description  = f"En doğru ve güncel ezan vakitleri ve imsakiye."
 
     return render_template('main/index.html',
                            sehir=sehir,
@@ -96,7 +96,7 @@ def sehir_sayfasi(sehir):
     )
 
     title       = f"Çağrı Vakti - {sehir} Ezan Vakitleri"
-    description = f"{sehir} ezan vakitleri: İmsak {vakitler['imsak']}, Öğle {vakitler['ogle']}, Akşam {vakitler['aksam']}. {sehir} günlük ezan vakitleri ve aylık imsakiye."
+    description = f"{sehir} ezan vakitleri. {sehir} günlük ezan vakitleri ve aylık imsakiye."
 
     response = make_response(render_template('city/city_page.html',
                                              sehir=sehir,
@@ -126,11 +126,14 @@ def sehir_secimi():
         _external = True,
     )
 
+    title       = f"Çağrı Vakti — Şehir Seçimi"
+    description = f"Hangi şehrin namaz vakitlerini görmek istiyorsunuz?"
+
     city_data = sorted(
         [{'name': c, 'country': get_country_for_city(c)} for c in all_cities],
         key=lambda x: x['name'],
     )
-    return render_template('city/city_selection.html', cities=city_data, og_image_url=og_image_url)
+    return render_template('city/city_selection.html', cities=city_data, og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 # ======================================================
 # ==== RAMADAN ====
@@ -148,7 +151,10 @@ def ramazan_nedir():
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
-    return render_template('ramadan/what_is_ramadan.html', og_image_url=og_image_url)
+
+    title       = f"Ramazan Nedir?"
+    description = f"Ramazan ayının önemi, ibadetleri ve fazileti hakkında bilgi edinin."
+    return render_template('ramadan/what_is_ramadan.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 
 @views_bp.route('/orucu-bozan-durumlar')
@@ -163,7 +169,10 @@ def orucu_bozan_durumlar():
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
-    return render_template('ramadan/things_that_break_fast.html', og_image_url=og_image_url)
+
+    title       = f"Orucu Bozan Durumlar"
+    description = f"Hangi durumlar orucu bozar? Varışca Slami bilgi."
+    return render_template('ramadan/things_that_break_fast.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 
 @views_bp.route('/imsakiye')
@@ -176,9 +185,11 @@ def imsakiye_secimi():
         theme     = 'ramadan',
         prompt    = '☪ Ramazan Mübarek',
         domain    = 'cagrivakti.com.tr',
-        _external = True,
     )
-    return render_template('ramadan/ramadan_schedule_selection.html', og_image_url=og_image_url)
+
+    title       = f"Ramazan İmsakiyesi"
+    description = f"Şehrinizi seçin, sahur ve iftar vakitlerini görün."
+    return render_template('ramadan/ramadan_schedule_selection.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 
 @views_bp.route('/imsakiye/<sehir>')
@@ -205,11 +216,15 @@ def imsakiye_detay(sehir):
         _external = True,
     )
 
+    title       = f"{sehir_adi} Ramazan İmsakiyesi"
+    description = f"{yil} Yılı Sahur ve İftar Vakitleri"
     return render_template('ramadan/ramadan_schedule_detail.html',
                            sehir=sehir,
                            country_code=country_code,
                            ramadan_info=RamadanService.get_ramadan_info(),
-                           og_image_url=og_image_url)
+                           og_image_url=og_image_url,
+                           seo_title=title,
+                           seo_description=description)
 
 # ======================================================
 # ==== GUIDES ====
@@ -231,6 +246,8 @@ def bilgi_kosesi_liste():
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
+
+
 
     return render_template('guide/guide_list.html',
                            guides=guides,
@@ -379,7 +396,13 @@ def neden_biz():
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
-    return render_template('info/why_us.html', og_image_url=og_image_url)
+    title       = "Neden Çağrı Vakti?"
+    description = "Doğruluk, hız ve gizlilik odaklı namaz vakitleri platformu."
+    
+    return render_template('info/why_us.html',
+                           seo_title=title,
+                           seo_description=description,
+                           og_image_url=og_image_url)
 
 
 @views_bp.route('/ilkelerimiz')
@@ -394,7 +417,13 @@ def ilkelerimiz():
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
-    return render_template('info/policies.html', og_image_url=og_image_url)
+    title       = "İlkelerimiz"
+    description = "Çağrı Vakti\'nin temel değerleri ve kullanım ilkeleri."
+    
+    return render_template('info/policies.html',
+                           seo_title=title,
+                           seo_description=description,
+                           og_image_url=og_image_url)
 
 
 @views_bp.route('/indir')
@@ -409,13 +438,29 @@ def indir():
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
-    return render_template('utils/download.html', og_image_url=og_image_url)
+
+    title       = "Çağrı Vakti\'ni İndirin"
+    description = "Rainmeter widget, Discord botu ve daha fazlası."
+
+
+
+    return render_template('utils/download.html',
+                           seo_title=title,
+                           seo_description=description,
+                           og_image_url=og_image_url)
+
+
 
 
 @views_bp.route('/Mustafa-Kemal-Ataturk')
 @cache.cached(timeout=86400)
 def ataturk():
-    return render_template('main/ataturk.html')
+    title       = "Mustafa Kemal Atatürk - Çağrı Vakti"
+    description = "Mustafa Kemal Atatürk'ün hayatı, ilkeleri ve İslam dünyasındaki yeri hakkında bilgi edinin."
+
+    return render_template('main/ataturk.html',
+                           seo_title=title,
+                           seo_description=description)
 
 # ======================================================
 # ==== ADMIN ====
@@ -667,13 +712,22 @@ def admin_logs():
 # ======================================================
 
 @views_bp.route('/asal-sayi')
+@cache.cached(timeout=86400)
 def prime_number():
-    return render_template('extra/prime-number/prime-number.html')
+    title       = "Asal Sayı Bulucu"
+    description = "Asal sayı bulucu, kullanıcıların girdiği sayının asal olup olmadığını kontrol eden bir araçtır."
+    return render_template('extra/prime-number/prime-number.html',
+                           seo_title=title,
+                           seo_description=description)
 
 
 @views_bp.route('/rainmeter-rehber')
 def rainmeter_guide():
-    return render_template('info/rainmeter_guide.html')
+    title       = "Rainmeter Rehber"
+    description = "Rainmeter Rehberi, Rainmeter'ün kullanımda gerekli bilgileri ve ipucları sunar."
+    return render_template('info/rainmeter_guide.html',
+                           seo_title=title,
+                           seo_description=description)
 
 
 @views_bp.route('/download-widget')
@@ -683,8 +737,13 @@ def download_widget():
 
 
 @views_bp.route('/qr-okuyucu')
+@cache.cached(timeout=86400)
 def qr_okuyucu():
-    return render_template('extra/qr-reader/qr-reader.html')
+    title       = "Qr Okuyucu"
+    description = "Qr Okuyucu, kullanıcıların girdiği qr kodun okunmasını sağlar."
+    return render_template('extra/qr-reader/qr-reader.html',
+                           seo_title=title,
+                           seo_description=description)
 
 
 @views_bp.route('/r/<short_id>')
