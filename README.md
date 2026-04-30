@@ -2,8 +2,8 @@
 
 Bu belge, **Çağrı Vakti** projesinin amacını, teknik yapısını ve sunduğu özellikleri genel bir bakış açısıyla sunar.
 
-[🇹🇷 Türkçe](https://github.com/yigitgulyurt/cagrivakti#-t%C3%BCrk%C3%A7e)<br>
-[🇺🇸 English](https://github.com/yigitgulyurt/cagrivakti#-english)
+- [🇹🇷 Türkçe](https://github.com/yigitgulyurt/cagrivakti#-t%C3%BCrk%C3%A7e)
+- [🇺🇸 English](https://github.com/yigitgulyurt/cagrivakti#-english)
 ---
 
 ## 🇹🇷 Türkçe
