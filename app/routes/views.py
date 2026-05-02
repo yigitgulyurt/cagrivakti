@@ -121,7 +121,7 @@ def sehir_secimi():
 
     og_image_url = url_for(
         'og.og_image',
-        title     = 'Çağrı Vakti — Şehir Seçimi',
+        title     = 'İl Seçimi — Çağrı Vakti',
         subtitle  = 'Hangi şehrin namaz vakitlerini görmek istiyorsunuz?',
         theme     = 'city',
         icon      = r'\udb80\udd46',
@@ -130,8 +130,8 @@ def sehir_secimi():
         _external = True,
     )
 
-    title       = f"Çağrı Vakti — Şehir Seçimi"
-    description = f"Hangi şehrin namaz vakitlerini görmek istiyorsunuz?"
+    title       = f"İl Seçimi — Çağrı Vakti"
+    description = f"Türkiye ve dünya illeri arasından seçiminizi yaparak namaz vakitlerini öğrenin."
 
     city_data = sorted(
         [{'name': c, 'country': get_country_for_city(c)} for c in all_cities],
@@ -198,7 +198,7 @@ def imsakiye_secimi():
     all_cities  = sorted(UserService.get_sehirler('ALL'))
     title       = f"{suanki_yil} Ramazan İmsakiyesi"
     description = f"Şehrinizi seçin, sahur ve iftar vakitlerini görün."
-    return render_template('ramadan/imsakiye_selection.html', cities=all_cities, og_image_url=og_image_url, seo_title=title, seo_description=description)
+    return render_template('imsakiye/imsakiye_selection.html', cities=all_cities, og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 
 @views_bp.route('/imsakiye/<sehir>')
@@ -228,7 +228,7 @@ def imsakiye_detay(sehir):
 
     title       = f"{sehir_adi} {suanki_yil} İmsakiyesi"
     description = f"{sehir_adi} şehri için {suanki_yil} yılı Ramazan imsakiyesi. İftar ve sahur vakitleri."
-    return render_template('ramadan/ramadan_schedule_detail.html',
+    return render_template('imsakiye/imsakite_detail.html.html',
                            sehir=sehir,
                            country_code=country_code,
                            ramadan_info=RamadanService.get_ramadan_info(),
@@ -452,7 +452,7 @@ def indir():
     og_image_url = url_for(
         'og.og_image',
         title     = 'Çağrı Vakti\'ni İndirin',
-        subtitle  = 'Rainmeter widget, Discord botu ve daha fazlası.',
+        subtitle  = 'Rainmeter widget, Discord botu ve mobil uygulama seçenekleri.',
         theme     = 'project',
         icon      = r'\udb80\uddda',
         prompt    = 'İndir',
@@ -460,8 +460,8 @@ def indir():
         _external = True,
     )
 
-    title       = "Çağrı Vakti\'ni İndirin"
-    description = "Rainmeter widget, Discord botu ve daha fazlası."
+    title       = "Uygulamayı İndir - Çağrı Vakti"
+    description = "Çağrı Vakti Rainmeter widget, Discord botu ve mobil uygulamamızı ücretsiz olarak indirin."
 
 
 
@@ -1002,7 +1002,7 @@ def serve_manifest():
 @views_bp.route('/konum-bul')
 def konum_bul():
     title       = "Konum Bul - Çağrı Vakti"
-    description = "Cihazınızın konumunu kullanarak en yakın namaz vakitlerini bulun."
+    description = "Cihazınızın konumunu kullanarak size en yakın il\'in namaz vakitlerini anında bulun."
 
     og_image_url = url_for(
         'og.og_image',
@@ -1051,12 +1051,12 @@ def send_admin_notification(name, email, subject, message):
 @views_bp.route('/iletisim', methods=['GET', 'POST'])
 @limiter.limit("10 per hour", methods=['POST'])
 def iletisim():
-    title       = "İletişim - Çağrı Vakti"
-    description = "Soru, öneri ve geri bildirimleriniz için bizimle iletişime geçin."
+    title       = "Bizimle İletişime Geçin - Çağrı Vakti"
+    description = "Soru, öneri ve geri bildirimleriniz için bizimle iletişime geçin. Görüşleriniz bizim için değerlidir."
 
     og_image_url = url_for(
         'og.og_image',
-        title     = 'İletişim',
+        title     = 'Bizimle İletişime Geçin',
         subtitle  = description,
         theme     = 'default',
         icon      = r'\uf0e0',
