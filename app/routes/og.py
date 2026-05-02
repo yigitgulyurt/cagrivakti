@@ -286,16 +286,23 @@ def make_og(
     dw       = db[2] - db[0]
     dh       = db[3] - db[1]
 
-    bx1 = W - MARGIN - dw - DOM_PAD_X * 2
-    by1 = H - MARGIN - dh - DOM_PAD_Y * 2
+    # Bracket kutusunun boyutları (metin + padding)
+    bx_w = dw + DOM_PAD_X * 2
+    bx_h = dh + DOM_PAD_Y * 2
+
+    # Sağ alt köşe koordinatları
     bx2 = W - MARGIN
     by2 = H - MARGIN
+    bx1 = bx2 - bx_w
+    by1 = by2 - bx_h
 
+    # Metni kutunun tam ortasına çiz (anchor="mm")
     d.text(
-        (bx1 + DOM_PAD_X, by1 + DOM_PAD_Y),
+        ((bx1 + bx2) / 2, (by1 + by2) / 2),
         domain,
         font=f_domain,
         fill=_hex_to_rgb(t['accent2']),
+        anchor="mm"
     )
     _draw_bracket(d, bx1, by1, bx2, by2, _hex_to_rgb(t['accent2']))
 
