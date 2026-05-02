@@ -39,6 +39,7 @@ def index():
         title     = 'Çağrı Vakti',
         subtitle  = 'Türkiye ve Dünya ülkeleri namaz vakitleri anında ve güncel elinde.',
         theme     = 'home',
+        icon      = r'\udb82\udd79',
         # prompt    = 'prompt',
         domain    = 'cagrivakti.com.tr',
         _external = True,
