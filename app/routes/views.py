@@ -91,7 +91,7 @@ def sehir_sayfasi(sehir):
         title     = f"{sehir_adi} {suanki_yil} Namaz Vakitleri",
         subtitle  = og_subtitle,
         theme     = 'city',
-        prompt    = f"\udb80\udd46 {sehir}",
+        prompt    = rf"\udb80\udd46 {sehir}",
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -122,7 +122,7 @@ def sehir_secimi():
         title     = 'Çağrı Vakti — Şehir Seçimi',
         subtitle  = 'Hangi şehrin namaz vakitlerini görmek istiyorsunuz?',
         theme     = 'city',
-        prompt    = '\udb80\udd46 Şehrini seç',
+        prompt    = r'\udb80\udd46 Şehrini seç',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
