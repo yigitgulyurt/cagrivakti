@@ -16,7 +16,6 @@ views_bp = Blueprint('views', __name__)
 
 # Mevcut yıl bilgisini global olarak tanımlayalım
 suanki_yil = datetime.now().year
-sehir_adi    = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
 
 def is_latin_only(text):
     """Metnin yalnızca Latin karakterler, sayılar ve izin verilen sembollerden oluştuğunu kontrol eder."""
@@ -81,8 +80,7 @@ def sehir_sayfasi(sehir):
     vakitler = PrayerService.get_vakitler(sehir, country_code)
 
     # Gösterim adı (örn. "istanbul" → "İstanbul")
-    # sehir_adi    = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
-
+    sehir_adi = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
     # Subtitle: ilk satır İmsak·Güneş·Öğle, ikinci satır İkindi·Akşam·Yatsı
     og_subtitle  = (
         f"İmsak {vakitler['imsak']} · Güneş {vakitler['gunes']} · Öğle {vakitler['ogle']}|"
@@ -207,6 +205,8 @@ def imsakiye_detay(sehir):
 
     if not is_latin_only(country_code):
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
+
+    sehir_adi = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
 
     og_image_url = url_for(
         'og.og_image',
