@@ -14,6 +14,10 @@ import hashlib
 
 views_bp = Blueprint('views', __name__)
 
+# Mevcut yıl bilgisini global olarak tanımlayalım
+suanki_yil = datetime.now().yea
+sehir_adi    = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
+
 def is_latin_only(text):
     """Metnin yalnızca Latin karakterler, sayılar ve izin verilen sembollerden oluştuğunu kontrol eder."""
     if not text:
@@ -34,15 +38,14 @@ def index():
     og_image_url = url_for(
         'og.og_image',
         title     = 'Çağrı Vakti',
-        subtitle  = 'Türkiye Namaz Vakitleri — Kıble, İmsakiye ve Daha Fazlası',
+        subtitle  = 'Türkiye ve Dünya ülkeleri namaz vakitleri anında ve güncel elinde.',
         theme     = 'home',
-        prompt    = '☪ cagrivakti.com.tr',
+        # prompt    = 'prompt',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
 
-    current_year = datetime.now().year
-    title        = f"Çağrı Vakti - Ezan Vakitleri {current_year}"
+    title        = f"Ezan Vakitleri {suanki_yil} - Çağrı Vakti"
     description  = f"En doğru ve güncel ezan vakitleri ve imsakiye."
 
     return render_template('main/index.html',
@@ -78,7 +81,7 @@ def sehir_sayfasi(sehir):
     vakitler = PrayerService.get_vakitler(sehir, country_code)
 
     # Gösterim adı (örn. "istanbul" → "İstanbul")
-    sehir_adi    = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
+    # sehir_adi    = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
 
     # Subtitle: ilk satır İmsak·Güneş·Öğle, ikinci satır İkindi·Akşam·Yatsı
     og_subtitle  = (
@@ -87,16 +90,16 @@ def sehir_sayfasi(sehir):
     )
     og_image_url = url_for(
         'og.og_image',
-        title     = f"{sehir_adi} Namaz Vakitleri",
+        title     = f"{sehir_adi} {suanki_yil} Namaz Vakitleri",
         subtitle  = og_subtitle,
         theme     = 'city',
-        prompt    = f"☪ {sehir_adi.lower()}",
+        prompt    = f"\udb80\udd46 {sehir}",
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
 
-    title       = f"Çağrı Vakti - {sehir} Ezan Vakitleri"
-    description = f"{sehir} ezan vakitleri. {sehir} günlük ezan vakitleri ve aylık imsakiye."
+    title       = f"{sehir_adi} Ezan Vakitleri - Çağrı Vakti"
+    description = f"{sehir_adi} ezan vakitleri. {sehir_adi} günlük ezan vakitleri ve aylık imsakiye."
 
     response = make_response(render_template('city/city_page.html',
                                              sehir=sehir,
@@ -121,7 +124,7 @@ def sehir_secimi():
         title     = 'Çağrı Vakti — Şehir Seçimi',
         subtitle  = 'Hangi şehrin namaz vakitlerini görmek istiyorsunuz?',
         theme     = 'city',
-        prompt    = '☪ cagrivakti.com.tr',
+        prompt    = '\udb80\udd46 Şehrini seç',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -147,7 +150,7 @@ def ramazan_nedir():
         title     = 'Ramazan Nedir?',
         subtitle  = 'Ramazan ayının önemi, ibadetleri ve fazileti hakkında bilgi edinin.',
         theme     = 'ramadan',
-        prompt    = '☪ Ramazan Mübarek',
+        prompt    = '\udb82\udd79 Ramazan Ayı Mübarek Olsun',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -165,7 +168,7 @@ def orucu_bozan_durumlar():
         title     = 'Orucu Bozan Durumlar',
         subtitle  = 'Hangi durumlar orucu bozar? Detaylı İslami bilgi.',
         theme     = 'ramadan',
-        prompt    = '☪ Ramazan Mübarek',
+        prompt    = '\udb82\udd79 Ramazan Ayı Mübarek Olsun',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -180,14 +183,15 @@ def orucu_bozan_durumlar():
 def imsakiye_secimi():
     og_image_url = url_for(
         'og.og_image',
-        title     = 'Ramazan İmsakiyesi',
+        title     = f"{suanki_yil} İmsakiyesi",
         subtitle  = 'Şehrinizi seçin, sahur ve iftar vakitlerini görün.',
         theme     = 'ramadan',
-        prompt    = '☪ Ramazan Mübarek',
+        prompt    = '\udb82\udd79 İmsakiye',
         domain    = 'cagrivakti.com.tr',
+        _external = True,
     )
 
-    title       = f"Ramazan İmsakiyesi"
+    title       = f"{suanki_yil} İmsakiyesi"
     description = f"Şehrinizi seçin, sahur ve iftar vakitlerini görün."
     return render_template('ramadan/ramadan_schedule_selection.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
 
@@ -204,20 +208,18 @@ def imsakiye_detay(sehir):
     if not is_latin_only(country_code):
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
 
-    sehir_adi    = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
-    yil          = datetime.now().year
     og_image_url = url_for(
         'og.og_image',
-        title     = f"{sehir_adi} Ramazan İmsakiyesi",
-        subtitle  = f"{yil} Yılı Sahur ve İftar Vakitleri",
+        title     = f"{sehir_adi} {suanki_yil} İmsakiyesi",
+        subtitle  = f"{suanki_yil} Yılı Sahur ve İftar Vakitleri",
         theme     = 'ramadan',
-        prompt    = '☪ Ramazan Mübarek',
+        prompt    = f'\udb82\udd79 {sehir_adi} İmsakiyesi',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
 
-    title       = f"{sehir_adi} Ramazan İmsakiyesi"
-    description = f"{yil} Yılı Sahur ve İftar Vakitleri"
+    title       = f"{sehir_adi} {suanki_yil} İmsakiyesi"
+    description = f"{suanki_yil} Yılı Sahur ve İftar Vakitleri"
     return render_template('ramadan/ramadan_schedule_detail.html',
                            sehir=sehir,
                            country_code=country_code,
@@ -234,7 +236,7 @@ def imsakiye_detay(sehir):
 @cache.cached(timeout=3600)
 def bilgi_kosesi_liste():
     guides      = get_guides()
-    title       = "Çağrı Vakti - Bilgi Köşesi"
+    title       = "Bilgi Köşesi - Çagrı Vakti"
     description = "Ezan vakitleri, kıble yönü, namaz bilgileri ve daha fazlası hakkında rehber yazılar."
 
     og_image_url = url_for(
@@ -242,7 +244,7 @@ def bilgi_kosesi_liste():
         title     = title,
         subtitle  = description,
         theme     = 'default',
-        prompt    = '☪ cagrivakti.com.tr',
+        prompt    = '\uede2 Bilgi Köşesi',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -267,15 +269,15 @@ def bilgi_kosesi_detay(slug):
         abort(404)
 
     guides      = get_guides()
-    title       = f"Çağrı Vakti - {guide['title']}"
+    title       = f"{guide['title']} - Çağrı Vakti"
     description = guide['description']
 
     og_image_url = url_for(
         'og.og_image',
-        title     = title,
+        title     = f'{guide["title"]}',
         subtitle  = description,
         theme     = 'blog',
-        prompt    = '☪ cagrivakti.com.tr',
+        prompt    = f'\uede2 Bilgi Köşesi - {guide["title"]}',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -295,15 +297,15 @@ def bilgi_kosesi_detay(slug):
 @cache.cached(timeout=86400)
 def sitene_ekle():
     all_cities  = sorted(UserService.get_sehirler('ALL'))
-    title       = "Çağrı Vakti - Sitenize Ekleyin"
+    title       = "Sitenize Ekleyin - Çağrı Vakti"
     description = "Web siteniz için ücretsiz ezan vakitleri widget'ı. Renkleri özelleştirin, şehrinizi seçin ve kodu sitenize ekleyin."
 
     og_image_url = url_for(
         'og.og_image',
-        title     = title,
+        title     = 'Sitenize Ekleyin',
         subtitle  = description,
         theme     = 'project',
-        prompt    = '☪ cagrivakti.com.tr',
+        prompt    = '\udb82\udd79 Sitenize Ekleyin',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -365,21 +367,21 @@ def embed_widget(sehir):
 @views_bp.route('/kible-pusulasi')
 @cache.cached(timeout=86400)
 def kible_pusulasi():
-    title       = "Kıble Pusulası"
+    title       = "Kıble Pusulası - Çağrı Vakti"
     description = "Pusula ve harita yardımıyla online kıble yönünü bulun. Telefonunuzun sensörlerini kullanarak en doğru kıble açısını hesaplayın."
 
     og_image_url = url_for(
         'og.og_image',
-        title     = title,
+        title     = 'Kıble Pusulası',
         subtitle  = description,
         theme     = 'default',
-        prompt    = '☪ cagrivakti.com.tr',
+        prompt    = '\udb82\udd79 Kıble bul',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
 
     return render_template('utils/qibla_compass.html',
-                           seo_title=f"Çağrı Vakti - {title}",
+                           seo_title=title,
                            seo_description=description,
                            og_image_url=og_image_url)
 
@@ -387,17 +389,19 @@ def kible_pusulasi():
 @views_bp.route('/neden-biz')
 @cache.cached(timeout=86400)
 def neden_biz():
+
+    title       = "Neden Çağrı Vakti?"
+    description = "Doğruluk, hız ve gizlilik odaklı namaz vakitleri platformu."
+    
     og_image_url = url_for(
         'og.og_image',
-        title     = 'Neden Çağrı Vakti?',
-        subtitle  = 'Doğruluk, hız ve gizlilik odaklı namaz vakitleri platformu.',
+        title     = title,
+        subtitle  = description,
         theme     = 'home',
-        prompt    = '☪ cagrivakti.com.tr',
+        prompt    = '\udb82\udd79 Neden?',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
-    title       = "Neden Çağrı Vakti?"
-    description = "Doğruluk, hız ve gizlilik odaklı namaz vakitleri platformu."
     
     return render_template('info/why_us.html',
                            seo_title=title,
@@ -408,17 +412,19 @@ def neden_biz():
 @views_bp.route('/ilkelerimiz')
 @cache.cached(timeout=86400)
 def ilkelerimiz():
+
+    title       = "İlkelerimiz"
+    description = "Çağrı Vakti\'nin temel değerleri ve kullanım ilkeleri."
+
     og_image_url = url_for(
         'og.og_image',
-        title     = 'İlkelerimiz',
-        subtitle  = 'Çağrı Vakti\'nin temel değerleri ve kullanım ilkeleri.',
+        title     = title,
+        subtitle  = description,
         theme     = 'default',
-        prompt    = '☪ cagrivakti.com.tr',
+        prompt    = '\uf0c0 İlkelerimiz',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
-    title       = "İlkelerimiz"
-    description = "Çağrı Vakti\'nin temel değerleri ve kullanım ilkeleri."
     
     return render_template('info/policies.html',
                            seo_title=title,
@@ -434,7 +440,7 @@ def indir():
         title     = 'Çağrı Vakti\'ni İndirin',
         subtitle  = 'Rainmeter widget, Discord botu ve daha fazlası.',
         theme     = 'project',
-        prompt    = '☪ cagrivakti.com.tr',
+        prompt    = '\udb80\uddda İndir',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -456,11 +462,22 @@ def indir():
 @cache.cached(timeout=86400)
 def ataturk():
     title       = "Mustafa Kemal Atatürk - Çağrı Vakti"
-    description = "Mustafa Kemal Atatürk'ün hayatı, ilkeleri ve İslam dünyasındaki yeri hakkında bilgi edinin."
+    description = "Mustafa Kemal Atatürk ve islama kattığı şeyler hakkında bilgi edinin."
+    
+    og_image_url = url_for(
+        'og.og_image',
+        title     = 'Mustafa Kemal Atatürk',
+        subtitle  = description,
+        theme     = 'project',
+        prompt    = '\udb82\udd79 Mustafa Kemal Atatürk',
+        domain    = 'cagrivakti.com.tr',
+        _external = True,
+    )
 
     return render_template('main/ataturk.html',
                            seo_title=title,
-                           seo_description=description)
+                           seo_description=description,
+                           og_image_url=og_image_url)
 
 # ======================================================
 # ==== ADMIN ====
@@ -714,20 +731,46 @@ def admin_logs():
 @views_bp.route('/asal-sayi')
 @cache.cached(timeout=86400)
 def prime_number():
-    title       = "Asal Sayı Bulucu"
-    description = "Asal sayı bulucu, kullanıcıların girdiği sayının asal olup olmadığını kontrol eden bir araçtır."
+    title       = "20000 Basamaklı Asal Sayı"
+    description = "Asal sayı, 1 ve kendi kendisiyle sadece 2 tane bölen sayıdır."
+
+    og_image_url = url_for(
+        'og.og_image',
+        title     = title,
+        subtitle  = description,
+        theme     = 'project',
+        prompt    = '\uf4f7 Asal sayı',
+        domain    = 'cagrivakti.com.tr',
+        _external = True,
+    )
+
     return render_template('extra/prime-number/prime-number.html',
                            seo_title=title,
-                           seo_description=description)
+                           seo_description=description,
+                           og_image_url=og_image_url
+                           )
 
 
 @views_bp.route('/rainmeter-rehber')
 def rainmeter_guide():
     title       = "Rainmeter Rehber"
     description = "Rainmeter Rehberi, Rainmeter'ün kullanımda gerekli bilgileri ve ipucları sunar."
+
+    og_image_url = url_for(
+        'og.og_image',
+        title     = title,
+        subtitle  = description,
+        theme     = 'project',
+        prompt    = '\uf4f7 Rainmeter Rehber',
+        domain    = 'cagrivakti.com.tr',
+        _external = True,
+    )
+
     return render_template('info/rainmeter_guide.html',
                            seo_title=title,
-                           seo_description=description)
+                           seo_description=description,
+                           og_image_url=og_image_url
+                           )
 
 
 @views_bp.route('/download-widget')
@@ -736,23 +779,35 @@ def download_widget():
     return send_from_directory(directory, 'cagrivakti-widget.rmskin', as_attachment=True)
 
 
-@views_bp.route('/qr-okuyucu')
-@cache.cached(timeout=86400)
-def qr_okuyucu():
-    title       = "Qr Okuyucu"
-    description = "Qr Okuyucu, kullanıcıların girdiği qr kodun okunmasını sağlar."
-    return render_template('extra/qr-reader/qr-reader.html',
-                           seo_title=title,
-                           seo_description=description)
+# @views_bp.route('/qr-okuyucu')
+# @cache.cached(timeout=86400)
+# def qr_okuyucu():
+#     title       = "Qr Okuyucu"
+#     description = "Qr Okuyucu, kullanıcıların girdiği qr kodun okunmasını sağlar."
+
+#     og_image_url = url_for(
+#         'og.og_image',
+#         title     = title,
+#         subtitle  = description,
+#         theme     = 'project',
+#         prompt    = '\udb81\udc33 Qr Okuyucu',
+#         domain    = 'cagrivakti.com.tr',
+#         _external = True,
+#     )
+#     return render_template('extra/qr-reader/qr-reader.html',
+#                            seo_title=title,
+#                            seo_description=description,
+#                            og_image_url=og_image_url
+#                            )
 
 
-@views_bp.route('/r/<short_id>')
-@csrf.exempt
-def redirect_url(short_id):
-    obj           = QrRedirect.query.get_or_404(short_id)
-    obj.hit_count += 1
-    db.session.commit()
-    return redirect(obj.url)
+# @views_bp.route('/r/<short_id>')
+# @csrf.exempt
+# def redirect_url(short_id):
+#     obj           = QrRedirect.query.get_or_404(short_id)
+#     obj.hit_count += 1
+#     db.session.commit()
+#     return redirect(obj.url)
 
 
 @views_bp.route('/oyunlar/under-the-red-sky')
