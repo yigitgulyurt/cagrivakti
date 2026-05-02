@@ -247,7 +247,7 @@ def og_image():
         pass
 
     # İkon varsa prompt'un başına ekle
-    full_prompt = f"{icon} {prompt}".strip() if icon else prompt
+    # full_prompt = f"{icon} {prompt}".strip() if icon else prompt
 
     data = _cached_og(title, subtitle, theme, full_prompt, domain)
     resp = send_file(io.BytesIO(data), mimetype='image/png')
