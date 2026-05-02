@@ -40,7 +40,7 @@ def index():
         subtitle  = 'Türkiye ve Dünya ülkeleri namaz vakitleri anında ve güncel elinde.',
         theme     = 'home',
         icon      = r'\udb82\udd79',
-        # prompt    = 'prompt',
+        prompt    = 'cagrivakti.com.tr',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -195,9 +195,10 @@ def imsakiye_secimi():
         _external = True,
     )
 
-    title       = f"{suanki_yil} İmsakiyesi"
+    all_cities  = sorted(UserService.get_sehirler('ALL'))
+    title       = f"{suanki_yil} Ramazan İmsakiyesi"
     description = f"Şehrinizi seçin, sahur ve iftar vakitlerini görün."
-    return render_template('ramadan/ramadan_schedule_selection.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
+    return render_template('ramadan/imsakiye_selection.html', cities=all_cities, og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 
 @views_bp.route('/imsakiye/<sehir>')
@@ -226,7 +227,7 @@ def imsakiye_detay(sehir):
     )
 
     title       = f"{sehir_adi} {suanki_yil} İmsakiyesi"
-    description = f"{suanki_yil} Yılı Sahur ve İftar Vakitleri"
+    description = f"{sehir_adi} şehri için {suanki_yil} yılı Ramazan imsakiyesi. İftar ve sahur vakitleri."
     return render_template('ramadan/ramadan_schedule_detail.html',
                            sehir=sehir,
                            country_code=country_code,
@@ -248,10 +249,11 @@ def bilgi_kosesi_liste():
 
     og_image_url = url_for(
         'og.og_image',
-        title     = title,
-        subtitle  = description,
+        title     = 'Bilgi Köşesi',
+        subtitle  = 'İslami bilgiler, rehberler ve daha fazlası.',
         theme     = 'default',
-        prompt    = '\uede2 Bilgi Köşesi',
+        icon      = r'\uede2',
+        prompt    = 'Bilgi Köşesi',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -284,7 +286,8 @@ def bilgi_kosesi_detay(slug):
         title     = f'{guide["title"]}',
         subtitle  = description,
         theme     = 'blog',
-        prompt    = f'\uede2 Bilgi Köşesi - {guide["title"]}',
+        icon      = r'\uede2',
+        prompt    = f'Bilgi Köşesi - {guide["title"]}',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -312,7 +315,8 @@ def sitene_ekle():
         title     = 'Sitenize Ekleyin',
         subtitle  = description,
         theme     = 'project',
-        prompt    = '\udb82\udd79 Sitenize Ekleyin',
+        icon      = r'\udb82\udd79',
+        prompt    = 'Sitenize Ekleyin',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -380,9 +384,10 @@ def kible_pusulasi():
     og_image_url = url_for(
         'og.og_image',
         title     = 'Kıble Pusulası',
-        subtitle  = description,
+        subtitle  = 'Online Kıble yönünü bulun ve hesaplayın.',
         theme     = 'default',
-        prompt    = '\udb82\udd79 Kıble bul',
+        icon      = r'\udb82\udd79',
+        prompt    = 'Kıble bul',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -402,10 +407,11 @@ def neden_biz():
     
     og_image_url = url_for(
         'og.og_image',
-        title     = title,
-        subtitle  = description,
+        title     = 'Neden Çağrı Vakti?',
+        subtitle  = 'Hız, doğruluk ve gizlilik odaklı namaz vakitleri.',
         theme     = 'home',
-        prompt    = '\udb82\udd79 Neden?',
+        icon      = r'\udb82\udd79',
+        prompt    = 'Neden?',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -425,10 +431,11 @@ def ilkelerimiz():
 
     og_image_url = url_for(
         'og.og_image',
-        title     = title,
-        subtitle  = description,
+        title     = 'İlkelerimiz',
+        subtitle  = 'Çağrı Vakti temel değerleri ve kullanım ilkeleri.',
         theme     = 'default',
-        prompt    = '\uf0c0 İlkelerimiz',
+        icon      = r'\uf0c0',
+        prompt    = 'İlkelerimiz',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -447,7 +454,8 @@ def indir():
         title     = 'Çağrı Vakti\'ni İndirin',
         subtitle  = 'Rainmeter widget, Discord botu ve daha fazlası.',
         theme     = 'project',
-        prompt    = '\udb80\uddda İndir',
+        icon      = r'\udb80\uddda',
+        prompt    = 'İndir',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -476,7 +484,8 @@ def ataturk():
         title     = 'Mustafa Kemal Atatürk',
         subtitle  = description,
         theme     = 'project',
-        prompt    = '\udb82\udd79 Mustafa Kemal Atatürk',
+        icon      = r'\udb82\udd79',
+        prompt    = 'Mustafa Kemal Atatürk',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -743,10 +752,11 @@ def prime_number():
 
     og_image_url = url_for(
         'og.og_image',
-        title     = title,
-        subtitle  = description,
+        title     = '20000 Basamaklı Asal Sayı',
+        subtitle  = '1 ve kendisinden başka böleni olmayan sayılar.',
         theme     = 'project',
-        prompt    = '\uf4f7 Asal sayı',
+        icon      = r'\uf4f7',
+        prompt    = 'Asal sayı',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -765,10 +775,11 @@ def rainmeter_guide():
 
     og_image_url = url_for(
         'og.og_image',
-        title     = title,
-        subtitle  = description,
+        title     = 'Rainmeter Rehber',
+        subtitle  = 'Rainmeter kullanımı için gerekli bilgiler ve ipuçları.',
         theme     = 'project',
-        prompt    = '\uf4f7 Rainmeter Rehber',
+        icon      = r'\uf4f7',
+        prompt    = 'Rainmeter Rehber',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -794,10 +805,11 @@ def download_widget():
 
 #     og_image_url = url_for(
 #         'og.og_image',
-#         title     = title,
-#         subtitle  = description,
+#         title     = 'Qr Okuyucu',
+#         subtitle  = 'Girdiğiniz QR kodların okunmasını sağlar.',
 #         theme     = 'project',
-#         prompt    = '\udb81\udc33 Qr Okuyucu',
+#         icon      = r'\udb81\udc33',
+#         prompt    = 'Qr Okuyucu',
 #         domain    = 'cagrivakti.com.tr',
 #         _external = True,
 #     )
