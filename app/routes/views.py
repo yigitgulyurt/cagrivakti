@@ -831,7 +831,25 @@ def download_widget():
 
 @views_bp.route('/oyunlar/under-the-red-sky')
 def under_the_red_sky():
-    return render_template('extra/oyun/oyun.html', oyun_adi="Under the Red Sky")
+    title       = "Under the Red Sky - Çağrı Vakti"
+    description = "Under the Red Sky oyununu online oynayın."
+
+    og_image_url = url_for(
+        'og.og_image',
+        title     = 'Under the Red Sky',
+        subtitle  = 'Under the Red Sky oyununu online oynayın.',
+        theme     = 'project',
+        icon      = r'\udb81\udca5',
+        prompt    = 'Oyun oyna',
+        domain    = 'cagrivakti.com.tr',
+        _external = True,
+    )
+
+    return render_template('extra/oyun/oyun.html', 
+                           oyun_adi="Under the Red Sky",
+                           seo_title=title,
+                           seo_description=description,
+                           og_image_url=og_image_url)
 
 
 @views_bp.route('/kaynak/under-the-red-sky/<path:filename>')
@@ -983,7 +1001,24 @@ def serve_manifest():
 
 @views_bp.route('/konum-bul')
 def konum_bul():
-    return render_template('city/detect_location.html')
+    title       = "Konum Bul - Çağrı Vakti"
+    description = "Cihazınızın konumunu kullanarak en yakın namaz vakitlerini bulun."
+
+    og_image_url = url_for(
+        'og.og_image',
+        title     = 'Konum Bul',
+        subtitle  = description,
+        theme     = 'default',
+        icon      = r'\udb81\udcc0',
+        prompt    = 'Konum algılanıyor',
+        domain    = 'cagrivakti.com.tr',
+        _external = True,
+    )
+
+    return render_template('city/detect_location.html',
+                           seo_title=title,
+                           seo_description=description,
+                           og_image_url=og_image_url)
 
 # ======================================================
 # ==== CONTACT ====
@@ -1016,6 +1051,20 @@ def send_admin_notification(name, email, subject, message):
 @views_bp.route('/iletisim', methods=['GET', 'POST'])
 @limiter.limit("10 per hour", methods=['POST'])
 def iletisim():
+    title       = "İletişim - Çağrı Vakti"
+    description = "Soru, öneri ve geri bildirimleriniz için bizimle iletişime geçin."
+
+    og_image_url = url_for(
+        'og.og_image',
+        title     = 'İletişim',
+        subtitle  = description,
+        theme     = 'default',
+        icon      = r'\uf0e0',
+        prompt    = 'Bize ulaşın',
+        domain    = 'cagrivakti.com.tr',
+        _external = True,
+    )
+
     if request.method == 'POST':
         if request.form.get('website'):
             return redirect(url_for('views.index'))
@@ -1051,4 +1100,7 @@ def iletisim():
             flash('Bir hata oluştu, lütfen daha sonra tekrar deneyin.', 'error')
             return redirect(url_for('views.iletisim'))
 
-    return render_template('main/contact.html')
+    return render_template('main/contact.html',
+                           seo_title=title,
+                           seo_description=description,
+                           og_image_url=og_image_url)
