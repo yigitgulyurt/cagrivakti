@@ -235,8 +235,15 @@ def og_image():
     title    = request.args.get('title',    'Çağrı Vakti')[:80]
     subtitle = request.args.get('subtitle', 'Türkiye Namaz Vakitleri')[:120]
     theme    = request.args.get('theme',    'default')
-    prompt   = request.args.get('prompt',   '☪ cagrivakti.com.tr')[:60]
+    prompt   = request.args.get('prompt',   '\udb82\udd79 cagrivakti.com.tr')[:60]
     domain   = request.args.get('domain',   'cagrivakti.com.tr')[:50]
+
+    # Unicode kaçış dizilerini (\uXXXX) gerçek karakterlere dönüştür
+    try:
+        if "\\" in prompt:
+            prompt = prompt.encode('utf-8').decode('unicode_escape')
+    except Exception:
+        pass
 
     data = _cached_og(title, subtitle, theme, prompt, domain)
     resp = send_file(io.BytesIO(data), mimetype='image/png')
