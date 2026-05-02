@@ -29,26 +29,8 @@ H = 630
 # ─────────────────────────────────────────────────────────────────────────────
 THEMES: dict[str, dict[str, str]] = {
 
-    # ── Çağrı Vakti — Şehir sayfaları (turkuaz-altın) ────────────────────────
-    'city': {
-        'bg':      '#0a0f14',
-        'accent':  '#2dd4bf',   # turkuaz
-        'accent2': '#f59e0b',   # amber/altın
-        'text':    '#e2e8f0',
-        'text2':   '#64748b',
-    },
-
-    # ── Çağrı Vakti — Ramazan sayfaları (altın-mor, mistik) ─────────────────
-    'ramadan': {
-        'bg':      '#0c0a14',
-        'accent':  '#d4af37',   # altın
-        'accent2': '#a78bfa',   # mor
-        'text':    '#fdf6e3',
-        'text2':   '#6b7280',
-    },
-
-    # ── Çağrı Vakti — Ana sayfa / genel (turuncu-kırmızı) ───────────────────
-    'home': {
+    # ── ANA SAYFA ───────────────────────────────────────────────────────────
+    'index': {
         'bg':      '#110a08',
         'accent':  '#fb923c',   # turuncu
         'accent2': '#ef4444',   # kırmızı
@@ -56,39 +38,156 @@ THEMES: dict[str, dict[str, str]] = {
         'text2':   '#78716c',
     },
 
-    # ── Standart Temalar (yigitgulyurt.net.tr ile uyumlu) ────────────────────
-    'default': {
+    # ── ŞEHİR VE KONUM ──────────────────────────────────────────────────────
+    'city': {
+        'bg':      '#0a0f14',
+        'accent':  '#2dd4bf',   # turkuaz
+        'accent2': '#f59e0b',   # amber/altın
+        'text':    '#e2e8f0',
+        'text2':   '#64748b',
+    },
+    'city-page': {
+        'bg':      '#0a0f14',
+        'accent':  '#2dd4bf',
+        'accent2': '#f59e0b',
+        'text':    '#e2e8f0',
+        'text2':   '#64748b',
+    },
+    'location-page': {
+        'bg':      '#0a0f14',
+        'accent':  '#2dd4bf',
+        'accent2': '#f59e0b',
+        'text':    '#e2e8f0',
+        'text2':   '#64748b',
+    },
+
+    # ── RAMAZAN VE İMSAKİYE ────────────────────────────────────────────────
+    'ramadan': {
+        'bg':      '#0c0a14',
+        'accent':  '#d4af37',   # altın
+        'accent2': '#a78bfa',   # mor
+        'text':    '#fdf6e3',
+        'text2':   '#6b7280',
+    },
+    'ramadan-fasting': {
+        'bg':      '#0c0a14',
+        'accent':  '#d4af37',
+        'accent2': '#a78bfa',
+        'text':    '#fdf6e3',
+        'text2':   '#6b7280',
+    },
+    'imsakiye': {
+        'bg':      '#0c0a14',
+        'accent':  '#d4af37',
+        'accent2': '#a78bfa',
+        'text':    '#fdf6e3',
+        'text2':   '#6b7280',
+    },
+    'imsakiye-page': {
+        'bg':      '#0c0a14',
+        'accent':  '#d4af37',
+        'accent2': '#a78bfa',
+        'text':    '#fdf6e3',
+        'text2':   '#6b7280',
+    },
+
+    # ── BİLGİ KÖŞESİ (REHBERLER) ───────────────────────────────────────────
+    'knowledge': {
         'bg':      '#0d0d0d',
-        'accent':  '#4ade80',   # yeşil (Terminal accent)
+        'accent':  '#fb923c',   # turuncu
+        'accent2': '#fcd34d',   # kehribar
+        'text':    '#e2e2e2',
+        'text2':   '#888888',
+    },
+    'knowledge-page': {
+        'bg':      '#0d0d0d',
+        'accent':  '#fb923c',
+        'accent2': '#fcd34d',
+        'text':    '#e2e2e2',
+        'text2':   '#888888',
+    },
+
+    # ── ARAÇLAR VE İNDİRMELER ──────────────────────────────────────────────
+    'add-widget': {
+        'bg':      '#0d0d0d',
+        'accent':  '#818cf8',   # indigo
+        'accent2': '#22d3ee',   # cyan
+        'text':    '#e2e2e2',
+        'text2':   '#888888',
+    },
+    'qibla-page': {
+        'bg':      '#0d0d0d',
+        'accent':  '#818cf8',
+        'accent2': '#22d3ee',
+        'text':    '#e2e2e2',
+        'text2':   '#888888',
+    },
+    'download-page': {
+        'bg':      '#0d0d0d',
+        'accent':  '#818cf8',
+        'accent2': '#22d3ee',
+        'text':    '#e2e2e2',
+        'text2':   '#888888',
+    },
+    'rainmeter-guide': {
+        'bg':      '#0d0d0d',
+        'accent':  '#818cf8',
+        'accent2': '#22d3ee',
+        'text':    '#e2e2e2',
+        'text2':   '#888888',
+    },
+
+    # ── KURUMSAL VE İLETİŞİM ──────────────────────────────────────────────
+    'why-us-page': {
+        'bg':      '#0d0d0d',
+        'accent':  '#4ade80',   # yeşil
         'accent2': '#60a5fa',   # mavi
         'text':    '#e2e2e2',
         'text2':   '#888888',
     },
-    'live': {
+    'policies-page': {
         'bg':      '#0d0d0d',
-        'accent':  '#f87171',   # kırmızı (Recording/Live)
-        'accent2': '#60a5fa',   # mavi
+        'accent':  '#4ade80',
+        'accent2': '#60a5fa',
         'text':    '#e2e2e2',
         'text2':   '#888888',
     },
-    'ataturk': {
+    'contact-page': {
+        'bg':      '#0d0d0d',
+        'accent':  '#818cf8',   # indigo
+        'accent2': '#22d3ee',   # cyan
+        'text':    '#e2e2e2',
+        'text2':   '#888888',
+    },
+
+    # ── ÖZEL SAYFALAR ──────────────────────────────────────────────────────
+    'ataturk-page': {
         'bg':      '#080808',
         'accent':  '#e30a17',   # Türk kırmızısı
         'accent2': '#c5a059',   # altın
         'text':    '#f0f0f0',
         'text2':   '#999999',
     },
-    'blog': {
+    'prime-number': {
         'bg':      '#0d0d0d',
-        'accent':  '#fb923c',   # turuncu (Yazı/Blog)
-        'accent2': '#fcd34d',   # kehribar
+        'accent':  '#6366f1',   # indigo
+        'accent2': '#a855f7',   # mor
         'text':    '#e2e2e2',
         'text2':   '#888888',
     },
-    'project': {
+    'game-page': {
+        'bg':      '#1a0b0b',   # koyu kırmızı/siyah
+        'accent':  '#ef4444',   # kırmızı
+        'accent2': '#f59e0b',   # amber
+        'text':    '#fecaca',
+        'text2':   '#7f1d1d',
+    },
+
+    # ── VARSAYILAN VE DİĞER ────────────────────────────────────────────────
+    'default': {
         'bg':      '#0d0d0d',
-        'accent':  '#818cf8',   # indigo (Yaratıcılık/Proje)
-        'accent2': '#22d3ee',   # cyan
+        'accent':  '#4ade80',
+        'accent2': '#60a5fa',
         'text':    '#e2e2e2',
         'text2':   '#888888',
     },
