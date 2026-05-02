@@ -235,18 +235,21 @@ def og_image():
     title    = request.args.get('title',    'Çağrı Vakti')[:80]
     subtitle = request.args.get('subtitle', 'Türkiye Namaz Vakitleri')[:120]
     theme    = request.args.get('theme',    'default')
-    prompt   = request.args.get('prompt',   '\udb82\udd79 cagrivakti.com.tr')[:60]
+    icon     = request.args.get('icon',     '')[:20]
+    prompt   = request.args.get('prompt',   'cagrivakti.com.tr')[:60]
     domain   = request.args.get('domain',   'cagrivakti.com.tr')[:50]
 
-    # Unicode kaçış dizilerini (\uXXXX veya \UXXXXXXXX) gerçek karakterlere dönüştür
+    # Sadece ikon parametresini Unicode kaçış dizilerinden arındır
     try:
-        if "\\" in prompt:
-            # Önce string olarak decode et, sonra surrogate pair'leri düzelt
-            prompt = prompt.encode('utf-8').decode('unicode_escape').encode('utf-16', 'surrogatepass').decode('utf-16')
+        if "\\" in icon:
+            icon = icon.encode('utf-8').decode('unicode_escape').encode('utf-16', 'surrogatepass').decode('utf-16')
     except Exception:
         pass
 
-    data = _cached_og(title, subtitle, theme, prompt, domain)
+    # İkon varsa prompt'un başına ekle
+    full_prompt = f"{icon} {prompt}".strip() if icon else prompt
+
+    data = _cached_og(title, subtitle, theme, full_prompt, domain)
     resp = send_file(io.BytesIO(data), mimetype='image/png')
     resp.headers['Cache-Control'] = 'public, max-age=3600'
     return resp
