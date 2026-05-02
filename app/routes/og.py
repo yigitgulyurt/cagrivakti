@@ -119,8 +119,8 @@ THEMES: dict[str, dict[str, str]] = {
 # ─────────────────────────────────────────────────────────────────────────────
 # FONT YOLLARI (Ubuntu/Debian — Liberation Mono)
 # ─────────────────────────────────────────────────────────────────────────────
-FONT_BOLD = '/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf'
-FONT_REG  = '/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf'
+FONT_BOLD = '/usr/share/fonts/JetBrainsMono/JetBrainsMono-Bold.ttf'
+FONT_REG  = '/usr/share/fonts/JetBrainsMono/JetBrainsMono-Regular.ttf'
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DİZAYN SABİTLERİ
