@@ -23,7 +23,7 @@
 
     {# ---- Open Graph ---- #}
     {# og_image_url: route'tan geçirilirse dinamik OG image, yoksa statik fallback #}
-    {% set _og_image = og_image_url if og_image_url is defined and og_image_url else 'https://cagrivakti.com.tr/static/icons/og-image.png' %}
+    {% set _og_image = og_image_url if og_image_url is defined and og_image_url else 'https://cagrivakti.com.tr/og-image' %}
 
     <meta property="og:type"         content="website" />
     <meta property="og:url"          content="https://cagrivakti.com.tr{{ request.path }}" />
