@@ -12,6 +12,7 @@ Query parametreleri:
 """
 
 import io
+import re
 from functools import lru_cache
 from flask import Blueprint, request, send_file
 from PIL import Image, ImageDraw, ImageFont
@@ -238,10 +239,14 @@ def og_image():
     prompt   = request.args.get('prompt',   '\udb82\udd79 cagrivakti.com.tr')[:60]
     domain   = request.args.get('domain',   'cagrivakti.com.tr')[:50]
 
-    # Unicode kaçış dizilerini (\uXXXX) gerçek karakterlere dönüştür
+    # Unicode kaçış dizilerini (\uXXXX veya \UXXXXXXXX) gerçek karakterlere dönüştür
     try:
-        if "\\" in prompt:
-            prompt = prompt.encode('utf-8').decode('unicode_escape')
+        def decode_match(match):
+            return chr(int(match.group(1), 16))
+        
+        # Hem \uXXXX hem de \UXXXXXXXX formatını yakala
+        prompt = re.sub(r'\\u([0-9a-fA-F]{4})', decode_match, prompt)
+        prompt = re.sub(r'\\U([0-9a-fA-F]{8})', decode_match, prompt)
     except Exception:
         pass
 
