@@ -148,7 +148,7 @@ def ramazan_nedir():
         title     = 'Ramazan Nedir?',
         subtitle  = 'Ramazan ayının önemi, ibadetleri ve fazileti hakkında bilgi edinin.',
         theme     = 'ramadan',
-        prompt    = '\udb82\udd79 Ramazan Ayı Mübarek Olsun',
+        prompt    = r'\udb82\udd79 Ramazan Ayı Mübarek Olsun',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -166,7 +166,7 @@ def orucu_bozan_durumlar():
         title     = 'Orucu Bozan Durumlar',
         subtitle  = 'Hangi durumlar orucu bozar? Detaylı İslami bilgi.',
         theme     = 'ramadan',
-        prompt    = '\udb82\udd79 Ramazan Ayı Mübarek Olsun',
+        prompt    = r'\udb82\udd79 Ramazan Ayı Mübarek Olsun',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -184,7 +184,7 @@ def imsakiye_secimi():
         title     = f"{suanki_yil} İmsakiyesi",
         subtitle  = 'Şehrinizi seçin, sahur ve iftar vakitlerini görün.',
         theme     = 'ramadan',
-        prompt    = '\udb82\udd79 İmsakiye',
+        prompt    = r'\udb82\udd79 İmsakiye',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
@@ -213,7 +213,7 @@ def imsakiye_detay(sehir):
         title     = f"{sehir_adi} {suanki_yil} İmsakiyesi",
         subtitle  = f"{suanki_yil} Yılı Sahur ve İftar Vakitleri",
         theme     = 'ramadan',
-        prompt    = f'\udb82\udd79 {sehir_adi} İmsakiyesi',
+        prompt    = rf'\udb82\udd79 {sehir_adi} İmsakiyesi',
         domain    = 'cagrivakti.com.tr',
         _external = True,
     )
