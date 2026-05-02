@@ -241,8 +241,12 @@ def og_image():
 
     # Sadece ikon parametresini Unicode kaçış dizilerinden arındır
     try:
-        if "\\" in icon:
-            icon = icon.encode('utf-8').decode('unicode_escape').encode('utf-16', 'surrogatepass').decode('utf-16')
+        if icon:
+            # URL'den gelen çift backslash veya düz metin halindeki \u dizilerini işle
+            if "\\" in icon:
+                icon = icon.encode('utf-8').decode('unicode_escape').encode('utf-16', 'surrogatepass').decode('utf-16')
+            # Bazı durumlarda unicode_escape yetmezse manuel temizlik (opsiyonel ama güvenli)
+            icon = icon.replace('\\', '') if '\\u' not in icon else icon
     except Exception:
         pass
 
