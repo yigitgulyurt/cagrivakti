@@ -15,7 +15,7 @@ import hashlib
 views_bp = Blueprint('views', __name__)
 
 # Mevcut yıl bilgisini global olarak tanımlayalım
-suanki_yil = datetime.now().yea
+suanki_yil = datetime.now().year
 sehir_adi    = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
 
 def is_latin_only(text):
