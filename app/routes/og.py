@@ -12,7 +12,6 @@ Query parametreleri:
 """
 
 import io
-import re
 from functools import lru_cache
 from flask import Blueprint, request, send_file
 from PIL import Image, ImageDraw, ImageFont
@@ -241,12 +240,9 @@ def og_image():
 
     # Unicode kaçış dizilerini (\uXXXX veya \UXXXXXXXX) gerçek karakterlere dönüştür
     try:
-        def decode_match(match):
-            return chr(int(match.group(1), 16))
-        
-        # Hem \uXXXX hem de \UXXXXXXXX formatını yakala
-        prompt = re.sub(r'\\u([0-9a-fA-F]{4})', decode_match, prompt)
-        prompt = re.sub(r'\\U([0-9a-fA-F]{8})', decode_match, prompt)
+        if "\\" in prompt:
+            # Önce string olarak decode et, sonra surrogate pair'leri düzelt
+            prompt = prompt.encode('utf-8').decode('unicode_escape').encode('utf-16', 'surrogatepass').decode('utf-16')
     except Exception:
         pass
 
