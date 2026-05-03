@@ -53,11 +53,11 @@ def setup_middleware(app):
             # Not: 'self' ve '*' birlikte kullanımı bazı tarayıcılarda (Firefox/Zen) sorun yaratabilir, sadece '*' yeterlidir.
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://static.cloudflareinsights.com; "
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
                 "font-src 'self' https://fonts.cagrivakti.com.tr; "
                 "img-src 'self' data: https:; "
-                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://cloudflareinsights.com; "
                 "frame-ancestors *; "
                 "base-uri 'self'; "
                 "form-action 'self';"
@@ -92,11 +92,11 @@ def setup_middleware(app):
             # frame-src 'self' *: Kendi sitemizdeki iframe'lerin çalışmasına izin ver (Önizleme vb. için)
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://static.cloudflareinsights.com; "
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.googleapis.com; "
                 "font-src 'self' https://fonts.cagrivakti.com.tr; "
                 "img-src 'self' data: https:; "
-                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://cloudflareinsights.com; "
                 "frame-src 'self' *; "
                 "frame-ancestors 'none'; "
                 "base-uri 'self'; "
