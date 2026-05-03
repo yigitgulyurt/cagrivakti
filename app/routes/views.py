@@ -178,7 +178,7 @@ def orucu_bozan_durumlar():
 
     title       = f"Orucu Bozan Durumlar — Çağrı Vakti"
     description = f"Hangi durumlar orucu bozar? Varışca Slami bilgi."
-    return render_template('ramadan/things_that_break_fast.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
+    return render_template('imsakiye/things_that_break_fast.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 
 @views_bp.route('/imsakiye')
