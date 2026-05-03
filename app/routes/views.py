@@ -45,7 +45,7 @@ def index():
         _external = True,
     )
 
-    title        = f"Ezan Vakitleri {suanki_yil} - Çağrı Vakti"
+    title        = f"Ezan Vakitleri {suanki_yil} — Çağrı Vakti"
     description  = f"En doğru ve güncel ezan vakitleri ve imsakiye."
 
     return render_template('main/index.html',
@@ -98,7 +98,7 @@ def sehir_sayfasi(sehir):
         _external = True,
     )
 
-    title       = f"{sehir_adi} Ezan Vakitleri - Çağrı Vakti"
+    title       = f"{sehir_adi} Ezan Vakitleri — Çağrı Vakti"
     description = f"{sehir_adi} ezan vakitleri. {sehir_adi} günlük ezan vakitleri ve aylık imsakiye."
 
     response = make_response(render_template('city/city_page.html',
@@ -157,7 +157,7 @@ def ramazan_nedir():
         _external = True,
     )
 
-    title       = f"Ramazan Nedir?"
+    title       = f"Ramazan Nedir? — Çağrı Vakti" 
     description = f"Ramazan ayının önemi, ibadetleri ve fazileti hakkında bilgi edinin."
     return render_template('ramadan/what_is_ramadan.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
 
@@ -176,7 +176,7 @@ def orucu_bozan_durumlar():
         _external = True,
     )
 
-    title       = f"Orucu Bozan Durumlar"
+    title       = f"Orucu Bozan Durumlar — Çağrı Vakti"
     description = f"Hangi durumlar orucu bozar? Varışca Slami bilgi."
     return render_template('ramadan/things_that_break_fast.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
 
@@ -196,7 +196,7 @@ def imsakiye_secimi():
     )
 
     all_cities  = sorted(UserService.get_sehirler('ALL'))
-    title       = f"{suanki_yil} Ramazan İmsakiyesi"
+    title       = f"{suanki_yil} Ramazan İmsakiyesi — Çağrı Vakti"
     description = f"Şehrinizi seçin, sahur ve iftar vakitlerini görün."
     return render_template('imsakiye/imsakiye_selection.html', cities=all_cities, og_image_url=og_image_url, seo_title=title, seo_description=description)
 
@@ -226,7 +226,7 @@ def imsakiye_detay(sehir):
         _external = True,
     )
 
-    title       = f"{sehir_adi} {suanki_yil} İmsakiyesi"
+    title       = f"{sehir_adi} {suanki_yil} İmsakiyesi — Çağrı Vakti"
     description = f"{sehir_adi} şehri için {suanki_yil} yılı Ramazan imsakiyesi. İftar ve sahur vakitleri."
     return render_template('imsakiye/imsakite_detail.html',
                            sehir=sehir,
@@ -244,7 +244,7 @@ def imsakiye_detay(sehir):
 @cache.cached(timeout=3600)
 def bilgi_kosesi_liste():
     guides      = get_guides()
-    title       = "Bilgi Köşesi - Çagrı Vakti"
+    title       = "Bilgi Köşesi — Çağrı Vakti"
     description = "Ezan vakitleri, kıble yönü, namaz bilgileri ve daha fazlası hakkında rehber yazılar."
 
     og_image_url = url_for(
@@ -278,7 +278,7 @@ def bilgi_kosesi_detay(slug):
         abort(404)
 
     guides      = get_guides()
-    title       = f"{guide['title']} - Çağrı Vakti"
+    title       = f"{guide['title']} — Çağrı Vakti"
     description = guide['description']
 
     og_image_url = url_for(
@@ -307,7 +307,7 @@ def bilgi_kosesi_detay(slug):
 @cache.cached(timeout=86400)
 def sitene_ekle():
     all_cities  = sorted(UserService.get_sehirler('ALL'))
-    title       = "Sitenize Ekleyin - Çağrı Vakti"
+    title       = "Sitenize Ekleyin — Çağrı Vakti"
     description = "Web siteniz için ücretsiz ezan vakitleri widget'ı. Renkleri özelleştirin, şehrinizi seçin ve kodu sitenize ekleyin."
 
     og_image_url = url_for(
@@ -378,7 +378,7 @@ def embed_widget(sehir):
 @views_bp.route('/kible-pusulasi')
 @cache.cached(timeout=86400)
 def kible_pusulasi():
-    title       = "Kıble Pusulası - Çağrı Vakti"
+    title       = "Kıble Pusulası — Çağrı Vakti"
     description = "Pusula ve harita yardımıyla online kıble yönünü bulun. Telefonunuzun sensörlerini kullanarak en doğru kıble açısını hesaplayın."
 
     og_image_url = url_for(
@@ -402,7 +402,7 @@ def kible_pusulasi():
 @cache.cached(timeout=86400)
 def neden_biz():
 
-    title       = "Neden Çağrı Vakti?"
+    title       = "Neden Çağrı Vakti? — Çağrı Vakti"
     description = "Doğruluk, hız ve gizlilik odaklı namaz vakitleri platformu."
     
     og_image_url = url_for(
@@ -426,7 +426,7 @@ def neden_biz():
 @cache.cached(timeout=86400)
 def ilkelerimiz():
 
-    title       = "İlkelerimiz"
+    title       = "İlkelerimiz — Çağrı Vakti"
     description = "Çağrı Vakti\'nin temel değerleri ve kullanım ilkeleri."
 
     og_image_url = url_for(
@@ -460,7 +460,7 @@ def indir():
         _external = True,
     )
 
-    title       = "Uygulamayı İndir - Çağrı Vakti"
+    title       = "Uygulamayı İndir — Çağrı Vakti"
     description = "Çağrı Vakti Rainmeter widget, Discord botu ve mobil uygulamamızı ücretsiz olarak indirin."
 
 
@@ -476,7 +476,7 @@ def indir():
 @views_bp.route('/Mustafa-Kemal-Ataturk')
 @cache.cached(timeout=86400)
 def ataturk():
-    title       = "Mustafa Kemal Atatürk - Çağrı Vakti"
+    title       = "Mustafa Kemal Atatürk — Çağrı Vakti"
     description = "Mustafa Kemal Atatürk ve islama kattığı şeyler hakkında bilgi edinin."
     
     og_image_url = url_for(
@@ -747,7 +747,7 @@ def admin_logs():
 @views_bp.route('/asal-sayi')
 @cache.cached(timeout=86400)
 def prime_number():
-    title       = "20000 Basamaklı Asal Sayı"
+    title       = "20000 Basamaklı Asal Sayı — Çağrı Vakti"
     description = "Asal sayı, 1 ve kendi kendisiyle sadece 2 tane bölen sayıdır."
 
     og_image_url = url_for(
@@ -770,7 +770,7 @@ def prime_number():
 
 @views_bp.route('/rainmeter-rehber')
 def rainmeter_guide():
-    title       = "Rainmeter Rehber"
+    title       = "Rainmeter Rehber — Çağrı Vakti"
     description = "Rainmeter Rehberi, Rainmeter'ün kullanımda gerekli bilgileri ve ipucları sunar."
 
     og_image_url = url_for(
@@ -800,7 +800,7 @@ def download_widget():
 # @views_bp.route('/qr-okuyucu')
 # @cache.cached(timeout=86400)
 # def qr_okuyucu():
-#     title       = "Qr Okuyucu"
+#     title       = "Qr Okuyucu — Çağrı Vakti"
 #     description = "Qr Okuyucu, kullanıcıların girdiği qr kodun okunmasını sağlar."
 
 #     og_image_url = url_for(
@@ -831,7 +831,7 @@ def download_widget():
 
 @views_bp.route('/oyunlar/under-the-red-sky')
 def under_the_red_sky():
-    title       = "Under the Red Sky - Çağrı Vakti"
+    title       = "Under the Red Sky — Çağrı Vakti"
     description = "Under the Red Sky oyununu online oynayın."
 
     og_image_url = url_for(
@@ -1001,7 +1001,7 @@ def serve_manifest():
 
 @views_bp.route('/konum-bul')
 def konum_bul():
-    title       = "Konum Bul - Çağrı Vakti"
+    title       = "Konum Bul — Çağrı Vakti"
     description = "Cihazınızın konumunu kullanarak size en yakın il\'in namaz vakitlerini anında bulun."
 
     og_image_url = url_for(
@@ -1051,7 +1051,7 @@ def send_admin_notification(name, email, subject, message):
 @views_bp.route('/iletisim', methods=['GET', 'POST'])
 @limiter.limit("10 per hour", methods=['POST'])
 def iletisim():
-    title       = "Bizimle İletişime Geçin - Çağrı Vakti"
+    title       = "Bizimle İletişime Geçin — Çağrı Vakti"
     description = "Soru, öneri ve geri bildirimleriniz için bizimle iletişime geçin. Görüşleriniz bizim için değerlidir."
 
     og_image_url = url_for(

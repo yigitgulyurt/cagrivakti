@@ -29,167 +29,167 @@ H = 630
 # ─────────────────────────────────────────────────────────────────────────────
 THEMES: dict[str, dict[str, str]] = {
 
-    # ── ANA SAYFA ───────────────────────────────────────────────────────────
+    # ── ANA SAYFA (Sıcak ve Karşılayıcı) ────────────────────────────────────
     'index': {
-        'bg':      '#110a08',
-        'accent':  '#fb923c',   # turuncu
-        'accent2': '#ef4444',   # kırmızı
-        'text':    '#fef3c7',
-        'text2':   '#78716c',
+        'bg':      '#0f0a09',   # Çok koyu kahve/siyah
+        'accent':  '#f97316',   # Turuncu (Enerji)
+        'accent2': '#facc15',   # Sarı (Aydınlık)
+        'text':    '#fff7ed',
+        'text2':   '#a8a29e',
     },
 
-    # ── ŞEHİR VE KONUM ──────────────────────────────────────────────────────
+    # ── ŞEHİR VE KONUM (Huzurlu ve Manevi) ──────────────────────────────────
     'city': {
-        'bg':      '#0a0f14',
-        'accent':  '#2dd4bf',   # turkuaz
-        'accent2': '#f59e0b',   # amber/altın
-        'text':    '#e2e8f0',
-        'text2':   '#64748b',
+        'bg':      '#061014',   # Koyu gece mavisi
+        'accent':  '#14b8a6',   # Teal/Turkuaz (İslami sanat tonu)
+        'accent2': '#fbbf24',   # Kehribar (Kandil ışığı)
+        'text':    '#f0fdfa',
+        'text2':   '#94a3b8',
     },
     'city-page': {
-        'bg':      '#0a0f14',
-        'accent':  '#2dd4bf',
-        'accent2': '#f59e0b',
-        'text':    '#e2e8f0',
-        'text2':   '#64748b',
+        'bg':      '#061014',
+        'accent':  '#14b8a6',
+        'accent2': '#fbbf24',
+        'text':    '#f0fdfa',
+        'text2':   '#94a3b8',
     },
     'location-page': {
-        'bg':      '#0a0f14',
-        'accent':  '#2dd4bf',
-        'accent2': '#f59e0b',
-        'text':    '#e2e8f0',
-        'text2':   '#64748b',
+        'bg':      '#061014',
+        'accent':  '#06b6d4',   # Cyan (GPS/Teknoloji vurgusu)
+        'accent2': '#fbbf24',
+        'text':    '#ecfeff',
+        'text2':   '#94a3b8',
     },
 
-    # ── RAMAZAN VE İMSAKİYE ────────────────────────────────────────────────
+    # ── RAMAZAN VE İMSAKİYE (Mistik ve Derin) ────────────────────────────────
     'ramadan': {
-        'bg':      '#0c0a14',
-        'accent':  '#d4af37',   # altın
-        'accent2': '#a78bfa',   # mor
-        'text':    '#fdf6e3',
-        'text2':   '#6b7280',
+        'bg':      '#0d0817',   # Derin patlıcan moru
+        'accent':  '#f59e0b',   # Altın sarısı
+        'accent2': '#c084fc',   # Lavanta
+        'text':    '#faf5ff',
+        'text2':   '#9ca3af',
     },
     'ramadan-fasting': {
-        'bg':      '#0c0a14',
-        'accent':  '#d4af37',
-        'accent2': '#a78bfa',
-        'text':    '#fdf6e3',
-        'text2':   '#6b7280',
+        'bg':      '#0d0817',
+        'accent':  '#f59e0b',
+        'accent2': '#c084fc',
+        'text':    '#faf5ff',
+        'text2':   '#9ca3af',
     },
     'imsakiye': {
-        'bg':      '#0c0a14',
-        'accent':  '#d4af37',
-        'accent2': '#a78bfa',
-        'text':    '#fdf6e3',
-        'text2':   '#6b7280',
+        'bg':      '#0d0817',
+        'accent':  '#fbbf24',
+        'accent2': '#d8b4fe',
+        'text':    '#faf5ff',
+        'text2':   '#9ca3af',
     },
     'imsakiye-page': {
-        'bg':      '#0c0a14',
-        'accent':  '#d4af37',
-        'accent2': '#a78bfa',
-        'text':    '#fdf6e3',
-        'text2':   '#6b7280',
+        'bg':      '#0d0817',
+        'accent':  '#fbbf24',
+        'accent2': '#d8b4fe',
+        'text':    '#faf5ff',
+        'text2':   '#9ca3af',
     },
 
-    # ── BİLGİ KÖŞESİ (REHBERLER) ───────────────────────────────────────────
+    # ── BİLGİ KÖŞESİ (Okunabilirlik ve Odak) ───────────────────────────────
     'knowledge': {
-        'bg':      '#0d0d0d',
-        'accent':  '#fb923c',   # turuncu
-        'accent2': '#fcd34d',   # kehribar
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'bg':      '#0c0a09',   # Taş rengi siyah
+        'accent':  '#ea580c',   # Yanık turuncu (Kitap/Kağıt tonu)
+        'accent2': '#fcd34d',   # Parlak kehribar
+        'text':    '#fafaf9',
+        'text2':   '#a8a29e',
     },
     'knowledge-page': {
-        'bg':      '#0d0d0d',
-        'accent':  '#fb923c',
+        'bg':      '#0c0a09',
+        'accent':  '#ea580c',
         'accent2': '#fcd34d',
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'text':    '#fafaf9',
+        'text2':   '#a8a29e',
     },
 
-    # ── ARAÇLAR VE İNDİRMELER ──────────────────────────────────────────────
+    # ── ARAÇLAR VE İNDİRMELER (Modern ve Teknolojik) ────────────────────────
     'add-widget': {
-        'bg':      '#0d0d0d',
-        'accent':  '#818cf8',   # indigo
-        'accent2': '#22d3ee',   # cyan
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'bg':      '#020617',   # Safir siyahı
+        'accent':  '#6366f1',   # İndigo (Yazılım)
+        'accent2': '#22d3ee',   # Cyan (Modernite)
+        'text':    '#f8fafc',
+        'text2':   '#94a3b8',
     },
     'qibla-page': {
-        'bg':      '#0d0d0d',
-        'accent':  '#818cf8',
-        'accent2': '#22d3ee',
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'bg':      '#020617',
+        'accent':  '#3b82f6',   # Mavi (Pusula/Navigasyon)
+        'accent2': '#2dd4bf',   # Turkuaz
+        'text':    '#f8fafc',
+        'text2':   '#94a3b8',
     },
     'download-page': {
-        'bg':      '#0d0d0d',
+        'bg':      '#020617',
         'accent':  '#818cf8',
-        'accent2': '#22d3ee',
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'accent2': '#38bdf8',
+        'text':    '#f8fafc',
+        'text2':   '#94a3b8',
     },
     'rainmeter-guide': {
-        'bg':      '#0d0d0d',
-        'accent':  '#818cf8',
-        'accent2': '#22d3ee',
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'bg':      '#020617',
+        'accent':  '#4f46e5',
+        'accent2': '#06b6d4',
+        'text':    '#f8fafc',
+        'text2':   '#94a3b8',
     },
 
-    # ── KURUMSAL VE İLETİŞİM ──────────────────────────────────────────────
+    # ── KURUMSAL VE İLETİŞİM (Güven ve Profesyonellik) ─────────────────────
     'why-us-page': {
-        'bg':      '#0d0d0d',
-        'accent':  '#4ade80',   # yeşil
-        'accent2': '#60a5fa',   # mavi
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'bg':      '#050505',
+        'accent':  '#10b981',   # Zümrüt yeşili (Güven/Doğruluk)
+        'accent2': '#3b82f6',   # Mavi (Profesyonellik)
+        'text':    '#f0fdf4',
+        'text2':   '#9ca3af',
     },
     'policies-page': {
-        'bg':      '#0d0d0d',
-        'accent':  '#4ade80',
-        'accent2': '#60a5fa',
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'bg':      '#050505',
+        'accent':  '#059669',
+        'accent2': '#2563eb',
+        'text':    '#f0fdf4',
+        'text2':   '#9ca3af',
     },
     'contact-page': {
-        'bg':      '#0d0d0d',
-        'accent':  '#818cf8',   # indigo
-        'accent2': '#22d3ee',   # cyan
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'bg':      '#050505',
+        'accent':  '#6366f1',
+        'accent2': '#06b6d4',
+        'text':    '#f8fafc',
+        'text2':   '#94a3b8',
     },
 
     # ── ÖZEL SAYFALAR ──────────────────────────────────────────────────────
     'ataturk-page': {
-        'bg':      '#080808',
-        'accent':  '#e30a17',   # Türk kırmızısı
-        'accent2': '#c5a059',   # altın
-        'text':    '#f0f0f0',
-        'text2':   '#999999',
+        'bg':      '#050505',
+        'accent':  '#dc2626',   # Türk Kırmızısı (Daha canlı)
+        'accent2': '#d4af37',   # Metalik Altın
+        'text':    '#ffffff',
+        'text2':   '#d1d5db',
     },
     'prime-number': {
-        'bg':      '#0d0d0d',
-        'accent':  '#6366f1',   # indigo
-        'accent2': '#a855f7',   # mor
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'bg':      '#08070b',
+        'accent':  '#8b5cf6',   # Mor (Matematik/Gizem)
+        'accent2': '#ec4899',   # Pembe
+        'text':    '#fdf2f8',
+        'text2':   '#9ca3af',
     },
     'game-page': {
-        'bg':      '#1a0b0b',   # koyu kırmızı/siyah
-        'accent':  '#ef4444',   # kırmızı
-        'accent2': '#f59e0b',   # amber
-        'text':    '#fecaca',
+        'bg':      '#0f0505',   # Kan kırmızısı siyah
+        'accent':  '#b91c1c',   # Koyu kırmızı
+        'accent2': '#f59e0b',   # Kehribar (Ateş/Işık)
+        'text':    '#fee2e2',
         'text2':   '#7f1d1d',
     },
 
-    # ── VARSAYILAN VE DİĞER ────────────────────────────────────────────────
+    # ── VARSAYILAN ─────────────────────────────────────────────────────────
     'default': {
-        'bg':      '#0d0d0d',
+        'bg':      '#0a0a0a',
         'accent':  '#4ade80',
         'accent2': '#60a5fa',
-        'text':    '#e2e2e2',
-        'text2':   '#888888',
+        'text':    '#e5e7eb',
+        'text2':   '#9ca3af',
     },
 }
 
