@@ -159,7 +159,7 @@ def ramazan_nedir():
 
     title       = f"Ramazan Nedir? — Çağrı Vakti" 
     description = f"Ramazan ayının önemi, ibadetleri ve fazileti hakkında bilgi edinin."
-    return render_template('ramadan/what_is_ramadan.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
+    return render_template('imsakiye/what_is_ramadan.html', og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 
 @views_bp.route('/orucu-bozan-durumlar')
