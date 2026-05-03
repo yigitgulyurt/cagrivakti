@@ -53,11 +53,11 @@ def setup_middleware(app):
             # Not: 'self' ve '*' birlikte kullanımı bazı tarayıcılarda (Firefox/Zen) sorun yaratabilir, sadece '*' yeterlidir.
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://static.cloudflareinsights.com; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode; "
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-                "font-src 'self' https://fonts.cagrivakti.com.tr https://fonts.gstatic.com; "
+                "font-src 'self' https://fonts.cagrivakti.com.tr; "
                 "img-src 'self' data: https:; "
-                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://cloudflareinsights.com https://fonts.googleapis.com https://fonts.gstatic.com; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
                 "frame-ancestors *; "
                 "base-uri 'self'; "
                 "form-action 'self';"
@@ -72,11 +72,11 @@ def setup_middleware(app):
                 # Oyun sayfası: frame'e izin ver ama diğer güvenlik kuralları sıkı kalsın
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdnjs.cloudflare.com https://static.cloudflareinsights.com; "
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-                "font-src 'self' data: https://fonts.gstatic.com; "
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdnjs.cloudflare.com; "
+                "style-src 'self' 'unsafe-inline'; "
+                "font-src 'self' data:; "
                 "img-src 'self' data: blob: https:; "
-                "connect-src 'self' blob: https://cloudflareinsights.com https://fonts.googleapis.com https://fonts.gstatic.com; "
+                "connect-src 'self' blob:; "
                 "frame-src 'self'; "
                 "frame-ancestors 'self'; "
                 "worker-src 'self' blob:; "
@@ -92,11 +92,11 @@ def setup_middleware(app):
             # frame-src 'self' *: Kendi sitemizdeki iframe'lerin çalışmasına izin ver (Önizleme vb. için)
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://static.cloudflareinsights.com; "
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-                "font-src 'self' https://fonts.cagrivakti.com.tr https://fonts.gstatic.com; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode; "
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.googleapis.com; "
+                "font-src 'self' https://fonts.cagrivakti.com.tr; "
                 "img-src 'self' data: https:; "
-                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://cloudflareinsights.com https://fonts.googleapis.com https://fonts.gstatic.com; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
                 "frame-src 'self' *; "
                 "frame-ancestors 'none'; "
                 "base-uri 'self'; "
