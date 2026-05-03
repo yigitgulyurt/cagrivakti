@@ -229,20 +229,99 @@
         transform: translateY(-8px);
     }
 
-    .at-card-title {
-        color: var(--at-red);
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 15px;
+    /* ── YENİ: ZAMAN ÇİZELGESİ (Timeline) ── */
+    .at-timeline {
+        position: relative;
+        padding: 40px 0;
     }
 
-    .at-card-desc {
+    .at-timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        width: 2px;
+        height: 100%;
+        background: var(--at-border);
+        transform: translateX(-50%);
+    }
+
+    .at-t-item {
+        position: relative;
+        width: 50%;
+        padding: 20px 40px;
+        box-sizing: border-box;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease;
+    }
+
+    .at-t-item.reveal {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .at-t-item:nth-child(odd) { left: 0; text-align: right; }
+    .at-t-item:nth-child(even) { left: 50%; text-align: left; }
+
+    .at-t-dot {
+        position: absolute;
+        top: 25px;
+        width: 16px;
+        height: 16px;
+        background: var(--at-red);
+        border-radius: 50%;
+        box-shadow: 0 0 15px var(--at-red);
+        z-index: 2;
+    }
+
+    .at-t-item:nth-child(odd) .at-t-dot { right: -8px; }
+    .at-t-item:nth-child(even) .at-t-dot { left: -8px; }
+
+    .at-t-year {
+        font-size: 24px;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 8px;
+    }
+
+    .at-t-content {
         font-size: 14px;
-        line-height: 1.7;
         color: #999;
+        line-height: 1.6;
     }
 
-    /* ── GENÇLİĞE HİTABE (Merkezi Parça) ── */
+    /* ── YENİ: DÜNYA LİDERLERİ ── */
+    .at-world-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .at-world-card {
+        padding: 30px;
+        background: rgba(255,255,255,0.01);
+        border: 1px solid rgba(255,255,255,0.03);
+        border-radius: 20px;
+        font-style: italic;
+    }
+
+    .at-world-text {
+        font-size: 15px;
+        color: #ddd;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    .at-world-author {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--at-gold);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* ── GENÇLİĞE HİTABE VE NUTUK ── */
     .at-hitabe {
         background: radial-gradient(circle at top right, rgba(var(--at-red-rgb), 0.1), transparent);
         border: 1px solid var(--at-border);
@@ -363,16 +442,78 @@
                 </div>
                 <div class="at-grid">
                     <div class="at-card" tabindex="0">
-                        <h3 class="at-card-title">Milli Egemenlik</h3>
-                        <p class="at-card-desc">"Egemenlik kayıtsız şartsız milletindir" ilkesiyle, gücü tek bir kişiden alıp asıl sahibi olan halka teslim etmiştir.</p>
+                        <h3 class="at-card-title" style="color:var(--at-red); font-size:18px; font-weight:700; margin-bottom:15px;">Milli Egemenlik</h3>
+                        <p class="at-card-desc" style="font-size:14px; line-height:1.7; color:#999;">"Egemenlik kayıtsız şartsız milletindir" ilkesiyle, gücü tek bir kişiden alıp asıl sahibi olan halka teslim etmiştir.</p>
                     </div>
                     <div class="at-card" tabindex="0">
-                        <h3 class="at-card-title">Eğitim Devrimi</h3>
-                        <p class="at-card-desc">Harf Devrimi ve Tevhid-i Tedrisat ile cehalete karşı topyekun bir savaş açmış, modern eğitim sistemini kurmuştur.</p>
+                        <h3 class="at-card-title" style="color:var(--at-red); font-size:18px; font-weight:700; margin-bottom:15px;">Eğitim Devrimi</h3>
+                        <p class="at-card-desc" style="font-size:14px; line-height:1.7; color:#999;">Harf Devrimi ve Tevhid-i Tedrisat ile cehalete karşı topyekun bir savaş açmış, modern eğitim sistemini kurmuştur.</p>
                     </div>
                     <div class="at-card" tabindex="0">
-                        <h3 class="at-card-title">Yurtta Sulh, Cihanda Sulh</h3>
-                        <p class="at-card-desc">Barışı temel bir dış politika haline getirerek Türkiye'yi modern dünyada saygın bir konuma taşımıştır.</p>
+                        <h3 class="at-card-title" style="color:var(--at-red); font-size:18px; font-weight:700; margin-bottom:15px;">Yurtta Sulh, Cihanda Sulh</h3>
+                        <p class="at-card-desc" style="font-size:14px; line-height:1.7; color:#999;">Barışı temel bir dış politika haline getirerek Türkiye'yi modern dünyada saygın bir konuma taşımıştır.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- YENİ: ZAMAN ÇİZELGESİ (Timeline) -->
+            <section class="at-section">
+                <div class="at-section-head">
+                    <h2 class="at-section-title">Kronolojik Başarılar</h2>
+                    <div class="at-section-line"></div>
+                </div>
+                <div class="at-timeline">
+                    <div class="at-t-item">
+                        <div class="at-t-dot"></div>
+                        <div class="at-t-year">1915</div>
+                        <div class="at-t-content">Çanakkale Savaşları'nda "Anafartalar Kahramanı" olarak dünya sahnesine çıktı.</div>
+                    </div>
+                    <div class="at-t-item">
+                        <div class="at-t-dot"></div>
+                        <div class="at-t-year">1919</div>
+                        <div class="at-t-content">19 Mayıs'ta Samsun'a çıkarak Milli Mücadele'nin meşalesini yaktı.</div>
+                    </div>
+                    <div class="at-t-item">
+                        <div class="at-t-dot"></div>
+                        <div class="at-t-year">1920</div>
+                        <div class="at-t-content">Türkiye Büyük Millet Meclisi'ni açarak milli iradeyi kurumsallaştırdı.</div>
+                    </div>
+                    <div class="at-t-item">
+                        <div class="at-t-dot"></div>
+                        <div class="at-t-year">1923</div>
+                        <div class="at-t-content">Cumhuriyet'i ilan ederek modern Türkiye'nin temellerini attı.</div>
+                    </div>
+                    <div class="at-t-item">
+                        <div class="at-t-dot"></div>
+                        <div class="at-t-year">1928</div>
+                        <div class="at-t-content">Harf Devrimi ile milletin okuma-yazma seferberliğini başlattı.</div>
+                    </div>
+                    <div class="at-t-item">
+                        <div class="at-t-dot"></div>
+                        <div class="at-t-year">1934</div>
+                        <div class="at-t-content">Türk kadınına seçme ve seçilme hakkı vererek toplumsal eşitliği sağladı.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- YENİ: DÜNYA LİDERLERİNİN GÖZÜNDEN -->
+            <section class="at-section">
+                <div class="at-section-head">
+                    <h2 class="at-section-title">Dünya Liderlerinin Gözünden</h2>
+                    <div class="at-section-line"></div>
+                </div>
+                <div class="at-world-grid">
+                    <div class="at-world-card">
+                        <p class="at-world-text">"Atatürk, modern çağın en büyük liderlerinden biriydi. O, sadece Türkiye'nin değil, tüm insanlığın ortak mirasıdır."</p>
+                        <div class="at-world-author">John F. Kennedy</div>
+                    </div>
+                    <div class="at-world-card">
+                        <p class="at-world-text">"Savaşta dahi bir deha, barışta ise bir bilgeydi. Onun gibi bir lider yüzyılda bir gelir."</p>
+                        <div class="at-world-author">Winston Churchill</div>
+                    </div>
+                    <div class="at-world-card">
+                        <p class="at-world-text">"Atatürk, çökmüş bir imparatorluktan modern ve hür bir millet yaratan mucizenin adıdır."</p>
+                        <div class="at-world-author">Douglas MacArthur</div>
                     </div>
                 </div>
             </section>
@@ -392,6 +533,24 @@
                 <div style="margin-top: 40px; text-align: center;">
                     <img src="/static/image/Mustafa-Kemal_Ataturk/Mustafa_Kemal_Ataturk-un-imzasi.svg" alt="Atatürk İmzası" class="at-signature" style="width: 200px; filter: invert(1);">
                 </div>
+            </section>
+
+            <!-- YENİ: ONUNCU YIL NUTKU (Özet) -->
+            <section class="at-hitabe" style="margin-top: 50px; background: rgba(var(--at-red-rgb), 0.02);">
+                <h2 class="at-hitabe-title" style="font-size: 26px;">Onuncu Yıl Nutku</h2>
+                <div class="at-hitabe-content" style="font-style: italic; border-left: 2px solid var(--at-red); padding-left: 30px;">
+                    Türk Milleti!
+                    Kurtuluş Savaşı'na başladığımızın on beşinci yılındayız. Bugün Cumhuriyetimizin onuncu yılını doldurduğu en büyük bayramdır. Kutlu olsun!
+
+                    Az zamanda çok ve büyük işler yaptık. Bu işlerin en büyüğü, temeli Türk kahramanlığı ve yüksek Türk kültürü olan Türkiye Cumhuriyeti'dir. Bundaki muvaffakiyeti Türk milletinin ve onun değerli ordusunun bir ve beraber olarak azimle yürümesine borçluyuz.
+
+                    Fakat yaptıklarımızı asla kâfi göremeyiz. Çünkü daha çok ve daha büyük işler yapmak mecburiyetinde ve azmindeyiz. Yurdumuzu dünyanın en mâmur ve en medenî memleketleri seviyesine çıkaracağız. Milletimizi en geniş refah vasıta ve kaynaklarına sahip kılacağız. Millî kültürümüzü muasır medeniyet seviyesinin üstüne çıkaracağız.
+
+                    Türk Milleti!
+                    Ebediyete akıp giden her on senede, bu büyük millet bayramını daha büyük şereflerle, saadetlerle huzur ve refah içinde kutlamanı gönülden dilerim.
+                    Ne mutlu Türk'üm diyene!
+                </div>
+                <div style="text-align: right; margin-top: 20px; font-weight: 700; color: #fff;">29 Ekim 1933</div>
             </section>
 
             <!-- KAYNAKÇA -->
@@ -415,13 +574,13 @@
  * Atatürk Sayfası Etkileşim Scriptleri
  * - Kaydırma bazlı isim animasyonu
  * - Dinamik alıntı rotasyonu
+ * - Intersection Observer (Scroll Reveal)
  */
 (function() {
     // 1. İsim Reveal Animasyonu
     const nameEl = document.getElementById('atName');
     if (nameEl) {
         window.addEventListener('scroll', () => {
-            // 50px kaydırıldığında ismi göster
             if (window.pageYOffset > 50) {
                 nameEl.classList.add('visible');
             } else {
@@ -438,14 +597,14 @@
         "Egemenlik kayıtsız şartsız milletindir.",
         "Bizim dinimiz en makul ve en doğal bir dindir.",
         "Türk çocuğu ecdadını tanıdıkça daha büyük işler yapmak için kendinde kuvvet bulacaktır.",
-        "Milletimiz din ve dil gibi kuvvetli iki fazilete maliktir."
+        "Milletimiz din ve dil gibi kuvvetli iki fazilete maliktir.",
+        "Bütün ümidim gençliktedir.",
+        "Sanatsız kalan bir milletin hayat damarlarından biri kopmuş demektir."
     ];
     
     let currentIdx = 0;
     const quoteText = document.getElementById('quoteText');
-    const quoteWrap = document.getElementById('quoteWrap');
-
-    if (quoteText && quoteWrap) {
+    if (quoteText) {
         setInterval(() => {
             quoteText.style.opacity = '0';
             setTimeout(() => {
@@ -455,6 +614,45 @@
             }, 500);
         }, 6000);
     }
+
+    // 3. Intersection Observer (Scroll Reveal)
+    const revealOptions = {
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px"
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('reveal');
+                revealObserver.unobserve(entry.target); // Sadece bir kez tetiklensin
+            }
+        });
+    }, revealOptions);
+
+    // Timeline itemları ve Kartları gözlemle
+    document.querySelectorAll('.at-t-item, .at-card, .at-world-card').forEach(el => {
+        // Kartlar için de benzer bir sınıf ekleyelim (CSS'te tanımlı olmalı veya burada eklenmeli)
+        if (!el.classList.contains('at-t-item')) {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+        }
+        revealObserver.observe(el);
+    });
+
+    // Kartlar için özel reveal logic (CSS'e bağımlı kalmamak için)
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, revealOptions);
+
+    document.querySelectorAll('.at-card, .at-world-card').forEach(el => cardObserver.observe(el));
+
 })();
 </script>
 {% endblock %}
