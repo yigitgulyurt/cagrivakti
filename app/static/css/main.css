@@ -1,4 +1,4 @@
-@import url('https://fonts.yigitgulyurt.net.tr/inter/inter.css');
+@import url('https://fonts.yigitgulyurt.net.tr/Montserrat/montserrat.css');
 :root {
     --primary: #ffc107;
     --primary-hover: #ffd54f;
@@ -101,7 +101,7 @@ a {
 }
 
 body {
-    font-family: "Inter", sans-serif;
+    font-family: "Montserrat", sans-serif;
     background-color: var(--dark);
     color: var(--text);
     line-height: 1.6;
