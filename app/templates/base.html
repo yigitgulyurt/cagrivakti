@@ -459,8 +459,16 @@
                 const newMainContent = doc.getElementById('main-content');
                 if (newMainContent && mainContent) {
                     mainContent.innerHTML = newMainContent.innerHTML;
-                    window.scrollTo(0, 0);
                 }
+
+                // Update Footer Scripts Container
+                const footerScripts = document.getElementById('spa-footer-scripts');
+                const newFooterScripts = doc.getElementById('spa-footer-scripts');
+                if (footerScripts && newFooterScripts) {
+                    footerScripts.innerHTML = newFooterScripts.innerHTML;
+                }
+
+                window.scrollTo(0, 0);
 
                 // --- DYNAMIC ASSET MANAGEMENT ---
                 
@@ -481,19 +489,39 @@
                 const currentScripts = Array.from(document.querySelectorAll('script[src]'));
                 const newScripts     = Array.from(doc.querySelectorAll('script'));
 
-                newScripts.forEach(script => {
-                    // Re-run inline scripts or load new external scripts
+                // Sort scripts: External scripts first, then inline scripts
+                const sortedScripts = [
+                    ...newScripts.filter(s => s.src),
+                    ...newScripts.filter(s => !s.src)
+                ];
+
+                for (const script of sortedScripts) {
                     const isExternal = script.src;
                     const isNewExternal = isExternal && !currentScripts.some(old => old.src === script.src);
-                    const isInline = !isExternal && (script.closest('#main-content') || script.innerHTML.length > 0);
-
-                    if (isNewExternal || isInline) {
+                    
+                    // IMPORTANT: Skip scripts that are already in the layout (base.html)
+                     // We identify these by checking if they are outside the #main-content and #spa-footer-scripts in the new doc
+                     const isLayoutScript = !script.closest('#main-content') && !script.closest('#spa-footer-scripts');
+                    
+                    if (isNewExternal) {
+                        await new Promise((resolve, reject) => {
+                            const newScript = document.createElement('script');
+                            Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                            newScript.onload = resolve;
+                            newScript.onerror = reject;
+                            document.body.appendChild(newScript);
+                        });
+                    } else if (!isExternal && !isLayoutScript) {
+                        // For inline scripts, we wrap them in a block to prevent const/let redeclaration errors
+                        // and only execute if they are not already present or are page-specific.
                         const newScript = document.createElement('script');
                         Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                        if (!isExternal) newScript.appendChild(document.createTextNode(script.innerHTML));
+                        
+                        // Wrap in a block and add a sourceURL for easier debugging
+                        newScript.text = `{\n${script.text}\n}\n//# sourceURL=spa-injected-${Date.now()}.js`;
                         document.body.appendChild(newScript);
                     }
-                });
+                }
 
                 // Update Canonical
                 const oldCanonical = document.querySelector('link[rel="canonical"]');
@@ -603,26 +631,28 @@
     /* ----------------------------------------------------------------
        City name helpers  (Turkish display ↔ Latin API name)
        ---------------------------------------------------------------- */
-    const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse(
-        '{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}'
-    );
-    const REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
-        Object.entries(CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
-    );
+    if (typeof window.CITY_DISPLAY_MAPPING_GLOBAL === 'undefined') {
+        window.CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse(
+            '{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}'
+        );
+        window.REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
+            Object.entries(window.CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
+        );
 
-    function getLatinNameGlobal(turkishName) {
-        if (REVERSE_CITY_MAPPING_GLOBAL[turkishName]) {
-            return REVERSE_CITY_MAPPING_GLOBAL[turkishName];
-        }
-        const charMap = {
-            'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G',
-            'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O',
-            'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U',
+        window.getLatinNameGlobal = function(turkishName) {
+            if (window.REVERSE_CITY_MAPPING_GLOBAL[turkishName]) {
+                return window.REVERSE_CITY_MAPPING_GLOBAL[turkishName];
+            }
+            const charMap = {
+                'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G',
+                'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O',
+                'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U',
+            };
+            return turkishName
+                .split('').map(c => charMap[c] || c).join('')
+                .replace(/\s+/g, '-')
+                .replace(/[^A-Za-z0-9\-]/g, '');
         };
-        return turkishName
-            .split('').map(c => charMap[c] || c).join('')
-            .replace(/\s+/g, '-')
-            .replace(/[^A-Za-z0-9\-]/g, '');
     }
 
 
@@ -888,7 +918,9 @@
     }
     </script>
 
-    {% block footer_js %}{% endblock %}
+    <div id="spa-footer-scripts">
+        {% block footer_js %}{% endblock %}
+    </div>
 
 </body>
 </html>
