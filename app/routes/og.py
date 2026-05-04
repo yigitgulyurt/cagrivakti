@@ -14,7 +14,7 @@ Query parametreleri:
 import io
 from functools import lru_cache
 from flask import Blueprint, request, send_file
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 og_bp = Blueprint('og', __name__)
 
@@ -23,6 +23,8 @@ og_bp = Blueprint('og', __name__)
 # ─────────────────────────────────────────────────────────────────────────────
 W = 1200
 H = 630
+STORY_W = 1080
+STORY_H = 1920
 
 # ─────────────────────────────────────────────────────────────────────────────
 # RENK TEMALAR
@@ -191,6 +193,15 @@ THEMES: dict[str, dict[str, str]] = {
         'text':    '#e5e7eb',
         'text2':   '#9ca3af',
     },
+
+    # ── SOSYAL PAYLAŞIM (Story/Post) ───────────────────────────────────────
+    'share-vakit': {
+        'bg':      '#0f172a',   # Slate 900
+        'accent':  '#38bdf8',   # Sky 400
+        'accent2': '#facc15',   # Yellow 400
+        'text':    '#f8fafc',
+        'text2':   '#cbd5e1',
+    },
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -319,6 +330,76 @@ def make_og(title, subtitle, theme, prompt, domain):
     return img
 
 # ─────────────────────────────────────────────────────────────────────────────
+# ÖZEL STORY ÜRETİCİ (Vakit Paylaş)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def make_story_vakit(sehir, vakitler):
+    """
+    vakitler: {'imsak': '05:30', 'gunes': '07:00', ...}
+    """
+    # 1. Base Image (Gradient/Glassmorphism effect)
+    img = Image.new('RGB', (STORY_W, STORY_H), (15, 23, 42)) # Slate 900
+    d = ImageDraw.Draw(img)
+
+    # Gradient Top-Bottom
+    for i in range(STORY_H):
+        r = int(15 + (30 - 15) * (i / STORY_H))
+        g = int(23 + (45 - 23) * (i / STORY_H))
+        b = int(42 + (80 - 42) * (i / STORY_H))
+        d.line([(0, i), (STORY_W, i)], fill=(r, g, b))
+
+    # Decorative Circles (Soft Glow)
+    overlay = Image.new('RGBA', (STORY_W, STORY_H), (0,0,0,0))
+    od = ImageDraw.Draw(overlay)
+    od.ellipse([STORY_W-400, 100, STORY_W+200, 700], fill=(56, 189, 248, 40)) # Sky 400
+    od.ellipse([-200, STORY_H-600, 400, STORY_H+100], fill=(250, 204, 21, 30)) # Yellow 400
+    img.paste(overlay, (0,0), overlay)
+    img = img.filter(ImageFilter.GaussianBlur(radius=50))
+    d = ImageDraw.Draw(img) # Re-bind draw after filter
+
+    # 2. Fonts
+    f_title = _load_font(FONT_BOLD, 80)
+    f_city  = _load_font(FONT_BOLD, 120)
+    f_label = _load_font(FONT_REG, 45)
+    f_time  = _load_font(FONT_BOLD, 75)
+    f_footer = _load_font(FONT_REG, 35)
+
+    # 3. Header
+    d.text((STORY_W//2, 250), "NAMAZ VAKİTLERİ", font=f_title, fill=(255, 255, 255), anchor="mm")
+    d.text((STORY_W//2, 380), sehir.upper(), font=f_city, fill=(250, 204, 21), anchor="mm")
+
+    # 4. Vakit Cards (Glassmorphism look)
+    vakit_keys = [
+        ('imsak', 'İMSAK'), ('gunes', 'GÜNEŞ'), ('ogle', 'ÖĞLE'),
+        ('ikindi', 'İKİNDİ'), ('aksam', 'AKŞAM'), ('yatsi', 'YATSI')
+    ]
+    
+    start_y = 550
+    card_h = 160
+    card_w = 800
+    gap = 40
+    
+    for i, (key, label) in enumerate(vakit_keys):
+        cy = start_y + i * (card_h + gap)
+        cx1, cy1 = (STORY_W - card_w)//2, cy
+        cx2, cy2 = cx1 + card_w, cy1 + card_h
+        
+        # Card Background (Semi-transparent)
+        d.rounded_rectangle([cx1, cy1, cx2, cy2], radius=30, fill=(255, 255, 255, 15), outline=(255, 255, 255, 30), width=2)
+        
+        # Label & Time
+        d.text((cx1 + 60, cy1 + card_h//2), label, font=f_label, fill=(203, 213, 225), anchor="lm")
+        d.text((cx2 - 60, cy1 + card_h//2), vakitler.get(key, '--:--'), font=f_time, fill=(255, 255, 255), anchor="rm")
+
+    # 5. Footer
+    d.text((STORY_W//2, STORY_H - 150), "cagrivakti.com.tr", font=f_footer, fill=(148, 163, 184), anchor="mm")
+    
+    # Accent Line at bottom
+    d.rectangle([STORY_W//2 - 100, STORY_H - 100, STORY_W//2 + 100, STORY_H - 95], fill=(250, 204, 21))
+
+    return img
+
+# ─────────────────────────────────────────────────────────────────────────────
 # FLASK ROUTE
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -338,6 +419,26 @@ def og_image():
     prompt   = request.args.get('prompt',   'cagrivakti.com.tr')[:60]
     domain   = request.args.get('domain',   'cagrivakti.com.tr')[:50]
 
+    # --- ÖZEL STORY MODU ---
+    if theme == 'share-vakit-story':
+        sehir = request.args.get('sehir', 'İstanbul')
+        # Vakitleri query string'den al (imsak:05:30,gunes:07:00...)
+        vakit_str = request.args.get('vakitler', '')
+        vakit_dict = {}
+        if vakit_str:
+            for item in vakit_str.split(','):
+                if ':' in item:
+                    k, v = item.split(':', 1)
+                    vakit_dict[k] = v
+        
+        img = make_story_vakit(sehir, vakit_dict)
+        buf = io.BytesIO()
+        img.save(buf, 'PNG', optimize=True)
+        resp = send_file(io.BytesIO(buf.getvalue()), mimetype='image/png')
+        resp.headers['Cache-Control'] = 'public, max-age=3600'
+        return resp
+
+    # --- STANDART OG MODU ---
     # Sadece ikon parametresini Unicode kaçış dizilerinden arındır
     try:
         if icon:

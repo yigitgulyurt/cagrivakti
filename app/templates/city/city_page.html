@@ -81,6 +81,12 @@
     <header class="header">
         <h1>{{ get_display_name(sehir) }}</h1>
         <div class="header-buttons">
+            <button class="btn btn-primary btn-share" 
+                    id="btn-share-vakit"
+                    title="Bugünkü Vakitleri Görsel Olarak Paylaş">
+                <svg class="icon" aria-hidden="true"><use xlink:href="#fa-share-nodes"></use></svg>
+                <span>Paylaş</span>
+            </button>
             <a href="{{ url_for('views.index') }}"
                class="btn btn-secondary"
                title="Ana Sayfaya Dön">
@@ -757,6 +763,36 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         }, 60_000);
     } catch (e) { /* sessionStorage not available */ }
+
+    // Görsel Paylaş Butonu Mantığı
+    const shareBtn = document.getElementById('btn-share-vakit');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', function() {
+            if (!ezanVakitleri) return;
+
+            const sehirAdi = "{{ get_display_name(sehir) }}";
+            const imsak    = ezanVakitleri.imsak;
+            const gunes    = ezanVakitleri.gunes;
+            const ogle     = ezanVakitleri.ogle;
+            const ikindi   = ezanVakitleri.ikindi;
+            const aksam    = ezanVakitleri.aksam;
+            const yatsi    = ezanVakitleri.yatsi;
+
+            const shareUrl = new URL('/og-image', window.location.origin);
+            shareUrl.searchParams.set('theme', 'share-vakit-story');
+            shareUrl.searchParams.set('sehir', sehirAdi);
+            
+            // Vakitleri virgülle ayrılmış key:value şeklinde gönder
+            const vakitParam = [
+                `imsak:${imsak}`, `gunes:${gunes}`, `ogle:${ogle}`,
+                `ikindi:${ikindi}`, `aksam:${aksam}`, `yatsi:${yatsi}`
+            ].join(',');
+            shareUrl.searchParams.set('vakitler', vakitParam);
+
+            // Görseli yeni sekmede aç
+            window.open(shareUrl.toString(), '_blank');
+        });
+    }
 });
 
 
