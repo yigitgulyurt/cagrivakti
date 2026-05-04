@@ -133,26 +133,6 @@
 
     {% block extra_css %}{% endblock %}
 
-    <style>
-        /* SPA Progress Bar */
-        #spa-progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), #ffd700);
-            z-index: 9999;
-            transition: width 0.3s ease, opacity 0.3s ease;
-            box-shadow: 0 0 10px var(--primary);
-            pointer-events: none;
-            opacity: 0;
-        }
-        #spa-progress-bar.loading {
-            opacity: 1;
-        }
-    </style>
-
     {# ---- PWA Service Worker registration ---- #}
     <script>
     if ('serviceWorker' in navigator) {
@@ -173,7 +153,6 @@
 </head>
 
 <body>
-    <div id="spa-progress-bar"></div>
 
     {# ================================================================
        INLINE SCRIPT: localStorage hygiene
@@ -414,194 +393,6 @@
        ================================================================ #}
     <script>
     /* ----------------------------------------------------------------
-       SEAMLESS SPA ENGINE (Yiğit Gülyurt)
-       ---------------------------------------------------------------- */
-    (function() {
-        const progressBar = document.getElementById('spa-progress-bar');
-        const mainContent = document.getElementById('main-content');
-        
-        function updateProgress(percent) {
-            if (progressBar) {
-                progressBar.classList.add('loading');
-                progressBar.style.width = percent + '%';
-                if (percent >= 100) {
-                    setTimeout(() => {
-                        progressBar.classList.remove('loading');
-                        progressBar.style.width = '0%';
-                    }, 300);
-                }
-            }
-        }
-
-        async function loadPage(url, pushState = true) {
-            updateProgress(30);
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Network response was not ok');
-                
-                updateProgress(60);
-                const html = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                
-                // Update Title
-                document.title = doc.title;
-                
-                // Update SEO Meta Tags
-                const metaTags = ['description', 'keywords', 'og:title', 'og:description', 'og:image', 'og:url', 'twitter:title', 'twitter:description', 'twitter:image'];
-                metaTags.forEach(name => {
-                    const oldMeta = document.querySelector(`meta[name="${name}"], meta[property="${name}"]`);
-                    const newMeta = doc.querySelector(`meta[name="${name}"], meta[property="${name}"]`);
-                    if (oldMeta && newMeta) oldMeta.setAttribute('content', newMeta.getAttribute('content'));
-                });
-
-                // Update Main Content
-                const newMainContent = doc.getElementById('main-content');
-                if (newMainContent && mainContent) {
-                    mainContent.innerHTML = newMainContent.innerHTML;
-                }
-
-                // Update Footer Scripts Container
-                const footerScripts = document.getElementById('spa-footer-scripts');
-                const newFooterScripts = doc.getElementById('spa-footer-scripts');
-                if (footerScripts && newFooterScripts) {
-                    footerScripts.innerHTML = newFooterScripts.innerHTML;
-                }
-
-                window.scrollTo(0, 0);
-
-                // --- DYNAMIC ASSET MANAGEMENT ---
-                
-                // 1. Update Dynamic CSS (extra_css block)
-                // We identify these by looking for styles/links that are NOT in the initial base.html
-                const currentStyles = Array.from(document.head.querySelectorAll('link[rel="stylesheet"], style'));
-                const newStyles     = Array.from(doc.head.querySelectorAll('link[rel="stylesheet"], style'));
-                
-                newStyles.forEach(newStyle => {
-                    const isNew = !currentStyles.some(oldStyle => 
-                        (newStyle.href && oldStyle.href === newStyle.href) || 
-                        (newStyle.innerHTML && oldStyle.innerHTML === newStyle.innerHTML)
-                    );
-                    if (isNew) document.head.appendChild(newStyle.cloneNode(true));
-                });
-
-                // 2. Update Dynamic Scripts (footer_js block and others)
-                const currentScripts = Array.from(document.querySelectorAll('script[src]'));
-                const newScripts     = Array.from(doc.querySelectorAll('script'));
-
-                // Sort scripts: External scripts first, then inline scripts
-                const sortedScripts = [
-                    ...newScripts.filter(s => s.src),
-                    ...newScripts.filter(s => !s.src)
-                ];
-
-                for (const script of sortedScripts) {
-                    const isExternal = script.src;
-                    const isNewExternal = isExternal && !currentScripts.some(old => old.src === script.src);
-                    
-                    // IMPORTANT: Skip scripts that are already in the layout (base.html)
-                     // We identify these by checking if they are outside the #main-content and #spa-footer-scripts in the new doc
-                     const isLayoutScript = !script.closest('#main-content') && !script.closest('#spa-footer-scripts');
-                    
-                    if (isNewExternal) {
-                        await new Promise((resolve, reject) => {
-                            const newScript = document.createElement('script');
-                            Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                            newScript.onload = resolve;
-                            newScript.onerror = reject;
-                            document.body.appendChild(newScript);
-                        });
-                    } else if (!isExternal && !isLayoutScript) {
-                        // For inline scripts, we wrap them in a block to prevent const/let redeclaration errors
-                        // and only execute if they are not already present or are page-specific.
-                        const newScript = document.createElement('script');
-                        Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                        
-                        // Wrap in a block and add a sourceURL for easier debugging
-                        newScript.text = `{\n${script.text}\n}\n//# sourceURL=spa-injected-${Date.now()}.js`;
-                        document.body.appendChild(newScript);
-                    }
-                }
-
-                // Update Canonical
-                const oldCanonical = document.querySelector('link[rel="canonical"]');
-                const newCanonical = doc.querySelector('link[rel="canonical"]');
-                if (oldCanonical && newCanonical) oldCanonical.setAttribute('href', newCanonical.getAttribute('href'));
-
-                // Handle History
-                if (pushState) history.pushState({ url }, doc.title, url);
-                
-                /* --- SCRIPT RE-EXECUTION REMOVED (Handled by dynamic asset management) --- */
-
-                // Re-initialize global features
-                if (typeof window.initPageFeatures === 'function') window.initPageFeatures();
-                
-                // Dispatch event for page-specific re-init
-                document.dispatchEvent(new CustomEvent('spa:page-loaded', { detail: { url, doc } }));
-
-                updateProgress(100);
-                
-                // Close mobile menu if open
-                const navLinks = document.getElementById('navLinks');
-                const navToggle = document.getElementById('navToggle');
-                if (navLinks && navLinks.classList.contains('active')) {
-                    navLinks.classList.remove('active');
-                    if (navToggle) navToggle.querySelector('use').setAttribute('xlink:href', '#fa-bars');
-                    document.body.style.overflow = 'auto';
-                }
-
-            } catch (error) {
-                console.error('SPA load error:', error);
-                window.location.href = url; // Fallback to normal load
-            }
-        }
-
-        // Intercept link clicks
-        document.addEventListener('click', e => {
-            const link = e.target.closest('a');
-            if (!link) return;
-            
-            const url = new URL(link.href, window.location.origin);
-            const isInternal = url.origin === window.location.origin;
-            const isNoSpa = link.classList.contains('no-spa') || link.getAttribute('target') === '_blank';
-            const isDownload = link.hasAttribute('download') || url.pathname.endsWith('.rmskin');
-
-            if (isInternal && !isNoSpa && !isDownload && !url.hash) {
-                e.preventDefault();
-                loadPage(link.href);
-            }
-        });
-
-        // Handle browser back/forward
-        window.addEventListener('popstate', e => {
-            if (e.state && e.state.url) {
-                loadPage(e.state.url, false);
-            } else {
-                window.location.reload();
-            }
-        });
-
-        // Handle form submissions (optional but good for seamlessness)
-        document.addEventListener('submit', async e => {
-            const form = e.target;
-            if (form.method.toLowerCase() === 'get' && !form.classList.contains('no-spa')) {
-                e.preventDefault();
-                const formData = new FormData(form);
-                const params = new URLSearchParams(formData).toString();
-                const url = form.action + '?' + params;
-                loadPage(url);
-            }
-        });
-
-        // Initial re-init function
-        window.initPageFeatures = function() {
-            // Re-run any global logic that needs to bind to new elements
-            console.log('Global features re-initialized');
-        };
-
-    })();
-
-    /* ----------------------------------------------------------------
        Online / offline status logging
        ---------------------------------------------------------------- */
     function updateOnlineStatus() {
@@ -631,28 +422,26 @@
     /* ----------------------------------------------------------------
        City name helpers  (Turkish display ↔ Latin API name)
        ---------------------------------------------------------------- */
-    if (typeof window.CITY_DISPLAY_MAPPING_GLOBAL === 'undefined') {
-        window.CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse(
-            '{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}'
-        );
-        window.REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
-            Object.entries(window.CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
-        );
+    const CITY_DISPLAY_MAPPING_GLOBAL = JSON.parse(
+        '{{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }}'
+    );
+    const REVERSE_CITY_MAPPING_GLOBAL = Object.fromEntries(
+        Object.entries(CITY_DISPLAY_MAPPING_GLOBAL).map(([latin, turkish]) => [turkish, latin])
+    );
 
-        window.getLatinNameGlobal = function(turkishName) {
-            if (window.REVERSE_CITY_MAPPING_GLOBAL[turkishName]) {
-                return window.REVERSE_CITY_MAPPING_GLOBAL[turkishName];
-            }
-            const charMap = {
-                'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G',
-                'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O',
-                'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U',
-            };
-            return turkishName
-                .split('').map(c => charMap[c] || c).join('')
-                .replace(/\s+/g, '-')
-                .replace(/[^A-Za-z0-9\-]/g, '');
+    function getLatinNameGlobal(turkishName) {
+        if (REVERSE_CITY_MAPPING_GLOBAL[turkishName]) {
+            return REVERSE_CITY_MAPPING_GLOBAL[turkishName];
+        }
+        const charMap = {
+            'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G',
+            'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O',
+            'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U',
         };
+        return turkishName
+            .split('').map(c => charMap[c] || c).join('')
+            .replace(/\s+/g, '-')
+            .replace(/[^A-Za-z0-9\-]/g, '');
     }
 
 
@@ -918,9 +707,7 @@
     }
     </script>
 
-    <div id="spa-footer-scripts">
-        {% block footer_js %}{% endblock %}
-    </div>
+    {% block footer_js %}{% endblock %}
 
 </body>
 </html>
