@@ -350,7 +350,7 @@
 {% endblock %}
 
 {% block footer_js %}
-<script src="https://js.yigitgulyurt.net.tr/city-data.js" defer></script>
+<script src="https://js.yigitgulyurt.net.tr/city-data.js?{{ app_version }}" defer></script>
 <script>
     $(document).ready(function() {
         const CITY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }};
