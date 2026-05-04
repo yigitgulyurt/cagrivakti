@@ -53,7 +53,7 @@ def setup_middleware(app):
             # Not: 'self' ve '*' birlikte kullanımı bazı tarayıcılarda (Firefox/Zen) sorun yaratabilir, sadece '*' yeterlidir.
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr; "
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr; "
                 "font-src 'self' https://fonts.yigitgulyurt.net.tr; "
                 "img-src 'self' data: https:; "
@@ -92,7 +92,7 @@ def setup_middleware(app):
             # frame-src 'self' *: Kendi sitemizdeki iframe'lerin çalışmasına izin ver (Önizleme vb. için)
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr; "
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr; "
                 "font-src 'self' https://fonts.yigitgulyurt.net.tr; "
                 "img-src 'self' data: https:; "
