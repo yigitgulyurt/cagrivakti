@@ -34,6 +34,25 @@ const PAGE_ASSETS = [
     '/Mustafa-Kemal-Ataturk',
 ];
 
+// ── Cross-origin subdomain dosyaları (js. ve css.yigitgulyurt.net.tr) ────────
+// Buraya çektiğin JS dosyalarının tam URL'lerini ekle.
+// Örnek: 'https://js.yigitgulyurt.net.tr/jquery.min.js'
+const JS_ASSETS = [
+    'https://js.yigitgulyurt.net.tr/cagrivakti/jquery.cagrivakti.js?v={{ app_version }}',
+    'https://js.yigitgulyurt.net.tr/cagrivakti/inappredirect.cagrivakti.js?v={{ app_version }}',
+    'https://js.yigitgulyurt.net.tr/cagrivakti/city-data.cagrivakti.js?v={{ app_version }}'
+];
+
+// Buraya çektiğin CSS dosyalarının tam URL'lerini ekle.
+// Örnek: 'https://css.yigitgulyurt.net.tr/main.css'
+const CSS_ASSETS = [
+    'https://css.yigitgulyurt.net.tr/cagrivakti/main.cagrivakti.css?v={{ app_version }}',
+];
+
+// JS_ASSETS ve CSS_ASSETS'i Request objelerine çevir (cross-origin için zorunlu)
+const CROSS_ORIGIN_REQUESTS = [...JS_ASSETS, ...CSS_ASSETS].map(
+    (url) => new Request(url, { mode: 'cors', credentials: 'omit' })
+);
 
 // ── Hiç önbelleğe alınmayacak URL'ler (tam eşleşme veya prefix) ─────────────
 const NO_CACHE_URLS = [
@@ -47,7 +66,7 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             console.log('[SW] Pre-caching critical assets');
-            return cache.addAll([...STATIC_ASSETS, ...PAGE_ASSETS]);
+            return cache.addAll([...STATIC_ASSETS, ...PAGE_ASSETS, ...CROSS_ORIGIN_REQUESTS]);
         }).then(() => self.skipWaiting())
     );
 });
@@ -148,6 +167,35 @@ self.addEventListener('fetch', (event) => {
                         headers: { 'Content-Type': 'application/json' }
                     });
                 })
+        );
+        return;
+    }
+
+    // ── js. ve css.yigitgulyurt.net.tr — Stale-While-Revalidate ─────────────
+    if (
+        url.hostname === 'js.yigitgulyurt.net.tr' ||
+        url.hostname === 'css.yigitgulyurt.net.tr'
+    ) {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                const fetchPromise = fetch(event.request, { mode: 'cors', credentials: 'omit' })
+                    .then((networkResponse) => {
+                        if (networkResponse && networkResponse.status === 200) {
+                            caches.open(CACHE_NAME).then((cache) => {
+                                cache.put(event.request, networkResponse.clone());
+                            });
+                        }
+                        return networkResponse;
+                    })
+                    .catch(() => {
+                        if (cachedResponse) {
+                            console.warn('[SW] Cross-origin fetch failed, serving from cache:', event.request.url);
+                            return cachedResponse;
+                        }
+                    });
+
+                return cachedResponse || fetchPromise;
+            })
         );
         return;
     }
