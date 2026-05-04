@@ -767,34 +767,65 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Görsel Paylaş Butonu Mantığı
     const shareBtn = document.getElementById('btn-share-vakit');
     if (shareBtn) {
-        shareBtn.addEventListener('click', function() {
+        shareBtn.addEventListener('click', async function() {
             if (!ezanVakitleri) return;
 
-            const sehirAdi = "{{ get_display_name(sehir) }}";
-            const imsak    = ezanVakitleri.imsak;
-            const gunes    = ezanVakitleri.gunes;
-            const ogle     = ezanVakitleri.ogle;
-            const ikindi   = ezanVakitleri.ikindi;
-            const aksam    = ezanVakitleri.aksam;
-            const yatsi    = ezanVakitleri.yatsi;
+            const originalContent = shareBtn.innerHTML;
+            shareBtn.disabled = true;
+            shareBtn.innerHTML = `<svg class="icon spin"><use xlink:href="#fa-sync"></use></svg> <span>Hazırlanıyor...</span>`;
 
-            const shareUrl = new URL('/paylas/vakit', window.location.origin);
-            shareUrl.searchParams.set('sehir', sehirAdi);
-            
-            // Bugünün tarihini al
-            const options = { day: 'numeric', month: 'long', year: 'numeric' };
-            const todayStr = new Date().toLocaleDateString('tr-TR', options);
-            shareUrl.searchParams.set('tarih', todayStr);
-            
-            // Vakitleri virgülle ayrılmış key:value şeklinde gönder
-            const vakitParam = [
-                `imsak:${imsak}`, `gunes:${gunes}`, `ogle:${ogle}`,
-                `ikindi:${ikindi}`, `aksam:${aksam}`, `yatsi:${yatsi}`
-            ].join(',');
-            shareUrl.searchParams.set('vakitler', vakitParam);
+            try {
+                const sehirAdi = "{{ get_display_name(sehir) }}";
+                const imsak    = ezanVakitleri.imsak;
+                const gunes    = ezanVakitleri.gunes;
+                const ogle     = ezanVakitleri.ogle;
+                const ikindi   = ezanVakitleri.ikindi;
+                const aksam    = ezanVakitleri.aksam;
+                const yatsi    = ezanVakitleri.yatsi;
 
-            // Görseli yeni sekmede aç
-            window.open(shareUrl.toString(), '_blank');
+                // Bugünün tarihini al
+                const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                const todayStr = new Date().toLocaleDateString('tr-TR', options);
+                
+                const vakitParam = [
+                    `imsak:${imsak}`, `gunes:${gunes}`, `ogle:${ogle}`,
+                    `ikindi:${ikindi}`, `aksam:${aksam}`, `yatsi:${yatsi}`
+                ].join(',');
+
+                const shareUrl = new URL('/paylas/vakit', window.location.origin);
+                shareUrl.searchParams.set('sehir', sehirAdi);
+                shareUrl.searchParams.set('tarih', todayStr);
+                shareUrl.searchParams.set('vakitler', vakitParam);
+
+                // 1. Görseli Blob olarak çek
+                const response = await fetch(shareUrl.toString());
+                const blob = await response.blob();
+                const fileName = `${sehirAdi.toLowerCase()}-namaz-vakitleri.png`;
+                const file = new File([blob], fileName, { type: 'image/png' });
+
+                // 2. Web Share API desteği kontrolü (Dosya paylaşımı için)
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: `${sehirAdi} Namaz Vakitleri`,
+                        text: `${sehirAdi} için bugünkü namaz vakitleri. @cagrivakti`
+                    });
+                } else {
+                    // 3. Fallback: İndirme işlemi
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = fileName;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                }
+            } catch (err) {
+                console.error('Paylaşım hatası:', err);
+                alert('Görsel hazırlanırken bir hata oluştu.');
+            } finally {
+                shareBtn.disabled = false;
+                shareBtn.innerHTML = originalContent;
+            }
         });
     }
 });
