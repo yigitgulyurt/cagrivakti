@@ -1,8 +1,10 @@
 // Service Worker - Ezan Vakitleri
 /* global VERSION */
-const CACHE_NAME = `ezan-vakitleri-V${VERSION}`;
-const API_CACHE_NAME = `api-cache-V${VERSION}`;
-const GAME_CACHE_NAME = `game-cache-V${VERSION}`;
+const STATIC_CACHE = `cv-static-v${VERSION}`;
+const API_CACHE    = `cv-api-v${VERSION}`;
+const GAME_CACHE   = `cv-game-v${VERSION}`;
+const JS_CACHE     = `cv-js-v${VERSION}`;
+const CSS_CACHE    = `cv-css-v${VERSION}`;
 
 // ── Statik dosyalar (İkonlar) ──────────────────────────────────────────────
 const STATIC_ASSETS = [
@@ -46,7 +48,10 @@ const CSS_ASSETS = [
 ];
 
 // JS_ASSETS ve CSS_ASSETS'i Request objelerine çevir (cross-origin için zorunlu)
-const CROSS_ORIGIN_REQUESTS = [...JS_ASSETS, ...CSS_ASSETS].map(
+const JS_REQUESTS = JS_ASSETS.map(
+    (url) => new Request(url, { mode: 'cors', credentials: 'omit' })
+);
+const CSS_REQUESTS = CSS_ASSETS.map(
     (url) => new Request(url, { mode: 'cors', credentials: 'omit' })
 );
 
@@ -60,10 +65,20 @@ const NO_CACHE_URLS = [
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('[SW] Pre-caching critical assets');
-            return cache.addAll([...STATIC_ASSETS, ...PAGE_ASSETS, ...CROSS_ORIGIN_REQUESTS]);
-        }).then(() => self.skipWaiting())
+        Promise.all([
+            caches.open(STATIC_CACHE).then((cache) => {
+                console.log('[SW] Pre-caching static assets');
+                return cache.addAll([...STATIC_ASSETS, ...PAGE_ASSETS]);
+            }),
+            caches.open(JS_CACHE).then((cache) => {
+                console.log('[SW] Pre-caching JS assets');
+                return cache.addAll(JS_REQUESTS);
+            }),
+            caches.open(CSS_CACHE).then((cache) => {
+                console.log('[SW] Pre-caching CSS assets');
+                return cache.addAll(CSS_REQUESTS);
+            })
+        ]).then(() => self.skipWaiting())
     );
 });
 
@@ -71,9 +86,10 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
+            const allowedCaches = [STATIC_CACHE, API_CACHE, GAME_CACHE, JS_CACHE, CSS_CACHE];
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME && cacheName !== GAME_CACHE_NAME) {
+                    if (!allowedCaches.includes(cacheName)) {
                         console.log('[SW] Removing old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
@@ -118,7 +134,7 @@ self.addEventListener('fetch', (event) => {
     // Oyun dosyaları — ayrı GAME_CACHE, Stale-While-Revalidate
     if (url.pathname.startsWith('/kaynak/under-the-red-sky/')) {
         event.respondWith(
-            caches.open(GAME_CACHE_NAME).then((cache) => {
+            caches.open(GAME_CACHE).then((cache) => {
                 return cache.match(event.request).then((cachedResponse) => {
                     const fetchPromise = fetch(event.request).then((networkResponse) => {
                         if (networkResponse && networkResponse.status === 200) {
@@ -146,7 +162,7 @@ self.addEventListener('fetch', (event) => {
                 .then((response) => {
                     if (response.ok) {
                         const responseClone = response.clone();
-                        caches.open(API_CACHE_NAME).then((cache) => {
+                        caches.open(API_CACHE).then((cache) => {
                             cache.put(event.request, responseClone);
                         });
                     }
@@ -172,12 +188,14 @@ self.addEventListener('fetch', (event) => {
         url.hostname === 'js.yigitgulyurt.net.tr' ||
         url.hostname === 'css.yigitgulyurt.net.tr'
     ) {
+        const targetCacheName = url.hostname === 'js.yigitgulyurt.net.tr' ? JS_CACHE : CSS_CACHE;
+
         event.respondWith(
             caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
                 const fetchPromise = fetch(event.request, { mode: 'cors', credentials: 'omit' })
                     .then((networkResponse) => {
                         if (networkResponse && networkResponse.status === 200) {
-                            caches.open(CACHE_NAME).then((cache) => {
+                            caches.open(targetCacheName).then((cache) => {
                                 cache.put(event.request, networkResponse.clone());
                             });
                         }
@@ -185,7 +203,7 @@ self.addEventListener('fetch', (event) => {
                     })
                     .catch(() => {
                         if (cachedResponse) {
-                            console.warn('[SW] Cross-origin fetch failed, serving from cache:', event.request.url);
+                            console.warn(`[SW] ${url.hostname} fetch failed, serving from cache:`, event.request.url);
                             return cachedResponse;
                         }
                     });
@@ -206,7 +224,7 @@ self.addEventListener('fetch', (event) => {
                         !response.url.includes('/kaynak/') &&
                         !response.url.includes('/canli-kaynak/')) {
                         const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
+                        caches.open(STATIC_CACHE).then((cache) => {
                             cache.put(event.request, responseClone);
                         });
                     }
@@ -243,7 +261,7 @@ self.addEventListener('fetch', (event) => {
                 .then((networkResponse) => {
                     if (networkResponse && networkResponse.status === 200) {
                         const responseToCache = networkResponse.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
+                        caches.open(STATIC_CACHE).then((cache) => {
                             cache.put(event.request, responseToCache);
                         });
                     }
