@@ -125,7 +125,7 @@
 
     {# ---- Main CSS bundle ---- #}
     {% assets "css_main" %}
-    <link rel="stylesheet" href="app/static/css/main.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     {% endassets %}
 
     {# ---- Preconnect to API ---- #}
@@ -384,8 +384,8 @@
 
     {# ---- Main JS bundle ---- #}
     {% assets "js_main" %}
-    <script src="app/static/js/jquery-cagrivakti.js"></script>
-    <script src="app/static/js/inappredirect-cagrivakti.js"></script>
+    <script src="{{ url_for('static', filename='js/jquery-cagrivakti.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/inappredirect-cagrivakti.js') }}"></script>
     {% endassets %}
 
     {# ================================================================
