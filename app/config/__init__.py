@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    APP_VERSION = "3.02"
+    APP_VERSION = "3.03"
     # Tek versiyon kaynağı: APP_VERSION
     SEND_FILE_MAX_AGE_DEFAULT = 31536000 # Flask static dosya cache süresi (1 Yıl)
     SERVER_NAME = os.environ.get('SERVER_NAME')
