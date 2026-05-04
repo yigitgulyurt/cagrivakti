@@ -665,25 +665,90 @@ to {
     font-size: 0.9rem;
 }
 
-.footer-creator {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.75rem;
+.creator-signature {
+    margin-top: 10px;
     margin-bottom: 20px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    font-weight: 300;
-    font-style: italic;
-    opacity: 0.8;
-}
-
-.footer-creator a {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 100px;
     text-decoration: none;
-    transition: var(--transition);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
 }
 
-.footer-creator a:hover {
-    color: var(--primary) !important;
-    text-shadow: 0 0 10px rgba(227, 10, 23, 0.4);
+.creator-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    background: var(--primary);
+    color: var(--dark);
+    border-radius: 4px;
+    line-height: 1;
+}
+
+.creator-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray);
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+.creator-text .highlight {
+    color: var(--text);
+    transition: color 0.3s ease;
+}
+
+.creator-signature .arrow {
+    width: 14px;
+    height: 14px;
+    color: var(--primary);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+.creator-signature:hover {
+    background: rgba(255, 193, 7, 0.08);
+    border-color: rgba(255, 193, 7, 0.3);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.creator-signature:hover .creator-text {
+    color: var(--text);
+}
+
+.creator-signature:hover .creator-text .highlight {
+    color: var(--primary);
+}
+
+.creator-signature:hover .arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.creator-signature::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 193, 7, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.creator-signature:hover::after {
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -1046,9 +1111,6 @@ to {
     color: var(--primary);
 }
 
-.footer-creator {
-    margin-top: 10px;
-}
 
 .footer-copy {
     font-size: 0.9rem;
