@@ -1,4 +1,4 @@
-@import url('https://fonts.yigitgulyurt.net.tr/Montserrat/montserrat.css');
+@import url('https://fonts.yigitgulyurt.net.tr/Montserrat/montserrat.css?v={{ app_version }}');
 :root {
     --primary: #ffc107;
     --primary-hover: #ffd54f;
