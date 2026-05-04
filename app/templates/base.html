@@ -462,6 +462,39 @@
                     window.scrollTo(0, 0);
                 }
 
+                // --- DYNAMIC ASSET MANAGEMENT ---
+                
+                // 1. Update Dynamic CSS (extra_css block)
+                // We identify these by looking for styles/links that are NOT in the initial base.html
+                const currentStyles = Array.from(document.head.querySelectorAll('link[rel="stylesheet"], style'));
+                const newStyles     = Array.from(doc.head.querySelectorAll('link[rel="stylesheet"], style'));
+                
+                newStyles.forEach(newStyle => {
+                    const isNew = !currentStyles.some(oldStyle => 
+                        (newStyle.href && oldStyle.href === newStyle.href) || 
+                        (newStyle.innerHTML && oldStyle.innerHTML === newStyle.innerHTML)
+                    );
+                    if (isNew) document.head.appendChild(newStyle.cloneNode(true));
+                });
+
+                // 2. Update Dynamic Scripts (footer_js block and others)
+                const currentScripts = Array.from(document.querySelectorAll('script[src]'));
+                const newScripts     = Array.from(doc.querySelectorAll('script'));
+
+                newScripts.forEach(script => {
+                    // Re-run inline scripts or load new external scripts
+                    const isExternal = script.src;
+                    const isNewExternal = isExternal && !currentScripts.some(old => old.src === script.src);
+                    const isInline = !isExternal && (script.closest('#main-content') || script.innerHTML.length > 0);
+
+                    if (isNewExternal || isInline) {
+                        const newScript = document.createElement('script');
+                        Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        if (!isExternal) newScript.appendChild(document.createTextNode(script.innerHTML));
+                        document.body.appendChild(newScript);
+                    }
+                });
+
                 // Update Canonical
                 const oldCanonical = document.querySelector('link[rel="canonical"]');
                 const newCanonical = doc.querySelector('link[rel="canonical"]');
@@ -470,14 +503,7 @@
                 // Handle History
                 if (pushState) history.pushState({ url }, doc.title, url);
                 
-                // Re-execute scripts in the new content
-                const scripts = mainContent.querySelectorAll('script');
-                scripts.forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
-                });
+                /* --- SCRIPT RE-EXECUTION REMOVED (Handled by dynamic asset management) --- */
 
                 // Re-initialize global features
                 if (typeof window.initPageFeatures === 'function') window.initPageFeatures();
