@@ -4,11 +4,8 @@ const CACHE_NAME = `ezan-vakitleri-V${VERSION}`;
 const API_CACHE_NAME = `api-cache-V${VERSION}`;
 const GAME_CACHE_NAME = `game-cache-V${VERSION}`;
 
-// ── Statik dosyalar (JS, CSS, ikonlar) ──────────────────────────────────────
+// ── Statik dosyalar (İkonlar) ──────────────────────────────────────────────
 const STATIC_ASSETS = [
-    '/static/js/city-data.js',
-    '/static/js/html5-qrcode.min.js',
-    '/static/js/jquery-cagrivakti.js',
     '/static/icons/favicon.ico',
     '/static/icons/ios/180.png',
     '/static/icons/android/android-launchericon-192-192.png',
@@ -30,7 +27,6 @@ const PAGE_ASSETS = [
     '/ilkelerimiz',
     '/bilgi-kosesi',
     '/asal-sayi',
-    '/qr-okuyucu',
     '/Mustafa-Kemal-Ataturk',
 ];
 
