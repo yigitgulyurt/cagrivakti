@@ -164,7 +164,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // ── Fontlar (Google Fonts & fonts.yigitgulyurt.net.tr) — Cache-First ───
+    // ── Fontlar (Google Fonts & fonts.yigitgulyurt.net.tr) ───
     if (
         url.hostname === 'fonts.googleapis.com' ||
         url.hostname === 'fonts.gstatic.com' ||
@@ -172,12 +172,10 @@ self.addEventListener('fetch', (event) => {
     ) {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
-                if (cachedResponse) return cachedResponse;
-
-                // Fontlar cross-origin olduğu için mode: 'cors' zorunludur
-                return fetch(event.request.url, { mode: 'cors', credentials: 'omit' })
+                // Fontlar için Stale-While-Revalidate stratejisi daha güvenlidir
+                const fetchPromise = fetch(event.request)
                     .then((networkResponse) => {
-                        if (networkResponse && networkResponse.status === 200) {
+                        if (networkResponse && networkResponse.ok) {
                             const responseClone = networkResponse.clone();
                             caches.open(CACHE_NAME).then((cache) => {
                                 cache.put(event.request, responseClone);
@@ -186,11 +184,11 @@ self.addEventListener('fetch', (event) => {
                         return networkResponse;
                     })
                     .catch((err) => {
-                         console.error('[SW] Font fetch failed:', err);
-                         // NetworkError durumunda promise'i reject etmek yerine 
-                         // tarayıcının kendi hata yönetimini tetiklemesine izin veriyoruz
-                         return fetch(event.request); 
-                     });
+                        console.warn('[SW] Font fetch failed, using cache if available:', err);
+                        return cachedResponse; // Cache yoksa undefined döner, tarayıcı hata verir ama INTERCEPTION_FAILED olmaz
+                    });
+
+                return cachedResponse || fetchPromise;
             })
         );
         return;
