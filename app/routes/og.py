@@ -428,6 +428,27 @@ def make_story_vakit(sehir, vakitler, tarih_str=""):
 
     return img.convert('RGB') # Finalde JPEG/PNG için RGB'ye çevir
 
+@og_bp.route('/paylas/vakit')
+def paylas_vakit():
+    """Özel vakit paylaşım görseli rotası"""
+    sehir = request.args.get('sehir', 'İstanbul')
+    tarih = request.args.get('tarih', '')
+    vakit_str = request.args.get('vakitler', '')
+    
+    vakit_dict = {}
+    if vakit_str:
+        for item in vakit_str.split(','):
+            if ':' in item:
+                k, v = item.split(':', 1)
+                vakit_dict[k] = v
+    
+    img = make_story_vakit(sehir, vakit_dict, tarih)
+    buf = io.BytesIO()
+    img.save(buf, 'PNG', optimize=True)
+    resp = send_file(io.BytesIO(buf.getvalue()), mimetype='image/png')
+    resp.headers['Cache-Control'] = 'public, max-age=3600'
+    return resp
+
 # ─────────────────────────────────────────────────────────────────────────────
 # FLASK ROUTE
 # ─────────────────────────────────────────────────────────────────────────────
@@ -452,27 +473,6 @@ def og_image():
     prompt   = request.args.get('prompt',   'cagrivakti.com.tr')[:60]
     domain   = request.args.get('domain',   'cagrivakti.com.tr')[:50]
 
-    # --- ÖZEL STORY MODU ---
-    if theme == 'share-vakit-story':
-        sehir = request.args.get('sehir', 'İstanbul')
-        tarih = request.args.get('tarih', '')
-        # Vakitleri query string'den al (imsak:05:30,gunes:07:00...)
-        vakit_str = request.args.get('vakitler', '')
-        vakit_dict = {}
-        if vakit_str:
-            for item in vakit_str.split(','):
-                if ':' in item:
-                    k, v = item.split(':', 1)
-                    vakit_dict[k] = v
-        
-        img = make_story_vakit(sehir, vakit_dict, tarih)
-        buf = io.BytesIO()
-        img.save(buf, 'PNG', optimize=True)
-        resp = send_file(io.BytesIO(buf.getvalue()), mimetype='image/png')
-        resp.headers['Cache-Control'] = 'public, max-age=3600'
-        return resp
-
-    # --- STANDART OG MODU ---
     # Sadece ikon parametresini Unicode kaçış dizilerinden arındır
     try:
         if icon:

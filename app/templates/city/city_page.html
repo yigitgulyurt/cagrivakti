@@ -778,8 +778,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             const aksam    = ezanVakitleri.aksam;
             const yatsi    = ezanVakitleri.yatsi;
 
-            const shareUrl = new URL('/og-image', window.location.origin);
-            shareUrl.searchParams.set('theme', 'share-vakit-story');
+            const shareUrl = new URL('/paylas/vakit', window.location.origin);
             shareUrl.searchParams.set('sehir', sehirAdi);
             
             // Bugünün tarihini al
