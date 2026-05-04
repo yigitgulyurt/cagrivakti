@@ -376,16 +376,16 @@ def make_story_vakit(sehir, vakitler, tarih_str=""):
     f_footer = _load_font(FONT_REG, 38)
 
     # 3. Header & Tarih
-    d.text((STORY_W//2, 220), "NAMAZ VAKİTLERİ", font=f_title, fill=(255, 255, 255, 220), anchor="mm")
-    d.text((STORY_W//2, 360), sehir.upper(), font=f_city, fill=(250, 204, 21, 255), anchor="mm")
+    d.text((STORY_W//2, 180), "NAMAZ VAKİTLERİ", font=f_title, fill=(255, 255, 255, 200), anchor="mm")
+    d.text((STORY_W//2, 310), sehir.upper(), font=f_city, fill=(250, 204, 21, 255), anchor="mm")
     
     if tarih_str:
-        # Tarih için şık bir kapsül
+        # Tarih için şık bir kapsül - Daha koyu ve belirgin
         tw = d.textbbox((0, 0), tarih_str, font=f_date)[2]
-        tx1, ty1 = STORY_W//2 - tw//2 - 30, 440
-        tx2, ty2 = STORY_W//2 + tw//2 + 30, 510
-        d.rounded_rectangle([tx1, ty1, tx2, ty2], radius=35, fill=(255, 255, 255, 25))
-        d.text((STORY_W//2, 475), tarih_str, font=f_date, fill=(255, 255, 255, 200), anchor="mm")
+        tx1, ty1 = STORY_W//2 - tw//2 - 40, 400
+        tx2, ty2 = STORY_W//2 + tw//2 + 40, 475
+        d.rounded_rectangle([tx1, ty1, tx2, ty2], radius=38, fill=(0, 0, 0, 60), outline=(255, 255, 255, 40), width=2)
+        d.text((STORY_W//2, 438), tarih_str, font=f_date, fill=(255, 255, 255, 220), anchor="mm")
 
     # 4. Vakit Kartları (Gerçek Glassmorphism)
     vakit_keys = [
@@ -393,43 +393,38 @@ def make_story_vakit(sehir, vakitler, tarih_str=""):
         ('ikindi', 'İKİNDİ', '\uf0599'), ('aksam', 'AKŞAM', '\uf0510'), ('yatsi', 'YATSI', '\uf0510')
     ]
     
-    start_y = 580
-    card_h = 175
-    card_w = 880
-    gap = 35
+    start_y = 540
+    card_h = 165
+    card_w = 900
+    gap = 30
     
     for i, (key, label, icon_hex) in enumerate(vakit_keys):
         cy = start_y + i * (card_h + gap)
         cx1, cy1 = (STORY_W - card_w)//2, cy
         cx2, cy2 = cx1 + card_w, cy1 + card_h
         
-        # Kart Katmanı (Ayrı bir katmanda çizip paste ediyoruz ki saydamlık düzgün olsun)
+        # Kart Katmanı
         card_layer = Image.new('RGBA', (STORY_W, STORY_H), (0,0,0,0))
         cd = ImageDraw.Draw(card_layer)
         
-        # Cam efekti arka planı
-        cd.rounded_rectangle([cx1, cy1, cx2, cy2], radius=40, fill=(255, 255, 255, 25))
-        # İnce kenarlık
-        cd.rounded_rectangle([cx1, cy1, cx2, cy2], radius=40, outline=(255, 255, 255, 50), width=2)
+        # Cam efekti - Biraz daha koyu ve belirgin kenarlık
+        cd.rounded_rectangle([cx1, cy1, cx2, cy2], radius=45, fill=(255, 255, 255, 20))
+        cd.rounded_rectangle([cx1, cy1, cx2, cy2], radius=45, outline=(255, 255, 255, 60), width=2)
         
         img.alpha_composite(card_layer)
         
-        # Yazıları ana resme ekle (Kontrast için gölge efektiyle)
+        # Yazıları ekle
         time_val = vakitler.get(key, '--:--')
-        
-        # Etiket (Sol)
-        d.text((cx1 + 70, cy1 + card_h//2), label, font=f_label, fill=(226, 232, 240, 255), anchor="lm")
-        
-        # Saat (Sağ) - ÖNEMLİ: Beyaz kart üzerine beyaz yazmamak için renk sarı/amber seçildi
-        d.text((cx2 - 70, cy1 + card_h//2), time_val, font=f_time, fill=(255, 255, 255, 255), anchor="rm")
+        d.text((cx1 + 80, cy1 + card_h//2), label, font=f_label, fill=(226, 232, 240, 255), anchor="lm")
+        d.text((cx2 - 80, cy1 + card_h//2), time_val, font=f_time, fill=(255, 255, 255, 255), anchor="rm")
 
-    # 5. Footer
+    # 5. Footer - En alta kaydırıldı
     footer_text = "cagrivakti.com.tr"
-    d.text((STORY_W//2, STORY_H - 180), footer_text, font=f_footer, fill=(148, 163, 184, 180), anchor="mm")
+    d.text((STORY_W//2, STORY_H - 120), footer_text, font=f_footer, fill=(148, 163, 184, 180), anchor="mm")
     
     # Alt Dekoratif Çizgi
-    line_w = 150
-    d.rounded_rectangle([STORY_W//2 - line_w, STORY_H - 130, STORY_W//2 + line_w, STORY_H - 122], radius=4, fill=(250, 204, 21, 200))
+    line_w = 180
+    d.rounded_rectangle([STORY_W//2 - line_w, STORY_H - 70, STORY_W//2 + line_w, STORY_H - 62], radius=4, fill=(250, 204, 21, 200))
 
     return img.convert('RGB') # Finalde JPEG/PNG için RGB'ye çevir
 
