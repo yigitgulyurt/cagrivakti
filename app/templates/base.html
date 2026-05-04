@@ -133,6 +133,15 @@
 
     {% block extra_css %}{% endblock %}
 
+    <style>
+        /* View Transition API optimization */
+        @media (prefers-reduced-motion: no-preference) {
+            #main-content {
+                view-transition-name: main-content;
+            }
+        }
+    </style>
+
     {# ---- PWA Service Worker registration ---- #}
     <script>
     if ('serviceWorker' in navigator) {
@@ -153,6 +162,8 @@
 </head>
 
 <body>
+    {# Top progress bar for seamless transitions #}
+    <div id="loading-bar"></div>
 
     {# ================================================================
        INLINE SCRIPT: localStorage hygiene
@@ -240,11 +251,12 @@
             <a href="{{ url_for('views.indir') }}"                  class="nav-link" title="Çağrı Vakti Mobil Uygulamasını Ücretsiz İndirin">Uygulamayı İndir</a>
             <a href="{{ url_for('views.ilkelerimiz') }}"            class="nav-link" title="Yayın İlkelerimiz ve Değerlerimiz">İlkelerimiz</a>
             <a href="{{ url_for('views.iletisim') }}"               class="nav-link" title="Görüş, Öneri ve İletişim">İletişim</a>
-            <a href="{{ url_for('views.under_the_red_sky') }}"      class="nav-link" title="Oyun">Oyun</a>
+            <a href="{{ url_for('views.under_the_red_sky') }}"      class="nav-link" title="Oyun" data-no-instant>Oyun</a>
             <a href="{{ url_for('views.ataturk') }}"
                class="nav-link nav-link-ataturk"
                title="Ulu Önder Mustafa Kemal Atatürk'ü Saygıyla Anıyoruz"
-               style="color: #ff5252 !important; font-weight: 600;">Atatürk</a>
+               style="color: #ff5252 !important; font-weight: 600;"
+               data-no-instant>Atatürk</a>
         </div>
     </nav>
 
@@ -406,7 +418,7 @@
        City-aware manifest URL
        Appends ?city=<saved-city> for targeted caching / shortcuts.
        ---------------------------------------------------------------- */
-    window.addEventListener('DOMContentLoaded', () => {
+    function updateManifestUrl() {
         const cityMatch = document.cookie.match(/user_city=([^;]+)/);
         if (cityMatch && cityMatch[1]) {
             const manifestLink = document.querySelector('link[rel="manifest"]');
@@ -416,7 +428,9 @@
                 manifestLink.href = url.toString();
             }
         }
-    });
+    }
+    window.addEventListener('DOMContentLoaded', updateManifestUrl);
+    document.addEventListener('page:loaded', updateManifestUrl);
 
 
     /* ----------------------------------------------------------------
@@ -686,6 +700,16 @@
     const navToggle = document.getElementById('navToggle');
     const navLinks  = document.getElementById('navLinks');
 
+    function closeMobileMenu() {
+        if (navLinks && navLinks.classList.contains('active')) {
+            navLinks.classList.remove('active');
+            if (navToggle) {
+                navToggle.querySelector('use').setAttribute('xlink:href', '#fa-bars');
+            }
+            document.body.style.overflow = 'auto';
+        }
+    }
+
     if (navToggle && navLinks) {
         navToggle.addEventListener('click', () => {
             const isOpen = navLinks.classList.toggle('active');
@@ -698,13 +722,121 @@
 
         // Close the menu when any nav link is clicked
         navLinks.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                navToggle.querySelector('use').setAttribute('xlink:href', '#fa-bars');
-                document.body.style.overflow = 'auto';
-            });
+            link.addEventListener('click', closeMobileMenu);
         });
     }
+
+    /* ----------------------------------------------------------------
+       Seamless Page Transitions (Professional PJAX-like)
+       ---------------------------------------------------------------- */
+    const loadingBar = document.getElementById('loading-bar');
+
+    function updateLoadingBar(progress) {
+        if (!loadingBar) return;
+        loadingBar.style.opacity = '1';
+        loadingBar.style.width = progress + '%';
+        if (progress >= 100) {
+            setTimeout(() => {
+                loadingBar.style.opacity = '0';
+                setTimeout(() => { loadingBar.style.width = '0'; }, 400);
+            }, 200);
+        }
+    }
+
+    async function loadPage(url, pushState = true) {
+        updateLoadingBar(30);
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Page load failed');
+            
+            updateLoadingBar(60);
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const newContent = doc.querySelector('#main-content');
+            const newTitle = doc.querySelector('title');
+            const newModals = doc.querySelector('#page-modals-container') || doc.querySelector('.modals-block'); // Custom modals if any
+
+            if (!newContent) {
+                window.location.href = url; // Fallback
+                return;
+            }
+
+            const performSwap = () => {
+                // Update title
+                if (newTitle) document.title = newTitle.textContent;
+                
+                // Update URL
+                if (pushState) history.pushState({ url }, '', url);
+                
+                // Swap content
+                const mainContent = document.getElementById('main-content');
+                mainContent.innerHTML = newContent.innerHTML;
+
+                // Close menu
+                closeMobileMenu();
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'instant' });
+
+                // Re-execute scripts in new content
+                const scripts = newContent.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+
+                // Trigger custom events for re-init
+                document.dispatchEvent(new CustomEvent('page:loaded', { detail: { url } }));
+                updateLoadingBar(100);
+            };
+
+            // Use View Transitions API if available
+            if (document.startViewTransition) {
+                document.startViewTransition(performSwap);
+            } else {
+                document.body.classList.add('page-transitioning');
+                performSwap();
+                setTimeout(() => document.body.classList.remove('page-transitioning'), 400);
+            }
+
+        } catch (error) {
+            console.error('Seamless transition error:', error);
+            window.location.href = url; // Fallback to normal load
+        }
+    }
+
+    // Intercept all internal links
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+        
+        const url = link.href;
+        const isInternal = url.startsWith(window.location.origin) && 
+                          !url.includes('#') && 
+                          !link.getAttribute('download') &&
+                          link.target !== '_blank' &&
+                          !link.hasAttribute('data-no-instant');
+
+        if (isInternal) {
+            e.preventDefault();
+            loadPage(url);
+        }
+    });
+
+    // Handle back/forward buttons
+    window.addEventListener('popstate', (e) => {
+        if (e.state && e.state.url) {
+            loadPage(e.state.url, false);
+        } else {
+            // Fallback for initial page
+            window.location.reload();
+        }
+    });
     </script>
 
     {% block footer_js %}{% endblock %}
