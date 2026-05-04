@@ -10,22 +10,22 @@ def setup_middleware(app):
     def log_request_info():
         path = request.path
         logged_pages = app.config.get('LOGGED_PAGES', set())
-        
+
         # Sadece belirlenen sayfaları ve kök dizini logla
         if path != '/' and not any(path.startswith(page) for page in logged_pages):
             return
-            
+
         # API ve Static dosyaları loglama
         if request.blueprint == 'api' or (request.host and request.host.startswith('api.')) or '/static/' in path or path.endswith(('.ico', '.json', '.txt')):
             return
-            
+
         try:
             # IP adresini al
             if request.headers.get('X-Forwarded-For'):
                 ip = request.headers.get('X-Forwarded-For').split(',')[0]
             else:
                 ip = request.remote_addr
-            
+
             # Her isteği kaydet (Deduplication kaldırıldı)
             try:
                 from flask import g
@@ -33,7 +33,7 @@ def setup_middleware(app):
             except Exception:
                 uid = '-'
             app.logger.info(f'{ip} ziyaret: {path} uid={uid}')
-                    
+
         except Exception as e:
             app.logger.error(f"Loglama hatası: {str(e)}")
 
@@ -46,30 +46,25 @@ def setup_middleware(app):
     @app.after_request
     def set_security_headers(response):
         """Güvenlik başlıklarını (Security Headers) ekle."""
-        
+
         # Embed sayfaları için özel izinler
         if request.path.startswith('/embed/'):
-            # Embed edilebilir sayfalar için frame-ancestors * (her yere izin ver)
-            # Not: 'self' ve '*' birlikte kullanımı bazı tarayıcılarda (Firefox/Zen) sorun yaratabilir, sadece '*' yeterlidir.
             csp = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr; "
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr;  "
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr; "
                 "font-src 'self' https://fonts.yigitgulyurt.net.tr; "
                 "img-src 'self' data: https:; "
-                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://js.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr; "
                 "frame-ancestors *; "
                 "base-uri 'self'; "
                 "form-action 'self';"
             )
             response.headers['Content-Security-Policy'] = csp
-            # X-Frame-Options header'ını kaldır (varsa)
             response.headers.pop('X-Frame-Options', None)
-            # Cross-origin erişim izni (CORS)
             response.headers['Access-Control-Allow-Origin'] = '*'
 
         elif request.path.startswith('/kaynak/'):
-                # Oyun sayfası: frame'e izin ver ama diğer güvenlik kuralları sıkı kalsın
             csp = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdnjs.cloudflare.com; "
@@ -82,45 +77,40 @@ def setup_middleware(app):
                 "worker-src 'self' blob:; "
                 "base-uri 'self'; "
                 "form-action 'self';"
-                )
+            )
             response.headers['Content-Security-Policy'] = csp
             response.headers['X-Frame-Options'] = 'SAMEORIGIN'
 
-            
         else:
-            # Standart sayfalar için sıkı güvenlik
-            # frame-src 'self' *: Kendi sitemizdeki iframe'lerin çalışmasına izin ver (Önizleme vb. için)
+            # Standart sayfalar
             csp = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr; "
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr;  "
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr; "
                 "font-src 'self' https://fonts.yigitgulyurt.net.tr; "
                 "img-src 'self' data: https:; "
-                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://js.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr; "
                 "frame-src 'self' *; "
                 "frame-ancestors 'none'; "
                 "base-uri 'self'; "
-                "form-action 'self';"
-                "worker-src 'self' blob:;" 
+                "form-action 'self'; "
+                "worker-src 'self' blob:; "
                 "media-src 'self' blob:;"
             )
             response.headers['Content-Security-Policy'] = csp
-            # Clickjacking koruması (DENY yerine SAMEORIGIN yapıyoruz ki kendi sitemiz içinde iframe kullanımı gerekirse sorun olmasın)
-            # iframe'i kendi sitemizde göstermek için X-Frame-Options SAMEORIGIN olmalı
             response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-        
+
         # MIME tipi koklamayı engelle
         response.headers['X-Content-Type-Options'] = 'nosniff'
-        
+
         # XSS koruması (Modern tarayıcılar için CSP olsa da eklenir)
         response.headers['X-XSS-Protection'] = '1; mode=block'
-        
+
         # Referrer politikasını belirle
         response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-        
+
         # HSTS (Sadece HTTPS üzerinden erişim zorunlu kılar)
-        # Sadece üretim ortamında aktifleştirilmesi önerilir, ancak projede SSL olduğu varsayımıyla ekliyoruz
         if not current_app.debug:
             response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'
-            
+
         return response
