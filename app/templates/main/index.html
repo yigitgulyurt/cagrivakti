@@ -683,8 +683,84 @@ function prevStep() {
                 <span class="stat-lbl">Ücretsiz</span>
             </div>
         </div>
+
+        {# --- Yiğit Gülyurt İmza --- #}
+        <div class="dev-signature-wrapper" style="margin-top: 60px; text-align: center; padding-bottom: 40px;">
+            <a href="https://yigitgulyurt.net.tr" target="_blank" class="dev-signature">
+                <span class="sig-text">Crafted with</span>
+                <span class="sig-heart">❤</span>
+                <span class="sig-text">by</span>
+                <span class="sig-name">Yiğit Gülyurt</span>
+            </a>
+        </div>
     </section>{# /stats #}
 </div>{# /.landing-wrapper #}
+
+<style>
+.dev-signature {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+}
+
+.sig-text {
+    color: var(--gray);
+}
+
+.sig-heart {
+    color: #ef4444;
+    font-size: 1rem;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.sig-name {
+    color: var(--white);
+    font-weight: 600;
+    position: relative;
+}
+
+.sig-name::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--primary);
+    transition: width 0.3s ease;
+}
+
+.dev-signature:hover {
+    background: rgba(255, 193, 7, 0.08);
+    border-color: rgba(255, 193, 7, 0.3);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dev-signature:hover .sig-name::after {
+    width: 100%;
+}
+
+.dev-signature:hover .sig-heart {
+    animation: heartbeat 0.6s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.15); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.15); }
+    70% { transform: scale(1); }
+}
+</style>
 {% endblock %}{# /content #}
 
 
