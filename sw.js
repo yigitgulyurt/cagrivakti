@@ -38,15 +38,15 @@ const PAGE_ASSETS = [
 // Buraya çektiğin JS dosyalarının tam URL'lerini ekle.
 // Örnek: 'https://js.yigitgulyurt.net.tr/jquery.min.js'
 const JS_ASSETS = [
-    'https://js.yigitgulyurt.net.tr/cagrivakti/jquery.cagrivakti.js?v={{ app_version }}',
-    'https://js.yigitgulyurt.net.tr/cagrivakti/inappredirect.cagrivakti.js?v={{ app_version }}',
-    'https://js.yigitgulyurt.net.tr/cagrivakti/city-data.cagrivakti.js?v={{ app_version }}'
+    'https://js.yigitgulyurt.net.tr/cagrivakti/jquery.cagrivakti.js',
+    'https://js.yigitgulyurt.net.tr/cagrivakti/inappredirect.cagrivakti.js',
+    'https://js.yigitgulyurt.net.tr/cagrivakti/city-data.cagrivakti.js'
 ];
 
 // Buraya çektiğin CSS dosyalarının tam URL'lerini ekle.
 // Örnek: 'https://css.yigitgulyurt.net.tr/main.css'
 const CSS_ASSETS = [
-    'https://css.yigitgulyurt.net.tr/cagrivakti/main.cagrivakti.css?v={{ app_version }}',
+    'https://css.yigitgulyurt.net.tr/cagrivakti/main.cagrivakti.css',
 ];
 
 // JS_ASSETS ve CSS_ASSETS'i Request objelerine çevir (cross-origin için zorunlu)

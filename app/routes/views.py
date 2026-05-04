@@ -943,7 +943,6 @@ def serve_sw():
         with open(sw_path, 'r', encoding='utf-8') as f:
             content = f.read()
         content = content.replace('${VERSION}', version)
-        content = content.replace('{{ app_version }}', version)
         resp    = make_response(content)
         resp.headers['Content-Type']  = 'application/javascript; charset=utf-8'
         resp.headers['Cache-Control'] = 'no-cache'
