@@ -54,7 +54,7 @@ def setup_middleware(app):
             csp = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr; "
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr; "
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr; https://css.yigitgulyurt.net.tr;  "
                 "font-src 'self' https://fonts.yigitgulyurt.net.tr; "
                 "img-src 'self' data: https:; "
                 "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
@@ -93,7 +93,7 @@ def setup_middleware(app):
             csp = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr; "
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr; "
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.yigitgulyurt.net.tr; https://css.yigitgulyurt.net.tr;  "
                 "font-src 'self' https://fonts.yigitgulyurt.net.tr; "
                 "img-src 'self' data: https:; "
                 "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr; "
