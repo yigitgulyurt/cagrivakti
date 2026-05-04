@@ -63,3 +63,4 @@ stress_test.py
 test.py
 folderico-FxMaQS.ico
 desktop.ini
+.env.example
