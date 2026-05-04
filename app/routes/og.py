@@ -333,71 +333,109 @@ def make_og(title, subtitle, theme, prompt, domain):
 # ÖZEL STORY ÜRETİCİ (Vakit Paylaş)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def make_story_vakit(sehir, vakitler):
+def make_story_vakit(sehir, vakitler, tarih_str=""):
     """
     vakitler: {'imsak': '05:30', 'gunes': '07:00', ...}
     """
-    # 1. Base Image (Gradient/Glassmorphism effect)
-    img = Image.new('RGB', (STORY_W, STORY_H), (15, 23, 42)) # Slate 900
+    # 1. Base Image - Derin Gradyan
+    # Slate 950 -> Slate 900 -> Indigo 950 geçişi gibi bir derinlik
+    img = Image.new('RGBA', (STORY_W, STORY_H), (2, 6, 23, 255)) 
     d = ImageDraw.Draw(img)
 
-    # Gradient Top-Bottom
+    # Çok katmanlı Gradyan (Daha "Premium" görünüm)
     for i in range(STORY_H):
-        r = int(15 + (30 - 15) * (i / STORY_H))
-        g = int(23 + (45 - 23) * (i / STORY_H))
-        b = int(42 + (80 - 42) * (i / STORY_H))
-        d.line([(0, i), (STORY_W, i)], fill=(r, g, b))
+        # Üstten alta koyulaşan ve hafif renk değiştiren geçiş
+        r = int(15 + (10 - 15) * (i / STORY_H))
+        g = int(23 + (15 - 23) * (i / STORY_H))
+        b = int(42 + (30 - 42) * (i / STORY_H))
+        d.line([(0, i), (STORY_W, i)], fill=(r, g, b, 255))
 
-    # Decorative Circles (Soft Glow)
+    # Dekoratif Işık Patlamaları (Mesh Gradient hissi)
     overlay = Image.new('RGBA', (STORY_W, STORY_H), (0,0,0,0))
     od = ImageDraw.Draw(overlay)
-    od.ellipse([STORY_W-400, 100, STORY_W+200, 700], fill=(56, 189, 248, 40)) # Sky 400
-    od.ellipse([-200, STORY_H-600, 400, STORY_H+100], fill=(250, 204, 21, 30)) # Yellow 400
-    img.paste(overlay, (0,0), overlay)
-    img = img.filter(ImageFilter.GaussianBlur(radius=50))
-    d = ImageDraw.Draw(img) # Re-bind draw after filter
+    # Sağ üstte turkuaz parlama
+    od.ellipse([STORY_W-600, -200, STORY_W+300, 700], fill=(20, 184, 166, 60)) 
+    # Sol ortada altın parlama
+    od.ellipse([-300, STORY_H//2-400, 400, STORY_H//2+400], fill=(245, 158, 11, 40))
+    # Alt tarafta morumsu derinlik
+    od.ellipse([200, STORY_H-500, STORY_W+400, STORY_H+300], fill=(99, 102, 241, 50))
+    
+    # Bulanıklaştırma ve ana resme ekleme
+    overlay = overlay.filter(ImageFilter.GaussianBlur(radius=80))
+    img.alpha_composite(overlay)
+    
+    # Çizim için tekrar draw objesi (RGBA destekli)
+    d = ImageDraw.Draw(img)
 
     # 2. Fonts
-    f_title = _load_font(FONT_BOLD, 80)
-    f_city  = _load_font(FONT_BOLD, 120)
-    f_label = _load_font(FONT_REG, 45)
-    f_time  = _load_font(FONT_BOLD, 75)
-    f_footer = _load_font(FONT_REG, 35)
+    f_title  = _load_font(FONT_BOLD, 65)
+    f_city   = _load_font(FONT_BOLD, 135)
+    f_date   = _load_font(FONT_REG, 45)
+    f_label  = _load_font(FONT_BOLD, 48)
+    f_time   = _load_font(FONT_BOLD, 85)
+    f_footer = _load_font(FONT_REG, 38)
 
-    # 3. Header
-    d.text((STORY_W//2, 250), "NAMAZ VAKİTLERİ", font=f_title, fill=(255, 255, 255), anchor="mm")
-    d.text((STORY_W//2, 380), sehir.upper(), font=f_city, fill=(250, 204, 21), anchor="mm")
+    # 3. Header & Tarih
+    d.text((STORY_W//2, 220), "NAMAZ VAKİTLERİ", font=f_title, fill=(255, 255, 255, 220), anchor="mm")
+    d.text((STORY_W//2, 360), sehir.upper(), font=f_city, fill=(250, 204, 21, 255), anchor="mm")
+    
+    if tarih_str:
+        # Tarih için şık bir kapsül
+        tw = d.textbbox((0, 0), tarih_str, font=f_date)[2]
+        tx1, ty1 = STORY_W//2 - tw//2 - 30, 440
+        tx2, ty2 = STORY_W//2 + tw//2 + 30, 510
+        d.rounded_rectangle([tx1, ty1, tx2, ty2], radius=35, fill=(255, 255, 255, 25))
+        d.text((STORY_W//2, 475), tarih_str, font=f_date, fill=(255, 255, 255, 200), anchor="mm")
 
-    # 4. Vakit Cards (Glassmorphism look)
+    # 4. Vakit Kartları (Gerçek Glassmorphism)
     vakit_keys = [
-        ('imsak', 'İMSAK'), ('gunes', 'GÜNEŞ'), ('ogle', 'ÖĞLE'),
-        ('ikindi', 'İKİNDİ'), ('aksam', 'AKŞAM'), ('yatsi', 'YATSI')
+        ('imsak', 'İMSAK', '\uf0510'), ('gunes', 'GÜNEŞ', '\uf0599'), ('ogle', 'ÖĞLE', '\uf0599'),
+        ('ikindi', 'İKİNDİ', '\uf0599'), ('aksam', 'AKŞAM', '\uf0510'), ('yatsi', 'YATSI', '\uf0510')
     ]
     
-    start_y = 550
-    card_h = 160
-    card_w = 800
-    gap = 40
+    start_y = 580
+    card_h = 175
+    card_w = 880
+    gap = 35
     
-    for i, (key, label) in enumerate(vakit_keys):
+    for i, (key, label, icon_hex) in enumerate(vakit_keys):
         cy = start_y + i * (card_h + gap)
         cx1, cy1 = (STORY_W - card_w)//2, cy
         cx2, cy2 = cx1 + card_w, cy1 + card_h
         
-        # Card Background (Semi-transparent)
-        d.rounded_rectangle([cx1, cy1, cx2, cy2], radius=30, fill=(255, 255, 255, 15), outline=(255, 255, 255, 30), width=2)
+        # Kart Katmanı (Ayrı bir katmanda çizip paste ediyoruz ki saydamlık düzgün olsun)
+        card_layer = Image.new('RGBA', (STORY_W, STORY_H), (0,0,0,0))
+        cd = ImageDraw.Draw(card_layer)
         
-        # Label & Time
-        d.text((cx1 + 60, cy1 + card_h//2), label, font=f_label, fill=(203, 213, 225), anchor="lm")
-        d.text((cx2 - 60, cy1 + card_h//2), vakitler.get(key, '--:--'), font=f_time, fill=(255, 255, 255), anchor="rm")
+        # Cam efekti arka planı
+        cd.rounded_rectangle([cx1, cy1, cx2, cy2], radius=40, fill=(255, 255, 255, 25))
+        # İnce kenarlık
+        cd.rounded_rectangle([cx1, cy1, cx2, cy2], radius=40, outline=(255, 255, 255, 50), width=2)
+        
+        img.alpha_composite(card_layer)
+        
+        # Yazıları ana resme ekle (Kontrast için gölge efektiyle)
+        time_val = vakitler.get(key, '--:--')
+        
+        # Etiket (Sol)
+        d.text((cx1 + 70, cy1 + card_h//2), label, font=f_label, fill=(226, 232, 240, 255), anchor="lm")
+        
+        # Saat (Sağ) - ÖNEMLİ: Beyaz kart üzerine beyaz yazmamak için renk sarı/amber seçildi
+        d.text((cx2 - 70, cy1 + card_h//2), time_val, font=f_time, fill=(255, 255, 255, 255), anchor="rm")
 
     # 5. Footer
-    d.text((STORY_W//2, STORY_H - 150), "cagrivakti.com.tr", font=f_footer, fill=(148, 163, 184), anchor="mm")
+    footer_text = "cagrivakti.com.tr"
+    d.text((STORY_W//2, STORY_H - 180), footer_text, font=f_footer, fill=(148, 163, 184, 180), anchor="mm")
     
-    # Accent Line at bottom
-    d.rectangle([STORY_W//2 - 100, STORY_H - 100, STORY_W//2 + 100, STORY_H - 95], fill=(250, 204, 21))
+    # Alt Dekoratif Çizgi
+    line_w = 150
+    d.rounded_rectangle([STORY_W//2 - line_w, STORY_H - 130, STORY_W//2 + line_w, STORY_H - 122], radius=4, fill=(250, 204, 21, 200))
 
-    return img
+    return img.convert('RGB') # Finalde JPEG/PNG için RGB'ye çevir
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FLASK ROUTE
+# ─────────────────────────────────────────────────────────────────────────────
 
 # ─────────────────────────────────────────────────────────────────────────────
 # FLASK ROUTE
@@ -422,6 +460,7 @@ def og_image():
     # --- ÖZEL STORY MODU ---
     if theme == 'share-vakit-story':
         sehir = request.args.get('sehir', 'İstanbul')
+        tarih = request.args.get('tarih', '')
         # Vakitleri query string'den al (imsak:05:30,gunes:07:00...)
         vakit_str = request.args.get('vakitler', '')
         vakit_dict = {}
@@ -431,7 +470,7 @@ def og_image():
                     k, v = item.split(':', 1)
                     vakit_dict[k] = v
         
-        img = make_story_vakit(sehir, vakit_dict)
+        img = make_story_vakit(sehir, vakit_dict, tarih)
         buf = io.BytesIO()
         img.save(buf, 'PNG', optimize=True)
         resp = send_file(io.BytesIO(buf.getvalue()), mimetype='image/png')

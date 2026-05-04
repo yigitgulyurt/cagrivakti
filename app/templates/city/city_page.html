@@ -782,6 +782,11 @@ document.addEventListener('DOMContentLoaded', async function () {
             shareUrl.searchParams.set('theme', 'share-vakit-story');
             shareUrl.searchParams.set('sehir', sehirAdi);
             
+            // Bugünün tarihini al
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            const todayStr = new Date().toLocaleDateString('tr-TR', options);
+            shareUrl.searchParams.set('tarih', todayStr);
+            
             // Vakitleri virgülle ayrılmış key:value şeklinde gönder
             const vakitParam = [
                 `imsak:${imsak}`, `gunes:${gunes}`, `ogle:${ogle}`,
