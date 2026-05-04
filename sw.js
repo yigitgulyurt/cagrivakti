@@ -89,8 +89,11 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(event.request.url);
 
-    // Stream bypass
+    // Font ve stream bypass (CORS hatalarını önlemek için fontlar yakalanmaz)
     if (
+        url.hostname === 'fonts.googleapis.com' ||
+        url.hostname === 'fonts.gstatic.com' ||
+        url.hostname === 'fonts.yigitgulyurt.net.tr' ||
         url.pathname.startsWith('/canli-kaynak/') ||
         url.pathname === '/stream/status'
     ) {
@@ -160,36 +163,6 @@ self.addEventListener('fetch', (event) => {
                         headers: { 'Content-Type': 'application/json' }
                     });
                 })
-        );
-        return;
-    }
-
-    // ── Fontlar (Google Fonts & fonts.yigitgulyurt.net.tr) ───
-    if (
-        url.hostname === 'fonts.googleapis.com' ||
-        url.hostname === 'fonts.gstatic.com' ||
-        url.hostname === 'fonts.yigitgulyurt.net.tr'
-    ) {
-        event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                // Fontlar için Stale-While-Revalidate stratejisi daha güvenlidir
-                const fetchPromise = fetch(event.request)
-                    .then((networkResponse) => {
-                        if (networkResponse && networkResponse.ok) {
-                            const responseClone = networkResponse.clone();
-                            caches.open(CACHE_NAME).then((cache) => {
-                                cache.put(event.request, responseClone);
-                            });
-                        }
-                        return networkResponse;
-                    })
-                    .catch((err) => {
-                        console.warn('[SW] Font fetch failed, using cache if available:', err);
-                        return cachedResponse; // Cache yoksa undefined döner, tarayıcı hata verir ama INTERCEPTION_FAILED olmaz
-                    });
-
-                return cachedResponse || fetchPromise;
-            })
         );
         return;
     }
