@@ -938,7 +938,7 @@ def favicon():
 @views_bp.route('/sw.js')
 def serve_sw():
     version = current_app.config.get('APP_VERSION', '1.0')
-    sw_path = os.path.join(current_app.root_path, 'static', 'js', 'sw.js')
+    sw_path = os.path.join(current_app.root_path, '..', 'sw.js')
     try:
         with open(sw_path, 'r', encoding='utf-8') as f:
             content = f.read()
