@@ -173,16 +173,24 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
                 if (cachedResponse) return cachedResponse;
-                
-                return fetch(event.request).then((networkResponse) => {
-                    if (networkResponse && networkResponse.status === 200) {
-                        const responseClone = networkResponse.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                    }
-                    return networkResponse;
-                });
+
+                // Fontlar cross-origin olduğu için mode: 'cors' zorunludur
+                return fetch(event.request.url, { mode: 'cors', credentials: 'omit' })
+                    .then((networkResponse) => {
+                        if (networkResponse && networkResponse.status === 200) {
+                            const responseClone = networkResponse.clone();
+                            caches.open(CACHE_NAME).then((cache) => {
+                                cache.put(event.request, responseClone);
+                            });
+                        }
+                        return networkResponse;
+                    })
+                    .catch((err) => {
+                         console.error('[SW] Font fetch failed:', err);
+                         // NetworkError durumunda promise'i reject etmek yerine 
+                         // tarayıcının kendi hata yönetimini tetiklemesine izin veriyoruz
+                         return fetch(event.request); 
+                     });
             })
         );
         return;
