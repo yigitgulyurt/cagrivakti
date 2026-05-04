@@ -800,15 +800,18 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // 1. Görseli Blob olarak çek
                 const response = await fetch(shareUrl.toString());
                 const blob = await response.blob();
-                const fileName = `${sehirAdi.toLowerCase()}-namaz-vakitleri.png`;
+                
+                // Dosya adını tarihli yap (örn: ankara-namaz-vakitleri-5-mayis-2026.png)
+                const safeDateStr = todayStr.toLowerCase().replace(/ /g, '-');
+                const fileName = `${sehirAdi.toLowerCase()}-namaz-vakitleri-${safeDateStr}.png`;
                 const file = new File([blob], fileName, { type: 'image/png' });
 
                 // 2. Web Share API desteği kontrolü (Dosya paylaşımı için)
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
                         files: [file],
-                        title: `${sehirAdi} Namaz Vakitleri`,
-                        text: `${sehirAdi} için bugünkü namaz vakitleri. @cagrivakti`
+                        title: `${sehirAdi} Namaz Vakitleri - ${todayStr}`,
+                        text: `${sehirAdi} için ${todayStr} tarihli namaz vakitleri. cagrivakti.com.tr`
                     });
                 } else {
                     // 3. Fallback: İndirme işlemi
