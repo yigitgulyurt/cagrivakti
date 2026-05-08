@@ -1034,11 +1034,11 @@ def send_admin_notification(name, email, subject, message):
     admin_id       = current_app.config.get('ADMIN_TELEGRAM_ID')
     if telegram_token and admin_id:
         try:
-            text = (f"📩*Yeni İletişim Mesajı (cagrivakti.com.tr)*\n\n"
-                    f"👤 *Gönderen:*   {name}\n"
-                    f"📧 *E-posta:*   {email}\n"
-                    f"📌 *Konu:*   {subject.capitalize()}\n\n"
-                    f"📝 *Mesaj:*\n\n{message}")
+            text = (f"📩 *Yeni Geri Bildirim (cagrivakti.com.tr)*\n\n"
+                    f"👤 *Gönderen:* {name}\n"
+                    f"📧 *E-posta:* {email}\n"
+                    f"📌 *Konu:* {subject.capitalize()}\n\n"
+                    f"📝 *Mesaj:*\n{message}")
             requests.post(
                 f"https://api.telegram.org/bot{telegram_token}/sendMessage",
                 json={"chat_id": admin_id, "text": text, "parse_mode": "Markdown"},
@@ -1049,7 +1049,7 @@ def send_admin_notification(name, email, subject, message):
 
 
 @views_bp.route('/iletisim', methods=['GET', 'POST'])
-@limiter.limit("10 per hour", methods=['POST'])
+@limiter.limit("5 per hour", methods=['POST'])
 def iletisim():
     title       = "Bizimle İletişime Geçin — Çağrı Vakti"
     description = "Soru, öneri ve geri bildirimleriniz için bizimle iletişime geçin. Görüşleriniz bizim için değerlidir."
@@ -1082,7 +1082,7 @@ def iletisim():
             flash('Mesajınız çok kısa, lütfen biraz daha detay verin.', 'error')
             return redirect(url_for('views.iletisim'))
 
-        if len(message) > 2000:
+        if len(message) > 3000:
             flash('Mesajınız çok uzun, lütfen daha kısa bir mesaj gönderin.', 'error')
             return redirect(url_for('views.iletisim'))
 
