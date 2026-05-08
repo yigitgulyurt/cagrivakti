@@ -1034,11 +1034,11 @@ def send_admin_notification(name, email, subject, message):
     admin_id       = current_app.config.get('ADMIN_TELEGRAM_ID')
     if telegram_token and admin_id:
         try:
-            text = (f"📩 *Yeni Geri Bildirim*\n\n"
-                    f"👤 *Gönderen:* {name}\n"
-                    f"📧 *E-posta:* {email}\n"
-                    f"📌 *Konu:* {subject.capitalize()}\n\n"
-                    f"📝 *Mesaj:*\n{message}")
+            text = (f"📩*Yeni İletişim Mesajı (cagrivakti.com.tr)*\n\n"
+                    f"👤 *Gönderen:*   {name}\n"
+                    f"📧 *E-posta:*   {email}\n"
+                    f"📌 *Konu:*   {subject.capitalize()}\n\n"
+                    f"📝 *Mesaj:*\n\n{message}")
             requests.post(
                 f"https://api.telegram.org/bot{telegram_token}/sendMessage",
                 json={"chat_id": admin_id, "text": text, "parse_mode": "Markdown"},
