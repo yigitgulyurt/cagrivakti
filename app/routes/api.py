@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app, abort
 import logging
 from app.models import QrRedirect
-from app.services import UserService, PrayerService, get_daily_content, get_country_for_city, get_timezone_for_city, CITY_DISPLAY_NAME_MAPPING
+from app.services import UserService, PrayerService, get_daily_content, get_country_for_city, get_timezone_for_city, CITY_DISPLAY_NAME_MAPPING, COUNTRY_NAME_MAPPING
 from app.extensions import cache, limiter, db, csrf
 from datetime import datetime, date, timedelta
 from functools import wraps
@@ -75,6 +75,76 @@ def uluslararasi_sehirleri_getir():
 def tum_sehirleri_getir():
     return jsonify(UserService.get_sehirler('ALL'))
 
+@api_bp.route('/sehirler/ara')
+#@restrict_to_main_domain
+@cache.cached(timeout=3600, query_string=True)
+def sehirleri_ara():
+    arama = request.args.get('q', '').strip().lower()
+    if not arama or not is_latin_only(arama):
+        return jsonify([])
+    tum_sehirler = UserService.get_sehirler('ALL')
+    sonuclar = []
+    for sehir in tum_sehirler:
+        sehir_lower = sehir.lower()
+        gorunen_adi = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title()).lower()
+        if arama in sehir_lower or arama in gorunen_adi:
+            sonuclar.append(sehir)
+    return jsonify(sonuclar)
+
+@api_bp.route('/sehir/suanki_zaman')
+#@restrict_to_main_domain
+@cache.cached(timeout=60, query_string=True)
+def sehir_suanki_zaman():
+    sehir = request.args.get('sehir')
+    if not sehir:
+        return jsonify({'error': 'Sehir bilgisi gerekli'}), 400
+    if not is_latin_only(sehir):
+        return jsonify({'error': 'Gecersiz karakter iceren sehir ismi'}), 400
+    country_code = get_country_for_city(sehir)
+    timezone = get_timezone_for_city(sehir, country_code)
+    from pytz import timezone as pytz_timezone
+    tz = pytz_timezone(timezone)
+    suanki = datetime.now(tz)
+    return jsonify({
+        'sehir': sehir,
+        'ulke_kodu': country_code,
+        'timezone': timezone,
+        'suanki_zaman': suanki.isoformat(),
+        'tarih': suanki.strftime('%Y-%m-%d'),
+        'saat': suanki.strftime('%H:%M:%S')
+    })
+
+@api_bp.route('/ulkeler')
+#@restrict_to_main_domain
+@cache.cached(timeout=86400)
+def ulkeleri_getir():
+    tum_sehirler = UserService.get_sehirler('ALL')
+    ulke_kodlari = set()
+    for sehir in tum_sehirler:
+        ulke_kodlari.add(get_country_for_city(sehir))
+    ulkeler = []
+    for kod in sorted(ulke_kodlari):
+        ulkeler.append({
+            'kod': kod,
+            'adi': COUNTRY_NAME_MAPPING.get(kod, kod)
+        })
+    return jsonify(ulkeler)
+
+@api_bp.route('/ulke/detay')
+#@restrict_to_main_domain
+@cache.cached(timeout=86400, query_string=True)
+def ulke_detay():
+    ulke_kodu = request.args.get('kod')
+    if not ulke_kodu or not is_latin_only(ulke_kodu):
+        return jsonify({'error': 'Gecerli ulke kodu gerekli'}), 400
+    ulke_adi = COUNTRY_NAME_MAPPING.get(ulke_kodu, ulke_kodu)
+    sehirler = UserService.get_sehirler(ulke_kodu)
+    return jsonify({
+        'kod': ulke_kodu,
+        'adi': ulke_adi,
+        'sehirler': sehirler
+    })
+
 @api_bp.route('/sehir/detay')
 #@restrict_to_main_domain
 @cache.cached(timeout=86400, query_string=True)
@@ -99,13 +169,16 @@ def sehir_detay():
 def sehir_kaydet():
     data = request.get_json()
     sehir = data.get('sehir')
-    country_code = data.get('country_code', 'TR')
+    country_code = data.get('country_code')
     
     if not sehir:
         return jsonify({'error': 'Sehir bilgisi gerekli'}), 400
         
-    if not is_latin_only(sehir) or not is_latin_only(country_code):
+    if not is_latin_only(sehir) or (country_code and not is_latin_only(country_code)):
         return jsonify({'error': 'Gecersiz karakter iceren sehir veya ulke kodu'}), 400
+    
+    if not country_code:
+        country_code = get_country_for_city(sehir)
         
     UserService.save_user_preferences(sehir, country_code)
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
@@ -169,22 +242,6 @@ def sonraki_vakti_getir():
         return jsonify({"error": "Gecersiz karakter iceren sehir veya ulke kodu"}), 400
     result = PrayerService.get_next_vakit(sehir, country_code)
     return jsonify(result)
-
-@api_bp.route('/update_city', methods=['POST'])
-#@restrict_to_main_domain
-def update_city():
-    try:
-        data = request.get_json()
-        new_city = data.get('sehir')
-        if not new_city:
-            return jsonify({"success": False, "error": "Sehir gerekli"})
-        if not is_latin_only(new_city):
-            return jsonify({"success": False, "error": "Gecersiz karakter iceren sehir ismi"})
-        country_code = get_country_for_city(new_city)
-        UserService.save_user_preferences(new_city, country_code)
-        return jsonify({"success": True, "message": f"Sehir {new_city} olarak guncellendi"})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
 
 @api_bp.route('/daily_content')
 #@restrict_to_main_domain
