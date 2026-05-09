@@ -55,7 +55,7 @@ def restrict_to_main_domain(f):
     return decorated_function
 
 @api_bp.route('/sehirler')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=86400, query_string=True)
 def sehirleri_getir():
     country_code = request.args.get('country', 'TR')
@@ -64,7 +64,7 @@ def sehirleri_getir():
     return jsonify(UserService.get_sehirler(country_code))
 
 @api_bp.route('/sehir_kaydet', methods=['POST'])
-@restrict_to_main_domain
+#@restrict_to_main_domain
 def sehir_kaydet():
     data = request.get_json()
     sehir = data.get('sehir')
@@ -81,7 +81,7 @@ def sehir_kaydet():
 
 from app.config import Config
 @api_bp.route(f'/ezan_vakitleri-V{Config.APP_VERSION}')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
 def ezan_vakitlerini_al_api():
     sehir = request.args.get('sehir')
@@ -128,7 +128,7 @@ def ezan_vakitlerini_al_api():
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/sonraki_vakit')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 def sonraki_vakti_getir():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
@@ -140,7 +140,7 @@ def sonraki_vakti_getir():
     return jsonify(result)
 
 @api_bp.route('/update_city', methods=['POST'])
-@restrict_to_main_domain
+#@restrict_to_main_domain
 def update_city():
     try:
         data = request.get_json()
@@ -155,14 +155,14 @@ def update_city():
         return jsonify({"success": False, "error": str(e)})
 
 @api_bp.route('/daily_content')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=86400)
 def daily_content():
     return jsonify(get_daily_content())
 
 # Public API v1
 @api_bp.route('/vakitler')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 def public_api_vakitler():
     sehir = request.args.get('sehir')
     country_code = request.args.get('ulke', 'TR').upper()
