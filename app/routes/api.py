@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app, abort
 import logging
 from app.models import QrRedirect
-from app.services import UserService, PrayerService, get_daily_content
+from app.services import UserService, PrayerService, get_daily_content, get_country_for_city, get_timezone_for_city, CITY_DISPLAY_NAME_MAPPING
 from app.extensions import cache, limiter, db, csrf
 from datetime import datetime, date, timedelta
 from functools import wraps
@@ -74,6 +74,25 @@ def uluslararasi_sehirleri_getir():
 @cache.cached(timeout=86400)
 def tum_sehirleri_getir():
     return jsonify(UserService.get_sehirler('ALL'))
+
+@api_bp.route('/sehir/detay')
+#@restrict_to_main_domain
+@cache.cached(timeout=86400, query_string=True)
+def sehir_detay():
+    sehir = request.args.get('sehir')
+    if not sehir:
+        return jsonify({'error': 'Sehir bilgisi gerekli'}), 400
+    if not is_latin_only(sehir):
+        return jsonify({'error': 'Gecersiz karakter iceren sehir ismi'}), 400
+    country_code = get_country_for_city(sehir)
+    timezone = get_timezone_for_city(sehir, country_code)
+    display_name = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
+    return jsonify({
+        'sehir': sehir,
+        'ulke_kodu': country_code,
+        'timezone': timezone,
+        'gorunen_adi': display_name
+    })
 
 @api_bp.route('/sehir_kaydet', methods=['POST'])
 #@restrict_to_main_domain
@@ -161,7 +180,8 @@ def update_city():
             return jsonify({"success": False, "error": "Sehir gerekli"})
         if not is_latin_only(new_city):
             return jsonify({"success": False, "error": "Gecersiz karakter iceren sehir ismi"})
-        UserService.save_user_city(new_city)
+        country_code = get_country_for_city(new_city)
+        UserService.save_user_preferences(new_city, country_code)
         return jsonify({"success": True, "message": f"Sehir {new_city} olarak guncellendi"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
