@@ -63,6 +63,18 @@ def sehirleri_getir():
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
     return jsonify(UserService.get_sehirler(country_code))
 
+@api_bp.route('/sehirler/uluslararasi')
+#@restrict_to_main_domain
+@cache.cached(timeout=86400)
+def uluslararasi_sehirleri_getir():
+    return jsonify(UserService.get_sehirler('INT'))
+
+@api_bp.route('/sehirler/tumu')
+#@restrict_to_main_domain
+@cache.cached(timeout=86400)
+def tum_sehirleri_getir():
+    return jsonify(UserService.get_sehirler('ALL'))
+
 @api_bp.route('/sehir_kaydet', methods=['POST'])
 #@restrict_to_main_domain
 def sehir_kaydet():
