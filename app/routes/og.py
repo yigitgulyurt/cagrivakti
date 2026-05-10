@@ -446,7 +446,9 @@ def paylas_vakit():
     buf = io.BytesIO()
     img.save(buf, 'PNG', optimize=True)
     resp = send_file(io.BytesIO(buf.getvalue()), mimetype='image/png')
-    resp.headers['Cache-Control'] = 'public, max-age=3600'
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
     return resp
 
 # ─────────────────────────────────────────────────────────────────────────────
