@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, make_response, send_from_directory, current_app, abort, flash, jsonify
 from functools import wraps
-from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city, CITY_DISPLAY_NAME_MAPPING
+from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city, CITY_DISPLAY_NAME_MAPPING, normalize_city_name
 from app.models import ContactMessage, DailyContent, Guide
 from app.extensions import cache, db, limiter, csrf
 from datetime import datetime, timedelta
@@ -67,21 +67,29 @@ def index():
 
 @views_bp.route('/sehir/<sehir>')
 def sehir_sayfasi(sehir):
-    if not is_latin_only(sehir):
+    canonical_sehir = normalize_city_name(sehir)
+    if canonical_sehir != sehir:
+        query_params = request.query_string.decode('utf-8')
+        if query_params:
+            return redirect(url_for('views.sehir_sayfasi', sehir=canonical_sehir) + '?' + query_params, 301)
+        else:
+            return redirect(url_for('views.sehir_sayfasi', sehir=canonical_sehir), 301)
+            
+    if not is_latin_only(canonical_sehir):
         abort(400, description="Gecersiz karakter iceren sehir ismi.")
 
     country_code = request.args.get('country')
     if not country_code:
-        country_code = get_country_for_city(sehir) or 'TR'
+        country_code = get_country_for_city(canonical_sehir) or 'TR'
 
     if not is_latin_only(country_code):
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
 
-    UserService.save_user_preferences(sehir, country_code)
-    vakitler = PrayerService.get_vakitler(sehir, country_code)
+    UserService.save_user_preferences(canonical_sehir, country_code)
+    vakitler = PrayerService.get_vakitler(canonical_sehir, country_code)
 
     # Gösterim adı (örn. "istanbul" → "İstanbul")
-    sehir_adi = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
+    sehir_adi = CITY_DISPLAY_NAME_MAPPING.get(canonical_sehir, canonical_sehir.replace('-', ' ').title())
     # Subtitle: ilk satır İmsak·Güneş·Öğle, ikinci satır İkindi·Akşam·Yatsı
     og_subtitle  = (
         f"İmsak {vakitler['imsak']} · Güneş {vakitler['gunes']} · Öğle {vakitler['ogle']}|"
@@ -102,7 +110,7 @@ def sehir_sayfasi(sehir):
     description = f"{sehir_adi} ezan vakitleri. {sehir_adi} günlük ezan vakitleri ve aylık imsakiye."
 
     response = make_response(render_template('city/city_page.html',
-                                             sehir=sehir,
+                                             sehir=canonical_sehir,
                                              country_code=country_code,
                                              vakitler=vakitler,
                                              daily_content=get_daily_content(),
@@ -110,7 +118,7 @@ def sehir_sayfasi(sehir):
                                              seo_title=title,
                                              seo_description=description,
                                              og_image_url=og_image_url))
-    response.set_cookie('user_city', sehir, max_age=31536000, path='/')
+    response.set_cookie('user_city', canonical_sehir, max_age=31536000, path='/')
     return response
 
 
@@ -203,17 +211,25 @@ def imsakiye_secimi():
 
 @views_bp.route('/imsakiye/<sehir>')
 def imsakiye_detay(sehir):
-    if not is_latin_only(sehir):
+    canonical_sehir = normalize_city_name(sehir)
+    if canonical_sehir != sehir:
+        query_params = request.query_string.decode('utf-8')
+        if query_params:
+            return redirect(url_for('views.imsakiye_detay', sehir=canonical_sehir) + '?' + query_params, 301)
+        else:
+            return redirect(url_for('views.imsakiye_detay', sehir=canonical_sehir), 301)
+            
+    if not is_latin_only(canonical_sehir):
         abort(400, description="Gecersiz karakter iceren sehir ismi.")
 
     country_code = request.args.get('country')
     if not country_code:
-        country_code = get_country_for_city(sehir) or 'TR'
+        country_code = get_country_for_city(canonical_sehir) or 'TR'
 
     if not is_latin_only(country_code):
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
 
-    sehir_adi = CITY_DISPLAY_NAME_MAPPING.get(sehir, sehir.replace('-', ' ').title())
+    sehir_adi = CITY_DISPLAY_NAME_MAPPING.get(canonical_sehir, canonical_sehir.replace('-', ' ').title())
 
     og_image_url = url_for(
         'og.og_image',
@@ -229,7 +245,7 @@ def imsakiye_detay(sehir):
     title       = f"{sehir_adi} {suanki_yil} İmsakiyesi — Çağrı Vakti"
     description = f"{sehir_adi} şehri için {suanki_yil} yılı Ramazan imsakiyesi. İftar ve sahur vakitleri."
     return render_template('imsakiye/imsakite_detail.html',
-                           sehir=sehir,
+                           sehir=canonical_sehir,
                            country_code=country_code,
                            ramadan_info=RamadanService.get_ramadan_info(),
                            og_image_url=og_image_url,
