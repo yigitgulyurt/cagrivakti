@@ -799,7 +799,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 shareUrl.searchParams.set('_t', Date.now().toString());
 
                 // 1. Görseli Blob olarak çek
-                const response = await fetch(shareUrl.toString());
+                const response = await fetch(shareUrl.toString(), { cache: 'no-store' });
                 const blob = await response.blob();
                 
                 // Dosya adını tarihli yap (örn: ankara-namaz-vakitleri-5-mayis-2026.png)
