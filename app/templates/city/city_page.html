@@ -796,6 +796,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 shareUrl.searchParams.set('sehir', sehirAdi);
                 shareUrl.searchParams.set('tarih', todayStr);
                 shareUrl.searchParams.set('vakitler', vakitParam);
+                shareUrl.searchParams.set('_t', Date.now().toString());
 
                 // 1. Görseli Blob olarak çek
                 const response = await fetch(shareUrl.toString());
