@@ -60,6 +60,7 @@ const NO_CACHE_URLS = [
     '/kaynak/under-the-red-sky/jsons/saveState.json',
     '/stream/viewers',
     '/stream/ping',
+    '/paylas/vakit',
 ];
 
 // Yükleme (Install) - Kritik dosyaları önbelleğe al
@@ -112,7 +113,8 @@ self.addEventListener('fetch', (event) => {
         url.hostname === 'font.yigitgulyurt.net.tr' ||
         url.hostname === 'image.yigitgulyurt.net.tr' ||
         url.pathname.startsWith('/canli-kaynak/') ||
-        url.pathname === '/stream/status'
+        url.pathname === '/stream/status' ||
+        url.pathname.startsWith('/paylas/')
     ) {
         return;
     }
