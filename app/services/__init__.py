@@ -921,18 +921,29 @@ class PrayerService:
             db_session = db.session
             
         try:
-            # Varsa eskiyi sil (Upsert)
-            db_session.query(EzanVakti).filter_by(
+            # Mevcut kaydı bul
+            existing = db_session.query(EzanVakti).filter_by(
                 sehir=sehir, country_code=country_code, tarih=tarih_date
-            ).delete()
+            ).first()
 
-            yeni_vakit = EzanVakti(
-                sehir=sehir, country_code=country_code, timezone=timezone_str, tarih=tarih_date,
-                imsak=vakitler['imsak'], gunes=vakitler['gunes'],
-                ogle=vakitler['ogle'], ikindi=vakitler['ikindi'],
-                aksam=vakitler['aksam'], yatsi=vakitler['yatsi']
-            )
-            db_session.add(yeni_vakit)
+            if existing:
+                # Mevcut kaydı güncelle
+                existing.timezone = timezone_str
+                existing.imsak = vakitler['imsak']
+                existing.gunes = vakitler['gunes']
+                existing.ogle = vakitler['ogle']
+                existing.ikindi = vakitler['ikindi']
+                existing.aksam = vakitler['aksam']
+                existing.yatsi = vakitler['yatsi']
+            else:
+                # Yeni kayıt ekle
+                yeni_vakit = EzanVakti(
+                    sehir=sehir, country_code=country_code, timezone=timezone_str, tarih=tarih_date,
+                    imsak=vakitler['imsak'], gunes=vakitler['gunes'],
+                    ogle=vakitler['ogle'], ikindi=vakitler['ikindi'],
+                    aksam=vakitler['aksam'], yatsi=vakitler['yatsi']
+                )
+                db_session.add(yeni_vakit)
             db_session.commit()
         except Exception as e:
             db_session.rollback()
@@ -946,7 +957,7 @@ class PrayerService:
             tarih_str = tarih_dt.strftime("%d-%m-%Y")
             # Aladhan API URL (Method 13 = Diyanet)
             # Not: Bazı şehirler için ülke kodu zorunludur.
-            url = f"http://api.aladhan.com/v1/timingsByCity/{tarih_str}"
+            url = f"https://api.aladhan.com/v1/timingsByCity/{tarih_str}"
             params = {
                 "city": sehir,
                 "country": country_code,

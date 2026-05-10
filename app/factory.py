@@ -10,7 +10,7 @@ import shutil
 import pytz
 from datetime import datetime
 from dotenv import load_dotenv
-from flask_assets import Bundle
+
 import json
 import time
 import uuid
@@ -69,14 +69,6 @@ def create_app(config_class=Config):
             ]
         },
         r"/daily_content": {
-            "origins": [
-                "https://cagrivakti.com.tr",
-                "https://www.cagrivakti.com.tr",
-                "http://localhost:*",
-                "http://127.0.0.1:*"
-            ]
-        },
-        r"/shorten*": {
             "origins": [
                 "https://cagrivakti.com.tr",
                 "https://www.cagrivakti.com.tr",
