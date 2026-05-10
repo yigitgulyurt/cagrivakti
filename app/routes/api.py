@@ -11,6 +11,79 @@ import string
 
 api_bp = Blueprint('api', __name__, subdomain='api')
 
+@api_bp.route('/')
+def api_anasayfa():
+    return jsonify({
+        'uygulama': 'Çağrı Vakti API',
+        'surum': '1.0',
+        'uygun_uc_noktalar': [
+            {
+                'yol': '/',
+                'aciklama': 'API ana sayfası'
+            },
+            {
+                'yol': '/sehirler',
+                'aciklama': 'Belirli bir ülkenin şehirlerini listeler (varsayılan: TR)'
+            },
+            {
+                'yol': '/sehirler/uluslararasi',
+                'aciklama': 'Tüm uluslararası şehirleri listeler'
+            },
+            {
+                'yol': '/sehirler/tumu',
+                'aciklama': 'Tüm şehirleri (Türkiye + uluslararası) listeler'
+            },
+            {
+                'yol': '/sehirler/ara',
+                'aciklama': 'Şehir adı ile arama yapar (parametre: q)'
+            },
+            {
+                'yol': '/sehir/detay',
+                'aciklama': 'Belirli bir şehrin detaylarını verir (parametre: sehir)'
+            },
+            {
+                'yol': '/sehir/suanki_zaman',
+                'aciklama': 'Belirli bir şehrin o anki zamanını verir (parametre: sehir)'
+            },
+            {
+                'yol': '/sehir_kaydet',
+                'aciklama': 'Şehir tercihini kaydeder (POST, parametreler: sehir, country_code)'
+            },
+            {
+                'yol': '/ulkeler',
+                'aciklama': 'Tüm ülkeleri listeler'
+            },
+            {
+                'yol': '/ulke/detay',
+                'aciklama': 'Belirli bir ülkenin detaylarını verir (parametre: kod)'
+            },
+            {
+                'yol': '/ezan_vakitleri-V<versiyon>',
+                'aciklama': 'Ezan vakitlerini alır'
+            },
+            {
+                'yol': '/vakitler',
+                'aciklama': 'Genel API v1 uç noktası'
+            },
+            {
+                'yol': '/sonraki_vakit',
+                'aciklama': 'Bir sonraki ezan vaktini verir'
+            },
+            {
+                'yol': '/daily_content',
+                'aciklama': 'Günlük içeriği verir'
+            },
+            {
+                'yol': '/shorten',
+                'aciklama': 'URL kısaltır (POST)'
+            },
+            {
+                'yol': '/status',
+                'aciklama': 'Sağlık kontrolü'
+            }
+        ]
+    })
+
 def is_latin_only(text):
     """Metnin yalnızca Latin karakterler, sayılar ve izin verilen sembollerden oluştuğunu kontrol eder."""
     if not text:
