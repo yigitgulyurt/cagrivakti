@@ -925,14 +925,7 @@ def serve_robots():
 
 @views_bp.route('/favicon.ico')
 def favicon():
-    response = make_response(send_from_directory(
-        os.path.join(current_app.root_path, 'static', 'icons'),
-        'favicon.ico',
-        mimetype='image/vnd.microsoft.icon',
-    ))
-    response.headers.pop('ETag', None)
-    response.headers.pop('Last-Modified', None)
-    return response
+    return redirect('https://image.yigitgulyurt.net.tr/file/cagrivakti/favicon.ico', code=301)
 
 
 @views_bp.route('/sw.js')
