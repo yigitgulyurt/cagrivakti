@@ -477,35 +477,66 @@ def public_api_vakitler():
 @api_bp.route('/status')
 def health_check():
     """
-    Uptime Kuma ve benzeri monitoring servisleri için health check endpoint'i.
+    Uptime Kuma ve benzeri monitoring servisleri için gelişmiş health check endpoint'i.
     restrict_to_main_domain kasıtlı olarak uygulanmıyor — harici checker'ların
     Referer/Origin başlığı göndermediği için 403 alırlardı.
     """
+    import time
+    start_time = time.time()
+    
     checks = {}
     http_status = 200
+    critical_failure = False
 
     # 1. Veritabanı bağlantısı
     try:
+        db_start = time.time()
         db.session.execute(db.text('SELECT 1'))
-        checks['database'] = 'ok'
+        db.session.commit()
+        db_time = round((time.time() - db_start) * 1000, 2)
+        checks['database'] = {
+            'status': 'ok',
+            'response_time_ms': db_time
+        }
     except Exception as e:
-        checks['database'] = f'error: {str(e)}'
+        checks['database'] = {
+            'status': 'error',
+            'message': str(e)
+        }
+        critical_failure = True
         http_status = 503
 
     # 2. Cache bağlantısı (Redis/SimpleCache vs.)
     try:
+        cache_start = time.time()
         cache.set('__healthcheck__', '1', timeout=5)
         val = cache.get('__healthcheck__')
-        checks['cache'] = 'ok' if val == '1' else 'miss'
+        cache_time = round((time.time() - cache_start) * 1000, 2)
+        checks['cache'] = {
+            'status': 'ok' if val == '1' else 'miss',
+            'response_time_ms': cache_time
+        }
     except Exception as e:
-        checks['cache'] = f'error: {str(e)}'
+        checks['cache'] = {
+            'status': 'error',
+            'message': str(e)
+        }
         # Cache hatası kritik değil, servisi durdurmuyoruz
 
-    # 3. Genel uygulama durumu
-    checks['app'] = 'ok'
+    # 3. Genel uygulama durumu ve metadata
+    checks['app'] = {
+        'status': 'ok',
+        'version': current_app.config.get('APP_VERSION', '1.0'),
+        'environment': 'production' if not current_app.debug else 'development'
+    }
 
+    # 4. Toplam yanıt süresi
+    total_time = round((time.time() - start_time) * 1000, 2)
+
+    # Sonuç
     return jsonify({
-        'status': 'ok' if http_status == 200 else 'degraded',
+        'status': 'ok' if not critical_failure else 'degraded',
         'checks': checks,
+        'total_response_time_ms': total_time,
         'timestamp': datetime.utcnow().isoformat() + 'Z'
     }), http_status
