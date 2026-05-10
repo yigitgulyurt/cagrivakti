@@ -110,6 +110,7 @@ self.addEventListener('fetch', (event) => {
         url.hostname === 'fonts.googleapis.com' ||
         url.hostname === 'fonts.gstatic.com' ||
         url.hostname === 'font.yigitgulyurt.net.tr' ||
+        url.hostname === 'image.yigitgulyurt.net.tr' ||
         url.pathname.startsWith('/canli-kaynak/') ||
         url.pathname === '/stream/status'
     ) {
