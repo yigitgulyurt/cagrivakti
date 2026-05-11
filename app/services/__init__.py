@@ -419,11 +419,66 @@ def build_city_alias_mapping():
 
 CITY_ALIAS_MAPPING = build_city_alias_mapping()
 
+def levenshtein_distance(s1, s2):
+    """Levenshtein mesafesini hesaplar (iki string arasındaki minimum düzenleme sayısı)."""
+    if len(s1) < len(s2):
+        return levenshtein_distance(s2, s1)
+    
+    if len(s2) == 0:
+        return len(s1)
+    
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 1
+            deletions = current_row[j] + 1
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+    
+    return previous_row[-1]
+
+def find_closest_city(input_name, all_cities, max_distance=2):
+    """
+    Verilen girişe en yakın şehri bulur.
+    max_distance: kabul edilebilir maksimum Levenshtein mesafesi
+    """
+    # Türkçe karakterleri dönüştür ve küçük harfe çevir
+    tr_chars = {
+        'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ö': 'o', 'ç': 'c',
+        'İ': 'I', 'Ğ': 'G', 'Ü': 'U', 'Ş': 'S', 'Ö': 'O', 'Ç': 'C'
+    }
+    processed_input = input_name.lower()
+    for tr_char, en_char in tr_chars.items():
+        processed_input = processed_input.replace(tr_char, en_char)
+    
+    best_match = None
+    min_distance = float('inf')
+    
+    for city in all_cities:
+        # Şehrin adını da aynı şekilde işle
+        processed_city = city.lower()
+        for tr_char, en_char in tr_chars.items():
+            processed_city = processed_city.replace(tr_char, en_char)
+        
+        distance = levenshtein_distance(processed_input, processed_city)
+        
+        # Eğer mesafe kabul edilebilir ve en küçük mesafeden küçükse
+        if distance <= max_distance and distance < min_distance:
+            min_distance = distance
+            best_match = city
+    
+    return best_match
+
 def normalize_city_name(input_name):
     """
     Gelen şehir ismini canonical (doğru) formata çevirir.
-    Farklı yazımlar, büyük/küçük harf, Türkçe karakter farklılıklarını düzeltir.
+    Farklı yazımlar, büyük/küçük harf, Türkçe karakter farklılıklarını ve basit yazım hatalarını düzeltir.
     """
+    # Tüm canonical şehirleri al
+    all_cities = UserService.get_sehirler('ALL')
+    
     # Girişi temizle (boşlukları vs kaldır)
     cleaned = input_name.strip()
     
@@ -449,6 +504,11 @@ def normalize_city_name(input_name):
     no_tr_lower = no_tr.lower()
     if no_tr_lower in CITY_ALIAS_MAPPING:
         return CITY_ALIAS_MAPPING[no_tr_lower]
+    
+    # Yazım hatası kontrolü: en yakın şehri bul
+    closest_city = find_closest_city(cleaned, all_cities)
+    if closest_city:
+        return closest_city
     
     # Hiçbir şey bulamazsak varsayılan döndür
     return DEFAULT_CITY
