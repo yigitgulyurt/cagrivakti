@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
 Veritabanı Yedekleme Scripti
-Bu script, veritabanını yedeklemek için kullanılır.
+Bu script, veritabanını yedeklemek ve Google Drive'a göndermek için kullanılır.
 """
 
 import os
 import sys
 import shutil
 import gzip
+import subprocess
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -21,38 +22,157 @@ def create_backup():
     backup_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'backups')
     os.makedirs(backup_dir, exist_ok=True)
     
-    # Veritabanı dosyası yolu (SQLite için)
-    db_path = os.environ.get('DATABASE_URL')
-    if db_path and db_path.startswith('sqlite:///'):
-        db_path = db_path.replace('sqlite:///', '')
-    else:
-        # Varsayılan instance dizini
-        db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'instance', 'cagrivakti.db')
+    # Veritabanı dosyası yolu (instance dizininde)
+    instance_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'instance')
+    db_files = []
     
-    if not os.path.exists(db_path):
-        print(f"Hata: Veritabanı dosyası bulunamadı: {db_path}")
+    # Instance dizinindeki tüm .db dosyalarını bul
+    for filename in os.listdir(instance_dir):
+        if filename.endswith('.db'):
+            db_files.append(os.path.join(instance_dir, filename))
+    
+    if not db_files:
+        print(f"Hata: Instance dizininde veritabanı dosyası bulunamadı: {instance_dir}")
         return False
     
-    # Yedek dosyası adı
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    backup_filename = f'cagrivakti_backup_{timestamp}.db.gz'
-    backup_path = os.path.join(backup_dir, backup_filename)
+    success = True
+    latest_backup_path = None
     
-    # Yedekleme ve sıkıştırma
+    # Her veritabanı dosyası için yedek al
+    for db_path in db_files:
+        if not os.path.exists(db_path):
+            print(f"Hata: Veritabanı dosyası bulunamadı: {db_path}")
+            continue
+        
+        db_filename = os.path.basename(db_path).replace('.db', '')
+        
+        # Yedek dosyası adı
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_filename = f'{db_filename}_backup_{timestamp}.db.gz'
+        backup_path = os.path.join(backup_dir, backup_filename)
+        
+        # Yedekleme ve sıkıştırma
+        try:
+            with open(db_path, 'rb') as f_in:
+                with gzip.open(backup_path, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+            
+            print(f"Başarılı! Yedek oluşturuldu: {backup_path}")
+            latest_backup_path = backup_path
+        except Exception as e:
+            print(f"Hata: Yedekleme başarısız {db_path}: {e}")
+            success = False
+    
+    # Eski yedekleri temizle (son 30 günü tut)
+    clean_old_backups(backup_dir, days=30)
+    
+    # Rclone ile Google Drive'a gönder
+    if latest_backup_path:
+        upload_to_google_drive(latest_backup_path)
+    
+    return success
+
+def upload_to_google_drive(backup_path):
+    """Yedek dosyasını rclone ile Google Drive'a gönderir"""
+    rclone_configured = False
+    
+    # Rclone yapılandırmasını kontrol et
     try:
-        with open(db_path, 'rb') as f_in:
-            with gzip.open(backup_path, 'wb') as f_out:
-                shutil.copyfileobj(f_in, f_out)
-        
-        print(f"Başarılı! Yedek oluşturuldu: {backup_path}")
-        
-        # Eski yedekleri temizle (son 30 günü tut)
-        clean_old_backups(backup_dir, days=30)
-        
-        return True
+        result = subprocess.run(
+            ['rclone', 'listremotes'],
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        if 'gdrive:' in result.stdout or 'drive:' in result.stdout:
+            rclone_configured = True
+    except FileNotFoundError:
+        print("Uyarı: rclone bulunamadı. Google Drive'a yükleme atlanıyor.")
+        return
     except Exception as e:
-        print(f"Hata: Yedekleme başarısız: {e}")
-        return False
+        print(f"Uyarı: rclone kontrolü başarısız: {e}")
+        return
+    
+    if not rclone_configured:
+        print("\nGoogle Drive için rclone yapılandırılmamış!")
+        print("Lütfen şu adımları izleyin:")
+        print("1. rclone'ı indirin: https://rclone.org/downloads/")
+        print("2. 'rclone config' komutu ile Google Drive'u yapılandırın (isim olarak 'gdrive' kullanın)")
+        print("3. Daha sonra tekrar bu scripti çalıştırın.\n")
+        return
+    
+    # Google Drive'a yükle
+    try:
+        # Remote adını bul (gdrive veya drive)
+        remote_name = 'gdrive:'
+        result = subprocess.run(['rclone', 'listremotes'], capture_output=True, text=True)
+        if 'gdrive:' not in result.stdout and 'drive:' in result.stdout:
+            remote_name = 'drive:'
+        
+        # Yedekleri klasör altında sakla
+        remote_folder = f'{remote_name}cagrivakti/database-backups'
+        
+        print(f"Yedek Google Drive'a yükleniyor: {backup_path}")
+        
+        subprocess.run(
+            ['rclone', 'copy', backup_path, remote_folder],
+            check=True,
+            timeout=300
+        )
+        
+        print(f"Başarılı! Yedek Google Drive'a yüklendi: {remote_folder}")
+        
+        # Google Drive'daki eski yedekleri de temizle (son 30 gün)
+        clean_remote_backups(remote_folder, days=30)
+        
+    except Exception as e:
+        print(f"Hata: Google Drive'a yükleme başarısız: {e}")
+
+def clean_remote_backups(remote_folder, days=30):
+    """Google Drive'daki eski yedekleri temizler"""
+    try:
+        print("Google Drive'daki eski yedekler kontrol ediliyor...")
+        # Remote dosyaları listele
+        result = subprocess.run(
+            ['rclone', 'lsjson', remote_folder],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        
+        if result.returncode != 0:
+            print("Uyarı: Remote dosyalar listelenemedi")
+            return
+        
+        import json
+        files = json.loads(result.stdout)
+        
+        now = datetime.now().timestamp()
+        cutoff = now - (days * 86400)
+        
+        for file_info in files:
+            if 'ModTime' in file_info and 'Name' in file_info:
+                file_name = file_info['Name']
+                if file_name.startswith('cagrivakti_backup_') or file_name.endswith('.db.gz'):
+                    # ModTime'ı parse et (RFC3339 formatı)
+                    try:
+                        from datetime import datetime
+                        mod_time = datetime.fromisoformat(file_info['ModTime'].replace('Z', '+00:00'))
+                        mod_timestamp = mod_time.timestamp()
+                        
+                        if mod_timestamp < cutoff:
+                            # Dosyayı sil
+                            remote_path = f'{remote_folder}/{file_name}'
+                            print(f"Eski remote yedek siliniyor: {file_name}")
+                            subprocess.run(
+                                ['rclone', 'deletefile', remote_path],
+                                timeout=30
+                            )
+                    except Exception as e:
+                        print(f"Uyarı: Dosya işlenemedi {file_name}: {e}")
+        
+    except Exception as e:
+        print(f"Uyarı: Remote temizleme başarısız: {e}")
 
 def clean_old_backups(backup_dir, days=30):
     """Eski yedek dosyalarını siler"""
@@ -62,7 +182,7 @@ def clean_old_backups(backup_dir, days=30):
     cutoff = now - (days * 86400)
     
     for filename in os.listdir(backup_dir):
-        if filename.startswith('cagrivakti_backup_') and filename.endswith('.db.gz'):
+        if filename.endswith('.db.gz'):
             file_path = os.path.join(backup_dir, filename)
             file_mtime = os.path.getmtime(file_path)
             

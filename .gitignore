@@ -65,5 +65,6 @@ folderico-FxMaQS.ico
 desktop.ini
 .env.example
 PROJE_GELISTIRME_ONERILERI.md
+RCLONE_KURULUM.md
 # Database Backups
 backups/
