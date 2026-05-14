@@ -68,5 +68,8 @@ PROJE_GELISTIRME_ONERILERI.md
 RCLONE_KURULUM.md
 # Database Backups
 backups/
+scripts/backup_database.py
+scripts/backup_project.py
+scripts/systemd/
 temp_backup/
 cagrivakti_project_backup_*.tar.gz
