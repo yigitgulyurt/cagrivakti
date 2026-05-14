@@ -36,7 +36,7 @@ def create_backup():
         return False
     
     success = True
-    latest_backup_path = None
+    all_backup_paths = []
     
     # Her veritabanı dosyası için yedek al
     for db_path in db_files:
@@ -58,7 +58,7 @@ def create_backup():
                     shutil.copyfileobj(f_in, f_out)
             
             print(f"Başarılı! Yedek oluşturuldu: {backup_path}")
-            latest_backup_path = backup_path
+            all_backup_paths.append(backup_path)
         except Exception as e:
             print(f"Hata: Yedekleme başarısız {db_path}: {e}")
             success = False
@@ -66,9 +66,9 @@ def create_backup():
     # Eski yedekleri temizle (son 30 günü tut)
     clean_old_backups(backup_dir, days=30)
     
-    # Rclone ile Google Drive'a gönder
-    if latest_backup_path:
-        upload_to_google_drive(latest_backup_path)
+    # Rclone ile tüm yedekleri Google Drive'a gönder
+    for backup_path in all_backup_paths:
+        upload_to_google_drive(backup_path)
     
     return success
 
@@ -147,16 +147,17 @@ def clean_remote_backups(remote_folder, days=30):
         import json
         files = json.loads(result.stdout)
         
+        # Şu anki zamanı al
+        from datetime import datetime
         now = datetime.now().timestamp()
         cutoff = now - (days * 86400)
         
         for file_info in files:
             if 'ModTime' in file_info and 'Name' in file_info:
                 file_name = file_info['Name']
-                if file_name.startswith('cagrivakti_backup_') or file_name.endswith('.db.gz'):
+                if file_name.startswith('cagrivakti_backup_') or file_name.endswith('.db.gz') or file_name.startswith('discord_users_backup_') or file_name.startswith('telegram_bot_backup_'):
                     # ModTime'ı parse et (RFC3339 formatı)
                     try:
-                        from datetime import datetime
                         mod_time = datetime.fromisoformat(file_info['ModTime'].replace('Z', '+00:00'))
                         mod_timestamp = mod_time.timestamp()
                         
