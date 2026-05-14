@@ -20,6 +20,9 @@ class EzanVakti(db.Model):
 
     __table_args__ = (
         db.Index('idx_vakit_sehir_ulke_tarih', 'sehir', 'country_code', 'tarih'),
+        db.Index('idx_vakit_tarih', 'tarih'),
+        db.Index('idx_vakit_sehir', 'sehir'),
+        db.Index('idx_vakit_ulke', 'country_code'),
     )
 
 class DailyContent(db.Model):
@@ -34,6 +37,8 @@ class DailyContent(db.Model):
 
     __table_args__ = (
         db.Index('idx_daily_content_query', 'category', 'is_active', 'last_shown'),
+        db.Index('idx_daily_content_type', 'content_type'),
+        db.Index('idx_daily_day_index', 'day_index'),
     )
 
     def to_dict(self):
