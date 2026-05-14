@@ -142,7 +142,7 @@ def create_app(config_class=Config):
                 )
         except Exception:
             pass
-        response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+        
         if request.endpoint == 'static' or request.path.startswith('/static/'):
             response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
             from datetime import datetime, timedelta
@@ -375,5 +375,28 @@ def setup_security_logging(app):
     handler = TimedRotatingFileHandler(
         sec_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
     )
-    handler.setFormatter(IstanbulFormatter('[%(asctime)s] %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+    handler.setFormatter(IstanbulFormatter('[%(asctime)s] %(levelname)s | ip=%(remote_addr)s | method=%(method)s | path=%(path)s | %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+    
+    class SecurityContextFilter(logging.Filter):
+        def filter(self, record):
+            try:
+                record.remote_addr = getattr(g, 'remote_addr', '-')
+                record.method = getattr(g, 'request_method', '-')
+                record.path = getattr(g, 'request_path', '-')
+            except Exception:
+                record.remote_addr = '-'
+                record.method = '-'
+                record.path = '-'
+            return True
+    
+    handler.addFilter(SecurityContextFilter())
     logger.addHandler(handler)
+    
+    @app.before_request
+    def capture_security_context():
+        try:
+            g.remote_addr = request.remote_addr
+            g.request_method = request.method
+            g.request_path = request.full_path
+        except Exception:
+            pass
