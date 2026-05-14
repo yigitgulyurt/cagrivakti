@@ -318,57 +318,58 @@ CITY_DISPLAY_NAME_MAPPING = {
 }
 
 # Şehir isimlerini normalize etmek için alias eşlemesi (farklı yazımlar için)
+# Tüm canonical şehirleri global olarak sakla
+ALL_CANONICAL_CITIES = []
+# Türkiye şehirleri
+ALL_CANONICAL_CITIES += [
+    "Adana", "Adiyaman", "Afyonkarahisar", "Agri", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin",
+    "Aydin", "Balikesir", "Bartin", "Batman", "Bayburt", "Bilecik", "Bingol", "Bitlis", "Bolu", "Burdur", "Bursa",
+    "Canakkale", "Cankiri", "Corum", "Denizli", "Diyarbakir", "Duzce", "Edirne", "Elazig", "Erzincan", "Erzurum",
+    "Eskisehir", "Gaziantep", "Giresun", "Gumushane", "Hakkari", "Hatay", "Igdir", "Isparta", "Istanbul", "Izmir",
+    "Kahramanmaras", "Karabuk", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kirikkale", "Kirklareli", "Kirsehir",
+    "Kilis", "Kocaeli", "Konya", "Kutahya", "Malatya", "Manisa", "Mardin", "Mersin", "Mugla", "Mus", "Nevsehir",
+    "Nigde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Sanliurfa", "Siirt", "Sinop", "Sirnak", "Sivas",
+    "Tekirdag", "Tokat", "Trabzon", "Tunceli", "Usak", "Van", "Yalova", "Yozgat", "Zonguldak"
+]
+# Uluslararası şehirler
+ALL_CANONICAL_CITIES += [
+    "Washington", "New-York", "Los-Angeles", "Ottawa", "Toronto", "Mexico-City", "Havana",
+    "Guatemala-City", "San-Salvador", "Tegucigalpa", "Managua", "San-Jose", "Panama-City",
+    "Kingston", "Santo-Domingo", "Port-au-Prince", "Nassau", "Belmopan", "Saint-Johns",
+    "Bridgetown", "Roseau", "Saint-Georges", "Basseterre", "Castries", "Kingstown",
+    "Port-of-Spain", "Oranjestad", "Willemstad",
+    "Brasilia", "Sao-Paulo", "Rio-de-Janeiro", "Buenos-Aires", "Santiago", "Bogota", "Lima", "Caracas",
+    "Quito", "Asuncion", "Montevideo", "La-Paz", "Georgetown", "Paramaribo", "Cayenne",
+    "London", "Paris", "Berlin", "Rome", "Madrid", "Amsterdam", "Brussels", "Vienna", "Bern", "Lisbon",
+    "Athens", "Dublin", "Luxembourg", "Monaco", "Andorra-la-Vella", "Valletta", "San-Marino", "Vaduz", "Vatican",
+    "Stockholm", "Oslo", "Copenhagen", "Helsinki", "Reykjavik",
+    "Moscow", "St.-Petersburg", "Kazan", "Kiev", "Warsaw", "Prague", "Budapest", "Bucharest", "Sofia",
+    "Belgrade", "Sarajevo", "Skopje", "Tirana", "Pristina", "Zagreb",
+    "Ljubljana", "Bratislava", "Chisinau", "Minsk", "Tallinn", "Riga", "Vilnius", "Podgorica",
+    "Mecca", "Medina", "Riyadh", "Baku", "Nakhchivan", "Tbilisi", "Yerevan", "Baghdad", "Tehran",
+    "Damascus", "Beirut", "Amman", "Jerusalem", "Dubai", "Kuwait", "Doha", "Muscat", "Manama",
+    "Sanaa", "Nicosia",
+    "Nur-Sultan", "Almaty", "Tashkent", "Ashgabat", "Bishkek", "Dushanbe", "Kabul", "Islamabad",
+    "New-Delhi", "Dhaka", "Colombo", "Kathmandu", "Thimphu", "Male",
+    "Tokyo", "Seoul", "Beijing", "Hong-Kong", "Ulaanbaatar", "Taipei", "Pyongyang",
+    "Jakarta", "Singapore", "Kuala-Lumpur", "Bangkok", "Manila", "Hanoi", "Phnom-Penh", "Vientiane",
+    "Naypyidaw", "Bandar-Seri-Begawan", "Dili",
+    "Sydney", "Melbourne", "Perth", "Auckland", "Port-Moresby", "Suva", "Honiara", "Port-Vila",
+    "Apia", "Nukualofa", "Palikir", "Ngerulmud",
+    "Cairo", "Tripoli", "Tunis", "Algiers", "Rabat", "Casablanca", "Khartoum", "Abuja", "Lagos",
+    "Dakar", "Accra", "Bamako", "Niamey", "Ouagadougou", "Conakry", "Freetown",
+    "Monrovia", "Abidjan", "Lome", "Porto-Novo", "Banjul", "Bissau", "Praia", "Nouakchott",
+    "Kinshasa", "Brazzaville", "Libreville", "Yaounde", "N-Djamena", "Bangui",
+    "Malabo", "Sao-Tome", "Nairobi", "Addis-Ababa", "Mogadishu", "Djibouti",
+    "Asmara", "Kampala", "Dodoma", "Kigali", "Bujumbura", "Juba",
+    "Pretoria", "Cape-Town", "Windhoek", "Gaborone", "Harare", "Lusaka",
+    "Maputo", "Lilongwe", "Mbabane", "Maseru", "Luanda", "Antananarivo",
+    "Port-Louis", "Victoria", "Moroni", "Saint-Denis"
+]
+
 def build_city_alias_mapping():
     mapping = {}
-    
-    # Tüm şehirleri al
-    all_cities = []
-    # Türkiye şehirleri
-    all_cities += [
-        "Adana", "Adiyaman", "Afyonkarahisar", "Agri", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin",
-        "Aydin", "Balikesir", "Bartin", "Batman", "Bayburt", "Bilecik", "Bingol", "Bitlis", "Bolu", "Burdur", "Bursa",
-        "Canakkale", "Cankiri", "Corum", "Denizli", "Diyarbakir", "Duzce", "Edirne", "Elazig", "Erzincan", "Erzurum",
-        "Eskisehir", "Gaziantep", "Giresun", "Gumushane", "Hakkari", "Hatay", "Igdir", "Isparta", "Istanbul", "Izmir",
-        "Kahramanmaras", "Karabuk", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kirikkale", "Kirklareli", "Kirsehir",
-        "Kilis", "Kocaeli", "Konya", "Kutahya", "Malatya", "Manisa", "Mardin", "Mersin", "Mugla", "Mus", "Nevsehir",
-        "Nigde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Sanliurfa", "Siirt", "Sinop", "Sirnak", "Sivas",
-        "Tekirdag", "Tokat", "Trabzon", "Tunceli", "Usak", "Van", "Yalova", "Yozgat", "Zonguldak"
-    ]
-    # Uluslararası şehirler
-    all_cities += [
-        "Washington", "New-York", "Los-Angeles", "Ottawa", "Toronto", "Mexico-City", "Havana",
-        "Guatemala-City", "San-Salvador", "Tegucigalpa", "Managua", "San-Jose", "Panama-City",
-        "Kingston", "Santo-Domingo", "Port-au-Prince", "Nassau", "Belmopan", "Saint-Johns",
-        "Bridgetown", "Roseau", "Saint-Georges", "Basseterre", "Castries", "Kingstown",
-        "Port-of-Spain", "Oranjestad", "Willemstad",
-        "Brasilia", "Sao-Paulo", "Rio-de-Janeiro", "Buenos-Aires", "Santiago", "Bogota", "Lima", "Caracas",
-        "Quito", "Asuncion", "Montevideo", "La-Paz", "Georgetown", "Paramaribo", "Cayenne",
-        "London", "Paris", "Berlin", "Rome", "Madrid", "Amsterdam", "Brussels", "Vienna", "Bern", "Lisbon",
-        "Athens", "Dublin", "Luxembourg", "Monaco", "Andorra-la-Vella", "Valletta", "San-Marino", "Vaduz", "Vatican",
-        "Stockholm", "Oslo", "Copenhagen", "Helsinki", "Reykjavik",
-        "Moscow", "St.-Petersburg", "Kazan", "Kiev", "Warsaw", "Prague", "Budapest", "Bucharest", "Sofia",
-        "Belgrade", "Sarajevo", "Skopje", "Tirana", "Pristina", "Zagreb",
-        "Ljubljana", "Bratislava", "Chisinau", "Minsk", "Tallinn", "Riga", "Vilnius", "Podgorica",
-        "Mecca", "Medina", "Riyadh", "Baku", "Nakhchivan", "Tbilisi", "Yerevan", "Baghdad", "Tehran",
-        "Damascus", "Beirut", "Amman", "Jerusalem", "Dubai", "Kuwait", "Doha", "Muscat", "Manama",
-        "Sanaa", "Nicosia",
-        "Nur-Sultan", "Almaty", "Tashkent", "Ashgabat", "Bishkek", "Dushanbe", "Kabul", "Islamabad",
-        "New-Delhi", "Dhaka", "Colombo", "Kathmandu", "Thimphu", "Male",
-        "Tokyo", "Seoul", "Beijing", "Hong-Kong", "Ulaanbaatar", "Taipei", "Pyongyang",
-        "Jakarta", "Singapore", "Kuala-Lumpur", "Bangkok", "Manila", "Hanoi", "Phnom-Penh", "Vientiane",
-        "Naypyidaw", "Bandar-Seri-Begawan", "Dili",
-        "Sydney", "Melbourne", "Perth", "Auckland", "Port-Moresby", "Suva", "Honiara", "Port-Vila",
-        "Apia", "Nukualofa", "Palikir", "Ngerulmud",
-        "Cairo", "Tripoli", "Tunis", "Algiers", "Rabat", "Casablanca", "Khartoum", "Abuja", "Lagos",
-        "Dakar", "Accra", "Bamako", "Niamey", "Ouagadougou", "Conakry", "Freetown",
-        "Monrovia", "Abidjan", "Lome", "Porto-Novo", "Banjul", "Bissau", "Praia", "Nouakchott",
-        "Kinshasa", "Brazzaville", "Libreville", "Yaounde", "N-Djamena", "Bangui",
-        "Malabo", "Sao-Tome", "Nairobi", "Addis-Ababa", "Mogadishu", "Djibouti",
-        "Asmara", "Kampala", "Dodoma", "Kigali", "Bujumbura", "Juba",
-        "Pretoria", "Cape-Town", "Windhoek", "Gaborone", "Harare", "Lusaka",
-        "Maputo", "Lilongwe", "Mbabane", "Maseru", "Luanda", "Antananarivo",
-        "Port-Louis", "Victoria", "Moroni", "Saint-Denis"
-    ]
+    all_cities = ALL_CANONICAL_CITIES
     
     # Türkçe karakter dönüşümü için eşleme
     tr_chars = {
@@ -476,9 +477,6 @@ def normalize_city_name(input_name):
     Gelen şehir ismini canonical (doğru) formata çevirir.
     Farklı yazımlar, büyük/küçük harf, Türkçe karakter farklılıklarını ve basit yazım hatalarını düzeltir.
     """
-    # Tüm canonical şehirleri al
-    all_cities = UserService.get_sehirler('ALL')
-    
     # Girişi temizle (boşlukları vs kaldır)
     cleaned = input_name.strip()
     
@@ -506,7 +504,7 @@ def normalize_city_name(input_name):
         return CITY_ALIAS_MAPPING[no_tr_lower]
     
     # Yazım hatası kontrolü: en yakın şehri bul
-    closest_city = find_closest_city(cleaned, all_cities)
+    closest_city = find_closest_city(cleaned, ALL_CANONICAL_CITIES)
     if closest_city:
         return closest_city
     
