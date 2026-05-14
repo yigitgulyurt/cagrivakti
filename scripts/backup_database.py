@@ -70,6 +70,21 @@ def create_backup():
     for backup_path in all_backup_paths:
         upload_to_google_drive(backup_path)
     
+    # Google Drive'daki eski yedekleri temizle (hem ana klasör hem de bot-backups)
+    try:
+        # Remote adını bul (gdrive veya drive)
+        remote_name = 'gdrive:'
+        result = subprocess.run(['rclone', 'listremotes'], capture_output=True, text=True)
+        if 'gdrive:' not in result.stdout and 'drive:' in result.stdout:
+            remote_name = 'drive:'
+        
+        # Ana klasörü temizle
+        clean_remote_backups(f'{remote_name}cagrivakti/database-backups', days=30)
+        # Bot-backups klasörünü temizle
+        clean_remote_backups(f'{remote_name}cagrivakti/database-backups/bot-backups', days=30)
+    except Exception as e:
+        print(f"Uyarı: Remote temizleme başarısız: {e}")
+    
     return success
 
 def upload_to_google_drive(backup_path):
@@ -109,8 +124,12 @@ def upload_to_google_drive(backup_path):
         if 'gdrive:' not in result.stdout and 'drive:' in result.stdout:
             remote_name = 'drive:'
         
-        # Yedekleri klasör altında sakla
-        remote_folder = f'{remote_name}cagrivakti/database-backups'
+        # Dosya adına göre klasör belirle
+        backup_filename = os.path.basename(backup_path)
+        if 'discord_users' in backup_filename or 'telegram_bot' in backup_filename:
+            remote_folder = f'{remote_name}cagrivakti/database-backups/bot-backups'
+        else:
+            remote_folder = f'{remote_name}cagrivakti/database-backups'
         
         print(f"Yedek Google Drive'a yükleniyor: {backup_path}")
         
@@ -121,9 +140,6 @@ def upload_to_google_drive(backup_path):
         )
         
         print(f"Başarılı! Yedek Google Drive'a yüklendi: {remote_folder}")
-        
-        # Google Drive'daki eski yedekleri de temizle (son 30 gün)
-        clean_remote_backups(remote_folder, days=30)
         
     except Exception as e:
         print(f"Hata: Google Drive'a yükleme başarısız: {e}")
