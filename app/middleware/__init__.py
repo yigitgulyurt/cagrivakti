@@ -51,11 +51,11 @@ def setup_middleware(app):
         if request.path.startswith('/embed/'):
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr https://static.cloudflareinsights.com; "
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://font.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr; "
                 "font-src 'self' https://font.yigitgulyurt.net.tr; "
                 "img-src 'self' data: https:; "
-                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://js.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://js.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr https://static.cloudflareinsights.com; "
                 "frame-ancestors *; "
                 "base-uri 'self'; "
                 "form-action 'self';"
@@ -67,11 +67,11 @@ def setup_middleware(app):
         elif request.path.startswith('/kaynak/'):
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdnjs.cloudflare.com; "
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdnjs.cloudflare.com https://static.cloudflareinsights.com; "
                 "style-src 'self' 'unsafe-inline'; "
                 "font-src 'self' data:; "
                 "img-src 'self' data: blob: https:; "
-                "connect-src 'self' blob:; "
+                "connect-src 'self' blob: https://static.cloudflareinsights.com; "
                 "frame-src 'self'; "
                 "frame-ancestors 'self'; "
                 "worker-src 'self' blob:; "
@@ -85,11 +85,11 @@ def setup_middleware(app):
             # Standart sayfalar
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.jsdelivr.net https://unpkg.com/html5-qrcode https://js.yigitgulyurt.net.tr https://static.cloudflareinsights.com; "
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://font.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr; "
                 "font-src 'self' https://font.yigitgulyurt.net.tr; "
                 "img-src 'self' data: https:; "
-                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://js.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr; "
+                "connect-src 'self' https://nominatim.openstreetmap.org https://api.cagrivakti.com.tr https://js.yigitgulyurt.net.tr https://css.yigitgulyurt.net.tr https://static.cloudflareinsights.com; "
                 "frame-src 'self' *; "
                 "frame-ancestors 'none'; "
                 "base-uri 'self'; "
