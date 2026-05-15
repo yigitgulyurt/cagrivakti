@@ -776,6 +776,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             try {
                 const sehirAdi = "{{ get_display_name(sehir) }}";
+                const footerLink = `cagrivakti.com.tr/sehir/${sehirAdi}`;
                 const imsak    = ezanVakitleri.imsak;
                 const gunes    = ezanVakitleri.gunes;
                 const ogle     = ezanVakitleri.ogle;
@@ -812,7 +813,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     await navigator.share({
                         files: [file],
                         title: `${sehirAdi} Namaz Vakitleri - ${todayStr}`,
-                        text: `${sehirAdi} için ${todayStr} tarihli namaz vakitleri. cagrivakti.com.tr`
+                        text: `${sehirAdi} için ${todayStr} tarihli namaz vakitleri.\n${footerLink}`
                     });
                 } else {
                     // 3. Fallback: İndirme işlemi
