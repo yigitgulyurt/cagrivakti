@@ -65,6 +65,8 @@ def index():
 # ==== CITY ====
 # ======================================================
 
+
+
 @views_bp.route('/sehir/<sehir>')
 def sehir_sayfasi(sehir):
     canonical_sehir = normalize_city_name(sehir)
@@ -1113,3 +1115,13 @@ def iletisim():
                            seo_title=title,
                            seo_description=description,
                            og_image_url=og_image_url)
+
+
+# ======================================================
+# ==== ROOT CITY ROUTE (son olmalı!) ====
+# ======================================================
+
+@views_bp.route('/<sehir>')
+def root_sehir_redirect(sehir):
+    """Kök dizinden şehir adına yönlendirme (örn: /ankara → /sehir/ankara)"""
+    return redirect(url_for('views.sehir_sayfasi', sehir=sehir, **request.args), code=301)
