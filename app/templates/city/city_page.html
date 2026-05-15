@@ -776,7 +776,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             try {
                 const sehirAdi = "{{ get_display_name(sehir) }}";
-                const footerLink = `cagrivakti.com.tr/sehir/${sehirAdi}`;
+                const sehirCanonical = "{{ sehir }}";
+                const footerLink = `cagrivakti.com.tr/sehir/${sehirCanonical}`;
                 const imsak    = ezanVakitleri.imsak;
                 const gunes    = ezanVakitleri.gunes;
                 const ogle     = ezanVakitleri.ogle;
@@ -794,7 +795,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 ].join(',');
 
                 const shareUrl = new URL('/paylas/vakit', window.location.origin);
-                shareUrl.searchParams.set('sehir', sehirAdi);
+                shareUrl.searchParams.set('sehir', sehirCanonical);
                 shareUrl.searchParams.set('tarih', todayStr);
                 shareUrl.searchParams.set('vakitler', vakitParam);
                 shareUrl.searchParams.set('_t', Date.now().toString());
