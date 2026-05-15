@@ -70,6 +70,7 @@ RCLONE_KURULUM.md
 backups/
 scripts/backup_database.py
 scripts/backup_project.py
+scripts/test_city_urls.py
 scripts/systemd/
 temp_backup/
 cagrivakti_project_backup_*.tar.gz
