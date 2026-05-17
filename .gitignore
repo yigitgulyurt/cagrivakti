@@ -71,6 +71,8 @@ backups/
 scripts/backup_database.py
 scripts/backup_project.py
 scripts/test_city_urls.py
+scripts/test_city_urls_advanced.py
 scripts/systemd/
+test_results.json
 temp_backup/
 cagrivakti_project_backup_*.tar.gz
