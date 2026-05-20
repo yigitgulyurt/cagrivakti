@@ -355,7 +355,13 @@ class NamazBot:
         msg += f"🕒 <b>{h} saat {m} dakika</b> kaldı.\n"
         msg += f"⏰ Vakit saati: <b>{next_v['vakit']}</b>"
         
-        await update.callback_query.edit_message_text(msg, reply_markup=self.get_main_keyboard(), parse_mode='HTML')
+        try:
+            await update.callback_query.edit_message_text(msg, reply_markup=self.get_main_keyboard(), parse_mode='HTML')
+        except BadRequest as e:
+            if "Message is not modified" in str(e):
+                await update.callback_query.answer("⏳ Zaten en güncel bilgiyi görüyorsunuz.")
+            else:
+                raise e
 
     async def _show_notification_menu(self, query, user_id):
         user = self.db.get_user(user_id)
