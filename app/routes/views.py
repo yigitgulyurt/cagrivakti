@@ -785,30 +785,39 @@ import subprocess
 def get_systemd_service_status(service_name):
     """Systemd servis durumunu döner (active/inactive)."""
     try:
+        current_app.logger.info(f'[DEBUG] systemctl is-active {service_name} çalıştırılıyor...')
         result = subprocess.run(
             ['systemctl', 'is-active', service_name],
             capture_output=True,
             text=True,
             timeout=5
         )
-        return result.stdout.strip()
-    except Exception:
+        status = result.stdout.strip()
+        current_app.logger.info(f'[DEBUG] systemctl is-active çıktısı: stdout={repr(status)}, stderr={repr(result.stderr)}, returncode={result.returncode}')
+        return status
+    except Exception as e:
+        current_app.logger.error(f'[DEBUG] get_systemd_service_status hatası: {str(e)}')
         return 'inactive'
 
 def run_systemctl_command(command):
     """Systemctl komutu çalıştırır ve (success, message) döner."""
     try:
-        subprocess.run(
-            ['sudo', 'systemctl'] + command,
+        cmd = ['sudo', 'systemctl'] + command
+        current_app.logger.info(f'[DEBUG] Komut çalıştırılıyor: {" ".join(cmd)}')
+        result = subprocess.run(
+            cmd,
             check=True,
             capture_output=True,
             text=True,
             timeout=10
         )
+        current_app.logger.info(f'[DEBUG] Komut başarıyla tamamlandı: stdout={repr(result.stdout)}, stderr={repr(result.stderr)}')
         return True, 'İşlem başarıyla tamamlandı.'
     except subprocess.CalledProcessError as e:
+        current_app.logger.error(f'[DEBUG] CalledProcessError: returncode={e.returncode}, stdout={repr(e.stdout)}, stderr={repr(e.stderr)}')
         return False, f'Hata: {e.stderr or e.stdout}'
     except Exception as e:
+        current_app.logger.error(f'[DEBUG] run_systemctl_command hatası: {str(e)}')
         return False, f'Hata: {str(e)}'
 
 
