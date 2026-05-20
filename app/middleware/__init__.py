@@ -32,7 +32,7 @@ def setup_middleware(app):
                 uid = getattr(g, 'user_uid', '-')
             except Exception:
                 uid = '-'
-            app.logger.info(f'{ip:<18} ziyaret: {path} uid={uid}')
+            app.logger.info(f'{ip:<15} ziyaret: {path} uid={uid}')
 
         except Exception as e:
             app.logger.error(f"Loglama hatası: {str(e)}")
