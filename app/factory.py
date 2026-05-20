@@ -233,12 +233,61 @@ def compress_rotator(source, dest):
             shutil.copyfileobj(f_in, f_out)
     os.remove(source)
 
+class RequestContextFilter(logging.Filter):
+    def filter(self, record):
+        try:
+            record.request_id = getattr(g, 'request_id', '-')
+        except Exception:
+            record.request_id = '-'
+        return True
+
+class APIRequestContextFilter(logging.Filter):
+    def filter(self, record):
+        try:
+            record.request_id = getattr(g, 'request_id', '-')
+            record.user_id = getattr(g, 'user_uid', '-')
+        except Exception:
+            record.request_id = '-'
+            record.user_id = '-'
+        if not hasattr(record, 'status'):
+            record.status = '-'
+        if not hasattr(record, 'duration_ms'):
+            record.duration_ms = 0
+        return True
+
+class SecurityContextFilter(logging.Filter):
+    def filter(self, record):
+        try:
+            record.remote_addr = getattr(g, 'remote_addr', '-')
+            record.method = getattr(g, 'request_method', '-')
+            record.path = getattr(g, 'request_path', '-')
+        except Exception:
+            record.remote_addr = '-'
+            record.method = '-'
+            record.path = '-'
+        return True
+
+class JSONFormatter(IstanbulFormatter):
+    def format(self, record):
+        log_record = {
+            'timestamp': self.formatTime(record),
+            'level': record.levelname,
+            'module': record.module,
+            'message': record.getMessage(),
+            'request_id': getattr(record, 'request_id', '-')
+        }
+        if record.exc_info:
+            log_record['exception'] = self.formatException(record.exc_info)
+        return json.dumps(log_record, ensure_ascii=False)
+
 def setup_logging(app):
     log_file = app.config['LOG_FILE']
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
     app.logger.handlers = []
     level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
-    app.logger.setLevel(getattr(logging, level_name, logging.INFO))
+    log_level = getattr(logging, level_name, logging.INFO)
+    app.logger.setLevel(log_level)
+    
     default_formatter = IstanbulFormatter(
         '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
@@ -247,23 +296,30 @@ def setup_logging(app):
         '[%(asctime)s] %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
+    json_formatter = JSONFormatter()
+    
+    ctx_filter = RequestContextFilter()
+    
     file_handler = TimedRotatingFileHandler(
         log_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
     )
-    file_handler.setFormatter(clean_formatter)
+    file_handler.rotator = compress_rotator
+    file_handler.setFormatter(json_formatter if app.config.get('APP_LOG_JSON') else clean_formatter)
     file_handler.setLevel(logging.INFO)
-
-    class RequestContextFilter(logging.Filter):
-        def filter(self, record):
-            try:
-                record.request_id = getattr(g, 'request_id', '-')
-            except Exception:
-                record.request_id = '-'
-            return True
-
-    ctx_filter = RequestContextFilter()
     file_handler.addFilter(ctx_filter)
     app.logger.addHandler(file_handler)
+    
+    if app.config.get('APP_LOG_JSON'):
+        json_file = log_file.replace('.log', '.jsonl')
+        json_file_handler = TimedRotatingFileHandler(
+            json_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
+        )
+        json_file_handler.rotator = compress_rotator
+        json_file_handler.setFormatter(json_formatter)
+        json_file_handler.setLevel(logging.INFO)
+        json_file_handler.addFilter(ctx_filter)
+        app.logger.addHandler(json_file_handler)
+    
     error_log_file = os.path.join(os.path.dirname(log_file), 'error.log')
     error_handler = RotatingFileHandler(
         error_log_file, maxBytes=10*1024*1024, backupCount=10, encoding='utf-8'
@@ -272,9 +328,17 @@ def setup_logging(app):
     error_handler.addFilter(ctx_filter)
     error_handler.setLevel(logging.ERROR)
     app.logger.addHandler(error_handler)
+    
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(default_formatter)
+    console_handler.setLevel(log_level)
+    console_handler.addFilter(ctx_filter)
+    app.logger.addHandler(console_handler)
+    
     werkzeug_logger = logging.getLogger('werkzeug')
     werkzeug_logger.setLevel(logging.ERROR)
     werkzeug_logger.addHandler(error_handler)
+    werkzeug_logger.addHandler(console_handler)
 
 def setup_api_logging(app):
     api_log_file = app.config['API_LOG_FILE']
@@ -290,34 +354,25 @@ def setup_api_logging(app):
     handler = TimedRotatingFileHandler(
         api_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
     )
+    handler.rotator = compress_rotator
     handler.setFormatter(formatter)
 
-    class RequestContextFilter(logging.Filter):
-        def filter(self, record):
-            try:
-                record.request_id = getattr(g, 'request_id', '-')
-            except Exception:
-                record.request_id = '-'
-                record.user_id = '-'
-            if not hasattr(record, 'status'):
-                record.status = '-'
-            if not hasattr(record, 'duration_ms'):
-                record.duration_ms = 0
-            return True
+    api_ctx_filter = APIRequestContextFilter()
 
-    handler.addFilter(RequestContextFilter())
+    handler.addFilter(api_ctx_filter)
     api_logger.addHandler(handler)
     if app.config.get('API_LOG_JSON', True):
         json_file = api_log_file.replace('.log', '.jsonl')
         json_handler = TimedRotatingFileHandler(
             json_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
         )
+        json_handler.rotator = compress_rotator
         json_handler.setLevel(getattr(logging, level_name, logging.INFO))
         json_logger = logging.getLogger('api_logger.json')
         json_logger.setLevel(getattr(logging, level_name, logging.INFO))
         json_logger.propagate = False
         json_logger.addHandler(json_handler)
-        json_handler.addFilter(RequestContextFilter())
+        json_handler.addFilter(api_ctx_filter)
         json_handler.setFormatter(logging.Formatter('%(message)s'))
 
     @app.before_request
@@ -375,21 +430,12 @@ def setup_security_logging(app):
     handler = TimedRotatingFileHandler(
         sec_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
     )
+    handler.rotator = compress_rotator
     handler.setFormatter(IstanbulFormatter('[%(asctime)s] %(levelname)s | ip=%(remote_addr)s | method=%(method)s | path=%(path)s | %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
     
-    class SecurityContextFilter(logging.Filter):
-        def filter(self, record):
-            try:
-                record.remote_addr = getattr(g, 'remote_addr', '-')
-                record.method = getattr(g, 'request_method', '-')
-                record.path = getattr(g, 'request_path', '-')
-            except Exception:
-                record.remote_addr = '-'
-                record.method = '-'
-                record.path = '-'
-            return True
+    sec_ctx_filter = SecurityContextFilter()
     
-    handler.addFilter(SecurityContextFilter())
+    handler.addFilter(sec_ctx_filter)
     logger.addHandler(handler)
     
     @app.before_request

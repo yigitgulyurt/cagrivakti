@@ -24,6 +24,7 @@ class Config:
     SECURITY_LOG_FILE = os.path.join(LOG_DIR, 'security.log')
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     API_LOG_JSON = os.environ.get('API_LOG_JSON', 'true').lower() in ('1', 'true', 'yes')
+    APP_LOG_JSON = os.environ.get('APP_LOG_JSON', 'false').lower() in ('1', 'true', 'yes')
     LOG_RETENTION_DAYS = int(os.environ.get('LOG_RETENTION_DAYS', '30'))
     
     LOGGED_PAGES = {

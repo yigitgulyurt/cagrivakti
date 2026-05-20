@@ -725,6 +725,25 @@ def admin_logs():
                         page_counts[path.strip()] += 1
                     except Exception as e:
                         current_app.logger.error(f"Log satır hatası: {e} - Satır: {line}")
+                else:
+                    try:
+                        log_entry = json.loads(line.strip())
+                        if 'message' in log_entry and 'ziyaret:' in log_entry['message']:
+                            msg = log_entry['message']
+                            path_match = _re.search(r'ziyaret: (.*)', msg)
+                            if path_match:
+                                path = path_match.group(1).split(' ')[0].strip()
+                                timestamp_str = log_entry.get('timestamp', '')
+                                try:
+                                    hour = (timestamp_str.split(' ')[1][:2] + ":00"
+                                            if ' ' in timestamp_str
+                                            else (timestamp_str[11:13] + ":00" if len(timestamp_str) > 13 else "00:00"))
+                                    hourly_counts[hour] += 1
+                                    page_counts[path] += 1
+                                except Exception as e:
+                                    current_app.logger.error(f"JSON log satır hatası: {e} - Satır: {line}")
+                    except json.JSONDecodeError:
+                        continue
             stats['hourly'] = dict(sorted(hourly_counts.items()))
             stats['pages']  = dict(page_counts.most_common())
         except Exception as e:
