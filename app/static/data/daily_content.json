@@ -680,6 +680,96 @@
         "text": "Ramazan, ruhun kendini dinlediği zamandır.",
         "category": "ramadan",
         "source": "Anonim"
+    },
+    {
+      "type": "ayet",
+      "text": "Ve biz insanı en güzel biçimde yarattık.",
+      "category": "daily",
+      "source": "Tîn Suresi, 95:4"
+    },
+    {
+      "type": "ayet",
+      "text": "Şüphesiz Allah, sabredenlerle beraberdir.",
+      "category": "motivasyon",
+      "source": "Bakara Suresi, 2:153"
+    },
+    {
+      "type": "hadis",
+      "text": "Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz.",
+      "category": "daily",
+      "source": "Buhârî, İlim 11"
+    },
+    {
+      "type": "hadis",
+      "text": "Komşusu açken tok yatan bizden değildir.",
+      "category": "ahlak",
+      "source": "Hâkim, el-Müstedrek"
+    },
+    {
+      "type": "soz",
+      "text": "Bir insan ancak çalıştığının karşılığını alır.",
+      "category": "motivasyon",
+      "source": "Hz. Ali"
+    },
+    {
+      "type": "soz",
+      "text": "Akıl yaşta değil, baştadır.",
+      "category": "hikmet",
+      "source": "Atasözü"
+    },
+    {
+      "type": "dua",
+      "text": "Rabbimiz, bize dünyada da ahirette de iyilik ver ve bizi cehennem azabından koru.",
+      "category": "daily",
+      "source": "Bakara Suresi, 2:201"
+    },
+    {
+      "type": "siir",
+      "text": "Biz bize benzeriz, bize benzemez hiç kimse;\nBiz bir tuhaf çiçeğiz, bahçede eşi yok.",
+      "category": "edebi",
+      "source": "Yunus Emre"
+    },
+    {
+      "type": "bilimsel",
+      "text": "Doğa, boşluktan nefret eder.",
+      "category": "fizik",
+      "source": "Aristoteles"
+    },
+    {
+      "type": "bilimsel",
+      "text": "Eğer tek bir doğru varsa, onu bulmak için binlerce yanlışı denemek gerekir.",
+      "category": "bilim_felsefesi",
+      "source": "Thomas Edison"
+    },
+    {
+      "type": "felsefi",
+      "text": "Kendini bil.",
+      "category": "antik",
+      "source": "Sokrates"
+    },
+    {
+      "type": "felsefi",
+      "text": "İki şey insanı şaşırtır: üstümdeki yıldızlı gök ve içimdeki ahlak yasası.",
+      "category": "modern",
+      "source": "Immanuel Kant"
+    },
+    {
+      "type": "tarihsel",
+      "text": "Türk milletinin istidadı ve kesin kararı medeniyette tam başarıya ulaşmaktır.",
+      "category": "milli",
+      "source": "Mustafa Kemal Atatürk"
+    },
+    {
+      "type": "tarihsel",
+      "text": "Düştükten sonra kalkmak, hiç düşmemekten daha büyük bir zaferdir.",
+      "category": "ilham",
+      "source": "Napoleon Bonaparte"
+    },
+    {
+      "type": "edebi",
+      "text": "İnsan ne kadar küçük görünse de, kendi içinde sonsuz bir evren taşır.",
+      "category": "roman",
+      "source": "Dostoyevski, Karamazov Kardeşler"
     }
     ]
 }
