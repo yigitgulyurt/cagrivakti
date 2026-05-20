@@ -280,6 +280,20 @@ class JSONFormatter(IstanbulFormatter):
             log_record['exception'] = self.formatException(record.exc_info)
         return json.dumps(log_record, ensure_ascii=False)
 
+class APILogFormatter(IstanbulFormatter):
+    def format(self, record):
+        asctime = self.formatTime(record)
+        remote_addr = getattr(record, 'remote_addr', '-')
+        method = getattr(record, 'method', '-')
+        path = getattr(record, 'path', '-')
+        status = getattr(record, 'status', '-')
+        duration_ms = getattr(record, 'duration_ms', 0)
+        request_id = getattr(record, 'request_id', '-')
+        user_id = getattr(record, 'user_id', '-')
+        
+        return (f'[{asctime}] {remote_addr:<20} - {method} {path:<60} '
+                f'{status:3} {duration_ms:4}ms rid={request_id} uid={user_id}')
+
 def setup_logging(app):
     log_file = app.config['LOG_FILE']
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
@@ -347,8 +361,7 @@ def setup_api_logging(app):
     level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
     api_logger.setLevel(getattr(logging, level_name, logging.INFO))
     api_logger.propagate = False
-    formatter = IstanbulFormatter(
-        '[%(asctime)s] %(remote_addr)s - %(method)s %(path)s %(status)s %(duration_ms)sms rid=%(request_id)s uid=%(user_id)s',
+    formatter = APILogFormatter(
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     handler = TimedRotatingFileHandler(
