@@ -1,0 +1,171 @@
+ {% extends "base.html" %}
+
+{% block title %}Bot Yönetimi | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}ADMİN PANELİ{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container {
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .admin-header {
+        margin-bottom: 30px;
+    }
+    .admin-header h1 {
+        font-size: 2rem;
+        color: var(--primary);
+    }
+    .bot-card {
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 30px;
+        border: 1px solid rgba(255, 193, 7, 0.1);
+        margin-bottom: 20px;
+    }
+    .bot-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .bot-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .status-running {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+    }
+    .status-stopped {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+    }
+    .bot-actions {
+        display: flex;
+        gap: 10px;
+    }
+    .btn {
+        padding: 10px 25px;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .btn-primary {
+        background: var(--primary);
+        color: #000;
+    }
+    .btn-primary:hover {
+        background: #e6b800;
+        transform: translateY(-2px);
+    }
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .bot-info {
+        color: #8b949e;
+        font-size: 0.95rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container fade-in">
+    <div class="admin-header">
+        <h1>🤖 Bot Yönetimi</h1>
+        <p>Telegram ve Discord botlarını buradan yönetebilirsiniz.</p>
+    </div>
+
+    <div class="bot-card">
+        <div class="bot-header">
+            <div class="bot-name">
+                <i class="fab fa-telegram"></i>
+                Telegram Bot
+            </div>
+            <span class="status-badge {% if bot_statuses.telegram == 'Running' %}status-running{% else %}status-stopped{% endif %}">
+                {% if bot_statuses.telegram == 'Running' %}
+                    <i class="fas fa-circle"></i> Çalışıyor
+                {% else %}
+                    <i class="fas fa-circle"></i> Durduruldu
+                {% endif %}
+            </span>
+        </div>
+        <div class="bot-info">
+            <p><i class="fas fa-file"></i> Dosya: bots/telegram_bot.py</p>
+        </div>
+        <div class="bot-actions" style="margin-top: 20px;">
+            {% if bot_statuses.telegram == 'Running' %}
+                <a href="{{ url_for('views.admin_stop_bot', bot_name='telegram') }}" class="btn btn-danger">
+                    <i class="fas fa-stop"></i> Durdur
+                </a>
+            {% else %}
+                <a href="{{ url_for('views.admin_start_bot', bot_name='telegram') }}" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Başlat
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bot-card">
+        <div class="bot-header">
+            <div class="bot-name">
+                <i class="fab fa-discord"></i>
+                Discord Bot
+            </div>
+            <span class="status-badge {% if bot_statuses.discord == 'Running' %}status-running{% else %}status-stopped{% endif %}">
+                {% if bot_statuses.discord == 'Running' %}
+                    <i class="fas fa-circle"></i> Çalışıyor
+                {% else %}
+                    <i class="fas fa-circle"></i> Durduruldu
+                {% endif %}
+            </span>
+        </div>
+        <div class="bot-info">
+            <p><i class="fas fa-file"></i> Dosya: bots/discord_bot.py</p>
+        </div>
+        <div class="bot-actions" style="margin-top: 20px;">
+            {% if bot_statuses.discord == 'Running' %}
+                <a href="{{ url_for('views.admin_stop_bot', bot_name='discord') }}" class="btn btn-danger">
+                    <i class="fas fa-stop"></i> Durdur
+                </a>
+            {% else %}
+                <a href="{{ url_for('views.admin_start_bot', bot_name='discord') }}" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Başlat
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bot-card">
+        <div style="text-align: center; padding: 20px;">
+            <a href="{{ url_for('views.admin_dashboard') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Dashboard'a Dön
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

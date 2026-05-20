@@ -5,12 +5,14 @@ from app.models import ContactMessage, DailyContent, Guide
 from app.extensions import cache, db, limiter, csrf
 from datetime import datetime, timedelta
 import os
+import sys
 import json
 import bleach
 import requests
 from threading import Thread
 import re
 import hashlib
+from app.services.bot_manager import BotManager
 
 views_bp = Blueprint('views', __name__)
 
@@ -776,6 +778,45 @@ def admin_logs():
                            bot_logs=bot_logs,
                            security_logs=security_logs,
                            stats=stats)
+
+
+@views_bp.route('/admin/botlar')
+@admin_required
+def admin_bots():
+    bot_statuses = BotManager.get_all_statuses()
+    return render_template('admin/bots.html', bot_statuses=bot_statuses)
+
+
+@views_bp.route('/admin/bot/<bot_name>/baslat')
+@admin_required
+def admin_start_bot(bot_name):
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if bot_name == 'telegram':
+        script_path = os.path.join(root_dir, 'bots', 'telegram_bot.py')
+    elif bot_name == 'discord':
+        script_path = os.path.join(root_dir, 'bots', 'discord_bot.py')
+    else:
+        flash('Geçersiz bot adı.', 'danger')
+        return redirect(url_for('views.admin_bots'))
+    
+    success, message = BotManager.start_bot(bot_name, script_path)
+    if success:
+        flash(message, 'success')
+    else:
+        flash(message, 'danger')
+    return redirect(url_for('views.admin_bots'))
+
+
+@views_bp.route('/admin/bot/<bot_name>/durdur')
+@admin_required
+def admin_stop_bot(bot_name):
+    success, message = BotManager.stop_bot(bot_name)
+    if success:
+        flash(message, 'success')
+    else:
+        flash(message, 'danger')
+    return redirect(url_for('views.admin_bots'))
+
 
 # ======================================================
 # ==== EXTRA ====

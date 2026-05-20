@@ -21,6 +21,10 @@ from app.factory import create_app
 log_file = Config.TELEGRAM_LOG_FILE
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
+import logging
+from logging.handlers import TimedRotatingFileHandler
+from app.logging_config import IstanbulFormatter, compress_rotator
+
 # Özet veriler
 bot_stats = {
     'users': {}, # {user_id: {last_action: time, count: total_actions}}
@@ -68,20 +72,34 @@ class ReportHandler(logging.Handler):
                 # Basit bir parser eklenebilir ama şimdilik genel loglamayı yapalım
                 pass
 
-# Root logger setup
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.INFO)
+# Logger setup
+logger = logging.getLogger('telegram_bot')
+logger.setLevel(logging.INFO)
+logger.propagate = False
 
-# Raporlama handler'ı
-report_handler = ReportHandler()
-root_logger.addHandler(report_handler)
+# Dosya handler'ı
+file_handler = TimedRotatingFileHandler(
+    log_file, when='midnight', interval=1, 
+    backupCount=getattr(Config, 'LOG_RETENTION_DAYS', 7), 
+    encoding='utf-8'
+)
+file_handler.rotator = compress_rotator
+formatter = IstanbulFormatter(
+    '[%(asctime)s] %(levelname)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 # Console Handler (Sadece kritik hataları göster)
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.ERROR)
-root_logger.addHandler(console_handler)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
 
-logger = logging.getLogger(__name__)
+# Raporlama handler'ı
+report_handler = ReportHandler()
+logger.addHandler(report_handler)
 
 # Kullanıcı işlemlerini loglayan yardımcı fonksiyon
 def log_user_action(user_id, db=None):
