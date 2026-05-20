@@ -45,7 +45,6 @@ css-maker.html
 .idea/
 *.swp
 *.swo
-app/static/data/daily_content.json
 # OS files
 .DS_Store
 Thumbs.db
@@ -54,10 +53,7 @@ Thumbs.db
 scripts/2026/*.xlsx
 scripts/**/*.xlsx
 scripts/**/*.json
-!scripts/daily_content.json
-!app/static/data/guides.json
-scripts/daily_content.json
-app/static/data/guides.json
+
 
 stress_test.py
 test.py

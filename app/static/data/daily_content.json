@@ -1,0 +1,685 @@
+{
+    "content": 
+    [
+    {
+        "type": "ayet",
+        "text": "Şüphesiz Allah sabredenlerle beraberdir.",
+        "category": "daily",
+        "source": "Bakara Suresi 153. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Az konuşmak, çok dinlemek bilgeliğin kapısını açar.",
+        "category": "daily",
+        "source": "Atasözü"
+    },
+    {
+        "type": "ayet",
+        "text": "İyilik ve takva üzerinde yardımlaşın.",
+        "category": "daily",
+        "source": "Maide Suresi 2. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "İnsanların en hayırlısı insanlara faydalı olandır.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Sabır, acıdır; fakat meyvesi tatlıdır.",
+        "category": "daily",
+        "source": "Aristo"
+    },
+    {
+        "type": "ayet",
+        "text": "Kim zerre kadar hayır yapmışsa onu görür.",
+        "category": "daily",
+        "source": "Zilzal Suresi 7. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Güler yüz sadakadır.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Damlaya damlaya göl olur.",
+        "category": "daily",
+        "source": "Türk Atasözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Şükrederseniz elbette size nimetimi artırırım.",
+        "category": "daily",
+        "source": "İbrahim Suresi 7. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Merhamet etmeyene merhamet edilmez.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "ayet",
+        "text": "Ramazan ayı, insanlara yol gösterici, doğruyu ve eğriyi ayırmanın açık delilleri olarak Kur'an'ın indirildiği aydır.",
+        "category": "ramadan",
+        "source": "Bakara Suresi 185. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Kim inanarak ve sevabını Allah’tan bekleyerek Ramazan orucunu tutarsa geçmiş günahları bağışlanır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Oruç sabrın yarısıdır.",
+        "category": "ramadan",
+        "source": "İslam Alimleri Sözü"
+    },
+    {
+        "type": "hadis",
+        "text": "Oruç tutunuz ki sıhhat bulasınız.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "ayet",
+        "text": "Kadir Gecesi bin aydan daha hayırlıdır.",
+        "category": "ramadan",
+        "source": "Kadir Suresi 3. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Ramazan geldiğinde cennet kapıları açılır, cehennem kapıları kapanır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, ruhun arınma ve kalbin dirilme mevsimidir.",
+        "category": "ramadan",
+        "source": "Tasavvuf Sözü"
+    },
+    {
+        "type": "hadis",
+        "text": "İftar verene, oruçlunun sevabı kadar sevap verilir.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah sizin için kolaylık ister, zorluk istemez.",
+        "category": "ramadan",
+        "source": "Bakara Suresi 185. Ayet"
+    },
+    {
+        "type": "söz",
+        "text": "Paylaşılan ekmek, bereketi artırır.",
+        "category": "ramadan",
+        "source": "Anadolu Sözü"
+    },
+    {
+        "type": "hadis",
+        "text": "Sahur yapınız; çünkü sahurda bereket vardır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "İnsan açken nefsini, tokken kalbini sınar.",
+        "category": "ramadan",
+        "source": "Tasavvuf Sözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah adaleti, iyiliği ve akrabaya yardım etmeyi emreder.",
+        "category": "daily",
+        "source": "Nahl Suresi 90. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Mümin, elinden ve dilinden insanların emin olduğu kişidir.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Bilgi, paylaşıldıkça çoğalır.",
+        "category": "daily",
+        "source": "Anonim"
+    },
+    {
+        "type": "ayet",
+        "text": "Şüphesiz güçlükle beraber bir kolaylık vardır.",
+        "category": "daily",
+        "source": "İnşirah Suresi 6. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Bir kimse kardeşine yardım ettiği sürece Allah da ona yardım eder.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Kalp kırmak, Kâbe yıkmak gibidir.",
+        "category": "daily",
+        "source": "Tasavvuf Sözü"
+    },
+    {
+        "type": "ayet",
+        "text": "İnsan için ancak çalıştığının karşılığı vardır.",
+        "category": "daily",
+        "source": "Necm Suresi 39. Ayet"
+    },
+    {
+        "type": "söz",
+        "text": "Acele işe şeytan karışır.",
+        "category": "daily",
+        "source": "Türk Atasözü"
+    },
+    {
+        "type": "hadis",
+        "text": "Doğruluk insanı iyiliğe götürür, iyilik de cennete götürür.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah, kuluna şah damarından daha yakındır.",
+        "category": "daily",
+        "source": "Kaf Suresi 16. Ayet"
+    },
+    {
+        "type": "söz",
+        "text": "Nefsini bilen, Rabbini bilir.",
+        "category": "daily",
+        "source": "Tasavvuf Sözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Ey iman edenler! Sabır ve namaz ile Allah'tan yardım isteyin.",
+        "category": "daily",
+        "source": "Bakara Suresi 45. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Sadaka belayı defeder.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "İyilik eden iyilik bulur.",
+        "category": "daily",
+        "source": "Türk Atasözü"
+    },
+
+    {
+        "type": "ayet",
+        "text": "Oruç, sayılı günlerdedir.",
+        "category": "ramadan",
+        "source": "Bakara Suresi 184. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Oruç bir kalkandır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, paylaşmanın en güzel öğretmenidir.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+    {
+        "type": "hadis",
+        "text": "Ramazan'ın ilk gecesi olduğunda şeytanlar zincire vurulur.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "ayet",
+        "text": "Biz Kur'an'ı Kadir gecesinde indirdik.",
+        "category": "ramadan",
+        "source": "Kadir Suresi 1. Ayet"
+    },
+    {
+        "type": "söz",
+        "text": "Açlık, bedenin değil ruhun da terbiyesidir.",
+        "category": "ramadan",
+        "source": "Tasavvuf Sözü"
+    },
+    {
+        "type": "hadis",
+        "text": "Oruçlunun iki sevinci vardır: Biri iftar ettiği zaman, diğeri Rabbine kavuştuğu zaman.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, kalbin sustuğu ve ruhun konuştuğu zamandır.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+    {
+        "type": "ayet",
+        "text": "Kullarım sana beni sorarlarsa, bilsinler ki ben çok yakınım.",
+        "category": "ramadan",
+        "source": "Bakara Suresi 186. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Kim bir oruçluyu doyurursa onun sevabı kadar sevap kazanır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Sahur, gecenin sessizliğinde edilen en samimi davettir.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+    {
+        "type": "hadis",
+        "text": "Ramazan sabır ayıdır, sabrın karşılığı ise cennettir.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "İftar sofraları kalpleri birleştirir.",
+        "category": "ramadan",
+        "source": "Anadolu Sözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Geceyi ibadetle geçirenler Rablerinin huzurunda secde eder ve kıyamda dururlar.",
+        "category": "ramadan",
+        "source": "Furkan Suresi 64. Ayet"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, zamanın yavaşladığı ve kalbin hızlandığı aydır.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah iyilik yapanları sever.",
+        "category": "daily",
+        "source": "Ali İmran Suresi 134. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Temizlik imanın yarısıdır.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Doğru söz yemin istemez.",
+        "category": "daily",
+        "source": "Türk Atasözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah israf edenleri sevmez.",
+        "category": "daily",
+        "source": "Araf Suresi 31. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Birbirinize hediye veriniz, sevginiz artsın.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "İyilik yap denize at, balık bilmezse Hâlık bilir.",
+        "category": "daily",
+        "source": "Türk Atasözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Şüphesiz Allah her şeyi hakkıyla görendir.",
+        "category": "daily",
+        "source": "Hucurat Suresi 18. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Kolay olanı seçiniz, zor olanı değil.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Sabırla koruk helva olur.",
+        "category": "daily",
+        "source": "Türk Atasözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Şüphesiz Allah tövbe edenleri sever.",
+        "category": "daily",
+        "source": "Bakara Suresi 222. Ayet"
+    },
+
+    {
+        "type": "hadis",
+        "text": "Komşusu açken tok yatan bizden değildir.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Paylaşmak bereketi çoğaltır.",
+        "category": "daily",
+        "source": "Anonim"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah sabredenleri müjdeler.",
+        "category": "daily",
+        "source": "Bakara Suresi 155. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "İnsanlara teşekkür etmeyen Allah’a şükretmiş olmaz.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Gönül kazanmak, şehir kazanmaktan zordur.",
+        "category": "daily",
+        "source": "Tasavvuf Sözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah affedici ve merhametlidir.",
+        "category": "daily",
+        "source": "Nisa Suresi 99. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "En üstün sadaka gizli verilendir.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Dost kara günde belli olur.",
+        "category": "daily",
+        "source": "Türk Atasözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah doğruları sever.",
+        "category": "daily",
+        "source": "Tevbe Suresi 119. Ayet"
+    },
+    {
+        "type": "söz",
+        "text": "İnsan, niyeti kadar yoldadır.",
+        "category": "daily",
+        "source": "Tasavvuf Sözü"
+    },
+
+    {
+        "type": "ayet",
+        "text": "Allah kullarına zulmetmez.",
+        "category": "daily",
+        "source": "Yunus Suresi 44. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "İman etmedikçe cennete giremezsiniz, birbirinizi sevmedikçe iman etmiş olmazsınız.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Azim, yolun yarısıdır.",
+        "category": "daily",
+        "source": "Anonim"
+    },
+    {
+        "type": "ayet",
+        "text": "Rabbiniz bağışlayandır, merhamet sahibidir.",
+        "category": "daily",
+        "source": "Kehf Suresi 58. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "İşlerin en hayırlısı az da olsa devamlı olanıdır.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+
+    {
+        "type": "söz",
+        "text": "Emanet, imanın aynasıdır.",
+        "category": "daily",
+        "source": "Tasavvuf Sözü"
+    },
+    {
+        "type": "ayet",
+        "text": "İyilikle kötülük bir olmaz.",
+        "category": "daily",
+        "source": "Fussilet Suresi 34. Ayet"
+    },
+    {
+        "type": "söz",
+        "text": "Söz gümüşse, sükût altındır.",
+        "category": "daily",
+        "source": "Türk Atasözü"
+    },
+    {
+        "type": "hadis",
+        "text": "Zarar vermek ve zarara zararla karşılık vermek yoktur.",
+        "category": "daily",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah iyiliğin karşılığını zayi etmez.",
+        "category": "daily",
+        "source": "Tevbe Suresi 120. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Oruç, kul ile Rabbi arasında bir ibadettir.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, kalbi arındıran bir yolculuktur.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+    {
+        "type": "ayet",
+        "text": "Oruç tutmanız sizin için daha hayırlıdır.",
+        "category": "ramadan",
+        "source": "Bakara Suresi 184. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Ramazan ayı sabır ve yardımlaşma ayıdır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "İftar, yalnız karın değil kalp de doyurur.",
+        "category": "ramadan",
+        "source": "Anadolu Sözü"
+    },
+    {
+        "type": "hadis",
+        "text": "Oruçlu için ağız kokusu Allah katında misk kokusundan daha güzeldir.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, nefisle yapılan en zarif mücadeledir.",
+        "category": "ramadan",
+        "source": "Tasavvuf Sözü"
+    },
+    {
+        "type": "ayet",
+        "text": "Allah sizin için dinde zorluk kılmamıştır.",
+        "category": "ramadan",
+        "source": "Hac Suresi 78. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Sahur yemeği yiyiniz, onda bereket vardır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, zamanın en bereketli dilimidir.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+
+    {
+        "type": "ayet",
+        "text": "Allah sabredenleri sever.",
+        "category": "ramadan",
+        "source": "Ali İmran Suresi 146. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Oruç, sabrın yarısıdır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, gönüllerin buluştuğu mevsimdir.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+    {
+        "type": "hadis",
+        "text": "Ramazan ayında yapılan umre, hac sevabına denktir.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Açlık, kalbin aynasını parlatır.",
+        "category": "ramadan",
+        "source": "Tasavvuf Sözü"
+    },
+
+    {
+        "type": "ayet",
+        "text": "Allah bağışlayanları sever.",
+        "category": "ramadan",
+        "source": "Şura Suresi 40. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Ramazan, ümmetim için bereket ayıdır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, paylaşmanın şiiridir.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+    {
+        "type": "hadis",
+        "text": "Oruçlu kimse kötü söz söylemesin.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, ruhun bahar mevsimidir.",
+        "category": "ramadan",
+        "source": "Tasavvuf Sözü"
+    },
+
+    {
+        "type": "ayet",
+        "text": "Şüphesiz Allah bağışlayıcıdır, merhametlidir.",
+        "category": "ramadan",
+        "source": "Zümer Suresi 53. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Kim Ramazan gecelerini ihya ederse bağışlanır.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, kalbi susturup ruhu konuşturan aydır.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+    {
+        "type": "hadis",
+        "text": "İftar vakti yapılan dua geri çevrilmez.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, sabrın öğretmenidir.",
+        "category": "ramadan",
+        "source": "Anonim"
+    },
+
+    {
+        "type": "ayet",
+        "text": "Rabbinize dua edin, O duaları işitendir.",
+        "category": "ramadan",
+        "source": "Mümin Suresi 60. Ayet"
+    },
+    {
+        "type": "hadis",
+        "text": "Sadaka malı eksiltmez.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, kalplerin birleştiği sofralar kurar.",
+        "category": "ramadan",
+        "source": "Anadolu Sözü"
+    },
+    {
+        "type": "hadis",
+        "text": "Oruç, insanı kötülüklerden alıkoyar.",
+        "category": "ramadan",
+        "source": "Hz. Muhammed (S.A.V.)"
+    },
+    {
+        "type": "söz",
+        "text": "Ramazan, ruhun kendini dinlediği zamandır.",
+        "category": "ramadan",
+        "source": "Anonim"
+    }
+    ]
+}
