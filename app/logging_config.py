@@ -102,7 +102,8 @@ class APILogFormatter(IstanbulFormatter):
 
 
 def setup_logging(app):
-    log_file = app.config['LOG_FILE']
+    log_file = app.config['WEB_LOG_FILE']
+    error_log_file = app.config['ERROR_LOG_FILE']
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
     app.logger.handlers = []
     level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
@@ -121,8 +122,9 @@ def setup_logging(app):
     
     ctx_filter = RequestContextFilter()
     
+    retention_days = app.config.get('LOG_RETENTION_DAYS', 7)
     file_handler = TimedRotatingFileHandler(
-        log_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
+        log_file, when='midnight', interval=1, backupCount=retention_days, encoding='utf-8'
     )
     file_handler.rotator = compress_rotator
     file_handler.setFormatter(json_formatter if app.config.get('APP_LOG_JSON') else clean_formatter)
@@ -133,7 +135,7 @@ def setup_logging(app):
     if app.config.get('APP_LOG_JSON'):
         json_file = log_file.replace('.log', '.jsonl')
         json_file_handler = TimedRotatingFileHandler(
-            json_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
+            json_file, when='midnight', interval=1, backupCount=retention_days, encoding='utf-8'
         )
         json_file_handler.rotator = compress_rotator
         json_file_handler.setFormatter(json_formatter)
@@ -141,7 +143,6 @@ def setup_logging(app):
         json_file_handler.addFilter(ctx_filter)
         app.logger.addHandler(json_file_handler)
     
-    error_log_file = os.path.join(os.path.dirname(log_file), 'error.log')
     error_handler = RotatingFileHandler(
         error_log_file, maxBytes=10*1024*1024, backupCount=10, encoding='utf-8'
     )

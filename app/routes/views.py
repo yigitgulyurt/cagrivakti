@@ -694,7 +694,7 @@ def admin_message_delete(message_id):
 @views_bp.route('/admin/logs')
 @admin_required
 def admin_logs():
-    log_file          = current_app.config.get('LOG_FILE')
+    log_file          = current_app.config.get('WEB_LOG_FILE')
     api_log_file      = current_app.config.get('API_LOG_FILE')
     bot_log_file      = current_app.config.get('TELEGRAM_LOG_FILE')
     security_log_file = current_app.config.get('SECURITY_LOG_FILE')
