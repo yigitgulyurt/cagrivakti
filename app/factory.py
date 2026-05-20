@@ -282,7 +282,8 @@ class JSONFormatter(IstanbulFormatter):
 
 class APILogFormatter(IstanbulFormatter):
     def format(self, record):
-        asctime = self.formatTime(record)
+        dt = self.converter(record.created)
+        asctime = dt.strftime('%Y-%m-%d %H:%M:%S')
         remote_addr = getattr(record, 'remote_addr', '-')
         method = getattr(record, 'method', '-')
         path = getattr(record, 'path', '-')
@@ -291,7 +292,7 @@ class APILogFormatter(IstanbulFormatter):
         request_id = getattr(record, 'request_id', '-')
         user_id = getattr(record, 'user_id', '-')
         
-        return (f'[{asctime}] {remote_addr:<15} - {method} {path:<50} '
+        return (f'[{asctime}] {remote_addr:<18} - {method} {path:<52} '
                 f'{status:3} {duration_ms:4}ms rid={request_id} uid={user_id}')
 
 def setup_logging(app):
