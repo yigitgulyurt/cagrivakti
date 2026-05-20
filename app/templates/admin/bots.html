@@ -55,6 +55,7 @@
     .bot-actions {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
     }
     .btn {
         padding: 10px 25px;
@@ -81,6 +82,14 @@
         background: #c82333;
         transform: translateY(-2px);
     }
+    .btn-info {
+        background: #17a2b8;
+        color: white;
+    }
+    .btn-info:hover {
+        background: #138496;
+        transform: translateY(-2px);
+    }
     .btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -90,6 +99,16 @@
         color: #8b949e;
         font-size: 0.95rem;
     }
+    .systemd-info {
+        background: rgba(23, 162, 184, 0.1);
+        border: 1px solid rgba(23, 162, 184, 0.3);
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+    .systemd-info p {
+        margin: 5px 0;
+    }
 </style>
 {% endblock %}
 
@@ -97,63 +116,40 @@
 <div class="admin-container fade-in">
     <div class="admin-header">
         <h1>🤖 Bot Yönetimi</h1>
-        <p>Telegram ve Discord botlarını buradan yönetebilirsiniz.</p>
+        <p>Telegram botunu Systemd servisi üzerinden yönetebilirsiniz.</p>
     </div>
 
     <div class="bot-card">
         <div class="bot-header">
             <div class="bot-name">
                 <i class="fab fa-telegram"></i>
-                Telegram Bot
+                Telegram Bot (Systemd)
             </div>
-            <span class="status-badge {% if bot_statuses.telegram == 'Running' %}status-running{% else %}status-stopped{% endif %}">
-                {% if bot_statuses.telegram == 'Running' %}
-                    <i class="fas fa-circle"></i> Çalışıyor
+            <span class="status-badge {% if bot_status == 'active' %}status-running{% else %}status-stopped{% endif %}">
+                {% if bot_status == 'active' %}
+                    <i class="fas fa-circle"></i> Aktif
                 {% else %}
                     <i class="fas fa-circle"></i> Durduruldu
                 {% endif %}
             </span>
         </div>
         <div class="bot-info">
+            <p><i class="fas fa-cog"></i> Servis: cagrivakti-bot.service</p>
             <p><i class="fas fa-file"></i> Dosya: bots/telegram_bot.py</p>
         </div>
+        <div class="systemd-info">
+            <p><i class="fas fa-info-circle"></i> Systemd ile yönetiliyor: Otomatik yeniden başlatma ve günlük kayıtları etkin.</p>
+        </div>
         <div class="bot-actions" style="margin-top: 20px;">
-            {% if bot_statuses.telegram == 'Running' %}
+            {% if bot_status == 'active' %}
                 <a href="{{ url_for('views.admin_stop_bot', bot_name='telegram') }}" class="btn btn-danger">
                     <i class="fas fa-stop"></i> Durdur
                 </a>
+                <a href="{{ url_for('views.admin_restart_bot', bot_name='telegram') }}" class="btn btn-info">
+                    <i class="fas fa-sync-alt"></i> Yeniden Başlat
+                </a>
             {% else %}
                 <a href="{{ url_for('views.admin_start_bot', bot_name='telegram') }}" class="btn btn-primary">
-                    <i class="fas fa-play"></i> Başlat
-                </a>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="bot-card">
-        <div class="bot-header">
-            <div class="bot-name">
-                <i class="fab fa-discord"></i>
-                Discord Bot
-            </div>
-            <span class="status-badge {% if bot_statuses.discord == 'Running' %}status-running{% else %}status-stopped{% endif %}">
-                {% if bot_statuses.discord == 'Running' %}
-                    <i class="fas fa-circle"></i> Çalışıyor
-                {% else %}
-                    <i class="fas fa-circle"></i> Durduruldu
-                {% endif %}
-            </span>
-        </div>
-        <div class="bot-info">
-            <p><i class="fas fa-file"></i> Dosya: bots/discord_bot.py</p>
-        </div>
-        <div class="bot-actions" style="margin-top: 20px;">
-            {% if bot_statuses.discord == 'Running' %}
-                <a href="{{ url_for('views.admin_stop_bot', bot_name='discord') }}" class="btn btn-danger">
-                    <i class="fas fa-stop"></i> Durdur
-                </a>
-            {% else %}
-                <a href="{{ url_for('views.admin_start_bot', bot_name='discord') }}" class="btn btn-primary">
                     <i class="fas fa-play"></i> Başlat
                 </a>
             {% endif %}

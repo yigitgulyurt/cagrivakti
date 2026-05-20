@@ -780,28 +780,55 @@ def admin_logs():
                            stats=stats)
 
 
+import subprocess
+
+def get_systemd_service_status(service_name):
+    """Systemd servis durumunu döner (active/inactive)."""
+    try:
+        result = subprocess.run(
+            ['systemctl', 'is-active', service_name],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+        return result.stdout.strip()
+    except Exception:
+        return 'inactive'
+
+def run_systemctl_command(command):
+    """Systemctl komutu çalıştırır ve (success, message) döner."""
+    try:
+        subprocess.run(
+            ['sudo', 'systemctl'] + command,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        return True, 'İşlem başarıyla tamamlandı.'
+    except subprocess.CalledProcessError as e:
+        return False, f'Hata: {e.stderr or e.stdout}'
+    except Exception as e:
+        return False, f'Hata: {str(e)}'
+
+
 @views_bp.route('/admin/botlar')
 @admin_required
 def admin_bots():
-    bot_statuses = BotManager.get_all_statuses()
-    return render_template('admin/bots.html', bot_statuses=bot_statuses)
+    bot_status = get_systemd_service_status('cagrivakti-bot.service')
+    return render_template('admin/bots.html', bot_status=bot_status)
 
 
 @views_bp.route('/admin/bot/<bot_name>/baslat')
 @admin_required
 def admin_start_bot(bot_name):
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if bot_name == 'telegram':
-        script_path = os.path.join(root_dir, 'bots', 'telegram_bot.py')
-    elif bot_name == 'discord':
-        script_path = os.path.join(root_dir, 'bots', 'discord_bot.py')
-    else:
+    if bot_name != 'telegram':
         flash('Geçersiz bot adı.', 'danger')
         return redirect(url_for('views.admin_bots'))
     
-    success, message = BotManager.start_bot(bot_name, script_path)
+    success, message = run_systemctl_command(['start', 'cagrivakti-bot.service'])
     if success:
-        flash(message, 'success')
+        flash('Telegram botu başarıyla başlatıldı.', 'success')
     else:
         flash(message, 'danger')
     return redirect(url_for('views.admin_bots'))
@@ -810,9 +837,28 @@ def admin_start_bot(bot_name):
 @views_bp.route('/admin/bot/<bot_name>/durdur')
 @admin_required
 def admin_stop_bot(bot_name):
-    success, message = BotManager.stop_bot(bot_name)
+    if bot_name != 'telegram':
+        flash('Geçersiz bot adı.', 'danger')
+        return redirect(url_for('views.admin_bots'))
+    
+    success, message = run_systemctl_command(['stop', 'cagrivakti-bot.service'])
     if success:
-        flash(message, 'success')
+        flash('Telegram botu başarıyla durduruldu.', 'success')
+    else:
+        flash(message, 'danger')
+    return redirect(url_for('views.admin_bots'))
+
+
+@views_bp.route('/admin/bot/<bot_name>/yeniden-baslat')
+@admin_required
+def admin_restart_bot(bot_name):
+    if bot_name != 'telegram':
+        flash('Geçersiz bot adı.', 'danger')
+        return redirect(url_for('views.admin_bots'))
+    
+    success, message = run_systemctl_command(['restart', 'cagrivakti-bot.service'])
+    if success:
+        flash('Telegram botu başarıyla yeniden başlatıldı.', 'success')
     else:
         flash(message, 'danger')
     return redirect(url_for('views.admin_bots'))
