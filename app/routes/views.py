@@ -785,9 +785,9 @@ import subprocess
 def get_systemd_service_status(service_name):
     """Systemd servis durumunu döner (active/inactive)."""
     try:
-        current_app.logger.info(f'[DEBUG] systemctl is-active {service_name} çalıştırılıyor...')
+        current_app.logger.info(f'[DEBUG] /bin/systemctl is-active {service_name} çalıştırılıyor...')
         result = subprocess.run(
-            ['systemctl', 'is-active', service_name],
+            ['/bin/systemctl', 'is-active', service_name],
             capture_output=True,
             text=True,
             timeout=5
@@ -802,7 +802,7 @@ def get_systemd_service_status(service_name):
 def run_systemctl_command(command):
     """Systemctl komutu çalıştırır ve (success, message) döner."""
     try:
-        cmd = ['sudo', 'systemctl'] + command
+        cmd = ['/usr/bin/sudo', '/bin/systemctl'] + command
         current_app.logger.info(f'[DEBUG] Komut çalıştırılıyor: {" ".join(cmd)}')
         result = subprocess.run(
             cmd,
