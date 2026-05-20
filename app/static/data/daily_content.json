@@ -702,19 +702,19 @@
     {
       "type": "hadis",
       "text": "Komşusu açken tok yatan bizden değildir.",
-      "category": "ahlak",
+      "category": "daily",
       "source": "Hâkim, el-Müstedrek"
     },
     {
       "type": "soz",
       "text": "Bir insan ancak çalıştığının karşılığını alır.",
-      "category": "motivasyon",
+      "category": "daily",
       "source": "Hz. Ali"
     },
     {
       "type": "soz",
       "text": "Akıl yaşta değil, baştadır.",
-      "category": "hikmet",
+      "category": "daily",
       "source": "Atasözü"
     },
     {
@@ -726,50 +726,530 @@
     {
       "type": "siir",
       "text": "Biz bize benzeriz, bize benzemez hiç kimse;\nBiz bir tuhaf çiçeğiz, bahçede eşi yok.",
-      "category": "edebi",
+      "category": "daily",
       "source": "Yunus Emre"
     },
     {
       "type": "bilimsel",
       "text": "Doğa, boşluktan nefret eder.",
-      "category": "fizik",
+      "category": "daily",
       "source": "Aristoteles"
     },
     {
       "type": "bilimsel",
       "text": "Eğer tek bir doğru varsa, onu bulmak için binlerce yanlışı denemek gerekir.",
-      "category": "bilim_felsefesi",
+      "category": "daily",
       "source": "Thomas Edison"
     },
     {
       "type": "felsefi",
       "text": "Kendini bil.",
-      "category": "antik",
+      "category": "daily",
       "source": "Sokrates"
     },
     {
       "type": "felsefi",
       "text": "İki şey insanı şaşırtır: üstümdeki yıldızlı gök ve içimdeki ahlak yasası.",
-      "category": "modern",
+      "category": "daily",
       "source": "Immanuel Kant"
     },
     {
       "type": "tarihsel",
       "text": "Türk milletinin istidadı ve kesin kararı medeniyette tam başarıya ulaşmaktır.",
-      "category": "milli",
+      "category": "daily",
       "source": "Mustafa Kemal Atatürk"
     },
     {
       "type": "tarihsel",
       "text": "Düştükten sonra kalkmak, hiç düşmemekten daha büyük bir zaferdir.",
-      "category": "ilham",
+      "category": "daily",
       "source": "Napoleon Bonaparte"
     },
     {
       "type": "edebi",
       "text": "İnsan ne kadar küçük görünse de, kendi içinde sonsuz bir evren taşır.",
-      "category": "roman",
+      "category": "daily",
       "source": "Dostoyevski, Karamazov Kardeşler"
+    },
+    {
+      "type": "ayet",
+      "text": "Şüphesiz zorluğun yanında bir kolaylık vardır.",
+      "category": "daily",
+      "source": "İnşirah Suresi, 94:6"
+    },
+    {
+      "type": "ayet",
+      "text": "O, göklerin ve yerin nurudur.",
+      "category": "daily",
+      "source": "Nûr Suresi, 24:35"
+    },
+    {
+      "type": "ayet",
+      "text": "Rabbiniz şöyle buyurdu: Bana dua edin, duanızı kabul edeyim.",
+      "category": "daily",
+      "source": "Mü'min Suresi, 40:60"
+    },
+    {
+      "type": "hadis",
+      "text": "Güçlü olan kişi güreşte başkasını yenen değil, öfkelendiğinde kendine hâkim olandır.",
+      "category": "daily",
+      "source": "Buhârî, Edeb 76"
+    },
+    {
+      "type": "hadis",
+      "text": "Bir kimse için kendi nefsine istediğini kardeşi için de istemedikçe gerçek mü'min olamaz.",
+      "category": "daily",
+      "source": "Buhârî, İman 7"
+    },
+    {
+      "type": "hadis",
+      "text": "İlim talep etmek her Müslümana farzdır.",
+      "category": "daily",
+      "source": "İbn Mâce, Mukaddime 17"
+    },
+    {
+      "type": "hadis",
+      "text": "Sözün en hayırlısı kısası ve özlü olanıdır.",
+      "category": "daily",
+      "source": "Ebû Dâvud, Edeb 88"
+    },
+    {
+      "type": "soz",
+      "text": "Bugün yapmadığın işi yarına bırakma; yarın yapamayacağın işi de hiç üstlenme.",
+      "category": "daily",
+      "source": "Hz. Ali"
+    },
+    {
+      "type": "soz",
+      "text": "Dil, kalbin tercümanıdır.",
+      "category": "daily",
+      "source": "Mevlânâ"
+    },
+    {
+      "type": "soz",
+      "text": "İnsanı insan yapan bilgi değil, ahlâktır.",
+      "category": "daily",
+      "source": "Hacı Bektaş Veli"
+    },
+    {
+      "type": "dua",
+      "text": "Allah'ım, bana doğruyu doğru olarak göster ve ona uymayı nasip et; yanlışı yanlış olarak göster ve ondan kaçınmayı nasip et.",
+      "category": "daily",
+      "source": "Me'sûr Dua"
+    },
+    {
+      "type": "dua",
+      "text": "Rabbim, benim göğsümü aç, işimi kolaylaştır ve dilimden düğümü çöz ki sözümü anlasınlar.",
+      "category": "daily",
+      "source": "Tâhâ Suresi, 20:25-28"
+    },
+    {
+      "type": "siir",
+      "text": "Gel, gel, ne olursan ol yine gel;\nİster kâfir, ister Mecûsî, ister puta tapan ol yine gel.",
+      "category": "daily",
+      "source": "Mevlânâ, Rubâiler"
+    },
+    {
+      "type": "siir",
+      "text": "Ölmeden önce ölünüz;\nÖldükten sonra ölmeyesiniz.",
+      "category": "daily",
+      "source": "Yunus Emre"
+    },
+    {
+      "type": "siir",
+      "text": "Korkma, sönmez bu şafaklarda yüzen al sancak;\nSönmeden yurdumun üstünde tüten en son ocak.",
+      "category": "daily",
+      "source": "Mehmet Âkif Ersoy, İstiklal Marşı"
+    },
+    {
+      "type": "bilimsel",
+      "text": "Matematiğin dili olmaksızın evrenin kitabını okumak imkânsızdır.",
+      "category": "daily",
+      "source": "Galileo Galilei"
+    },
+    {
+      "type": "bilimsel",
+      "text": "Hiçbir şey kaybolmaz, hiçbir şey yoktan var olmaz; her şey dönüşür.",
+      "category": "daily",
+      "source": "Antoine Lavoisier — Kütlenin Korunumu Yasası"
+    },
+    {
+      "type": "bilimsel",
+      "text": "İki nesne arasındaki çekim kuvveti, kütleleriyle doğru orantılı, aralarındaki mesafenin karesiyle ters orantılıdır.",
+      "category": "daily",
+      "source": "Isaac Newton — Evrensel Çekim Yasası"
+    },
+    {
+      "type": "bilimsel",
+      "text": "Beyin, düşünce ürettiği sürece varlığını sürdürür; kullanılmayan sinir bağlantıları körelir.",
+      "category": "daily",
+      "source": "Donald Hebb — Hebbian Learning, 1949"
+    },
+    {
+      "type": "bilimsel",
+      "text": "Evren genişliyor; bu, geçmişte bir başlangıç noktasının olduğu anlamına gelir.",
+      "category": "daily",
+      "source": "Edwin Hubble — Hubble Yasası, 1929"
+    },
+    {
+      "type": "felsefi",
+      "text": "Düşünüyorum, öyleyse varım.",
+      "category": "daily",
+      "source": "René Descartes, Meditasyonlar"
+    },
+    {
+      "type": "felsefi",
+      "text": "Mutluluk, erdemin ödülü değil; erdemin kendisidir.",
+      "category": "daily",
+      "source": "Baruch Spinoza, Etika"
+    },
+    {
+      "type": "felsefi",
+      "text": "İnsan özgürlüğe mahkûmdur.",
+      "category": "daily",
+      "source": "Jean-Paul Sartre, Varoluş ve Hiçlik"
+    },
+    {
+      "type": "felsefi",
+      "text": "Mutlu yaşam erdemli yaşamdır; ikisi ayrı şeyler değildir.",
+      "category": "daily",
+      "source": "Aristoteles, Nikomakhos'a Etik"
+    },
+    {
+      "type": "felsefi",
+      "text": "Her şey akar, hiçbir şey kalmaz.",
+      "category": "daily",
+      "source": "Herakleitos"
+    },
+    {
+      "type": "tarihsel",
+      "text": "Vatanını en çok seven, görevini en iyi yapandır.",
+      "category": "daily",
+      "source": "Mustafa Kemal Atatürk"
+    },
+    {
+      "type": "tarihsel",
+      "text": "Roma bir günde kurulmadı.",
+      "category": "daily",
+      "source": "Ortaçağ Latin Atasözü"
+    },
+    {
+      "type": "tarihsel",
+      "text": "Bir imparatorluk silahla kurulur ama adaletle yaşatılır.",
+      "category": "daily",
+      "source": "Kanuni Sultan Süleyman'a atfedilen söz"
+    },
+    {
+      "type": "tarihsel",
+      "text": "Ben gidersem ışık sönmez; ışık sönmemesi için gitmem gerekebilir.",
+      "category": "daily",
+      "source": "Mahatma Gandhi"
+    },
+    {
+      "type": "edebi",
+      "text": "Tüm mutlu aileler birbirine benzer; mutsuz her ailenin mutsuzluğu kendinedir.",
+      "category": "daily",
+      "source": "Lev Tolstoy, Anna Karenina"
+    },
+    {
+      "type": "edebi",
+      "text": "Söylenecek her şey söylendi; ama kimse dinlemedi, bu yüzden her şeyi yeniden söylemek gerekiyor.",
+      "category": "daily",
+      "source": "André Gide"
+    },
+    {
+      "type": "psikolojik",
+      "text": "İnsan, uyaran ile tepki arasındaki boşlukta özgürdür. Bu boşlukta büyümesi ve mutluluğu yatar.",
+      "category": "daily",
+      "source": "Viktor Frankl, İnsanın Anlam Arayışı"
+    },
+    {
+      "type": "psikolojik",
+      "text": "Bilinçdışı bastırılmaz; bastırılan şey geri döner ve daha güçlü biçimde kendini gösterir.",
+      "category": "daily",
+      "source": "Sigmund Freud"
+    },
+    {
+      "type": "psikolojik",
+      "text": "Bir insan ne olacağını seçemeyebilir; ama nasıl tepki vereceğini seçebilir.",
+      "category": "daily",
+      "source": "Viktor Frankl"
+    },
+    {
+      "type": "ekonomik",
+      "text": "Bedava öğle yemeği diye bir şey yoktur.",
+      "category": "daily",
+      "source": "Milton Friedman"
+    },
+    {
+      "type": "ekonomik",
+      "text": "Uzun vadede hepimiz ölüyüz.",
+      "category": "daily",
+      "source": "John Maynard Keynes"
+    },
+    {
+      "type": "matematiksel",
+      "text": "Matematikte güzellik kanıtlanamaz; yalnızca hissedilebilir.",
+      "category": "daily",
+      "source": "G. H. Hardy, Bir Matematikçinin Savunması"
+    },
+    {
+      "type": "matematiksel",
+      "text": "Tanrı tamsayıları yarattı; geri kalan her şey insan yapısıdır.",
+      "category": "daily",
+      "source": "Leopold Kronecker"
+    },
+    {
+      "type": "astronomi",
+      "text": "Evrenden bakıldığında tüm insan kavgaları bir toz tanesinin üzerinde geçen kör bir gürültüdür.",
+      "category": "daily",
+      "source": "Carl Sagan, Soluk Mavi Nokta"
+    },
+    {
+      "type": "astronomi",
+      "text": "Biz yıldız tozuyuz; milyarlarca yıl önce patlayan yıldızların kalıntılarından oluşuyoruz.",
+      "category": "daily",
+      "source": "Carl Sagan"
+    },
+    {
+      "type": "ayet",
+      "text": "Şüphesiz zorluğun yanında bir kolaylık vardır.",
+      "category": "daily",
+      "source": "İnşirah Suresi, 94:6"
+    },
+    {
+      "type": "ayet",
+      "text": "Biz insanı en güzel biçimde yarattık.",
+      "category": "daily",
+      "source": "Tîn Suresi, 95:4"
+    },
+    {
+      "type": "ayet",
+      "text": "Allah hiçbir nefse taşıyabileceğinden fazlasını yüklemez.",
+      "category": "daily",
+      "source": "Bakara Suresi, 2:286"
+    },
+    {
+      "type": "hadis",
+      "text": "Ameller niyetlere göredir.",
+      "category": "daily",
+      "source": "Buhârî, Bed'ü'l-Vahy 1"
+    },
+    {
+      "type": "hadis",
+      "text": "Güçlü olan kişi güreşte başkasını yenen değil, öfkelendiğinde kendine hâkim olandır.",
+      "category": "daily",
+      "source": "Buhârî, Edeb 76"
+    },
+    {
+      "type": "dua",
+      "text": "Rabbim, bana faydalı ilim, temiz rızık ve kabul gören amel nasip et.",
+      "category": "daily",
+      "source": "Me'sûr Dua"
+    },
+    {
+      "type": "dua",
+      "text": "Allah'ım, beni affet, bana merhamet et, bana hidayet ver ve bana rızık ver.",
+      "category": "daily",
+      "source": "Müslim, Zikir 35"
+    },
+    {
+      "type": "siir",
+      "text": "Gel, gel, ne olursan ol yine gel;\nİster kâfir, ister Mecûsî, ister puta tapan ol yine gel.",
+      "category": "daily",
+      "source": "Mevlânâ, Rubâiler"
+    },
+    {
+      "type": "siir",
+      "text": "Ölmeden önce ölünüz;\nÖldükten sonra ölmeyesiniz.",
+      "category": "daily",
+      "source": "Yunus Emre"
+    },
+    {
+      "type": "felsefi",
+      "text": "Düşünüyorum, öyleyse varım.",
+      "category": "daily",
+      "source": "René Descartes, Meditasyonlar"
+    },
+    {
+      "type": "felsefi",
+      "text": "Her şey akar, hiçbir şey kalmaz.",
+      "category": "daily",
+      "source": "Herakleitos"
+    },
+    {
+      "type": "felsefi",
+      "text": "İnsan özgürlüğe mahkûmdur.",
+      "category": "daily",
+      "source": "Jean-Paul Sartre, Varoluş ve Hiçlik"
+    },
+    {
+      "type": "bilimsel",
+      "text": "Matematiğin dili olmaksızın evrenin kitabını okumak imkânsızdır.",
+      "category": "daily",
+      "source": "Galileo Galilei"
+    },
+    {
+      "type": "bilimsel",
+      "text": "Hiçbir şey kaybolmaz, hiçbir şey yoktan var olmaz; her şey dönüşür.",
+      "category": "daily",
+      "source": "Antoine Lavoisier"
+    },
+    {
+      "type": "bilimsel",
+      "text": "Eğer tek bir doğru varsa, onu bulmak için binlerce yanlışı denemek gerekir.",
+      "category": "daily",
+      "source": "Thomas Edison"
+    },
+    {
+      "type": "tarihsel",
+      "text": "Vatanını en çok seven, görevini en iyi yapandır.",
+      "category": "daily",
+      "source": "Mustafa Kemal Atatürk"
+    },
+    {
+      "type": "tarihsel",
+      "text": "Roma bir günde kurulmadı.",
+      "category": "daily",
+      "source": "Ortaçağ Latin Atasözü"
+    },
+    {
+      "type": "tarihsel",
+      "text": "Düştükten sonra kalkmak, hiç düşmemekten daha büyük bir zaferdir.",
+      "category": "daily",
+      "source": "Napoleon Bonaparte"
+    },
+    {
+      "type": "edebi",
+      "text": "Tüm mutlu aileler birbirine benzer; mutsuz her ailenin mutsuzluğu kendinedir.",
+      "category": "daily",
+      "source": "Lev Tolstoy, Anna Karenina"
+    },
+    {
+      "type": "edebi",
+      "text": "İnsan ne kadar küçük görünse de, kendi içinde sonsuz bir evren taşır.",
+      "category": "daily",
+      "source": "Dostoyevski, Karamazov Kardeşler"
+    },
+    {
+      "type": "psikolojik",
+      "text": "İnsan, uyaran ile tepki arasındaki boşlukta özgürdür. Bu boşlukta büyümesi ve mutluluğu yatar.",
+      "category": "daily",
+      "source": "Viktor Frankl, İnsanın Anlam Arayışı"
+    },
+    {
+      "type": "psikolojik",
+      "text": "Bir insan ne olacağını seçemeyebilir; ama nasıl tepki vereceğini seçebilir.",
+      "category": "daily",
+      "source": "Viktor Frankl"
+    },
+    {
+      "type": "psikolojik",
+      "text": "Bilinçdışı bastırılmaz; bastırılan şey geri döner ve daha güçlü biçimde kendini gösterir.",
+      "category": "daily",
+      "source": "Sigmund Freud"
+    },
+    {
+      "type": "ekonomik",
+      "text": "Bedava öğle yemeği diye bir şey yoktur.",
+      "category": "daily",
+      "source": "Milton Friedman"
+    },
+    {
+      "type": "ekonomik",
+      "text": "Uzun vadede hepimiz ölüyüz.",
+      "category": "daily",
+      "source": "John Maynard Keynes"
+    },
+    {
+      "type": "matematiksel",
+      "text": "Tanrı tamsayıları yarattı; geri kalan her şey insan yapısıdır.",
+      "category": "daily",
+      "source": "Leopold Kronecker"
+    },
+    {
+      "type": "matematiksel",
+      "text": "Matematikte güzellik kanıtlanamaz; yalnızca hissedilebilir.",
+      "category": "daily",
+      "source": "G. H. Hardy, Bir Matematikçinin Savunması"
+    },
+    {
+      "type": "astronomi",
+      "text": "Biz yıldız tozuyuz; milyarlarca yıl önce patlayan yıldızların kalıntılarından oluşuyoruz.",
+      "category": "daily",
+      "source": "Carl Sagan"
+    },
+    {
+      "type": "astronomi",
+      "text": "Evrenden bakıldığında tüm insan kavgaları bir toz tanesinin üzerinde geçen kör bir gürültüdür.",
+      "category": "daily",
+      "source": "Carl Sagan, Soluk Mavi Nokta"
+    },
+    {
+      "type": "soz",
+      "text": "Akıl yaşta değil, baştadır.",
+      "category": "daily",
+      "source": "Atasözü"
+    },
+    {
+      "type": "soz",
+      "text": "Dil, kalbin tercümanıdır.",
+      "category": "daily",
+      "source": "Mevlânâ"
+    },
+    {
+      "type": "soz",
+      "text": "İnsanı insan yapan bilgi değil, ahlâktır.",
+      "category": "daily",
+      "source": "Hacı Bektaş Veli"
+    },
+    {
+      "type": "biyografik",
+      "text": "Hayatım boyunca başarısız oldum, defalarca. İşte bu yüzden başardım.",
+      "category": "daily",
+      "source": "Michael Jordan"
+    },
+    {
+      "type": "biyografik",
+      "text": "Zeki insanlar fikir değiştirenlere denir; aptallar ise hiç değiştirmeyenlere.",
+      "category": "daily",
+      "source": "Bertrand Russell"
+    },
+    {
+      "type": "tasavvufi",
+      "text": "Nefsini bilen Rabbini bilir.",
+      "category": "daily",
+      "source": "Hadis-i Şerif (meşhur rivayet)"
+    },
+    {
+      "type": "tasavvufi",
+      "text": "Aşk olmayınca meşk olmaz.",
+      "category": "daily",
+      "source": "Mevlânâ"
+    },
+    {
+      "type": "hukuki",
+      "text": "Kanun önünde herkes eşittir.",
+      "category": "daily",
+      "source": "Evrensel İnsan Hakları Beyannamesi, Madde 7"
+    },
+    {
+      "type": "hukuki",
+      "text": "Suçlu olduğu kanıtlanana kadar herkes masumdur.",
+      "category": "daily",
+      "source": "Masumiyet Karinesi — Roma Hukuku"
+    },
+    {
+      "type": "mitolojik",
+      "text": "Kibir, tanrıların en çok nefret ettiği günahtır.",
+      "category": "daily",
+      "source": "Antik Yunan — Hubris kavramı"
+    },
+    {
+      "type": "mitolojik",
+      "text": "Prometeus ateşi çaldı; insanlığa verdi. Tanrılar onu zincirledi ama ateş söndürülemedi.",
+      "category": "daily",
+      "source": "Yunan Mitolojisi — Hesiodos"
     }
     ]
 }
