@@ -17,64 +17,79 @@ def api_anasayfa():
         'uygun_uc_noktalar': [
             {
                 'yol': '/',
-                'aciklama': 'API ana sayfası'
+                'aciklama': 'API ana sayfası',
+                'durum': 'Erişime Açık'
             },
             {
                 'yol': '/sehirler',
-                'aciklama': 'Belirli bir ülkenin şehirlerini listeler (varsayılan: TR)'
+                'aciklama': 'Belirli bir ülkenin şehirlerini listeler (varsayılan: TR)',
+                'durum': 'Erişime Açık'
             },
             {
                 'yol': '/sehirler/uluslararasi',
-                'aciklama': 'Tüm uluslararası şehirleri listeler'
+                'aciklama': 'Tüm ulusuz uluslararası şehirleri listeler',
+                'durum': 'Erişime Açık'
             },
             {
                 'yol': '/sehirler/tumu',
-                'aciklama': 'Tüm şehirleri (Türkiye + uluslararası) listeler'
+                'aciklama': 'Tüm şehirleri (Türkiye ve 160+ + uluslararası) listeler',
+                'durum': 'Erişime Açık'
             },
             {
                 'yol': '/sehirler/ara',
-                'aciklama': 'Şehir adı ile arama yapar (parametre: q)'
+                'aciklama': 'Şehir adı ile arama yapar (parametre: q)',
+                'durum': 'Erişime Kapalı'
             },
             {
                 'yol': '/sehir/detay',
-                'aciklama': 'Belirli bir şehrin detaylarını verir (parametre: sehir)'
+                'aciklama': 'Belirli bir şehrin detaylarını verir (parametre: sehir)',
+                'durum': 'Erişime Kapalı'
             },
             {
                 'yol': '/sehir/suanki_zaman',
-                'aciklama': 'Belirli bir şehrin o anki zamanını verir (parametre: sehir)'
+                'aciklama': 'Belirli bir şehrin o anki zamanını verir (parametre: sehir)',
+                'durum': 'Erişime Kapalı'
             },
             {
                 'yol': '/sehir_kaydet',
-                'aciklama': 'Şehir tercihini kaydeder (POST, parametreler: sehir, country_code)'
+                'aciklama': 'Şehir tercihini kaydeder (POST, parametreler: sehir, country_code)',
+                'durum': 'Erişime Kapalı'
             },
             {
                 'yol': '/ulkeler',
-                'aciklama': 'Tüm ülkeleri listeler'
+                'aciklama': 'Tüm ülkeleri listeler',
+                'durum': 'Erişime Kapalı'
             },
             {
                 'yol': '/ulke/detay',
-                'aciklama': 'Belirli bir ülkenin detaylarını verir (parametre: kod)'
+                'aciklama': 'Belirli bir ülkenin detaylarını verir (parametre: kod)',
+                'durum': 'Erişime Kapalı'
             },
             {
                 'yol': '/ezan_vakitleri-V<versiyon>',
-                'aciklama': 'Ezan vakitlerini alır'
+                'aciklama': 'Ezan vakitlerini alır',
+                'durum': 'Erişime Kapalı'
             },
             {
                 'yol': '/vakitler',
-                'aciklama': 'Genel API v1 uç noktası'
+                'aciklama': 'Genel API v1 uç noktası',
+                'durum': 'Erişime Kapalı'
             },
             {
                 'yol': '/sonraki_vakit',
-                'aciklama': 'Bir sonraki ezan vaktini verir'
+                'aciklama': 'Bir sonraki ezan vaktini verir',
+                'durum': 'Erişime Kapalı'
             },
             {
                 'yol': '/daily_content',
-                'aciklama': 'Günlük içeriği verir'
+                'aciklama': 'Günlük içeriği verir',
+                'durum': 'Erişime Kapalı'
             },
 
             {
                 'yol': '/status',
-                'aciklama': 'Sağlık kontrolü'
+                'aciklama': 'Sağlık kontrolü',
+                'durum': 'Erişime Açık'
             }
         ]
     })
@@ -144,7 +159,7 @@ def tum_sehirleri_getir():
     return jsonify(UserService.get_sehirler('ALL'))
 
 @api_bp.route('/sehirler/ara')
-#@restrict_to_main_domain
+@restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
 def sehirleri_ara():
     arama = request.args.get('q', '').strip().lower()
@@ -160,7 +175,7 @@ def sehirleri_ara():
     return jsonify(sonuclar)
 
 @api_bp.route('/sehir/suanki_zaman')
-#@restrict_to_main_domain
+@restrict_to_main_domain
 @cache.cached(timeout=60, query_string=True)
 def sehir_suanki_zaman():
     sehir = request.args.get('sehir')
@@ -183,7 +198,7 @@ def sehir_suanki_zaman():
     })
 
 @api_bp.route('/ulkeler')
-#@restrict_to_main_domain
+@restrict_to_main_domain
 @cache.cached(timeout=86400)
 def ulkeleri_getir():
     tum_sehirler = UserService.get_sehirler('ALL')
@@ -199,7 +214,7 @@ def ulkeleri_getir():
     return jsonify(ulkeler)
 
 @api_bp.route('/ulke/detay')
-#@restrict_to_main_domain
+@restrict_to_main_domain
 @cache.cached(timeout=86400, query_string=True)
 def ulke_detay():
     ulke_kodu = request.args.get('kod')
@@ -214,7 +229,7 @@ def ulke_detay():
     })
 
 @api_bp.route('/sehir/detay')
-#@restrict_to_main_domain
+@restrict_to_main_domain
 @cache.cached(timeout=86400, query_string=True)
 def sehir_detay():
     sehir = request.args.get('sehir')
@@ -233,7 +248,7 @@ def sehir_detay():
     })
 
 @api_bp.route('/sehir_kaydet', methods=['POST'])
-#@restrict_to_main_domain
+@restrict_to_main_domain
 def sehir_kaydet():
     data = request.get_json()
     sehir = data.get('sehir')
@@ -253,7 +268,7 @@ def sehir_kaydet():
 
 from app.config import Config
 @api_bp.route(f'/ezan_vakitleri-V{Config.APP_VERSION}')
-#@restrict_to_main_domain
+@restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
 def ezan_vakitlerini_al_api():
     sehir = request.args.get('sehir')
@@ -300,7 +315,7 @@ def ezan_vakitlerini_al_api():
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/sonraki_vakit')
-#@restrict_to_main_domain
+@restrict_to_main_domain
 def sonraki_vakti_getir():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
@@ -312,14 +327,14 @@ def sonraki_vakti_getir():
     return jsonify(result)
 
 @api_bp.route('/daily_content')
-#@restrict_to_main_domain
+@restrict_to_main_domain
 @cache.cached(timeout=86400)
 def daily_content():
     return jsonify(get_daily_content())
 
 # Public API v1
 @api_bp.route('/vakitler')
-#@restrict_to_main_domain
+@restrict_to_main_domain
 def public_api_vakitler():
     sehir = request.args.get('sehir')
     country_code = request.args.get('ulke', 'TR').upper()
