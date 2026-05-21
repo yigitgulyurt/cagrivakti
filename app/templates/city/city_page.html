@@ -552,14 +552,14 @@ async function ezanVakitleriniYukle() {
     }
 
     try {
-        const res  = await fetch(`https://api.cagrivakti.com.tr/vakitler?sehir=${mevcutSehir}&ulke=${mevcutUlke}`);
+        const res  = await fetch(`https://api.cagrivakti.com.tr/cagri_vakitleri?v=${app_version}|&sehir=${mevcutSehir}&country=${mevcutUlke}`);
         const data = await res.json();
 
-        if (data.durum === 'basarili' && data.data) {
+        if (data.vakitler) {
             ezanVakitleri = {
-                ...data.data.vakitler,
-                timezone:   data.data.timezone || 'Europe/Istanbul',
-                yarin:      data.data.yarin    || null,
+                ...data.vakitler,
+                timezone:   data.timezone || 'Europe/Istanbul',
+                yarin:      data.yarin    || null,
                 is_ramadan: ezanVakitleri.is_ramadan ?? false,
             };
             setCachedVakitler(ezanVakitleri);

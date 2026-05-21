@@ -490,20 +490,19 @@ const app_version = "{{ app_version }}";
                 if (cachedData) return;
 
                 // API isteğini sıraya ekle
-                const url = `https://api.cagrivakti.com.tr/vakitler?sehir=${sehir}&ulke=${ulke}`;
+                const url = `https://api.cagrivakti.com.tr/cagri_vakitleri?v=${app_version}|&sehir=${sehir}&country=${ulke}`;
                 const callback = function(data) {
-                    if (data.durum === 'basarili' && data.data) {
+                    if (data.vakitler) {
                         // Yarın verisini de ekle
-                        const vakitlerData = {
-                            ...data.data.vakitler,
-                            yarin: data.data.yarin
-                        };
+                        if (data.yarin) {
+                            data.vakitler.yarin = data.yarin;
+                        }
 
                         localStorage.setItem(CACHE_KEY, JSON.stringify({
                             tarih: TODAY,
-                            data: vakitlerData
+                            data: data.vakitler
                         }));
-                        updateUI(vakitlerData);
+                        updateUI(data.vakitler);
                     } else if (!card.hasClass('content-loaded')) {
                         card.removeClass('skeleton-card').addClass('content-loaded');
                         cityName.empty().text(getDisplayName(sehir));

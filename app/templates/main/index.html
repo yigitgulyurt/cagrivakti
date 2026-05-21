@@ -903,27 +903,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     : new Date().toLocaleDateString('en-CA');
 
                 if (parsed.tarih === correctDate) {
-                    data = parsed.data;
+                    data = { vakitler: parsed.data };
                 }
             }
 
             /* --- Fetch from API if cache miss --- */
             if (!data) {
                 const app_version = "{{ app_version }}";
-                const response     = await fetch(`https://api.cagrivakti.com.tr/vakitler?sehir=${city}&ulke=${country}`);
+                const response     = await fetch(`https://api.cagrivakti.com.tr/cagri_vakitleri?v=${app_version}|&sehir=${city}&country=${country}`);
                 const responseData = await response.json();
 
-                if (responseData.durum === 'basarili' && responseData.data) {
-                    const tz    = responseData.data.timezone
+                if (responseData.vakitler) {
+                    const tz    = responseData.timezone
+                               || responseData.vakitler?.timezone
                                || 'Europe/Istanbul';
                     const today = getCityDateStr(tz);
 
                     localStorage.setItem(CACHE_KEY, JSON.stringify({
                         tarih: today,
-                        data: responseData.data,
+                        data: responseData.vakitler,
                     }));
 
-                    data = responseData.data;
+                    data = responseData;
                 }
             }
 
@@ -972,8 +973,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // If no prayer remains today, use tomorrow's Imsak
-                if (!nextVakit && data.yarin?.imsak) {
-                    const [h, m] = data.yarin.imsak.split(':').map(Number);
+                if (!nextVakit) {
+                    const [h, m] = vakitler['imsak'].split(':').map(Number);
                     const vDate  = new Date(cityNow);
                     vDate.setDate(vDate.getDate() + 1);
                     vDate.setHours(h, m, 0, 0);
