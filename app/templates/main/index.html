@@ -903,28 +903,34 @@ document.addEventListener('DOMContentLoaded', function () {
                     : new Date().toLocaleDateString('en-CA');
 
                 if (parsed.tarih === correctDate) {
-                    data = { vakitler: parsed.data };
+                    data = { 
+                        vakitler: parsed.data, 
+                        timezone: parsed.data.timezone, 
+                        yarin: parsed.yarin 
+                    };
                 }
             }
 
             /* --- Fetch from API if cache miss --- */
             if (!data) {
-                const app_version = "{{ app_version }}";
-                const response     = await fetch(`https://api.cagrivakti.com.tr/cagri_vakitleri?v=${app_version}|&sehir=${city}&country=${country}`);
+                const response     = await fetch(`https://api.cagrivakti.com.tr/vakitler?sehir=${city}&ulke=${country}`);
                 const responseData = await response.json();
 
-                if (responseData.vakitler) {
-                    const tz    = responseData.timezone
-                               || responseData.vakitler?.timezone
-                               || 'Europe/Istanbul';
+                if (responseData.durum === 'basarili' && responseData.data?.vakitler) {
+                    const tz    = responseData.data.timezone || 'Europe/Istanbul';
                     const today = getCityDateStr(tz);
 
                     localStorage.setItem(CACHE_KEY, JSON.stringify({
                         tarih: today,
-                        data: responseData.vakitler,
+                        data: responseData.data.vakitler,
+                        yarin: responseData.data.yarin
                     }));
 
-                    data = responseData;
+                    data = { 
+                        vakitler: responseData.data.vakitler, 
+                        timezone: tz, 
+                        yarin: responseData.data.yarin 
+                    };
                 }
             }
 
