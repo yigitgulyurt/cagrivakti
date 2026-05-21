@@ -554,11 +554,45 @@ class NamazBot:
             gunler.append(g)
             g += timedelta(days=1)
         
-        # Sayfalama (her sayfada 10 gün)
+        # Sayfalama (her sayfada 10 gün, son sayfada fazladan alabilir)
         sayfa_basina = 10
-        toplam_sayfa = (len(gunler) + sayfa_basina - 1) // sayfa_basina
-        baslangic_indeks = sayfa * sayfa_basina
-        bitis_indeks = baslangic_indeks + sayfa_basina
+        
+        if len(gunler) == 30:
+            # 30 gün: 3 sayfa, 10'şer
+            toplam_sayfa = 3
+            if sayfa == 0:
+                baslangic_indeks = 0
+                bitis_indeks = 10
+            elif sayfa == 1:
+                baslangic_indeks = 10
+                bitis_indeks = 20
+            elif sayfa == 2:
+                baslangic_indeks = 20
+                bitis_indeks = 30
+            else:
+                baslangic_indeks = 0
+                bitis_indeks = 10
+        elif len(gunler) == 31:
+            # 31 gün: 3 sayfa, son sayfada 11 gün
+            toplam_sayfa = 3
+            if sayfa == 0:
+                baslangic_indeks = 0
+                bitis_indeks = 10
+            elif sayfa == 1:
+                baslangic_indeks = 10
+                bitis_indeks = 20
+            elif sayfa == 2:
+                baslangic_indeks = 20
+                bitis_indeks = 31
+            else:
+                baslangic_indeks = 0
+                bitis_indeks = 10
+        else:
+            # 28, 29 gün: 3 sayfa, son sayfada kalan gün
+            toplam_sayfa = (len(gunler) + sayfa_basina - 1) // sayfa_basina
+            baslangic_indeks = sayfa * sayfa_basina
+            bitis_indeks = baslangic_indeks + sayfa_basina
+        
         gosterilecek_gunler = gunler[baslangic_indeks:bitis_indeks]
         
         with self.app.app_context():
