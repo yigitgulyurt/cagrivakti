@@ -23,24 +23,35 @@ class DiniGunlerService:
         
         gunler = []
         
-        # Kandiller (Hicri ay ve gün olarak)
+        # Regaip Kandili: Recep ayının ilk Cuma gecesi
+        try:
+            # Recep ayının 1. gününü bul
+            recep_1 = RamadanService.hijri_to_gregorian(h_year, 7, 1)
+            
+            # İlk Cumayı bulana kadar gün ekle
+            # weekday(): 0=Pazartesi, 1=Salı, ..., 4=Cuma
+            ilk_cuma = recep_1
+            while ilk_cuma.weekday() != 4:  # 4 = Cuma
+                ilk_cuma += timedelta(days=1)
+            
+            gunler.append({
+                "ad": "Regaip Kandili",
+                "tarih": ilk_cuma,
+                "tur": "kandil",
+                "kalan_gun": (ilk_cuma - current_date).days
+            })
+        except:
+            pass
+        
+        # Diğer kandiller
         kandiller = [
-            {"ad": "Regaip Kandili", "h_ay": 1, "h_gun": 27},
-            {"ad": "Miraç Kandili", "h_ay": 2, "h_gun": 27},
-            {"ad": "Berat Kandili", "h_ay": 8, "h_gun": 15},
-            {"ad": "Kadir Gecesi", "h_ay": 9, "h_gun": 27},
+            {"ad": "Miraç Kandili", "h_ay": 7, "h_gun": 27},   # Recep 27
+            {"ad": "Berat Kandili", "h_ay": 8, "h_gun": 15},    # Şaban 15
+            {"ad": "Kadir Gecesi",  "h_ay": 9, "h_gun": 27},    # Ramazan 27
         ]
         
-        # Bayramlar
-        bayramlar = [
-            {"ad": "Ramazan Bayramı", "h_ay": 10, "h_gun": 1, "gun_sayisi": 3},
-            {"ad": "Kurban Bayramı", "h_ay": 12, "h_gun": 10, "gun_sayisi": 4},
-        ]
-        
-        # Kandilleri hesapla
         for kandil in kandiller:
             try:
-                # Bu yılki
                 g_date = RamadanService.hijri_to_gregorian(h_year, kandil["h_ay"], kandil["h_gun"])
                 gunler.append({
                     "ad": kandil["ad"],
@@ -63,7 +74,12 @@ class DiniGunlerService:
         except:
             pass
         
-        # Bayramları hesapla
+        # Bayramlar
+        bayramlar = [
+            {"ad": "Ramazan Bayramı", "h_ay": 10, "h_gun": 1, "gun_sayisi": 3},
+            {"ad": "Kurban Bayramı", "h_ay": 12, "h_gun": 10, "gun_sayisi": 4},
+        ]
+        
         for bayram in bayramlar:
             try:
                 g_date = RamadanService.hijri_to_gregorian(h_year, bayram["h_ay"], bayram["h_gun"])
