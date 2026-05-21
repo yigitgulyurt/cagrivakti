@@ -1243,4 +1243,5 @@ def iletisim():
 @views_bp.route('/<sehir>')
 def root_sehir_redirect(sehir):
     """Kök dizinden şehir adına yönlendirme (örn: /ankara → /sehir/ankara)"""
-    return redirect(url_for('views.sehir_sayfasi', sehir=sehir, **request.args), code=301)
+    query_params = {k: v for k, v in request.args.items() if k != 'sehir'}
+    return redirect(url_for('views.sehir_sayfasi', sehir=sehir, **query_params), code=301)
