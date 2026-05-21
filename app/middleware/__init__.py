@@ -43,21 +43,6 @@ def setup_middleware(app):
         if 'instagram' in user_agent and ('fbav' in user_agent or 'instagram' in user_agent):
             return render_template('open_in_browser.html')
 
-    @app.before_request
-    def restrict_subdomains():
-        host = request.host
-        path = request.path
-        # Eğer api. subdomainindeysek
-        if host and host.startswith('api.'):
-            # Statik dosyalar, favicon gibi özel dosyaları izin ver
-            if path.startswith('/static/') or path in ('/favicon.ico', '/robots.txt', '/sitemap.xml'):
-                return
-            # Sadece 'api.' ile başlayan endpointlere izin ver
-            endpoint = request.endpoint
-            if not endpoint or not endpoint.startswith('api.'):
-                from flask import abort
-                abort(404)
-
     @app.after_request
     def set_security_headers(response):
         """Güvenlik başlıklarını (Security Headers) ekle."""
