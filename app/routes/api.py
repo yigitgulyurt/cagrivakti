@@ -224,7 +224,7 @@ def ulke_detay():
     })
 
 @api_bp.route('/sehir/detay')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=86400, query_string=True)
 def sehir_detay():
     sehir = request.args.get('sehir')
@@ -264,7 +264,7 @@ def sehir_kaydet():
 
 
 @api_bp.route('/sonraki_vakit')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 def sonraki_vakti_getir():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
@@ -283,7 +283,7 @@ def daily_content():
 
 # Public API v1
 @api_bp.route('/cagri_vakitleri')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 def public_api_vakitler():
     sehir = request.args.get('sehir')
     country_code = request.args.get('ulke', 'TR').upper()

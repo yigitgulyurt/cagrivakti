@@ -5,6 +5,7 @@ from logging.handlers import RotatingFileHandler
 import sqlite3
 import asyncio
 import pytz
+import httpx
 
 # Proje kök dizinini Python yoluna ekle
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,9 +14,54 @@ from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton, InputTextMessageContent, InlineQueryResultArticle
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, InlineQueryHandler
 from telegram.error import BadRequest
-from app.services import PrayerService, UserService, get_country_for_city
 from app.config import Config
-from app.factory import create_app
+
+# API istemci fonksiyonları
+class APIClient:
+    BASE_URL = "https://api.cagrivakti.com.tr"
+    
+    @classmethod
+    async def get_sehirler(cls, country_code='ALL'):
+        params = {'country': country_code}
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{cls.BASE_URL}/sehirler/tumu" if country_code == 'ALL' else f"{cls.BASE_URL}/sehirler", 
+                                         params=params)
+            if response.status_code == 200:
+                return response.json()
+            return []
+    
+    @classmethod
+    async def get_country_for_city(cls, sehir):
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{cls.BASE_URL}/sehir/detay", 
+                                         params={'sehir': sehir})
+            if response.status_code == 200:
+                data = response.json()
+                return data.get('ulke_kodu', 'TR')
+            return 'TR'
+    
+    @classmethod
+    async def get_vakitler(cls, sehir, country_code, tarih=None):
+        params = {'sehir': sehir, 'ulke': country_code}
+        if tarih:
+            params['tarih'] = tarih
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{cls.BASE_URL}/cagri_vakitleri", 
+                                         params=params)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('durum') == 'basarili':
+                    return data['data']['vakitler']
+            return None
+    
+    @classmethod
+    async def get_next_vakit(cls, sehir, country_code):
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{cls.BASE_URL}/sonraki_vakit", 
+                                         params={'sehir': sehir, 'country': country_code})
+            if response.status_code == 200:
+                return response.json()
+            return None
 
 # Logging configuration
 log_file = Config.TELEGRAM_LOG_FILE
@@ -180,12 +226,16 @@ class NamazBot:
     
     def __init__(self) -> None:
         """Botu başlatır ve gerekli servisleri yükler."""
-        self.app = create_app()
         self.token = Config.TELEGRAM_TOKEN
         self.db = TelegramDB()
         self.tz = pytz.timezone('Europe/Istanbul')
-        with self.app.app_context():
-            self.cities = UserService.get_sehirler('ALL')
+        self.cities = []
+        # Şehir listesini başlatma sırasında API'den çekelim
+        asyncio.run(self._init_cities())
+    
+    async def _init_cities(self):
+        """Şehir listesini API'den çeker."""
+        self.cities = await APIClient.get_sehirler('ALL')
 
     def get_main_keyboard(self) -> InlineKeyboardMarkup:
         """Ana menü klavyesini döner - Ultra Sadeleştirilmiş Versiyon."""
@@ -271,13 +321,12 @@ class NamazBot:
             else:
                 await update.effective_message.reply_text(msg, reply_markup=self.get_main_keyboard(), parse_mode='HTML')
             return
-
+ 
         sehir = user['sehir']
         now = datetime.now(self.tz)
-        with self.app.app_context():
-            country = get_country_for_city(sehir)
-            prayer_times = PrayerService.get_vakitler(sehir, country, now.strftime('%Y-%m-%d'))
-            next_v = PrayerService.get_next_vakit(sehir, country)
+        country = await APIClient.get_country_for_city(sehir)
+        prayer_times = await APIClient.get_vakitler(sehir, country, now.strftime('%Y-%m-%d'))
+        next_v = await APIClient.get_next_vakit(sehir, country)
         
         if not prayer_times:
             msg = "❌ <b>Hata:</b> Vakit bilgileri şu an alınamıyor. Lütfen daha sonra tekrar deneyin."
@@ -334,9 +383,8 @@ class NamazBot:
             return
 
         sehir = user['sehir']
-        with self.app.app_context():
-            country = get_country_for_city(sehir)
-            next_v = PrayerService.get_next_vakit(sehir, country)
+        country = await APIClient.get_country_for_city(sehir)
+        next_v = await APIClient.get_next_vakit(sehir, country)
         
         if not next_v:
             await update.callback_query.answer("❌ Vakit bilgisi alınamadı.", show_alert=True)
@@ -663,25 +711,24 @@ class NamazBot:
             matching_cities = [c for c in self.cities if query in c.lower()][:10]
         
         now = datetime.now(self.tz)
-        with self.app.app_context():
-            for city in matching_cities:
-                country = get_country_for_city(city)
-                prayer_times = PrayerService.get_vakitler(city, country, now.strftime('%Y-%m-%d'))
-                
-                if prayer_times:
-                    desc = f"İmsak: {prayer_times['imsak']} | Öğle: {prayer_times['ogle']} | Akşam: {prayer_times['aksam']}"
-                else:
-                    desc = "Vakit bilgisi alınamadı."
+        for city in matching_cities:
+            country = await APIClient.get_country_for_city(city)
+            prayer_times = await APIClient.get_vakitler(city, country, now.strftime('%Y-%m-%d'))
+            
+            if prayer_times:
+                desc = f"İmsak: {prayer_times['imsak']} | Öğle: {prayer_times['ogle']} | Akşam: {prayer_times['aksam']}"
+            else:
+                desc = "Vakit bilgisi alınamadı."
 
-                results.append(
-                    InlineQueryResultArticle(
-                        id=city,
-                        title=f"📍 {city}",
-                        description=desc,
-                        input_message_content=InputTextMessageContent(f"!sehirsec_{city}"),
-                        thumbnail_url="https://raw.githubusercontent.com/yigitgulyurt/namaz-vakitleri-api/master/assets/mosque.png"
-                    )
+            results.append(
+                InlineQueryResultArticle(
+                    id=city,
+                    title=f"📍 {city}",
+                    description=desc,
+                    input_message_content=InputTextMessageContent(f"!sehirsec_{city}"),
+                    thumbnail_url="https://raw.githubusercontent.com/yigitgulyurt/namaz-vakitleri-api/master/assets/mosque.png"
                 )
+            )
 
         await update.inline_query.answer(results, cache_time=60, is_personal=True)
 
@@ -791,11 +838,10 @@ class NamazBot:
             if not preferred: continue
 
             if city not in city_times_cache:
-                with self.app.app_context():
-                    # Ülke kodunu şehre göre tespit et
-                    country = get_country_for_city(city)
-                    prayer_times = PrayerService.get_vakitler(city, country, now.strftime('%Y-%m-%d'))
-                    city_times_cache[city] = prayer_times
+                # Ülke kodunu şehre göre tespit et
+                country = await APIClient.get_country_for_city(city)
+                prayer_times = await APIClient.get_vakitler(city, country, now.strftime('%Y-%m-%d'))
+                city_times_cache[city] = prayer_times
             
             prayer_times = city_times_cache[city]
             if not prayer_times: continue
