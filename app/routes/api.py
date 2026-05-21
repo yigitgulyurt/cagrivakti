@@ -66,7 +66,7 @@ def api_anasayfa():
                 'durum': 'Erişime Kapalı'
             },
             {
-                'yol': '/vakitler',
+                'yol': '/cagri_vakitleri',
                 'aciklama': 'Genel API v1 uç noktası',
                 'durum': 'Erişime Kapalı'
             },

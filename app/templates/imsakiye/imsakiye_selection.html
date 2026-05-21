@@ -351,11 +351,11 @@ const app_version = "{{ app_version }}";
             // Mevcut kartları temizle ama iskeletleri sadece veri geldikçe değiştir
             grid.empty();
 
-            sehirler.forEach((item, index) => {
+            for (const item of sehirler) {
                 const sehir = typeof item === 'object' ? item.sehir : item;
-                const itemCountryCode = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
+                const ulke = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
                 
-                const CACHE_KEY = `vakitler_${sehir}_${itemCountryCode}`;
+                const CACHE_KEY = `cagri_vakitleri-v=${app_version}|${sehir}_${ulke}`;
                 const TODAY = new Date().toISOString().split('T')[0];
                 const cached = localStorage.getItem(CACHE_KEY);
                 let cachedData = null;
@@ -371,13 +371,12 @@ const app_version = "{{ app_version }}";
                     .click(function() {
                         if ($(this).hasClass('skeleton-card')) return;
                         // İmsakiye detay sayfasına yönlendir
-                        window.location.href = `/imsakiye/${sehir}?country=${itemCountryCode}`;
+                        window.location.href = `/imsakiye/${sehir}?country=${ulke}`;
                     });
 
                 const cityName = $('<div>').addClass('city-name');
                 
                 const IS_RAMADAN = {{ 'true' if ramadan_info.is_ramadan else 'false' }};
-                const aksamLabel = IS_RAMADAN ? 'İftar' : 'Akşam';
 
                 if (cachedData) {
                     card.addClass('content-loaded');
@@ -391,36 +390,33 @@ const app_version = "{{ app_version }}";
                 card.append(cityName);
                 grid.append(card);
                 
-                function updateUI(vakitler) {
-                    card.removeClass('skeleton-card').addClass('content-loaded');
-                    cityName.empty().text(getDisplayName(sehir));
-                }
+                if (cachedData) continue;
 
-                if (cachedData) return;
+                // API isteğini sıraya ekle - IIFE ile closure sorunu çözüldü
+                (function(sehir, ulke, CACHE_KEY, TODAY, card, cityName) {
+                    const url = `https://api.cagrivakti.com.tr/cagri_vakitleri?sehir=${sehir}&ulke=${ulke}`;
+                    const callback = function(data) {
+                        if (data.durum === 'basarili' && data.data?.vakitler) {
+                            localStorage.setItem(CACHE_KEY, JSON.stringify({
+                                tarih: TODAY,
+                                data: data.data.vakitler
+                            }));
+                            card.removeClass('skeleton-card').addClass('content-loaded');
+                            cityName.empty().text(getDisplayName(sehir));
+                        } else if (!card.hasClass('content-loaded')) {
+                            card.removeClass('skeleton-card').addClass('content-loaded');
+                            cityName.empty().text(getDisplayName(sehir));
+                        }
+                    };
 
-                // API isteğini sıraya ekle
-                const url = `https://api.cagrivakti.com.tr/cagri_vakitleri?v=${app_version}|&sehir=${sehir}&country=${itemCountryCode}`;
-                const callback = function(data) {
-                    if (data.vakitler) {
-                        localStorage.setItem(CACHE_KEY, JSON.stringify({
-                            tarih: TODAY,
-                            data: data.vakitler
-                        }));
-                        updateUI(data.vakitler);
-                    } else if (!card.hasClass('content-loaded')) {
-                        card.removeClass('skeleton-card').addClass('content-loaded');
-                        cityName.empty().text(getDisplayName(sehir));
-                        vakitBilgisi.text('Hata oluştu');
+                    if (!isLazy) {
+                        $.get(url).done(callback);
+                    } else {
+                        requestQueue.push({ url, callback });
+                        processQueue();
                     }
-                };
-
-                if (!isLazy) {
-                    $.get(url).done(callback);
-                } else {
-                    requestQueue.push({ url, callback });
-                    processQueue();
-                }
-            });
+                })(sehir, ulke, CACHE_KEY, TODAY, card, cityName);
+            }
         }
 
         $('.search-box').on('input', function() {
