@@ -38,20 +38,14 @@ def format_turkish_date(dt):
 def strip_html_tags(text):
     """HTML etiketlerini temizler ve Telegram uyumlu hale getirir."""
     import re
-    # <br>, <br /> → yeni satır
     text = re.sub(r'<br\s*/?>', '\n', text)
-    # <p>, </p> → yeni satır
     text = re.sub(r'</p>', '\n\n', text)
     text = re.sub(r'<p>', '', text)
-    # <h1>...</h1> → <b>...</b>
     text = re.sub(r'<h\d>', '<b>', text)
     text = re.sub(r'</h\d>', '</b>', text)
-    # <li> → • 
     text = re.sub(r'<li>', '• ', text)
     text = re.sub(r'</li>', '\n', text)
-    # <ul>, </ul>, <ol>, </ol> → temizle
     text = re.sub(r'<ul>|</ul>|<ol>|</ol>', '', text)
-    # Diğer tüm etiketleri temizle
     text = re.sub(r'<[^>]+>', '', text)
     return text
 
@@ -65,8 +59,8 @@ from app.logging_config import IstanbulFormatter, compress_rotator
 
 # Özet veriler
 bot_stats = {
-    'users': {}, # {user_id: {last_action: time, count: total_actions}}
-    'errors': {} # {message: {count: count, last_seen: time}}
+    'users': {},
+    'errors': {}
 }
 
 def save_bot_report():
@@ -104,21 +98,17 @@ class ReportHandler(logging.Handler):
             bot_stats['errors'][msg]['last_seen'] = now
             save_bot_report()
         elif record.levelno >= logging.INFO:
-            # Kullanıcı etkileşimlerini yakalamaya çalış (varsa)
             msg = record.getMessage()
             if "User:" in msg or "user_id" in msg:
-                # Basit bir parser eklenebilir ama şimdilik genel loglamayı yapalım
                 pass
 
-# Logger setup
 logger = logging.getLogger('telegram_bot')
 logger.setLevel(logging.INFO)
 logger.propagate = False
 
-# Dosya handler'ı
 file_handler = TimedRotatingFileHandler(
-    log_file, when='midnight', interval=1, 
-    backupCount=getattr(Config, 'LOG_RETENTION_DAYS', 7), 
+    log_file, when='midnight', interval=1,
+    backupCount=getattr(Config, 'LOG_RETENTION_DAYS', 7),
     encoding='utf-8'
 )
 file_handler.rotator = compress_rotator
@@ -129,17 +119,14 @@ formatter = IstanbulFormatter(
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-# Console Handler (Sadece kritik hataları göster)
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.ERROR)
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-# Raporlama handler'ı
 report_handler = ReportHandler()
 logger.addHandler(report_handler)
 
-# Kullanıcı işlemlerini loglayan yardımcı fonksiyon
 def log_user_action(user_id, db=None):
     now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if user_id not in bot_stats['users']:
@@ -155,7 +142,6 @@ def log_user_action(user_id, db=None):
             
     save_bot_report()
 
-# Reduce noise from other libraries
 logging.getLogger('httpx').setLevel(logging.WARNING)
 logging.getLogger('telegram').setLevel(logging.WARNING)
 logging.getLogger('apscheduler').setLevel(logging.WARNING)
@@ -217,35 +203,36 @@ class NamazBot:
     """Namaz Vakitleri Telegram Bot ana sınıfı."""
     
     def __init__(self) -> None:
-        """Botu başlatır ve gerekli servisleri yükler."""
         self.app = create_app()
         self.token = Config.TELEGRAM_TOKEN
         self.db = TelegramDB()
         self.tz = pytz.timezone('Europe/Istanbul')
         with self.app.app_context():
             self.cities = UserService.get_sehirler('ALL')
-        # Gönderilen dini gün hatırlatmalarını takip et (gun_adi_tarih formatında)
         self.gonderilen_dini_gunler = set()
 
     def get_main_keyboard(self) -> InlineKeyboardMarkup:
-        """Ana menü klavyesini döner - Ultra Sadeleştirilmiş Versiyon."""
-        # Ramazan kontrolü
+        """Ana menü klavyesini döner."""
         with self.app.app_context():
             ramadan_info = RamadanService.get_ramadan_info()
         is_ramadan = ramadan_info['is_ramadan']
         
         keyboard = [
-            [InlineKeyboardButton("Namaz Vakitleri 🕒", callback_data="vakitler")],
-            [InlineKeyboardButton("⏳ Kalan Süre", callback_data="kalan_sure")],
-            [InlineKeyboardButton("📅 Haftalık Takvim", callback_data="haftalik_takvim"),
-             InlineKeyboardButton("📆 Aylık Takvim", callback_data="aylik_takvim")]
+            [InlineKeyboardButton("🕒 Bugünün Vakitleri", callback_data="vakitler"),
+             InlineKeyboardButton("⏳ Sonraki Vakit", callback_data="kalan_sure")],
+            [InlineKeyboardButton("📅 Haftalık", callback_data="haftalik_takvim"),
+             InlineKeyboardButton("📆 Aylık Takvim", callback_data="aylik_takvim")],
+            [InlineKeyboardButton("📍 Şehir Seç", switch_inline_query_current_chat="")],
         ]
         
-        # Ramazan ayındaysa Ramazan butonunu ekle
         if is_ramadan:
             keyboard.append([InlineKeyboardButton("🌙 Ramazan", callback_data="ramazan")])
         
-        keyboard.append([InlineKeyboardButton("Ayarlar ve Yardım ⚙️", callback_data="yardim")])
+        keyboard.append([
+            InlineKeyboardButton("🔔 Bildirimler", callback_data="bildirim_ayarlari"),
+            InlineKeyboardButton("☰ Daha Fazla", callback_data="yardim")
+        ])
+        
         return InlineKeyboardMarkup(keyboard)
 
     def get_notification_keyboard(self, user_id: int) -> InlineKeyboardMarkup:
@@ -254,11 +241,11 @@ class NamazBot:
         is_active = user['bildirim_aktif'] if user else False
         
         keyboard = [
-            [InlineKeyboardButton("Bildirimleri Kapat 🔕" if is_active else "Bildirimleri Aç 🔔", 
+            [InlineKeyboardButton("🔕 Bildirimleri Kapat" if is_active else "🔔 Bildirimleri Aç",
                                  callback_data="bildirim_toggle")],
-            [InlineKeyboardButton("Vakit Seçimi 🎯", callback_data="vakit_secimi")],
-            [InlineKeyboardButton("Bildirim Süresini Ayarla ⚙️", callback_data="bildirim_sure_menu")],
-            [InlineKeyboardButton("Ana Menüye Dön ⬅️", callback_data="main_menu")]
+            [InlineKeyboardButton("🎯 Hangi Vakitler?", callback_data="vakit_secimi"),
+             InlineKeyboardButton("⏱ Süre Ayarı", callback_data="bildirim_sure_menu")],
+            [InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]
         ]
         return InlineKeyboardMarkup(keyboard)
 
@@ -267,17 +254,16 @@ class NamazBot:
         user = self.db.get_user(user_id)
         preferred = user['preferred_vakitler'].split(',') if user and user['preferred_vakitler'] else []
         
-        # Ramazan kontrolü
         with self.app.app_context():
             ramadan_info = RamadanService.get_ramadan_info()
         is_ramadan = ramadan_info['is_ramadan']
         
         vakitler = {
-            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
-            'gunes': 'Güneş', 
-            'ogle': 'Öğle', 
-            'ikindi': 'İkindi', 
-            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'imsak': 'Sahur' if is_ramadan else 'İmsak',
+            'gunes': 'Güneş',
+            'ogle': 'Öğle',
+            'ikindi': 'İkindi',
+            'aksam': 'İftar' if is_ramadan else 'Akşam',
             'yatsi': 'Yatsı'
         }
         
@@ -289,49 +275,47 @@ class NamazBot:
                 if i + j < len(v_keys):
                     k = v_keys[i + j]
                     label = vakitler[k]
-                    icon = "✅" if k in preferred else "❌"
-                    row.append(InlineKeyboardButton(f"{label} {icon}", callback_data=f"toggle_vakit_{k}"))
+                    icon = "✅" if k in preferred else "☐"
+                    row.append(InlineKeyboardButton(f"{icon} {label}", callback_data=f"toggle_vakit_{k}"))
             keyboard.append(row)
         
-        keyboard.append([InlineKeyboardButton("Geri Dön ⬅️", callback_data="bildirim_ayarlari")])
+        keyboard.append([InlineKeyboardButton("⬅️ Bildirim Ayarları", callback_data="bildirim_ayarlari")])
         return InlineKeyboardMarkup(keyboard)
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """/start komutunu karşılar."""
         user_id = update.effective_user.id
+        first_name = update.effective_user.first_name or "Kardeşim"
         log_user_action(user_id, self.db)
         self.db.add_user(user_id)
         
+        # Şehir seçilmemiş mi?
+        user = self.db.get_user(user_id)
+        sehir_notu = ""
+        if not user or not user['sehir']:
+            sehir_notu = "\n\n💡 <b>İpucu:</b> Vakitleri görmek için önce <b>📍 Şehir Seç</b> butonuna basın."
+        
         welcome_msg = (
-            "✨ <b>Namaz Vakitleri Botuna Hoş Geldiniz!</b>\n\n"
-            "Bu bot ile dünya genelindeki ezan vakitlerini anlık takip edebilir ve "
-            "vakitlerden önce hatırlatıcılar kurabilirsiniz.\n\n"
-            "🚀 <b>Hızlı Başlangıç:</b>\n"
-            "Aşağıdaki menüden vakitleri görebilir veya ⚙️ <b>Ayarlar</b> kısmından şehrinizi belirleyebilirsiniz.\n\n"
-            "<i>Huzurlu ve bereketli vakitler dileriz.</i>"
+            f"Hoş geldiniz, <b>{first_name}</b>! 🕌\n\n"
+            f"Namaz vakitlerini takip edebilir, vakit bildirimlerinizi ayarlayabilirsiniz."
+            f"{sehir_notu}"
         )
         
-        # Günlük içeriği ekle
         with self.app.app_context():
             daily_content = get_daily_content()
         
         if daily_content:
-            type_emoji = {
-                'ayet': '📖',
-                'hadis': '�',
-                'soz': '💬',
-                'söz': '💬'
-            }
+            type_emoji = {'ayet': '📖', 'hadis': '📜', 'soz': '💬', 'söz': '💬'}
+            type_label = {'ayet': 'Günün Ayeti', 'hadis': 'Günün Hadisi', 'soz': 'Günün Sözü', 'söz': 'Günün Sözü'}
 
             emoji = type_emoji.get(daily_content.get('type'), '💫')
-            label = daily_content.get('type', 'İçerik')
+            label = type_label.get(daily_content.get('type'), 'Günlük İçerik')
             
-            welcome_msg += f"\n\n───────────────────\n"
-            welcome_msg += f"{emoji} <b>Günlük {label.capitalize()} Metin</b> {emoji}\n"
-            welcome_msg += f"{daily_content.get('text')}"
-            welcome_msg += f"\n\n───────────────────\n"
+            welcome_msg += f"\n\n─────────────────────\n"
+            welcome_msg += f"{emoji} <b>{label}</b>\n\n"
+            welcome_msg += f"<i>{daily_content.get('text')}</i>"
             if daily_content.get('source'):
-                welcome_msg += f"\n\n<i>📚 Kaynak: {daily_content['source']}</i>"
+                welcome_msg += f"\n\n📚 <i>{daily_content['source']}</i>"
         
         await update.effective_message.reply_text(
             welcome_msg,
@@ -345,14 +329,18 @@ class NamazBot:
         
         if not user or not user['sehir']:
             msg = (
-                "⚠️ <b>Henüz Şehir Seçilmedi</b>\n\n"
-                "Vakitleri gösterebilmem için önce bir şehir seçmelisiniz.\n\n"
-                "🚀 <b>Şehir Seçimi 📍</b> butonuna tıklayarak şehrinizi belirleyebilirsiniz."
+                "📍 <b>Şehir Seçilmemiş</b>\n\n"
+                "Vakitleri görmek için önce şehrinizi belirlemeniz gerekiyor.\n\n"
+                "Aşağıdaki <b>Şehir Seç</b> butonuna basarak arama yapabilirsiniz."
             )
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("📍 Şehir Seç", switch_inline_query_current_chat="")],
+                [InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]
+            ])
             if update.callback_query:
-                await update.callback_query.edit_message_text(msg, reply_markup=self.get_main_keyboard(), parse_mode='HTML')
+                await update.callback_query.edit_message_text(msg, reply_markup=keyboard, parse_mode='HTML')
             else:
-                await update.effective_message.reply_text(msg, reply_markup=self.get_main_keyboard(), parse_mode='HTML')
+                await update.effective_message.reply_text(msg, reply_markup=keyboard, parse_mode='HTML')
             return
 
         sehir = user['sehir']
@@ -365,50 +353,65 @@ class NamazBot:
         is_ramadan = ramadan_info['is_ramadan']
         
         if not prayer_times:
-            msg = "❌ <b>Hata:</b> Vakit bilgileri şu an alınamıyor. Lütfen daha sonra tekrar deneyin."
+            msg = "❌ Vakit bilgileri şu an alınamıyor. Lütfen bir süre sonra tekrar deneyin."
             if update.callback_query:
                 await update.callback_query.answer(msg, show_alert=True)
             else:
-                await update.effective_message.reply_text(msg, parse_mode='HTML')
+                await update.effective_message.reply_text(msg)
             return
 
         vakit_labels = {
-            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
-            'gunes': 'Güneş', 
-            'ogle': 'Öğle', 
-            'ikindi': 'İkindi', 
-            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'imsak': 'Sahur' if is_ramadan else 'İmsak',
+            'gunes': 'Güneş',
+            'ogle': 'Öğle',
+            'ikindi': 'İkindi',
+            'aksam': 'İftar' if is_ramadan else 'Akşam',
             'yatsi': 'Yatsı'
         }
         
         message = (
-            f"📍 <b>{sehir.upper()}</b>\n"
-            f"🗓 <b>{format_turkish_date(now)}</b>\n"
-            f"───────────────────\n"
+            f"📍 <b>{sehir}</b>  —  🗓 {format_turkish_date(now)}\n"
+            f"─────────────────────\n"
         )
+        
+        now_time = now.time().replace(second=0, microsecond=0)
         
         for key, label in vakit_labels.items():
             time_val = prayer_times.get(key, '--:--')
-            if next_v and next_v['sonraki_vakit'] == key:
-                message += f"▶️ <b>{label:<7} : {time_val}</b> ✨\n"
+            is_next = next_v and next_v['sonraki_vakit'] == key
+            
+            # Geçmiş vakit tespiti
+            try:
+                v_time = datetime.strptime(time_val, '%H:%M').time()
+                is_past = v_time < now_time and not is_next
+            except:
+                is_past = False
+            
+            if is_next:
+                message += f"▶️ <b>{label:<8}: {time_val}</b> ✨\n"
+            elif is_past:
+                message += f"  <s>{label:<8}: {time_val}</s>\n"
             else:
-                message += f"▫️ <code>{label:<7} : {time_val}</code>\n"
+                message += f"  {label:<8}: {time_val}\n"
         
-        message += f"───────────────────\n"
+        message += f"─────────────────────\n"
         
         if next_v:
             kalan = next_v['kalan_sure']
             h = kalan // 3600
             m = (kalan % 3600) // 60
-            v_label = vakit_labels.get(next_v['sonraki_vakit'])
-            message += f"⌛ <b>{v_label}</b> vaktine <b>{h}s {m}d</b> kaldı."
+            v_label = vakit_labels.get(next_v['sonraki_vakit'], '')
+            if h > 0:
+                message += f"⌛ <b>{v_label}</b> vaktine <b>{h} saat {m} dakika</b> kaldı."
+            else:
+                message += f"⌛ <b>{v_label}</b> vaktine <b>{m} dakika</b> kaldı."
 
         if update.callback_query:
             try:
                 await update.callback_query.edit_message_text(message, reply_markup=self.get_main_keyboard(), parse_mode='HTML')
             except BadRequest as e:
                 if "Message is not modified" in str(e):
-                    await update.callback_query.answer("Zaten en güncel vakitleri görüyorsunuz.")
+                    await update.callback_query.answer("Vakitler zaten güncel.")
                 else:
                     raise e
         else:
@@ -419,7 +422,7 @@ class NamazBot:
         user = self.db.get_user(user_id)
         
         if not user or not user['sehir']:
-            await update.callback_query.answer("❌ Önce bir şehir seçmelisiniz!", show_alert=True)
+            await update.callback_query.answer("Önce bir şehir seçmelisiniz.", show_alert=True)
             return
 
         sehir = user['sehir']
@@ -430,41 +433,51 @@ class NamazBot:
         is_ramadan = ramadan_info['is_ramadan']
         
         if not next_v:
-            await update.callback_query.answer("❌ Vakit bilgisi alınamadı.", show_alert=True)
+            await update.callback_query.answer("Vakit bilgisi alınamadı.", show_alert=True)
             return
 
         vakit_labels = {
-            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
-            'gunes': 'Güneş', 
-            'ogle': 'Öğle', 
-            'ikindi': 'İkindi', 
-            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'imsak': 'Sahur' if is_ramadan else 'İmsak',
+            'gunes': 'Güneş',
+            'ogle': 'Öğle',
+            'ikindi': 'İkindi',
+            'aksam': 'İftar' if is_ramadan else 'Akşam',
             'yatsi': 'Yatsı'
         }
         
         kalan = next_v['kalan_sure']
         h = kalan // 3600
         m = (kalan % 3600) // 60
+        v_label = vakit_labels.get(next_v['sonraki_vakit'], '')
         
-        msg = f"📍 {sehir}\n⏳ <b>{vakit_labels.get(next_v['sonraki_vakit'])}</b> vaktine:\n\n"
-        msg += f"🕒 <b>{h} saat {m} dakika</b> kaldı.\n"
-        msg += f"⏰ Vakit saati: <b>{next_v['vakit']}</b>"
+        if h > 0:
+            kalan_str = f"{h} saat {m} dakika"
+        else:
+            kalan_str = f"{m} dakika"
+        
+        msg = (
+            f"📍 <b>{sehir}</b>\n"
+            f"─────────────────────\n"
+            f"Sonraki vakit: <b>{v_label}</b>\n"
+            f"Saat: <b>{next_v['vakit']}</b>\n\n"
+            f"⏳ <b>{kalan_str}</b> kaldı."
+        )
         
         try:
             await update.callback_query.edit_message_text(msg, reply_markup=self.get_main_keyboard(), parse_mode='HTML')
         except BadRequest as e:
             if "Message is not modified" in str(e):
-                await update.callback_query.answer("⏳ Zaten en güncel bilgiyi görüyorsunuz.")
+                await update.callback_query.answer("Bilgi zaten güncel.")
             else:
                 raise e
 
     async def handle_haftalik_takvim(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Haftalık vakit takvimini gösterir (sadece bu hafta, bugün işaretli)."""
+        """Haftalık vakit takvimini gösterir — geçmiş günler soluk, bugün işaretli."""
         user_id = update.effective_user.id
         user = self.db.get_user(user_id)
         
         if not user or not user['sehir']:
-            msg = "❌ Önce bir şehir seçmelisiniz!"
+            msg = "📍 Önce bir şehir seçmelisiniz."
             if update.callback_query:
                 await update.callback_query.answer(msg, show_alert=True)
             else:
@@ -474,8 +487,6 @@ class NamazBot:
         sehir = user['sehir']
         now = datetime.now(self.tz)
         bugun = now.date()
-        
-        # Bu haftanın Pazartesi'sinden başla
         baslangic = bugun - timedelta(days=bugun.weekday())
         
         with self.app.app_context():
@@ -484,31 +495,54 @@ class NamazBot:
         is_ramadan = ramadan_info['is_ramadan']
         
         vakit_labels = {
-            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
-            'gunes': 'Güneş', 
-            'ogle': 'Öğle', 
-            'ikindi': 'İkindi', 
-            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'imsak': 'Sahur' if is_ramadan else 'İmsak',
+            'gunes': 'Güneş',
+            'ogle': 'Öğle',
+            'ikindi': 'İkindi',
+            'aksam': 'İftar' if is_ramadan else 'Akşam',
             'yatsi': 'Yatsı'
         }
         
-        message = f"📍 <b>{sehir.upper()}</b>\n🗓 <b>BU HAFTANIN VAKİTLERİ</b>\n───────────────────\n"
+        message = f"📍 <b>{sehir}</b> — Haftalık Vakitler\n─────────────────────\n"
+        now_time = now.time().replace(second=0, microsecond=0)
         
         for i in range(7):
             gun_tarihi = baslangic + timedelta(days=i)
             with self.app.app_context():
                 prayer_times = PrayerService.get_vakitler(sehir, country, gun_tarihi.strftime('%Y-%m-%d'))
             
-            if prayer_times:
-                bugun_mu = (gun_tarihi == bugun)
-                bugun_isaret = " 📌 BUGÜN!" if bugun_mu else ""
-                message += f"\n📅 <b>{format_turkish_date(gun_tarihi)}</b>{bugun_isaret}\n"
-                for key, label in vakit_labels.items():
-                    time_val = prayer_times.get(key, '--:--')
-                    if bugun_mu:
-                        message += f"▶️ <b>{label:<7}: {time_val}</b> ✨\n"
+            if not prayer_times:
+                continue
+            
+            bugun_mu = (gun_tarihi == bugun)
+            gecmis_gun_mu = (gun_tarihi < bugun)
+            
+            if bugun_mu:
+                message += f"\n📌 <b>{format_turkish_date(gun_tarihi)}</b>\n"
+            elif gecmis_gun_mu:
+                message += f"\n<i>{format_turkish_date(gun_tarihi)}</i>\n"
+            else:
+                message += f"\n{format_turkish_date(gun_tarihi)}\n"
+            
+            for key, label in vakit_labels.items():
+                time_val = prayer_times.get(key, '--:--')
+                
+                if bugun_mu:
+                    # Bugün: geçmiş vakitler üstü çizili, sonraki bold
+                    try:
+                        v_time = datetime.strptime(time_val, '%H:%M').time()
+                        is_past = v_time < now_time
+                    except:
+                        is_past = False
+                    
+                    if is_past:
+                        message += f"  <s>{label:<8}: {time_val}</s>\n"
                     else:
-                        message += f"▫️ {label:<7}: {time_val}\n"
+                        message += f"  <b>{label:<8}: {time_val}</b>\n"
+                elif gecmis_gun_mu:
+                    message += f"  <i>{label:<8}: {time_val}</i>\n"
+                else:
+                    message += f"  {label:<8}: {time_val}\n"
         
         keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
         
@@ -522,12 +556,12 @@ class NamazBot:
             await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
 
     async def handle_aylik_takvim(self, update: Update, context: ContextTypes.DEFAULT_TYPE, sayfa=0):
-        """Aylık vakit takvimini gösterir (sadece bu ay, sayfalama, bugün işaretli)."""
+        """Aylık vakit takvimini gösterir (bu ay, sayfalama, bugün işaretli)."""
         user_id = update.effective_user.id
         user = self.db.get_user(user_id)
         
         if not user or not user['sehir']:
-            msg = "❌ Önce bir şehir seçmelisiniz!"
+            msg = "📍 Önce bir şehir seçmelisiniz."
             if update.callback_query:
                 await update.callback_query.answer(msg, show_alert=True)
             else:
@@ -538,57 +572,38 @@ class NamazBot:
         now = datetime.now(self.tz)
         bugun = now.date()
         
-        # Bu ayın 1. günü ve son günü
         ayin_ilk_gunu = bugun.replace(day=1)
-        # Gelecek ayın 1. gününden 1 gün çıkar
         if ayin_ilk_gunu.month == 12:
             gelecek_ayin_ilk_gunu = ayin_ilk_gunu.replace(year=ayin_ilk_gunu.year+1, month=1, day=1)
         else:
             gelecek_ayin_ilk_gunu = ayin_ilk_gunu.replace(month=ayin_ilk_gunu.month+1, day=1)
         ayin_son_gunu = gelecek_ayin_ilk_gunu - timedelta(days=1)
         
-        # Bu aydaki tüm günleri listele
         gunler = []
         g = ayin_ilk_gunu
         while g <= ayin_son_gunu:
             gunler.append(g)
             g += timedelta(days=1)
         
-        # Sayfalama (her sayfada 10 gün, son sayfada fazladan alabilir)
         sayfa_basina = 10
         
         if len(gunler) == 30:
-            # 30 gün: 3 sayfa, 10'şer
             toplam_sayfa = 3
             if sayfa == 0:
-                baslangic_indeks = 0
-                bitis_indeks = 10
+                baslangic_indeks, bitis_indeks = 0, 10
             elif sayfa == 1:
-                baslangic_indeks = 10
-                bitis_indeks = 20
-            elif sayfa == 2:
-                baslangic_indeks = 20
-                bitis_indeks = 30
+                baslangic_indeks, bitis_indeks = 10, 20
             else:
-                baslangic_indeks = 0
-                bitis_indeks = 10
+                baslangic_indeks, bitis_indeks = 20, 30
         elif len(gunler) == 31:
-            # 31 gün: 3 sayfa, son sayfada 11 gün
             toplam_sayfa = 3
             if sayfa == 0:
-                baslangic_indeks = 0
-                bitis_indeks = 10
+                baslangic_indeks, bitis_indeks = 0, 10
             elif sayfa == 1:
-                baslangic_indeks = 10
-                bitis_indeks = 20
-            elif sayfa == 2:
-                baslangic_indeks = 20
-                bitis_indeks = 31
+                baslangic_indeks, bitis_indeks = 10, 20
             else:
-                baslangic_indeks = 0
-                bitis_indeks = 10
+                baslangic_indeks, bitis_indeks = 20, 31
         else:
-            # 28, 29 gün: 3 sayfa, son sayfada kalan gün
             toplam_sayfa = (len(gunler) + sayfa_basina - 1) // sayfa_basina
             baslangic_indeks = sayfa * sayfa_basina
             bitis_indeks = baslangic_indeks + sayfa_basina
@@ -601,38 +616,65 @@ class NamazBot:
         is_ramadan = ramadan_info['is_ramadan']
         
         vakit_labels = {
-            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
-            'gunes': 'Güneş', 
-            'ogle': 'Öğle', 
-            'ikindi': 'İkindi', 
-            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'imsak': 'Sahur' if is_ramadan else 'İmsak',
+            'gunes': 'Güneş',
+            'ogle': 'Öğle',
+            'ikindi': 'İkindi',
+            'aksam': 'İftar' if is_ramadan else 'Akşam',
             'yatsi': 'Yatsı'
         }
         
         ay_adi = TURKISH_MONTHS[ayin_ilk_gunu.month]
-        message = f"📍 <b>{sehir.upper()}</b>\n🗓 <b>{ay_adi} {ayin_ilk_gunu.year}</b>\n(Sayfa {sayfa+1}/{toplam_sayfa})\n───────────────────\n"
+        message = (
+            f"📍 <b>{sehir}</b> — {ay_adi} {ayin_ilk_gunu.year}\n"
+            f"Sayfa {sayfa+1}/{toplam_sayfa}\n"
+            f"─────────────────────\n"
+        )
+        now_time = now.time().replace(second=0, microsecond=0)
         
         for gun_tarihi in gosterilecek_gunler:
             with self.app.app_context():
                 prayer_times = PrayerService.get_vakitler(sehir, country, gun_tarihi.strftime('%Y-%m-%d'))
             
-            if prayer_times:
-                bugun_mu = (gun_tarihi == bugun)
-                bugun_isaret = " 📌 BUGÜN!" if bugun_mu else ""
-                message += f"\n📅 <b>{format_turkish_date(gun_tarihi)}</b>{bugun_isaret}\n"
-                for key, label in vakit_labels.items():
-                    time_val = prayer_times.get(key, '--:--')
-                    if bugun_mu:
-                        message += f"▶️ <b>{label:<7}: {time_val}</b> ✨\n"
+            if not prayer_times:
+                continue
+            
+            bugun_mu = (gun_tarihi == bugun)
+            gecmis_gun_mu = (gun_tarihi < bugun)
+            
+            if bugun_mu:
+                message += f"\n📌 <b>{format_turkish_date(gun_tarihi)}</b>\n"
+            elif gecmis_gun_mu:
+                message += f"\n<i>{format_turkish_date(gun_tarihi)}</i>\n"
+            else:
+                message += f"\n{format_turkish_date(gun_tarihi)}\n"
+            
+            for key, label in vakit_labels.items():
+                time_val = prayer_times.get(key, '--:--')
+                
+                if bugun_mu:
+                    try:
+                        v_time = datetime.strptime(time_val, '%H:%M').time()
+                        is_past = v_time < now_time
+                    except:
+                        is_past = False
+                    if is_past:
+                        message += f"  <s>{label:<8}: {time_val}</s>\n"
                     else:
-                        message += f"▫️ {label:<7}: {time_val}\n"
+                        message += f"  <b>{label:<8}: {time_val}</b>\n"
+                elif gecmis_gun_mu:
+                    message += f"  <i>{label:<8}: {time_val}</i>\n"
+                else:
+                    message += f"  {label:<8}: {time_val}\n"
         
-        # Sayfalama klavyesi
         keyboard = []
+        nav_row = []
         if sayfa > 0:
-            keyboard.append([InlineKeyboardButton("⬅️ Önceki Sayfa", callback_data=f"aylik_sayfa_{sayfa-1}")])
+            nav_row.append(InlineKeyboardButton("◀️ Önceki", callback_data=f"aylik_sayfa_{sayfa-1}"))
         if sayfa < toplam_sayfa - 1:
-            keyboard.append([InlineKeyboardButton("Sonraki Sayfa ➡️", callback_data=f"aylik_sayfa_{sayfa+1}")])
+            nav_row.append(InlineKeyboardButton("Sonraki ▶️", callback_data=f"aylik_sayfa_{sayfa+1}"))
+        if nav_row:
+            keyboard.append(nav_row)
         keyboard.append([InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")])
         
         if update.callback_query:
@@ -646,17 +688,20 @@ class NamazBot:
 
     async def _show_notification_menu(self, query, user_id):
         user = self.db.get_user(user_id)
-        status = "Aktif ✅" if user['bildirim_aktif'] else "Kapalı 🔕"
+        is_active = user['bildirim_aktif']
+        status = "Aktif ✅" if is_active else "Kapalı 🔕"
         city = user['sehir'] or "Seçilmemiş"
-        time = user['bildirim_suresi'] or 5
+        lead_time = user['bildirim_suresi'] or 5
+        preferred = user['preferred_vakitler'] or ''
+        vakit_sayisi = len([v for v in preferred.split(',') if v]) if preferred else 0
         
         msg = (
-            f"🔔 <b>Bildirim Yönetimi</b>\n\n"
-            f"Sizin için vakitlerden önce hatırlatıcı gönderiyoruz.\n\n"
-            f"🔹 <b>Durum:</b> {status}\n"
-            f"🔹 <b>Süre:</b> {time} dakika önce\n"
-            f"📍 <b>Şehir:</b> {city}\n\n"
-            f"<i>Ayarlarınızı aşağıdan güncelleyebilirsiniz:</i>"
+            f"🔔 <b>Bildirim Ayarları</b>\n"
+            f"─────────────────────\n"
+            f"Durum:       <b>{status}</b>\n"
+            f"Şehir:         <b>{city}</b>\n"
+            f"Kaç dakika önce: <b>{lead_time} dk</b>\n"
+            f"Seçili vakit:  <b>{vakit_sayisi}/6</b>"
         )
         try:
             await query.edit_message_text(msg, reply_markup=self.get_notification_keyboard(user_id), parse_mode='HTML')
@@ -676,7 +721,6 @@ class NamazBot:
         log_user_action(user_id, self.db)
         data = query.data
         
-        # Her butona tıklandığında dönen animasyonu durdur
         await query.answer()
 
         if data == "haftalik_takvim":
@@ -687,36 +731,22 @@ class NamazBot:
             sayfa = int(data.split("_")[2])
             await self.handle_aylik_takvim(update, context, sayfa)
         elif data == "main_menu":
-            welcome_msg = (
-                "✨ <b>Namaz Vakitleri Botuna Hoş Geldiniz!</b>\n\n"
-                "Aşağıdaki menüden vakitleri görebilir veya ⚙️ <b>Ayarlar</b> kısmından şehrinizi belirleyebilirsiniz."
-            )
+            welcome_msg = "🕌 <b>Ana Menü</b>\n\nAşağıdan istediğiniz özelliği seçebilirsiniz."
             
-            # Günlük içeriği ekle
             with self.app.app_context():
                 daily_content = get_daily_content()
             
             if daily_content:
-                type_emoji = {
-                    'ayet': '📖',
-                    'hadis': '�',
-                    'soz': '💬',
-                    'söz': '💬'
-                }
-                type_label = {
-                    'ayet': 'Ayet',
-                    'hadis': 'Hadis',
-                    'soz': 'Söz',
-                    'söz': 'Söz'
-                }
+                type_emoji = {'ayet': '📖', 'hadis': '📜', 'soz': '💬', 'söz': '💬'}
+                type_label = {'ayet': 'Günün Ayeti', 'hadis': 'Günün Hadisi', 'soz': 'Günün Sözü', 'söz': 'Günün Sözü'}
                 emoji = type_emoji.get(daily_content.get('type'), '💫')
-                label = daily_content.get('type', 'İçerik')
+                label = type_label.get(daily_content.get('type'), 'Günlük İçerik')
                 
-                welcome_msg += f"\n\n───────────────────\n"
-                welcome_msg += f"{emoji} <b>GÜNÜN {label.upper()}</b> {emoji}\n"
-                welcome_msg += f"{daily_content.get('text')}"
+                welcome_msg += f"\n\n─────────────────────\n"
+                welcome_msg += f"{emoji} <b>{label}</b>\n\n"
+                welcome_msg += f"<i>{daily_content.get('text')}</i>"
                 if daily_content.get('source'):
-                    welcome_msg += f"\n\n<i>📚 Kaynak: {daily_content['source']}</i>"
+                    welcome_msg += f"\n\n📚 <i>{daily_content['source']}</i>"
             
             try:
                 await query.edit_message_text(
@@ -736,7 +766,7 @@ class NamazBot:
         elif data == "vakit_secimi":
             try:
                 await query.edit_message_text(
-                    "🎯 <b>Bildirim Alınacak Vakitler</b>\n\nHangi vakitler için bildirim almak istediğinizi seçin:",
+                    "🎯 <b>Bildirim Alınacak Vakitler</b>\n\nHangi vakitler için bildirim almak istediğinizi işaretleyin:",
                     reply_markup=self.get_vakit_selection_keyboard(user_id),
                     parse_mode='HTML'
                 )
@@ -767,27 +797,30 @@ class NamazBot:
             
             new_status = 0 if user['bildirim_aktif'] else 1
             self.db.update_user(user_id, bildirim_aktif=new_status)
-            await query.answer("✅ Bildirimler " + ("açıldı" if new_status else "kapatıldı"), show_alert=False)
+            await query.answer("✅ Bildirimler " + ("açıldı!" if new_status else "kapatıldı."), show_alert=False)
             await self._show_notification_menu(query, user_id)
         elif data == "bildirim_sure_menu":
             keyboard = [
-                [InlineKeyboardButton("1 Dakika ⏰", callback_data="set_sure_1"),
-                 InlineKeyboardButton("5 Dakika ⏰", callback_data="set_sure_5")],
-                [InlineKeyboardButton("10 Dakika ⏰", callback_data="set_sure_10"),
-                 InlineKeyboardButton("15 Dakika ⏰", callback_data="set_sure_15")],
-                [InlineKeyboardButton("30 Dakika ⏰", callback_data="set_sure_30")],
-                [InlineKeyboardButton("Geri Dön ⬅️", callback_data="bildirim_ayarlari")]
+                [InlineKeyboardButton("1 dk", callback_data="set_sure_1"),
+                 InlineKeyboardButton("5 dk", callback_data="set_sure_5"),
+                 InlineKeyboardButton("10 dk", callback_data="set_sure_10")],
+                [InlineKeyboardButton("15 dk", callback_data="set_sure_15"),
+                 InlineKeyboardButton("30 dk", callback_data="set_sure_30")],
+                [InlineKeyboardButton("⬅️ Geri", callback_data="bildirim_ayarlari")]
             ]
             try:
-                await query.edit_message_text("⚙️ Bildirim Süresini Ayarla\n\nKaç dakika önce bildirim istersiniz?", 
-                                             reply_markup=InlineKeyboardMarkup(keyboard))
+                await query.edit_message_text(
+                    "⏱ <b>Bildirim Süresi</b>\n\nVakit girmeden kaç dakika önce bildirim almak istersiniz?",
+                    reply_markup=InlineKeyboardMarkup(keyboard),
+                    parse_mode='HTML'
+                )
             except BadRequest as e:
                 if "Message is not modified" not in str(e):
                     raise e
         elif data.startswith("set_sure_"):
             sure = int(data.split("_")[2])
             self.db.update_user(user_id, bildirim_suresi=sure)
-            await query.answer(f"✅ Süre {sure} dakika olarak ayarlandı")
+            await query.answer(f"✅ {sure} dakika olarak ayarlandı.")
             await self._show_notification_menu(query, user_id)
         elif data == "yardim":
             await self.handle_help(update, context)
@@ -813,26 +846,20 @@ class NamazBot:
 
     async def handle_help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         help_text = (
-            "⚙️ <b>Ayarlar ve Yardım Menüsü</b>\n\n"
-            "Botun tüm ayarlarına ve yardımcı özelliklerine buradan erişebilirsiniz.\n\n"
-            "📌 <b>Hızlı Komutlar:</b>\n"
-            "/start - Ana menüyü açar\n"
-            "/aciklama - Bot hakkında bilgi\n"
-            "/temizle - Sohbet geçmişini temizler\n\n"
-            "👥 <b>Grup Kullanımı:</b> Botu bir gruba ekleyip /grup komutunu vererek o grupta vakitlerin otomatik paylaşılmasını sağlayabilirsiniz."
+            "☰ <b>Tüm Özellikler</b>\n"
+            "─────────────────────\n"
+            "Aşağıdan bir özelliğe ulaşabilirsiniz:"
         )
         
         keyboard = [
-            [InlineKeyboardButton("🔔 Bildirim Ayarları", callback_data="bildirim_ayarlari")],
-            [InlineKeyboardButton("🔍 Şehir Seçimi 📍", switch_inline_query_current_chat="")],
-            [InlineKeyboardButton("💫 Günlük İçerik", callback_data="gunluk")],
-            [InlineKeyboardButton("📚 Bilgi Köşesi", callback_data="rehberler")],
-            [InlineKeyboardButton("🌙 Ramazan", callback_data="ramazan")],
-            [InlineKeyboardButton("📅 Dini Günler", callback_data="dini_gunler"),
-             InlineKeyboardButton("🧭 Kıble Yönü", callback_data="kible_yonu")],
-            [InlineKeyboardButton("👥 Grup Ayarı", callback_data="grup_ayarlari"),
+            [InlineKeyboardButton("💫 Günlük İçerik", callback_data="gunluk"),
+             InlineKeyboardButton("📚 Bilgi Köşesi", callback_data="rehberler")],
+            [InlineKeyboardButton("🌙 Ramazan", callback_data="ramazan"),
+             InlineKeyboardButton("📅 Dini Günler", callback_data="dini_gunler")],
+            [InlineKeyboardButton("🧭 Kıble Yönü", callback_data="kible_yonu"),
+             InlineKeyboardButton("👥 Grup Ayarları", callback_data="grup_ayarlari")],
+            [InlineKeyboardButton("📢 Botu Paylaş", callback_data="arkadas_oner_cb"),
              InlineKeyboardButton("📱 İletişim", callback_data="iletisim")],
-            [InlineKeyboardButton("📢 Botu Paylaş", callback_data="arkadas_oner_cb")],
             [InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]
         ]
         
@@ -850,7 +877,7 @@ class NamazBot:
         with self.app.app_context():
             dini_gunler_list = DiniGunlerService.get_dini_gunler()
         
-        message = "📅 <b>Yaklaşan Dini Günler ve Geceler</b>\n\n"
+        message = "📅 <b>Dini Günler ve Geceler</b>\n─────────────────────\n\n"
         
         tur_emoji = {
             'kandil': '🌙',
@@ -865,23 +892,26 @@ class NamazBot:
             kalan = gun['kalan_gun']
             
             if kalan == 0:
-                kalan_str = "� Bugün!"
+                kalan_str = "📌 Bugün"
+            elif kalan == 1:
+                kalan_str = "⏳ Yarın"
             elif kalan > 0:
-                kalan_str = f"⏳ {kalan} gün kaldı"
+                kalan_str = f"⏳ {kalan} gün sonra"
             else:
                 kalan_str = "✅ Geçti"
             
-            message += f"{emoji} <b>{gun['ad']}:</b> {tarih_str} ({kalan_str})\n"
+            message += f"{emoji} <b>{gun['ad']}</b>\n"
+            message += f"   {tarih_str} · {kalan_str}\n\n"
         
-        message += "\n<i>Not: Tarihler Hicri takvime göre otomatik hesaplanmıştır.</i>"
+        message += "<i>Tarihler Hicri takvime göre hesaplanmıştır.</i>"
         
-        keyboard = [[InlineKeyboardButton("⬅️ Geri Dön", callback_data="yardim")]]
+        keyboard = [[InlineKeyboardButton("⬅️ Geri", callback_data="yardim")]]
         
         if update.callback_query:
             try:
                 await update.callback_query.edit_message_text(
-                    message, 
-                    reply_markup=InlineKeyboardMarkup(keyboard), 
+                    message,
+                    reply_markup=InlineKeyboardMarkup(keyboard),
                     parse_mode='HTML'
                 )
             except BadRequest as e:
@@ -893,18 +923,17 @@ class NamazBot:
     async def handle_kible_yonu(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Kıble yönü hakkında bilgi verir."""
         kible_text = (
-            "🧭 <b>Kıble Yönü Nasıl Bulunur?</b>\n\n"
-            "Bulunduğunuz konumdan kıble yönünü en doğru şekilde bulmak için sitemizdeki kıble bulucu aracını kullanabilirsiniz:\n\n"
-            "🔗 <a href='https://cagrivakti.com.tr/kible-pusulasi'>cagrivakti.com.tr/kible-pusulasi</a>\n\n"
-            "<i>Sitemiz üzerinden konum izni vererek tam yönünüzü görebilirsiniz.</i>"
+            "🧭 <b>Kıble Yönü</b>\n\n"
+            "Konumunuzdan kıble yönünü bulmak için sitemizdeki kıble pusulasını kullanabilirsiniz:\n\n"
+            "🔗 <a href='https://cagrivakti.com.tr/kible-pusulasi'>cagrivakti.com.tr/kible-pusulasi</a>"
         )
         
-        keyboard = [[InlineKeyboardButton("⬅️ Geri Dön", callback_data="yardim")]]
+        keyboard = [[InlineKeyboardButton("⬅️ Geri", callback_data="yardim")]]
         
         if update.callback_query:
             await update.callback_query.edit_message_text(
-                kible_text, 
-                reply_markup=InlineKeyboardMarkup(keyboard), 
+                kible_text,
+                reply_markup=InlineKeyboardMarkup(keyboard),
                 parse_mode='HTML',
                 disable_web_page_preview=True
             )
@@ -919,38 +948,36 @@ class NamazBot:
         keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
         
         if ramadan_info['is_ramadan']:
-            # Ramazan aktif
             message = (
-                "🌙 <b>RAMAZAN AYI</b> 🌙\n\n"
-                f"📍 <b>{ramadan_info['current_day']}. Gün</b>\n"
-                f"📅 Kalan Gün: {ramadan_info['days_remaining']}\n\n"
+                f"🌙 <b>Ramazan-ı Şerif</b>\n"
+                f"─────────────────────\n"
+                f"<b>{ramadan_info['current_day']}. gün</b>  ·  {ramadan_info['days_remaining']} gün kaldı\n"
             )
             
             if ramadan_info['is_laylat_al_qadr_day']:
-                message += "✨ <b>KADİR GECESİ!</b> ✨\n\n"
-            
-            if ramadan_info['is_laylat_al_qadr_next_day']:
-                message += "⏳ Yarın Kadir Gecesi!\n\n"
+                message += "\n✨ <b>Hayırlı Kadir Geceleri!</b>\n"
+            elif ramadan_info['is_laylat_al_qadr_next_day']:
+                message += "\n⏳ Yarın Kadir Gecesi!\n"
             
             if ramadan_info.get('ramadan_content'):
-                message += f"💬 <b>Günün İçeriği:</b>\n{ramadan_info['ramadan_content']}\n"
-            
+                message += f"\n💬 <b>Günün İçeriği</b>\n<i>{ramadan_info['ramadan_content']}</i>\n"
         else:
-            # Ramazan aktif değil
             if ramadan_info['status'] == 'upcoming':
                 message = (
-                    "⏳ <b>Ramazan Yaklaşıyor!</b>\n\n"
-                    f"📅 Ramazan Başlangıcı: {format_turkish_date(ramadan_info['start_date'])}\n"
-                    f"📍 Kalan Gün: {ramadan_info['days_to_start']}"
+                    f"🌙 <b>Ramazan Yaklaşıyor</b>\n"
+                    f"─────────────────────\n"
+                    f"Başlangıç: <b>{format_turkish_date(ramadan_info['start_date'])}</b>\n"
+                    f"Kalan: <b>{ramadan_info['days_to_start']} gün</b>"
                 )
             elif ramadan_info['status'] == 'finished':
                 message = (
-                    "✅ <b>Ramazan Bitti</b>\n\n"
-                    f"📅 Gelecek Ramazan: {format_turkish_date(ramadan_info['next_ramadan_date'])}\n"
-                    f"📍 Kalan Gün: {ramadan_info['days_to_next']}"
+                    f"✅ <b>Ramazan Sona Erdi</b>\n"
+                    f"─────────────────────\n"
+                    f"Gelecek Ramazan: <b>{format_turkish_date(ramadan_info['next_ramadan_date'])}</b>\n"
+                    f"Kalan: <b>{ramadan_info['days_to_next']} gün</b>"
                 )
             else:
-                message = "ℹ️ Ramazan bilgileri şu an alınamıyor."
+                message = "Ramazan bilgileri şu an alınamıyor."
         
         if update.callback_query:
             try:
@@ -962,34 +989,29 @@ class NamazBot:
             await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
 
     async def handle_gunluk(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Günlük içeriği gösterir (ayet/hadis/söz)."""
+        """Günlük içeriği gösterir."""
         with self.app.app_context():
             daily_content = get_daily_content()
         
         keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
         
         if daily_content:
-            # İçerik tipine göre emoji ve başlık
-            type_emoji = {
-                'ayet': '📖',
-                'hadis': '📜',
-                'soz': '💬',
-                'söz': '💬'
-            }
+            type_emoji = {'ayet': '📖', 'hadis': '📜', 'soz': '💬', 'söz': '💬'}
+            type_label = {'ayet': 'Günün Ayeti', 'hadis': 'Günün Hadisi', 'soz': 'Günün Sözü', 'söz': 'Günün Sözü'}
 
-            
             emoji = type_emoji.get(daily_content.get('type'), '💫')
-            label = daily_content.get('type', 'İçerik')
+            label = type_label.get(daily_content.get('type'), 'Günlük İçerik')
             
             message = (
-                f"{emoji} <b>GÜNÜN {label.upper()}</b> {emoji}\n\n"
-                f"{daily_content.get('text')}"
+                f"{emoji} <b>{label}</b>\n"
+                f"─────────────────────\n\n"
+                f"<i>{daily_content.get('text')}</i>"
             )
             
             if daily_content.get('source'):
-                message += f"\n\n<i>📚 Kaynak: {daily_content['source']}</i>"
+                message += f"\n\n📚 <i>{daily_content['source']}</i>"
         else:
-            message = "ℹ️ Günlük içerik şu an gösterilemiyor."
+            message = "Günlük içerik şu an gösterilemiyor."
         
         if update.callback_query:
             try:
@@ -1005,64 +1027,45 @@ class NamazBot:
         with self.app.app_context():
             guides = get_guides()
         
-        if not guides:
-            message = "ℹ️ Henüz rehber yok."
-            keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
-            if update.callback_query:
-                try:
-                    await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
-                except BadRequest as e:
-                    if "Message is not modified" not in str(e):
-                        raise e
-            else:
-                await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
-            return
+        keyboard_buttons = []
+        if guides:
+            for guide in guides:
+                keyboard_buttons.append([InlineKeyboardButton(f"📖 {guide['title']}", callback_data=f"rehber_{guide['slug']}")])
         
-        keyboard = []
-        for guide in guides:
-            keyboard.append([InlineKeyboardButton(f"📚 {guide['title']}", callback_data=f"rehber_{guide['slug']}")])
-        keyboard.append([InlineKeyboardButton("⬅️ Yardım", callback_data="yardim")])
+        keyboard_buttons.append([InlineKeyboardButton("⬅️ Geri", callback_data="yardim")])
         
-        message = "📚 <b>BİLGİ KÖŞESİ</b>\n\nAşağıdaki rehberlerden birini seçin:"
+        message = (
+            "📚 <b>Bilgi Köşesi</b>\n"
+            "─────────────────────\n\n"
+            + ("Bir rehber seçin:" if guides else "Henüz rehber eklenmemiş.")
+        )
         
         if update.callback_query:
             try:
-                await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+                await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard_buttons), parse_mode='HTML')
             except BadRequest as e:
                 if "Message is not modified" not in str(e):
                     raise e
         else:
-            await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+            await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard_buttons), parse_mode='HTML')
 
     async def handle_rehber_detay(self, update: Update, context: ContextTypes.DEFAULT_TYPE, slug: str):
         """Belirli bir rehberi detaylı gösterir."""
         with self.app.app_context():
             guide = get_guide_by_slug(slug)
         
+        keyboard = [[InlineKeyboardButton("⬅️ Rehberler", callback_data="rehberler")]]
+        
         if not guide:
-            message = "ℹ️ Rehber bulunamadı."
-            keyboard = [[InlineKeyboardButton("⬅️ Rehberler", callback_data="rehberler")]]
-            if update.callback_query:
-                try:
-                    await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
-                except BadRequest as e:
-                    if "Message is not modified" not in str(e):
-                        raise e
-            else:
-                await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
-            return
-        
-        keyboard = [
-            [InlineKeyboardButton("⬅️ Rehberler", callback_data="rehberler")]
-        ]
-        
-        message = (
-            f"📚 <b>{guide['title']}</b>\n\n"
-            f"{strip_html_tags(guide['content'])}"
-        )
-        
-        if len(message) > 4096:
-            message = message[:4090] + "..."
+            message = "Rehber bulunamadı."
+        else:
+            message = (
+                f"📖 <b>{guide['title']}</b>\n"
+                f"─────────────────────\n\n"
+                f"{strip_html_tags(guide['content'])}"
+            )
+            if len(message) > 4096:
+                message = message[:4090] + "…"
         
         if update.callback_query:
             try:
@@ -1075,13 +1078,14 @@ class NamazBot:
 
     async def handle_contact(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         contact_text = (
-            "📱 <b>İletişim</b>\n\n"
+            "📱 <b>İletişim</b>\n"
+            "─────────────────────\n\n"
             "👨‍💻 <b>Geliştirici:</b> Yiğit Gülyurt\n"
-            "📧 <b>E-posta:</b> yigitgulyurt@proton.me\n"
-            "🌐 <b>Web:</b> <a href='https://yigitgulyurt.com'>yigitgulyurt.com</a>\n"
-            "🐙 <b>GitHub:</b> <a href='https://github.com/yigitgulyurt'>github.com/yigitgulyurt</a>"
+            "📧 yigitgulyurt@proton.me\n"
+            "🌐 <a href='https://yigitgulyurt.com'>yigitgulyurt.com</a>\n"
+            "🐙 <a href='https://github.com/yigitgulyurt'>github.com/yigitgulyurt</a>"
         )
-        keyboard = [[InlineKeyboardButton("⬅️ Geri Dön", callback_data="yardim")]]
+        keyboard = [[InlineKeyboardButton("⬅️ Geri", callback_data="yardim")]]
         
         if update.callback_query:
             try:
@@ -1096,20 +1100,22 @@ class NamazBot:
 
     async def handle_aciklama(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         aciklama = (
-            "📖 <b>Ezan Vakti Botu Nedir?</b>\n\n"
-            "Bu bot, dünya genelindeki ezan vakitlerini anlık olarak takip etmenizi ve "
+            "📖 <b>Bu Bot Nedir?</b>\n\n"
+            "Dünya genelindeki namaz vakitlerini takip etmenizi ve "
             "vakitlerden önce bildirim almanızı sağlar.\n\n"
-            "✨ <b>Özellikler:</b>\n"
-            "• 81 il ve dünya şehirleri desteği\n"
-            "• Vakitlerden önce hatırlatma (5-15 dk)\n"
-            "• Grup desteği ile toplu bilgilendirme\n"
-            "• Temiz ve hızlı arayüz\n\n"
-            "💡 <b>İpucu:</b> /start yazarak her zaman ana menüye dönebilirsiniz."
+            "<b>Özellikler:</b>\n"
+            "• 81 il ve dünya şehirleri\n"
+            "• Vakit öncesi hatırlatma bildirimleri\n"
+            "• Haftalık ve aylık takvim\n"
+            "• Günlük ayet / hadis / söz\n"
+            "• Ramazan ve dini gün takibi\n"
+            "• Grup bildirimleri\n\n"
+            "<i>/start ile ana menüye dönebilirsiniz.</i>"
         )
         await update.effective_message.reply_text(aciklama, parse_mode='HTML')
 
     async def handle_temizle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        """Sohbet geçmişini (mümkün olduğunca) temizler."""
+        """Sohbet geçmişini temizler."""
         chat_id = update.effective_chat.id
         message_id = update.effective_message.message_id
         
@@ -1123,11 +1129,10 @@ class NamazBot:
             except:
                 continue
         
-        await status_msg.edit_text(f"✅ Sohbet temizlendi ({deleted_count} mesaj).")
+        await status_msg.edit_text(f"✅ {deleted_count} mesaj silindi.")
         await asyncio.sleep(2)
         await status_msg.delete()
         
-        # Ana menüyü tekrar gönder
         await context.bot.send_message(
             chat_id=chat_id,
             text="🕌 Ana Menü",
@@ -1138,27 +1143,25 @@ class NamazBot:
         import urllib.parse
         
         share_text_plain = (
-            "🕌 Ezan Vakti Botu\n\n"
-            "Ezan vakitlerini takip etmek ve bildirim almak için bu botu kullanabilirsin!\n\n"
+            "🕌 Namaz Vakitleri Botu\n\n"
+            "Ezan vakitlerini takip etmek ve bildirim almak için:\n\n"
             "👉 t.me/namaz_vaktibot"
         )
         
         encoded_text = urllib.parse.quote(share_text_plain)
-        
-        # Share links
         whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_text}"
         twitter_url = f"https://twitter.com/intent/tweet?text={encoded_text}"
         
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("Telegram'da Paylaş 🚀", switch_inline_query=share_text_plain)],
-            [InlineKeyboardButton("WhatsApp'ta Paylaş 🟢", url=whatsapp_url)],
-            [InlineKeyboardButton("Twitter'da Paylaş 🐦", url=twitter_url)],
-            [InlineKeyboardButton("⬅️ Geri Dön", callback_data="yardim")]
+            [InlineKeyboardButton("WhatsApp 🟢", url=whatsapp_url),
+             InlineKeyboardButton("Twitter 🐦", url=twitter_url)],
+            [InlineKeyboardButton("⬅️ Geri", callback_data="yardim")]
         ])
         
         share_msg = (
             "📢 <b>Botu Paylaş</b>\n\n"
-            "Aşağıdaki butonları kullanarak botu arkadaşlarınızla her yerden paylaşabilirsiniz."
+            "Arkadaşlarınızın da vakitlerden haberdar olması için botu paylaşabilirsiniz."
         )
         
         if update.callback_query:
@@ -1168,15 +1171,25 @@ class NamazBot:
 
     async def handle_inline_query(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Şehir arama sonuçlarını inline olarak gösterir."""
-        query = update.inline_query.query.lower()
+        query_text = update.inline_query.query.lower().strip()
+        
+        if not query_text:
+            # Boş sorguda yönlendirme kartı göster
+            results = [
+                InlineQueryResultArticle(
+                    id="placeholder",
+                    title="🔍 Şehir adı yazın",
+                    description="Örnek: Ankara, İstanbul, Bursa…",
+                    input_message_content=InputTextMessageContent("Lütfen yukarıdaki arama kutusuna şehir adını yazın."),
+                    thumbnail_url="https://raw.githubusercontent.com/yigitgulyurt/namaz-vakitleri-api/master/assets/mosque.png"
+                )
+            ]
+            await update.inline_query.answer(results, cache_time=5, is_personal=False)
+            return
+        
+        matching_cities = [c for c in self.cities if query_text in c.lower()][:10]
         
         results = []
-        # Eğer sorgu boşsa en popüler/ilk 10 şehri göster
-        if not query:
-            matching_cities = self.cities[:10]
-        else:
-            matching_cities = [c for c in self.cities if query in c.lower()][:10]
-        
         now = datetime.now(self.tz)
         with self.app.app_context():
             for city in matching_cities:
@@ -1184,7 +1197,7 @@ class NamazBot:
                 prayer_times = PrayerService.get_vakitler(city, country, now.strftime('%Y-%m-%d'))
                 
                 if prayer_times:
-                    desc = f"İmsak: {prayer_times['imsak']} | Öğle: {prayer_times['ogle']} | Akşam: {prayer_times['aksam']}"
+                    desc = f"İmsak {prayer_times['imsak']}  ·  Öğle {prayer_times['ogle']}  ·  Akşam {prayer_times['aksam']}"
                 else:
                     desc = "Vakit bilgisi alınamadı."
 
@@ -1201,7 +1214,7 @@ class NamazBot:
         await update.inline_query.answer(results, cache_time=60, is_personal=True)
 
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        """Gelen metin mesajlarını işler (Örn: Inline'dan gelen şehir seçimi)."""
+        """Gelen metin mesajlarını işler."""
         if not update.message or not update.message.text:
             return
             
@@ -1213,21 +1226,22 @@ class NamazBot:
             if city in self.cities:
                 self.db.update_user(user_id, sehir=city)
                 await update.message.reply_text(
-                    f"✅ <b>{city}</b> başarıyla seçildi!\n\n"
-                    "Artık ana menüden vakitleri görebilir veya bildirim ayarlarınızı yapabilirsiniz.",
+                    f"✅ <b>{city}</b> seçildi!\n\n"
+                    "Artık ana menüden vakitleri görebilir, bildirim ayarlarınızı yapabilirsiniz.",
                     reply_markup=self.get_main_keyboard(),
                     parse_mode='HTML'
                 )
             else:
                 logger.warning(f"Geçersiz şehir seçimi denemesi: {city}")
-                await update.message.reply_text("⚠️ <b>Hata:</b> Geçersiz bir şehir seçildi. Lütfen listeden tekrar seçin.", parse_mode='HTML')
+                await update.message.reply_text(
+                    "⚠️ Geçersiz bir şehir seçildi. Lütfen listeden tekrar seçin.",
+                    parse_mode='HTML'
+                )
         elif text == "Ezan Vakti 🕒":
             await self.handle_vakitler(update, context)
         else:
-            # Anlaşılmayan mesajlar için yönlendirme
             await update.message.reply_text(
-                "💬 <b>Bunu anlayamadım...</b>\n\n"
-                "Lütfen aşağıdaki menüyü kullanın veya /start yazarak ana menüye dönün.",
+                "Menüyü kullanmak için aşağıdaki butonlara basın ya da /start yazın.",
                 reply_markup=self.get_main_keyboard(),
                 parse_mode='HTML'
             )
@@ -1238,25 +1252,25 @@ class NamazBot:
         
         if chat.type == 'private':
             msg = (
-                "❌ <b>Bu özellik sadece gruplarda kullanılabilir.</b>\n\n"
-                "Botu bir gruba ekleyip yönetici yetkisi verdikten sonra bu komutu kullanabilirsiniz."
+                "👥 <b>Grup Ayarları</b>\n\n"
+                "Bu özellik yalnızca gruplarda kullanılabilir.\n\n"
+                "Botu bir gruba ekleyip yönetici yetkisi verdikten sonra "
+                "grupta /grup komutunu çalıştırın."
             )
-            keyboard = [[InlineKeyboardButton("⬅️ Geri Dön", callback_data="yardim")]]
+            keyboard = [[InlineKeyboardButton("⬅️ Geri", callback_data="yardim")]]
             if update.callback_query:
                 await update.callback_query.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
             else:
                 await update.effective_message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
             return
 
-        # Check bot permissions in group
         bot_member = await context.bot.get_chat_member(chat.id, context.bot.id)
         if bot_member.status != 'administrator':
-            msg = "⚠️ Botun bildirim gönderebilmesi için grupta 'Yönetici' yetkisine sahip olması önerilir."
-            await context.bot.send_message(chat.id, msg)
+            await context.bot.send_message(chat.id, "⚠️ Bildirim gönderebilmem için lütfen beni yönetici yapın.")
 
         member = await context.bot.get_chat_member(chat.id, user_id)
         if member.status not in ['creator', 'administrator']:
-            msg = "❌ Sadece grup yöneticileri bu ayarı yapabilir."
+            msg = "❌ Bu ayarı yalnızca grup yöneticileri yapabilir."
             if update.callback_query:
                 await update.callback_query.answer(msg, show_alert=True)
             else:
@@ -1273,30 +1287,16 @@ class NamazBot:
             return
 
         self.db.update_user(user_id, grup_id=str(chat.id))
-        msg = f"✅ Bu grup için <b>{user['sehir']}</b> vakitleri paylaşılacaktır.\n🔔 Bildirimlerinizi özel mesaj üzerinden yönetebilirsiniz."
+        msg = f"✅ Bu grup için <b>{user['sehir']}</b> vakitleri paylaşılacak.\nBildirimlerinizi özel mesaj üzerinden yönetebilirsiniz."
         if update.callback_query:
             await update.callback_query.answer(msg, show_alert=True)
         else:
             await update.effective_message.reply_text(msg, parse_mode='HTML')
 
-    async def send_vakit_notification(self, user_id, chat_id, vakit_name, vakit_time, is_reminder=False, lead_time=5):
-        try:
-            if is_reminder:
-                text = f"⏰ <b>Hatırlatıcı:</b> {vakit_name} vaktine {lead_time} dakika kaldı! ({vakit_time})"
-            else:
-                text = f"🕌 <b>{vakit_name} vakti girdi!</b> ({vakit_time})"
-            
-            return text
-        except Exception as e:
-            logger.error(f"Error preparing notification: {e}")
-            return None
-
     async def check_notifications(self, context: ContextTypes.DEFAULT_TYPE):
         now = datetime.now(self.tz)
         active_users = self.db.get_active_users()
-        
         city_times_cache = {}
-        processed_cities = set()
 
         for user in active_users:
             city = user['sehir']
@@ -1307,7 +1307,6 @@ class NamazBot:
 
             if city not in city_times_cache:
                 with self.app.app_context():
-                    # Ülke kodunu şehre göre tespit et
                     country = get_country_for_city(city)
                     prayer_times = PrayerService.get_vakitler(city, country, now.strftime('%Y-%m-%d'))
                     city_times_cache[city] = prayer_times
@@ -1317,7 +1316,6 @@ class NamazBot:
 
             lead_time = user['bildirim_suresi'] or 5
             
-            # Vakit isimleri eşlemesi (Ramazan'da imsak=Sahur, akşam=İftar)
             with self.app.app_context():
                 ramadan_info = RamadanService.get_ramadan_info()
             is_ramadan = ramadan_info['is_ramadan']
@@ -1334,42 +1332,39 @@ class NamazBot:
             for vakit_key, vakit_time_str in prayer_times.items():
                 if vakit_key not in vakit_labels or not vakit_time_str or vakit_time_str == "--:--":
                     continue
-                
                 if vakit_key not in preferred:
                     continue
                 
                 try:
                     v_time = datetime.strptime(vakit_time_str, '%H:%M').time()
                     v_dt = now.replace(hour=v_time.hour, minute=v_time.minute, second=0, microsecond=0)
-                    
                     diff = (v_dt - now).total_seconds()
                     v_name = vakit_labels[vakit_key]
                     
-                    # Özel mesajlar
                     is_sahur = (vakit_key == 'imsak' and is_ramadan)
                     is_iftar = (vakit_key == 'aksam' and is_ramadan)
                     
-                    # 1. Hatırlatma (X dakika kala)
+                    # Hatırlatma (X dakika kala)
                     if abs(diff - (lead_time * 60)) < 30:
                         if is_sahur:
-                            text = f"🌙 <b>Sahur Vakti Hatırlatması!</b>\n\n{v_name} vaktine {lead_time} dakika kaldı! ({city})\n\n<i>Hayırlı sahurlayın.</i>"
+                            text = f"🌙 <b>Sahur Hatırlatması</b>\n\nSahura {lead_time} dakika kaldı! ({city})\n\n<i>Hayırlı sahurlayın.</i>"
                         elif is_iftar:
-                            text = f"🌙 <b>İftar Vakti Hatırlatması!</b>\n\n{v_name} vaktine {lead_time} dakika kaldı! ({city})\n\n<i>Hayırlı iftarlar dileriz.</i>"
+                            text = f"🌙 <b>İftar Hatırlatması</b>\n\nİftara {lead_time} dakika kaldı! ({city})\n\n<i>Hayırlı iftarlar dileriz.</i>"
                         else:
-                            text = f"⏰ <b>Hatırlatma:</b> {v_name} vaktine {lead_time} dakika kaldı. ({city})"
+                            text = f"⏰ <b>{v_name}</b> vaktine {lead_time} dakika kaldı. ({city})"
                         
                         await self._safe_send_message(context.bot, user['user_id'], text)
                         if user['grup_id']:
                             await self._safe_send_message(context.bot, user['grup_id'], text)
                     
-                    # 2. Vakit Girdi Bildirimi (Tam anında)
+                    # Vakit Girdi (tam anında)
                     elif abs(diff) < 30:
                         if is_sahur:
-                            text = f"🌙 <b>Sahur Vakti Girdi!</b> ({city})\n\n<i>Hayırlı sahurlayın, orucunuz kabul olsun.</i>"
+                            text = f"🌙 <b>Sahur Vakti Girdi</b> — {city}\n\n<i>Hayırlı sahurlayın, orucunuz kabul olsun.</i>"
                         elif is_iftar:
-                            text = f"🌙 <b>İftar Vakti Girdi!</b> ({city})\n\n<i>Hayırlı iftarlar, dualarınız kabul olsun.</i>"
+                            text = f"🌙 <b>İftar Vakti Girdi</b> — {city}\n\n<i>Hayırlı iftarlar, dualarınız kabul olsun.</i>"
                         else:
-                            text = f"🕌 <b>{v_name} vakti girdi!</b> ({city})\n\n<i>Rabbimiz ibadetlerinizi kabul eylesin.</i>"
+                            text = f"🕌 <b>{v_name} Vakti Girdi</b> — {city}\n\n<i>Rabbimiz ibadetlerinizi kabul eylesin.</i>"
                         
                         await self._safe_send_message(context.bot, user['user_id'], text)
                         if user['grup_id']:
@@ -1398,26 +1393,22 @@ class NamazBot:
                 kalan = gun['kalan_gun']
                 gun_adi = gun['ad']
                 emoji = tur_emoji.get(gun['tur'], '🔸')
-                
-                # Benzersiz anahtar: gun_adi + gun_tarihi
                 gun_key = f"{gun_adi}_{gun_tarihi}"
                 
-                # 1 gün kala hatırlatma (09:00'da)
                 if kalan == 1 and now.hour == 9 and now.minute < 5:
                     hatirlatma_key = f"{gun_key}_1gun"
                     if hatirlatma_key not in self.gonderilen_dini_gunler:
-                        mesaj = f"{emoji} <b>YAKLAŞAN GÜN!</b>\n\n{gun_adi} yarın!\n({DiniGunlerService.format_turkish_date(gun_tarihi)})\n\n<i>Bu kutsal günü karşılayalım.</i>"
+                        mesaj = f"{emoji} <b>Yarın {gun_adi}!</b>\n{DiniGunlerService.format_turkish_date(gun_tarihi)}\n\n<i>Bu kutsal günü en iyi şekilde karşılayalım.</i>"
                         for user in active_users:
                             await self._safe_send_message(context.bot, user['user_id'], mesaj)
                             if user['grup_id']:
                                 await self._safe_send_message(context.bot, user['grup_id'], mesaj)
                         self.gonderilen_dini_gunler.add(hatirlatma_key)
                 
-                # O günün başında hatırlatma (09:00'da)
                 elif kalan == 0 and now.hour == 9 and now.minute < 5:
                     bugun_key = f"{gun_key}_bugun"
                     if bugun_key not in self.gonderilen_dini_gunler:
-                        mesaj = f"{emoji} <b>BUGÜN!</b>\n\nBugün {gun_adi}!\n({DiniGunlerService.format_turkish_date(gun_tarihi)})\n\n<i>Bu kutsal günü en iyi şekilde değerlendirelim.</i>"
+                        mesaj = f"{emoji} <b>Bugün {gun_adi}!</b>\n{DiniGunlerService.format_turkish_date(gun_tarihi)}\n\n<i>Bu kutsal günü en iyi şekilde değerlendirelim.</i>"
                         for user in active_users:
                             await self._safe_send_message(context.bot, user['user_id'], mesaj)
                             if user['grup_id']:
@@ -1428,21 +1419,20 @@ class NamazBot:
             logger.error(f"Dini günler hatırlatıcıları hatası: {e}")
 
     async def _safe_send_message(self, bot, chat_id, text):
+        """Mesaj gönderir, hata durumunda kullanıcıyı pasif yapar."""
         try:
-            await bot.send_message(chat_id=chat_id, text=text)
+            await bot.send_message(chat_id=chat_id, text=text, parse_mode='HTML')
             return True
         except Exception as e:
             err_msg = str(e).lower()
             logger.error(f"Could not send message to {chat_id}: {e}")
             if "bot was blocked" in err_msg or "chat not found" in err_msg or "user is deactivated" in err_msg:
                 self.db.set_user_inactive(chat_id)
-                logger.info(f"User {chat_id} blocked the bot. Notifications disabled.")
+                logger.info(f"User {chat_id} deactivated. Notifications disabled.")
             return False
 
     async def handle_error(self, update: object, context: ContextTypes.DEFAULT_TYPE):
         """Hataları yakalar ve loglar."""
-        # 'No item with that key' hatası genellikle job_queue veya callback query'lerde 
-        # olmayan bir referansa erişmeye çalışırken oluşur.
         err_str = str(context.error)
         
         if "No item with that key" in err_str:
@@ -1453,29 +1443,27 @@ class NamazBot:
         
         if isinstance(update, Update) and update.effective_message:
             try:
-                # Kullanıcıyı bıktırmamak için sadece kritik hatalarda mesaj gönder
                 if "Forbidden" not in err_str:
-                    await update.effective_message.reply_text("❌ İşleminiz sırasında bir hata oluştu. Lütfen /start ile ana menüye dönün.")
+                    await update.effective_message.reply_text(
+                        "Bir hata oluştu. /start yazarak ana menüye dönebilirsiniz."
+                    )
             except:
                 pass
 
     async def post_init(self, application: Application) -> None:
-        """Bot başlatıldıktan sonra yapılacak işlemler."""
         commands = [
             ("start", "Ana menüyü açar"),
-            ("help", "Yardım ve özellikler"),
+            ("help", "Tüm özellikler"),
             ("aciklama", "Bot hakkında bilgi"),
             ("grup", "Grup bildirimlerini ayarlar"),
             ("temizle", "Sohbeti temizler"),
             ("iletisim", "Geliştiriciye ulaş"),
             ("arkadas_oner", "Botu paylaş"),
-            ("ramazan", "Ramazan bilgilerini gösterir"),
-            ("gunluk", "Günlük içeriği gösterir"),
-            ("gundelik", "Günlük içeriği gösterir"),
-            ("rehberler", "Bilgi köşesi rehberlerini gösterir"),
-            ("bilgi_kosesi", "Bilgi köşesi rehberlerini gösterir"),
-            ("haftalik", "Haftalık vakit takvimini gösterir"),
-            ("aylik", "Aylık vakit takvimini gösterir")
+            ("ramazan", "Ramazan bilgileri"),
+            ("gunluk", "Günlük içerik"),
+            ("rehberler", "Bilgi köşesi"),
+            ("haftalik", "Haftalık vakit takvimi"),
+            ("aylik", "Aylık vakit takvimi")
         ]
         await application.bot.set_my_commands(commands)
         logger.info("Bot komutları başarıyla ayarlandı.")
@@ -1483,7 +1471,6 @@ class NamazBot:
     def run(self):
         application = Application.builder().token(self.token).post_init(self.post_init).build()
         
-        # Handlers
         application.add_handler(CommandHandler("start", self.start))
         application.add_handler(CommandHandler("help", self.handle_help))
         application.add_handler(CommandHandler("aciklama", self.handle_aciklama))
@@ -1502,10 +1489,7 @@ class NamazBot:
         application.add_handler(InlineQueryHandler(self.handle_inline_query))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
         
-        # Error handler
         application.add_error_handler(self.handle_error)
-        
-        # Job queue
         application.job_queue.run_repeating(self.check_notifications, interval=60, first=10)
         
         logger.info("Telegram bot is running...")
