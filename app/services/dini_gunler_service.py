@@ -12,14 +12,14 @@ class DiniGunlerService:
         if current_date is None:
             tz = pytz.timezone('Europe/Istanbul')
             current_date = datetime.now(tz).date()
-    
+
         cache_key = f"dini_gunler_{current_date.strftime('%Y-%m-%d')}"
         cached = cache.get(cache_key)
         if cached:
             return cached
-    
+
         h_year, h_month, h_day = RamadanService.gregorian_to_hijri(current_date)
-    
+
         def en_yakin_tarih(h_ay, h_gun, offset_gun=0):
             """
             Verilen Hicri ay/gün için h_year ve h_year+1'i dener,
@@ -42,9 +42,9 @@ class DiniGunlerService:
             if gelecek:
                 return min(gelecek)
             return max(gecmis)  # hepsi geçtiyse en son geçeni döndür
-    
+
         gunler = []
-    
+
         # Regaip Kandili: Recep 1'den sonraki ilk Cuma
         for yil in [h_year - 1, h_year, h_year + 1]:
             try:
@@ -64,16 +64,16 @@ class DiniGunlerService:
                     break
             except:
                 pass
-            
+
         # Kandiller: algoritma 1 gün ileri hesaplıyor, -1 offset uygula
         kandiller = [
-            {"ad": "Aşure Günü",     "h_ay": 1, "h_gun": 10, "offset": 0},
-            {"ad": "Mevlid Kandili", "h_ay": 3, "h_gun": 12, "offset": 0},
+            {"ad": "Aşure Günü",     "h_ay": 1, "h_gun": 10, "offset": -1},  # 0 → -1
+            {"ad": "Mevlid Kandili", "h_ay": 3, "h_gun": 12, "offset": -2},  # 0 → -2
             {"ad": "Miraç Kandili",  "h_ay": 7, "h_gun": 27, "offset": -1},
             {"ad": "Berat Kandili",  "h_ay": 8, "h_gun": 15, "offset": -1},
             {"ad": "Kadir Gecesi",   "h_ay": 9, "h_gun": 27, "offset":  0},
         ]
-    
+
         for k in kandiller:
             g_date = en_yakin_tarih(k["h_ay"], k["h_gun"], k["offset"])
             if g_date:
@@ -83,15 +83,15 @@ class DiniGunlerService:
                     "tur": "kandil",
                     "kalan_gun": (g_date - current_date).days
                 })
-    
-        # Özel günler
+
+        # Özel günler 
         ozel_gunler = [
-            {"ad": "Hicri Yılbaşı",         "h_ay": 1,  "h_gun": 1,  "offset": 0},
-            {"ad": "Üç Ayların Başlangıcı", "h_ay": 7,  "h_gun": 1,  "offset": 0},
-            {"ad": "Ramazan Başlangıcı",    "h_ay": 9,  "h_gun": 1,  "offset": -1},
-            {"ad": "Arefe (Kurban)",        "h_ay": 12, "h_gun": 9,  "offset": 0},
+            {"ad": "Hicri Yılbaşı",         "h_ay": 1,  "h_gun": 1, "offset": -1},  # 0 → -1
+            {"ad": "Üç Ayların Başlangıcı", "h_ay": 7,  "h_gun": 1, "offset": -1},  # 0 → -1
+            {"ad": "Ramazan Başlangıcı",    "h_ay": 9,  "h_gun": 1, "offset": -1},
+            {"ad": "Arefe (Kurban)",        "h_ay": 12, "h_gun": 9, "offset":  0},
         ]
-    
+
         for gun in ozel_gunler:
             g_date = en_yakin_tarih(gun["h_ay"], gun["h_gun"], gun["offset"])
             if g_date:
@@ -101,13 +101,13 @@ class DiniGunlerService:
                     "tur": "ozel",
                     "kalan_gun": (g_date - current_date).days
                 })
-    
+
         # Bayramlar
         bayramlar = [
             {"ad": "Ramazan Bayramı", "h_ay": 10, "h_gun": 1,  "gun_sayisi": 3, "offset": 0},
             {"ad": "Kurban Bayramı",  "h_ay": 12, "h_gun": 10, "gun_sayisi": 4, "offset": 0},
         ]
-    
+
         for b in bayramlar:
             g_date = en_yakin_tarih(b["h_ay"], b["h_gun"], b["offset"])
             if g_date:
@@ -118,7 +118,7 @@ class DiniGunlerService:
                     "kalan_gun": (g_date - current_date).days,
                     "gun_sayisi": b["gun_sayisi"]
                 })
-    
+
         gunler_sirali = sorted(gunler, key=lambda x: x["tarih"])
         cache.set(cache_key, gunler_sirali, timeout=3600)
         return gunler_sirali
