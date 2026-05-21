@@ -16,7 +16,7 @@ from functools import lru_cache
 from flask import Blueprint, request, send_file
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-og_bp = Blueprint('og', __name__, subdomain=None)
+og_bp = Blueprint('og', __name__)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # GÖRSEL BOYUTLARI

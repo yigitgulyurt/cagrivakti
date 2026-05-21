@@ -14,7 +14,7 @@ import re
 import hashlib
 from app.services.bot_manager import BotManager
 
-views_bp = Blueprint('views', __name__, subdomain=None)
+views_bp = Blueprint('views', __name__)
 
 # Mevcut yıl bilgisini global olarak tanımlayalım
 suanki_yil = datetime.now().year
