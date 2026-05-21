@@ -224,6 +224,8 @@ class NamazBot:
         self.tz = pytz.timezone('Europe/Istanbul')
         with self.app.app_context():
             self.cities = UserService.get_sehirler('ALL')
+        # Gönderilen dini gün hatırlatmalarını takip et (gun_adi_tarih formatında)
+        self.gonderilen_dini_gunler = set()
 
     def get_main_keyboard(self) -> InlineKeyboardMarkup:
         """Ana menü klavyesini döner - Ultra Sadeleştirilmiş Versiyon."""
@@ -1178,6 +1180,55 @@ class NamazBot:
                                 
                 except Exception as e:
                     logger.error(f"Error in notification loop for user {user['user_id']}: {e}")
+        
+        # Dini Günler Hatırlatıcıları
+        try:
+            today = now.date()
+            with self.app.app_context():
+                dini_gunler_list = DiniGunlerService.get_dini_gunler(today)
+            
+            tur_emoji = {
+                'kandil': '🌙',
+                'ramazan': '🌙',
+                'bayram': '🎊',
+                'ozel': '✨'
+            }
+            
+            active_users = self.db.get_active_users()
+            
+            for gun in dini_gunler_list:
+                gun_tarihi = gun['tarih']
+                kalan = gun['kalan_gun']
+                gun_adi = gun['ad']
+                emoji = tur_emoji.get(gun['tur'], '🔸')
+                
+                # Benzersiz anahtar: gun_adi + gun_tarihi
+                gun_key = f"{gun_adi}_{gun_tarihi}"
+                
+                # 1 gün kala hatırlatma (09:00'da)
+                if kalan == 1 and now.hour == 9 and now.minute < 5:
+                    hatirlatma_key = f"{gun_key}_1gun"
+                    if hatirlatma_key not in self.gonderilen_dini_gunler:
+                        mesaj = f"{emoji} <b>YAKLAŞAN GÜN!</b>\n\n{gun_adi} yarın!\n({DiniGunlerService.format_turkish_date(gun_tarihi)})\n\n<i>Bu kutsal günü karşılayalım.</i>"
+                        for user in active_users:
+                            await self._safe_send_message(context.bot, user['user_id'], mesaj)
+                            if user['grup_id']:
+                                await self._safe_send_message(context.bot, user['grup_id'], mesaj)
+                        self.gonderilen_dini_gunler.add(hatirlatma_key)
+                
+                # O günün başında hatırlatma (09:00'da)
+                elif kalan == 0 and now.hour == 9 and now.minute < 5:
+                    bugun_key = f"{gun_key}_bugun"
+                    if bugun_key not in self.gonderilen_dini_gunler:
+                        mesaj = f"{emoji} <b>BUGÜN!</b>\n\nBugün {gun_adi}!\n({DiniGunlerService.format_turkish_date(gun_tarihi)})\n\n<i>Bu kutsal günü en iyi şekilde değerlendirelim.</i>"
+                        for user in active_users:
+                            await self._safe_send_message(context.bot, user['user_id'], mesaj)
+                            if user['grup_id']:
+                                await self._safe_send_message(context.bot, user['grup_id'], mesaj)
+                        self.gonderilen_dini_gunler.add(bugun_key)
+        
+        except Exception as e:
+            logger.error(f"Dini günler hatırlatıcıları hatası: {e}")
 
     async def _safe_send_message(self, bot, chat_id, text):
         try:
