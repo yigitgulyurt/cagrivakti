@@ -14,6 +14,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKe
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, InlineQueryHandler
 from telegram.error import BadRequest
 from app.services import PrayerService, UserService, get_country_for_city
+from app.services.ramadan_service import RamadanService
 from app.config import Config
 from app.factory import create_app
 
@@ -192,6 +193,7 @@ class NamazBot:
         keyboard = [
             [InlineKeyboardButton("Namaz Vakitleri 🕒", callback_data="vakitler")],
             [InlineKeyboardButton("⏳ Kalan Süre", callback_data="kalan_sure")],
+            [InlineKeyboardButton("🌙 Ramazan", callback_data="ramazan")],
             [InlineKeyboardButton("Ayarlar ve Yardım ⚙️", callback_data="yardim")]
         ]
         return InlineKeyboardMarkup(keyboard)
@@ -474,6 +476,8 @@ class NamazBot:
             await self._show_notification_menu(query, user_id)
         elif data == "yardim":
             await self.handle_help(update, context)
+        elif data == "ramazan":
+            await self.handle_ramazan(update, context)
         elif data == "dini_gunler":
             await self.handle_dini_gunler(update, context)
         elif data == "kible_yonu":
@@ -551,12 +555,65 @@ class NamazBot:
         
         keyboard = [[InlineKeyboardButton("⬅️ Geri Dön", callback_data="yardim")]]
         
-        await update.callback_query.edit_message_text(
-            kible_text, 
-            reply_markup=InlineKeyboardMarkup(keyboard), 
-            parse_mode='HTML',
-            disable_web_page_preview=True
-        )
+        if update.callback_query:
+            await update.callback_query.edit_message_text(
+                kible_text, 
+                reply_markup=InlineKeyboardMarkup(keyboard), 
+                parse_mode='HTML',
+                disable_web_page_preview=True
+            )
+        else:
+            await update.effective_message.reply_text(kible_text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML', disable_web_page_preview=True)
+
+    async def handle_ramazan(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Ramazan bilgilerini gösterir."""
+        with self.app.app_context():
+            ramadan_info = RamadanService.get_ramadan_info()
+        
+        keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
+        
+        if ramadan_info['is_ramadan']:
+            # Ramazan aktif
+            message = (
+                "🌙 <b>RAMAZAN AYI</b> 🌙\n\n"
+                f"📍 <b>{ramadan_info['current_day']}. Gün</b>\n"
+                f"📅 Kalan Gün: {ramadan_info['days_remaining']}\n\n"
+            )
+            
+            if ramadan_info['is_laylat_al_qadr_day']:
+                message += "✨ <b>KADİR GECESİ!</b> ✨\n\n"
+            
+            if ramadan_info['is_laylat_al_qadr_next_day']:
+                message += "⏳ Yarın Kadir Gecesi!\n\n"
+            
+            if ramadan_info.get('ramadan_content'):
+                message += f"💬 <b>Günün İçeriği:</b>\n{ramadan_info['ramadan_content']}\n"
+            
+        else:
+            # Ramazan aktif değil
+            if ramadan_info['status'] == 'upcoming':
+                message = (
+                    "⏳ <b>Ramazan Yaklaşıyor!</b>\n\n"
+                    f"📅 Ramazan Başlangıcı: {ramadan_info['start_date'].strftime('%d %B %Y')}\n"
+                    f"📍 Kalan Gün: {ramadan_info['days_to_start']}"
+                )
+            elif ramadan_info['status'] == 'finished':
+                message = (
+                    "✅ <b>Ramazan Bitti</b>\n\n"
+                    f"📅 Gelecek Ramazan: {ramadan_info['next_ramadan_date'].strftime('%d %B %Y')}\n"
+                    f"📍 Kalan Gün: {ramadan_info['days_to_next']}"
+                )
+            else:
+                message = "ℹ️ Ramazan bilgileri şu an alınamıyor."
+        
+        if update.callback_query:
+            try:
+                await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+            except BadRequest as e:
+                if "Message is not modified" not in str(e):
+                    raise e
+        else:
+            await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
 
     async def handle_contact(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         contact_text = (
@@ -885,7 +942,8 @@ class NamazBot:
             ("grup", "Grup bildirimlerini ayarlar"),
             ("temizle", "Sohbeti temizler"),
             ("iletisim", "Geliştiriciye ulaş"),
-            ("arkadas_oner", "Botu paylaş")
+            ("arkadas_oner", "Botu paylaş"),
+            ("ramazan", "Ramazan bilgilerini gösterir")
         ]
         await application.bot.set_my_commands(commands)
         logger.info("Bot komutları başarıyla ayarlandı.")
@@ -901,6 +959,7 @@ class NamazBot:
         application.add_handler(CommandHandler("arkadas_oner", self.handle_arkadas_oner))
         application.add_handler(CommandHandler("iletisim", self.handle_contact))
         application.add_handler(CommandHandler("grup", self.handle_group))
+        application.add_handler(CommandHandler("ramazan", self.handle_ramazan))
         application.add_handler(CallbackQueryHandler(self.handle_callback))
         application.add_handler(InlineQueryHandler(self.handle_inline_query))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
