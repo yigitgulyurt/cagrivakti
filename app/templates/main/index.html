@@ -910,7 +910,7 @@ document.addEventListener('DOMContentLoaded', function () {
             /* --- Fetch from API if cache miss --- */
             if (!data) {
                 const app_version = "{{ app_version }}";
-                const response     = await fetch(`https://api.cagrivakti.com.tr/cagri_vakitleri?v=${app_version}|&sehir=${city}&country=${country}`);
+                const response     = await fetch(`https://api.cagrivakti.com.tr/cagri_vakitleri?v${app_version}|&sehir=${city}&country=${country}`);
                 const responseData = await response.json();
 
                 if (responseData.vakitler) {
