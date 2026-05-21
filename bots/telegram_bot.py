@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton, InputTextMessageContent, InlineQueryResultArticle
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, InlineQueryHandler
 from telegram.error import BadRequest
-from app.services import PrayerService, UserService, get_country_for_city, get_daily_content
+from app.services import PrayerService, UserService, get_country_for_city, get_daily_content, get_guides, get_guide_by_slug
 from app.services.ramadan_service import RamadanService
 from app.config import Config
 from app.factory import create_app
@@ -303,8 +303,9 @@ class NamazBot:
             label = daily_content.get('type', 'İçerik')
             
             welcome_msg += f"\n\n───────────────────\n"
-            welcome_msg += f"{emoji} <b>Günlük {label.capitalize()}</b> {emoji}\n"
+            welcome_msg += f"{emoji} <b>Günlük {label.capitalize()} Metin</b> {emoji}\n"
             welcome_msg += f"{daily_content.get('text')}"
+            welcome_msg += f"\n\n───────────────────\n"
             if daily_content.get('source'):
                 welcome_msg += f"\n\n<i>📚 Kaynak: {daily_content['source']}</i>"
         
@@ -575,6 +576,11 @@ class NamazBot:
             await self.handle_ramazan(update, context)
         elif data == "gunluk":
             await self.handle_gunluk(update, context)
+        elif data == "rehberler":
+            await self.handle_rehberler(update, context)
+        elif data.startswith("rehber_"):
+            slug = data.replace("rehber_", "")
+            await self.handle_rehber_detay(update, context, slug)
         elif data == "dini_gunler":
             await self.handle_dini_gunler(update, context)
         elif data == "kible_yonu":
@@ -601,6 +607,7 @@ class NamazBot:
             [InlineKeyboardButton("🔔 Bildirim Ayarları", callback_data="bildirim_ayarlari")],
             [InlineKeyboardButton("🔍 Şehir Seçimi 📍", switch_inline_query_current_chat="")],
             [InlineKeyboardButton("💫 Günlük İçerik", callback_data="gunluk")],
+            [InlineKeyboardButton("📚 Bilgi Köşesi", callback_data="rehberler")],
             [InlineKeyboardButton("🌙 Ramazan", callback_data="ramazan")],
             [InlineKeyboardButton("📅 Dini Günler", callback_data="dini_gunler"),
              InlineKeyboardButton("🧭 Kıble Yönü", callback_data="kible_yonu")],
@@ -752,6 +759,79 @@ class NamazBot:
                     raise e
         else:
             await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+
+    async def handle_rehberler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Rehberleri listeler."""
+        with self.app.app_context():
+            guides = get_guides()
+        
+        if not guides:
+            message = "ℹ️ Henüz rehber yok."
+            keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
+            if update.callback_query:
+                try:
+                    await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+                except BadRequest as e:
+                    if "Message is not modified" not in str(e):
+                        raise e
+            else:
+                await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+            return
+        
+        keyboard = []
+        for guide in guides:
+            keyboard.append([InlineKeyboardButton(f"📚 {guide['title']}", callback_data=f"rehber_{guide['slug']}")])
+        keyboard.append([InlineKeyboardButton("⬅️ Yardım", callback_data="yardim")])
+        
+        message = "📚 <b>BİLGİ KÖŞESİ</b>\n\nAşağıdaki rehberlerden birini seçin:"
+        
+        if update.callback_query:
+            try:
+                await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+            except BadRequest as e:
+                if "Message is not modified" not in str(e):
+                    raise e
+        else:
+            await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+
+    async def handle_rehber_detay(self, update: Update, context: ContextTypes.DEFAULT_TYPE, slug: str):
+        """Belirli bir rehberi detaylı gösterir."""
+        with self.app.app_context():
+            guide = get_guide_by_slug(slug)
+        
+        if not guide:
+            message = "ℹ️ Rehber bulunamadı."
+            keyboard = [[InlineKeyboardButton("⬅️ Rehberler", callback_data="rehberler")]]
+            if update.callback_query:
+                try:
+                    await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+                except BadRequest as e:
+                    if "Message is not modified" not in str(e):
+                        raise e
+            else:
+                await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+            return
+        
+        keyboard = [
+            [InlineKeyboardButton("⬅️ Rehberler", callback_data="rehberler")]
+        ]
+        
+        message = (
+            f"📚 <b>{guide['title']}</b>\n\n"
+            f"{guide['content']}"
+        )
+        
+        if len(message) > 4096:
+            message = message[:4090] + "..."
+        
+        if update.callback_query:
+            try:
+                await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML', disable_web_page_preview=True)
+            except BadRequest as e:
+                if "Message is not modified" not in str(e):
+                    raise e
+        else:
+            await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML', disable_web_page_preview=True)
 
     async def handle_contact(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         contact_text = (
@@ -1102,7 +1182,9 @@ class NamazBot:
             ("arkadas_oner", "Botu paylaş"),
             ("ramazan", "Ramazan bilgilerini gösterir"),
             ("gunluk", "Günlük içeriği gösterir"),
-            ("gundelik", "Günlük içeriği gösterir")
+            ("gundelik", "Günlük içeriği gösterir"),
+            ("rehberler", "Bilgi köşesi rehberlerini gösterir"),
+            ("bilgi_kosesi", "Bilgi köşesi rehberlerini gösterir")
         ]
         await application.bot.set_my_commands(commands)
         logger.info("Bot komutları başarıyla ayarlandı.")
@@ -1121,6 +1203,8 @@ class NamazBot:
         application.add_handler(CommandHandler("ramazan", self.handle_ramazan))
         application.add_handler(CommandHandler("gunluk", self.handle_gunluk))
         application.add_handler(CommandHandler("gundelik", self.handle_gunluk))
+        application.add_handler(CommandHandler("rehberler", self.handle_rehberler))
+        application.add_handler(CommandHandler("bilgi_kosesi", self.handle_rehberler))
         application.add_handler(CallbackQueryHandler(self.handle_callback))
         application.add_handler(InlineQueryHandler(self.handle_inline_query))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
