@@ -72,12 +72,12 @@ def index():
 @views_bp.route('/sehir/<sehir>')
 def sehir_sayfasi(sehir):
     canonical_sehir = normalize_city_name(sehir)
-    # if canonical_sehir != sehir:
-    #     query_params = request.query_string.decode('utf-8')
-    #     if query_params:
-    #         return redirect(url_for('views.sehir_sayfasi', sehir=canonical_sehir) + '?' + query_params, 301)
-    #     else:
-    #         return redirect(url_for('views.sehir_sayfasi', sehir=canonical_sehir), 301)
+    if canonical_sehir != sehir:
+        query_params = request.query_string.decode('utf-8')
+        if query_params:
+            return redirect(url_for('views.sehir_sayfasi', sehir=canonical_sehir) + '?' + query_params, 301)
+        else:
+            return redirect(url_for('views.sehir_sayfasi', sehir=canonical_sehir), 301)
             
     if not is_latin_only(canonical_sehir):
         abort(400, description="Gecersiz karakter iceren sehir ismi.")
@@ -1240,8 +1240,8 @@ def iletisim():
 # ==== ROOT CITY ROUTE (son olmalı!) ====
 # ======================================================
 
-# @views_bp.route('/<sehir>')
-# def root_sehir_redirect(sehir):
-#     """Kök dizinden şehir adına yönlendirme (örn: /ankara → /sehir/ankara)"""
-#     query_params = {k: v for k, v in request.args.items() if k != 'sehir'}
-#     return redirect(url_for('views.sehir_sayfasi', sehir=sehir, **query_params), code=301)
+@views_bp.route('/<sehir>')
+def root_sehir_redirect(sehir):
+    """Kök dizinden şehir adına yönlendirme (örn: /ankara → /sehir/ankara)"""
+    query_params = {k: v for k, v in request.args.items() if k != 'sehir'}
+    return redirect(url_for('views.sehir_sayfasi', sehir=sehir, **query_params), code=301)
