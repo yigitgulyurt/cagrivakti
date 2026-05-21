@@ -489,7 +489,6 @@
                 if (cachedData) return;
 
                 // API isteğini sıraya ekle
-                const app_version = "{{ app_version }}";
                 const url = `https://api.cagrivakti.com.tr/ezan_vakitleri?sehir=${sehir}&country=${itemCountryCode}&v=${app_version}`;
                 const callback = function(data) {
                     if (data.vakitler) {
