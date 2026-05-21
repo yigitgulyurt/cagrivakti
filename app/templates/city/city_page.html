@@ -412,7 +412,7 @@ let ezanVakitleri = {{ vakitler | tojson }};
 
 // Cache keys — all versioned so old entries are ignored automatically
 //const CACHE_VERSION           = app_version;
-const CACHE_KEY               = `cagri_vakitleri-v${ app_version }|${mevcutSehir}_${mevcutUlke}`;
+const CACHE_KEY               = `cagri_vakitleri-v${app_version}|${mevcutSehir}_${mevcutUlke}`;
 const DAILY_CONTENT_CACHE_KEY = `daily_content_v${app_version}`;
 const DATE_TRACK_KEY          = `date_track_${mevcutSehir}_${mevcutUlke}`;
 
@@ -552,7 +552,7 @@ async function ezanVakitleriniYukle() {
     }
 
     try {
-        const res  = await fetch(`https://api.cagrivakti.com.tr/ezan_vakitleri?sehir=${mevcutSehir}&country=${mevcutUlke}&v=${app_version}`);
+        const res  = await fetch(`https://api.cagrivakti.com.tr/cagri_vakitleri?v=${app_version}|&sehir=${mevcutSehir}&country=${mevcutUlke}`);
         const data = await res.json();
 
         if (data.vakitler) {

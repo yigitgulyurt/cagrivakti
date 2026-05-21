@@ -66,8 +66,8 @@ def api_anasayfa():
                 'durum': 'Erişime Kapalı'
             },
             {
-                'yol': '/ezan_vakitleri',
-                'aciklama': 'Ezan vakitlerini alır',
+                'yol': '/cagri_vakitleri',
+                'aciklama': 'Çagri vakitlerini alır',
                 'durum': 'Erişime Kapalı'
             },
             {
@@ -267,10 +267,10 @@ def sehir_kaydet():
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
 
 from app.config import Config
-@api_bp.route('/ezan_vakitleri')
+@api_bp.route('/cagri_vakitleri')
 @restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
-def ezan_vakitlerini_al_api():
+def cagri_vakitlerini_al_api():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
     tarih = request.args.get('date')
