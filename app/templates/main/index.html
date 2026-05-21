@@ -880,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function () {
        -------------------------------------------------------- */
     async function initHomeCountdown(city, country) {
         try {
-            const CACHE_VERSION  = 'V{{ app_version }}';
+            const CACHE_VERSION  = 'v{{ app_version }}';
             const CACHE_KEY      = `vakitler_${city}_${country}_${CACHE_VERSION}`;
             const DATE_TRACK_KEY = `home_date_track_${city}_${country}`;
 

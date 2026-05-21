@@ -411,14 +411,14 @@ const app_version = "{{ app_version }}";
 let ezanVakitleri = {{ vakitler | tojson }};
 
 // Cache keys — all versioned so old entries are ignored automatically
-const CACHE_VERSION           = 'V{{ app_version }}';
-const CACHE_KEY               = `vakitler_${mevcutSehir}_${mevcutUlke}_${CACHE_VERSION}`;
-const DAILY_CONTENT_CACHE_KEY = `daily_content_cache_${CACHE_VERSION}`;
+//const CACHE_VERSION           = app_version;
+const CACHE_KEY               = `cagri_vakitleri-v${ app_version }|${mevcutSehir}_${mevcutUlke}`;
+const DAILY_CONTENT_CACHE_KEY = `daily_content_v${app_version}`;
 const DATE_TRACK_KEY          = `date_track_${mevcutSehir}_${mevcutUlke}`;
 
 // Remove legacy (un-versioned) cache entries left from older app versions
 try {
-    const legacyVakitKey   = `vakitler_${mevcutSehir}_${mevcutUlke}`;
+    const legacyVakitKey   = `cagri_vakitleri_${mevcutSehir}_${mevcutUlke}`;
     const legacyContentKey = 'daily_content_cache';
     if (localStorage.getItem(legacyVakitKey))   localStorage.removeItem(legacyVakitKey);
     if (localStorage.getItem(legacyContentKey)) localStorage.removeItem(legacyContentKey);
