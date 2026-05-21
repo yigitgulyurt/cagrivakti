@@ -44,7 +44,7 @@ def create_app(config_class=Config):
                 "http://127.0.0.1:*"
             ]
         },
-        r"/ezan_vakitleri-V2*": {
+        r"/ezan_vakitleri": {
             "origins": [
                 "https://cagrivakti.com.tr",
                 "https://www.cagrivakti.com.tr",
