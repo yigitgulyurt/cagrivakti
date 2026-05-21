@@ -909,6 +909,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             /* --- Fetch from API if cache miss --- */
             if (!data) {
+                const app_version = "{{ app_version }}";
                 const response     = await fetch(`https://api.cagrivakti.com.tr/ezan_vakitleri?sehir=${city}&country=${country}&v=${app_version}`);
                 const responseData = await response.json();
 
