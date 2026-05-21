@@ -18,6 +18,23 @@ from app.services.ramadan_service import RamadanService
 from app.config import Config
 from app.factory import create_app
 
+# Türkçe ay ve gün isimleri
+TURKISH_MONTHS = [
+    '', 'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+]
+TURKISH_DAYS = [
+    'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'
+]
+
+def format_turkish_date(dt):
+    """Tarihi Türkçe formatta döndürür: 21 Mayıs 2026 Perşembe"""
+    day = dt.day
+    month = TURKISH_MONTHS[dt.month]
+    year = dt.year
+    weekday = TURKISH_DAYS[dt.weekday()]
+    return f"{day} {month} {year} {weekday}"
+
 # Logging configuration
 log_file = Config.TELEGRAM_LOG_FILE
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
@@ -217,9 +234,18 @@ class NamazBot:
         user = self.db.get_user(user_id)
         preferred = user['preferred_vakitler'].split(',') if user and user['preferred_vakitler'] else []
         
+        # Ramazan kontrolü
+        with self.app.app_context():
+            ramadan_info = RamadanService.get_ramadan_info()
+        is_ramadan = ramadan_info['is_ramadan']
+        
         vakitler = {
-            'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': 'Öğle', 
-            'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'
+            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
+            'gunes': 'Güneş', 
+            'ogle': 'Öğle', 
+            'ikindi': 'İkindi', 
+            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'yatsi': 'Yatsı'
         }
         
         keyboard = []
@@ -280,6 +306,8 @@ class NamazBot:
             country = get_country_for_city(sehir)
             prayer_times = PrayerService.get_vakitler(sehir, country, now.strftime('%Y-%m-%d'))
             next_v = PrayerService.get_next_vakit(sehir, country)
+            ramadan_info = RamadanService.get_ramadan_info()
+        is_ramadan = ramadan_info['is_ramadan']
         
         if not prayer_times:
             msg = "❌ <b>Hata:</b> Vakit bilgileri şu an alınamıyor. Lütfen daha sonra tekrar deneyin."
@@ -290,13 +318,17 @@ class NamazBot:
             return
 
         vakit_labels = {
-            'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': 'Öğle', 
-            'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'
+            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
+            'gunes': 'Güneş', 
+            'ogle': 'Öğle', 
+            'ikindi': 'İkindi', 
+            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'yatsi': 'Yatsı'
         }
         
         message = (
             f"📍 <b>{sehir.upper()}</b>\n"
-            f"🗓 <b>{now.strftime('%d %B %Y')}</b>\n"
+            f"🗓 <b>{format_turkish_date(now)}</b>\n"
             f"───────────────────\n"
         )
         
@@ -339,14 +371,20 @@ class NamazBot:
         with self.app.app_context():
             country = get_country_for_city(sehir)
             next_v = PrayerService.get_next_vakit(sehir, country)
+            ramadan_info = RamadanService.get_ramadan_info()
+        is_ramadan = ramadan_info['is_ramadan']
         
         if not next_v:
             await update.callback_query.answer("❌ Vakit bilgisi alınamadı.", show_alert=True)
             return
 
         vakit_labels = {
-            'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': 'Öğle', 
-            'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'
+            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
+            'gunes': 'Güneş', 
+            'ogle': 'Öğle', 
+            'ikindi': 'İkindi', 
+            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'yatsi': 'Yatsı'
         }
         
         kalan = next_v['kalan_sure']
@@ -594,13 +632,13 @@ class NamazBot:
             if ramadan_info['status'] == 'upcoming':
                 message = (
                     "⏳ <b>Ramazan Yaklaşıyor!</b>\n\n"
-                    f"📅 Ramazan Başlangıcı: {ramadan_info['start_date'].strftime('%d %B %Y')}\n"
+                    f"📅 Ramazan Başlangıcı: {format_turkish_date(ramadan_info['start_date'])}\n"
                     f"📍 Kalan Gün: {ramadan_info['days_to_start']}"
                 )
             elif ramadan_info['status'] == 'finished':
                 message = (
                     "✅ <b>Ramazan Bitti</b>\n\n"
-                    f"📅 Gelecek Ramazan: {ramadan_info['next_ramadan_date'].strftime('%d %B %Y')}\n"
+                    f"📅 Gelecek Ramazan: {format_turkish_date(ramadan_info['next_ramadan_date'])}\n"
                     f"📍 Kalan Gün: {ramadan_info['days_to_next']}"
                 )
             else:
@@ -859,13 +897,17 @@ class NamazBot:
 
             lead_time = user['bildirim_suresi'] or 5
             
-            # Vakit isimleri eşlemesi
+            # Vakit isimleri eşlemesi (Ramazan'da imsak=Sahur, akşam=İftar)
+            with self.app.app_context():
+                ramadan_info = RamadanService.get_ramadan_info()
+            is_ramadan = ramadan_info['is_ramadan']
+            
             vakit_labels = {
-                'imsak': 'İmsak',
+                'imsak': 'Sahur' if is_ramadan else 'İmsak',
                 'gunes': 'Güneş',
                 'ogle': 'Öğle',
                 'ikindi': 'İkindi',
-                'aksam': 'Akşam',
+                'aksam': 'İftar' if is_ramadan else 'Akşam',
                 'yatsi': 'Yatsı'
             }
             
@@ -883,17 +925,32 @@ class NamazBot:
                     diff = (v_dt - now).total_seconds()
                     v_name = vakit_labels[vakit_key]
                     
+                    # Özel mesajlar
+                    is_sahur = (vakit_key == 'imsak' and is_ramadan)
+                    is_iftar = (vakit_key == 'aksam' and is_ramadan)
+                    
                     # 1. Hatırlatma (X dakika kala)
                     if abs(diff - (lead_time * 60)) < 30:
-                        text = f"⏰ <b>Hatırlatma:</b> {v_name} vaktine {lead_time} dakika kaldı. ({city})"
+                        if is_sahur:
+                            text = f"🌙 <b>Sahur Vakti Hatırlatması!</b>\n\n{v_name} vaktine {lead_time} dakika kaldı! ({city})\n\n<i>Hayırlı sahurlayın.</i>"
+                        elif is_iftar:
+                            text = f"🌙 <b>İftar Vakti Hatırlatması!</b>\n\n{v_name} vaktine {lead_time} dakika kaldı! ({city})\n\n<i>Hayırlı iftarlar dileriz.</i>"
+                        else:
+                            text = f"⏰ <b>Hatırlatma:</b> {v_name} vaktine {lead_time} dakika kaldı. ({city})"
+                        
                         await self._safe_send_message(context.bot, user['user_id'], text)
                         if user['grup_id']:
                             await self._safe_send_message(context.bot, user['grup_id'], text)
                     
                     # 2. Vakit Girdi Bildirimi (Tam anında)
                     elif abs(diff) < 30:
-                        # Interval 60 olduğu için 30 sn tolerans yeterli olacaktır
-                        text = f"🕌 <b>{v_name} vakti girdi!</b> ({city})\n\n<i>Rabbimiz ibadetlerinizi kabul eylesin.</i>"
+                        if is_sahur:
+                            text = f"🌙 <b>Sahur Vakti Girdi!</b> ({city})\n\n<i>Hayırlı sahurlayın, orucunuz kabul olsun.</i>"
+                        elif is_iftar:
+                            text = f"🌙 <b>İftar Vakti Girdi!</b> ({city})\n\n<i>Hayırlı iftarlar, dualarınız kabul olsun.</i>"
+                        else:
+                            text = f"🕌 <b>{v_name} vakti girdi!</b> ({city})\n\n<i>Rabbimiz ibadetlerinizi kabul eylesin.</i>"
+                        
                         await self._safe_send_message(context.bot, user['user_id'], text)
                         if user['grup_id']:
                             await self._safe_send_message(context.bot, user['grup_id'], text)
