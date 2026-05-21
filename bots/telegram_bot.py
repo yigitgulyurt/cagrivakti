@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton, InputTextMessageContent, InlineQueryResultArticle
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, InlineQueryHandler
 from telegram.error import BadRequest
-from app.services import PrayerService, UserService, get_country_for_city
+from app.services import PrayerService, UserService, get_country_for_city, get_daily_content
 from app.services.ramadan_service import RamadanService
 from app.config import Config
 from app.factory import create_app
@@ -287,6 +287,30 @@ class NamazBot:
             "<i>Huzurlu ve bereketli vakitler dileriz.</i>"
         )
         
+        # Günlük içeriği ekle
+        with self.app.app_context():
+            daily_content = get_daily_content()
+        
+        if daily_content:
+            type_emoji = {
+                'ayet': '📖',
+                'hadis': '📜',
+                'soz': '💬'
+            }
+            type_label = {
+                'ayet': 'Ayet',
+                'hadis': 'Hadis',
+                'soz': 'Söz'
+            }
+            emoji = type_emoji.get(daily_content.get('type'), '💫')
+            label = type_label.get(daily_content.get('type'), 'İçerik')
+            
+            welcome_msg += f"\n\n───────────────────\n"
+            welcome_msg += f"{emoji} <b>GÜNÜN {label.upper()}</b> {emoji}\n"
+            welcome_msg += f"{daily_content.get('text')}"
+            if daily_content.get('source'):
+                welcome_msg += f"\n\n<i>📚 Kaynak: {daily_content['source']}</i>"
+        
         await update.effective_message.reply_text(
             welcome_msg,
             reply_markup=self.get_main_keyboard(),
@@ -452,6 +476,31 @@ class NamazBot:
                 "✨ <b>Namaz Vakitleri Botuna Hoş Geldiniz!</b>\n\n"
                 "Aşağıdaki menüden vakitleri görebilir veya ⚙️ <b>Ayarlar</b> kısmından şehrinizi belirleyebilirsiniz."
             )
+            
+            # Günlük içeriği ekle
+            with self.app.app_context():
+                daily_content = get_daily_content()
+            
+            if daily_content:
+                type_emoji = {
+                    'ayet': '📖',
+                    'hadis': '📜',
+                    'soz': '💬'
+                }
+                type_label = {
+                    'ayet': 'Ayet',
+                    'hadis': 'Hadis',
+                    'soz': 'Söz'
+                }
+                emoji = type_emoji.get(daily_content.get('type'), '💫')
+                label = type_label.get(daily_content.get('type'), 'İçerik')
+                
+                welcome_msg += f"\n\n───────────────────\n"
+                welcome_msg += f"{emoji} <b>GÜNÜN {label.upper()}</b> {emoji}\n"
+                welcome_msg += f"{daily_content.get('text')}"
+                if daily_content.get('source'):
+                    welcome_msg += f"\n\n<i>📚 Kaynak: {daily_content['source']}</i>"
+            
             try:
                 await query.edit_message_text(
                     welcome_msg,
@@ -525,6 +574,8 @@ class NamazBot:
             await self.handle_help(update, context)
         elif data == "ramazan":
             await self.handle_ramazan(update, context)
+        elif data == "gunluk":
+            await self.handle_gunluk(update, context)
         elif data == "dini_gunler":
             await self.handle_dini_gunler(update, context)
         elif data == "kible_yonu":
@@ -550,6 +601,7 @@ class NamazBot:
         keyboard = [
             [InlineKeyboardButton("🔔 Bildirim Ayarları", callback_data="bildirim_ayarlari")],
             [InlineKeyboardButton("🔍 Şehir Seçimi 📍", switch_inline_query_current_chat="")],
+            [InlineKeyboardButton("💫 Günlük İçerik", callback_data="gunluk")],
             [InlineKeyboardButton("🌙 Ramazan", callback_data="ramazan")],
             [InlineKeyboardButton("📅 Dini Günler", callback_data="dini_gunler"),
              InlineKeyboardButton("🧭 Kıble Yönü", callback_data="kible_yonu")],
@@ -653,6 +705,48 @@ class NamazBot:
                 )
             else:
                 message = "ℹ️ Ramazan bilgileri şu an alınamıyor."
+        
+        if update.callback_query:
+            try:
+                await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+            except BadRequest as e:
+                if "Message is not modified" not in str(e):
+                    raise e
+        else:
+            await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+
+    async def handle_gunluk(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Günlük içeriği gösterir (ayet/hadis/söz)."""
+        with self.app.app_context():
+            daily_content = get_daily_content()
+        
+        keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
+        
+        if daily_content:
+            # İçerik tipine göre emoji ve başlık
+            type_emoji = {
+                'ayet': '📖',
+                'hadis': '📜',
+                'soz': '💬'
+            }
+            type_label = {
+                'ayet': 'Ayet',
+                'hadis': 'Hadis',
+                'soz': 'Söz'
+            }
+            
+            emoji = type_emoji.get(daily_content.get('type'), '💫')
+            label = type_label.get(daily_content.get('type'), 'İçerik')
+            
+            message = (
+                f"{emoji} <b>GÜNÜN {label.upper()}</b> {emoji}\n\n"
+                f"{daily_content.get('text')}"
+            )
+            
+            if daily_content.get('source'):
+                message += f"\n\n<i>📚 Kaynak: {daily_content['source']}</i>"
+        else:
+            message = "ℹ️ Günlük içerik şu an gösterilemiyor."
         
         if update.callback_query:
             try:
@@ -1010,7 +1104,9 @@ class NamazBot:
             ("temizle", "Sohbeti temizler"),
             ("iletisim", "Geliştiriciye ulaş"),
             ("arkadas_oner", "Botu paylaş"),
-            ("ramazan", "Ramazan bilgilerini gösterir")
+            ("ramazan", "Ramazan bilgilerini gösterir"),
+            ("gunluk", "Günlük içeriği gösterir"),
+            ("gundelik", "Günlük içeriği gösterir")
         ]
         await application.bot.set_my_commands(commands)
         logger.info("Bot komutları başarıyla ayarlandı.")
@@ -1027,6 +1123,8 @@ class NamazBot:
         application.add_handler(CommandHandler("iletisim", self.handle_contact))
         application.add_handler(CommandHandler("grup", self.handle_group))
         application.add_handler(CommandHandler("ramazan", self.handle_ramazan))
+        application.add_handler(CommandHandler("gunluk", self.handle_gunluk))
+        application.add_handler(CommandHandler("gundelik", self.handle_gunluk))
         application.add_handler(CallbackQueryHandler(self.handle_callback))
         application.add_handler(InlineQueryHandler(self.handle_inline_query))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))

@@ -102,10 +102,10 @@ class RamadanService:
             return cached_info
 
         # Otomatik Hesaplama
-        # h_year, h_month, h_day = cls.gregorian_to_hijri(current_date)
+        h_year, h_month, h_day = cls.gregorian_to_hijri(current_date)
 
         # TEST MODU: Ramazan ayında gibi göster (geçici olarak)
-        h_year, h_month, h_day = 1447, 9, 15  # 15. Ramazan günü olarak test ediy
+        # h_year, h_month, h_day = 1447, 9, 15  # 15. Ramazan günü olarak test ediy
         
         res = {"is_ramadan": False, "status": "none"}
 

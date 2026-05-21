@@ -72,3 +72,5 @@ scripts/systemd/
 test_results.json
 temp_backup/
 cagrivakti_project_backup_*.tar.gz
+
+TELEGRAM_BOT_GELISTIRMELER.md
