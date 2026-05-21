@@ -411,9 +411,9 @@ const app_version = "{{ app_version }}";
 
             sehirler.forEach((item, index) => {
                 const sehir = typeof item === 'object' ? item.sehir : item;
-                const itemCountryCode = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
+                const ulke = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
                 
-                const CACHE_KEY = `cagri_vakitleri-v=${app_version}|${sehir}_${itemCountryCode}selam`;
+                const CACHE_KEY = `cagri_vakitleri-v=${app_version}|${sehir}_${ulke}`;
                 const TODAY = new Date().toISOString().split('T')[0];
                 const cached = localStorage.getItem(CACHE_KEY);
                 let cachedData = null;
@@ -426,7 +426,7 @@ const app_version = "{{ app_version }}";
 
                 const card = $('<a>')
                     .addClass('city-card')
-                    .attr('href', `/sehir/${sehir}?country=${itemCountryCode}`)
+                    .attr('href', `/sehir/${sehir}?country=${ulke}`)
                     .click(function(e) {
                         if ($(this).hasClass('skeleton-card')) {
                             e.preventDefault();
@@ -490,19 +490,20 @@ const app_version = "{{ app_version }}";
                 if (cachedData) return;
 
                 // API isteğini sıraya ekle
-                const url = `https://api.cagrivakti.com.tr/cagri_vakitleri?v${app_version}|&sehir=${sehir}&country=${itemCountryCode}`;
+                const url = `https://api.cagrivakti.com.tr/vakitler?sehir=${sehir}&ulke=${ulke}`;
                 const callback = function(data) {
-                    if (data.vakitler) {
+                    if (data.durum === 'basarili' && data.data) {
                         // Yarın verisini de ekle
-                        if (data.yarin) {
-                            data.vakitler.yarin = data.yarin;
-                        }
+                        const vakitlerData = {
+                            ...data.data.vakitler,
+                            yarin: data.data.yarin
+                        };
 
                         localStorage.setItem(CACHE_KEY, JSON.stringify({
                             tarih: TODAY,
-                            data: data.vakitler
+                            data: vakitlerData
                         }));
-                        updateUI(data.vakitler);
+                        updateUI(vakitlerData);
                     } else if (!card.hasClass('content-loaded')) {
                         card.removeClass('skeleton-card').addClass('content-loaded');
                         cityName.empty().text(getDisplayName(sehir));

@@ -266,53 +266,7 @@ def sehir_kaydet():
     UserService.save_user_preferences(sehir, country_code)
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
 
-from app.config import Config
-@api_bp.route('/cagri_vakitleri')
-@restrict_to_main_domain
-@cache.cached(timeout=3600, query_string=True)
-def cagri_vakitlerini_al_api():
-    sehir = request.args.get('sehir')
-    country_code = request.args.get('country', 'TR')
-    tarih = request.args.get('date')
-    
-    if not sehir:
-        return jsonify({'error': 'Sehir bilgisi gerekli'}), 400
-        
-    if not is_latin_only(sehir) or not is_latin_only(country_code) or (tarih and not is_latin_only(tarih)):
-        return jsonify({'error': 'Gecersiz karakter iceren parametre'}), 400
-        
-    try:
-        vakitler = PrayerService.get_vakitler(sehir, country_code, tarih)
-        if vakitler:
-            # Timezone'u ayır ve vakitleri sırala
-            tz_info = vakitler.pop('timezone', 'Europe/Istanbul')
-            sirali_vakitler = {}
-            for v in ["imsak", "gunes", "ogle", "ikindi", "aksam", "yatsi"]:
-                if v in vakitler:
-                    sirali_vakitler[v] = vakitler[v]
-            
-            # Yarının imsak vaktini de al
-            yarin_tarih = None
-            if tarih:
-                try:
-                    tarih_obj = datetime.strptime(tarih, '%Y-%m-%d')
-                    yarin_tarih = (tarih_obj + timedelta(days=1)).strftime('%Y-%m-%d')
-                except:
-                    pass
-            else:
-                yarin_tarih = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
-            
-            yarin_vakitler = PrayerService.get_vakitler(sehir, country_code, yarin_tarih)
-            yarin_imsak = yarin_vakitler.get('imsak') if yarin_vakitler else None
 
-            return jsonify({
-                'vakitler': sirali_vakitler,
-                'timezone': tz_info,
-                'yarin': {'imsak': yarin_imsak} if yarin_imsak else None
-            })
-        return jsonify({'error': 'Vakit bulunamadı'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/sonraki_vakit')
 @restrict_to_main_domain
@@ -474,6 +428,20 @@ def public_api_vakitler():
                 if v in vakitler:
                     sirali_vakitler[v] = vakitler[v]
             
+            # Yarının imsak vaktini al
+            yarin_tarih = None
+            if tarih:
+                try:
+                    tarih_obj = datetime.strptime(tarih, '%Y-%m-%d')
+                    yarin_tarih = (tarih_obj + timedelta(days=1)).strftime('%Y-%m-%d')
+                except:
+                    pass
+            else:
+                yarin_tarih = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+            
+            yarin_vakitler = PrayerService.get_vakitler(sehir, country_code, yarin_tarih)
+            yarin_imsak = yarin_vakitler.get('imsak') if yarin_vakitler else None
+
             return jsonify({
                 'durum': 'basarili', 
                 'tip': 'gunluk', 
@@ -482,7 +450,8 @@ def public_api_vakitler():
                     'ulke': country_code, 
                     'tarih': tarih or datetime.now().strftime('%Y-%m-%d'), 
                     'vakitler': sirali_vakitler,
-                    'timezone': tz_info
+                    'timezone': tz_info,
+                    'yarin': {'imsak': yarin_imsak} if yarin_imsak else None
                 }
             })
         return jsonify({'durum': 'hata', 'mesaj': 'Vakit bulunamadı.'}), 404

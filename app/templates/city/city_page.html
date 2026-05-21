@@ -412,8 +412,8 @@ let ezanVakitleri = {{ vakitler | tojson }};
 
 // Cache keys — all versioned so old entries are ignored automatically
 //const CACHE_VERSION           = app_version;
-const CACHE_KEY               = `cagri_vakitleri-v${app_version}|${mevcutSehir}_${mevcutUlke}merhaba`;
-const DAILY_CONTENT_CACHE_KEY = `daily_content_v${app_version}`;
+const CACHE_KEY               = `cagri_vakitleri-v=${app_version}|${mevcutSehir}_${mevcutUlke}`;
+const DAILY_CONTENT_CACHE_KEY = `daily_content_v=${app_version}`;
 const DATE_TRACK_KEY          = `date_track_${mevcutSehir}_${mevcutUlke}`;
 
 // Remove legacy (un-versioned) cache entries left from older app versions
@@ -552,14 +552,14 @@ async function ezanVakitleriniYukle() {
     }
 
     try {
-        const res  = await fetch(`https://api.cagrivakti.com.tr/cagri_vakitleri?v${app_version}|&sehir=${mevcutSehir}&country=${mevcutUlke}`);
+        const res  = await fetch(`https://api.cagrivakti.com.tr/vakitler?sehir=${mevcutSehir}&ulke=${mevcutUlke}`);
         const data = await res.json();
 
-        if (data.vakitler) {
+        if (data.durum === 'basarili' && data.data) {
             ezanVakitleri = {
-                ...data.vakitler,
-                timezone:   data.timezone || 'Europe/Istanbul',
-                yarin:      data.yarin    || null,
+                ...data.data.vakitler,
+                timezone:   data.data.timezone || 'Europe/Istanbul',
+                yarin:      data.data.yarin    || null,
                 is_ramadan: ezanVakitleri.is_ramadan ?? false,
             };
             setCachedVakitler(ezanVakitleri);

@@ -399,7 +399,7 @@ const app_version = "{{ app_version }}";
                 if (cachedData) return;
 
                 // API isteğini sıraya ekle
-                const url = `https://api.cagrivakti.com.tr/cagri_vakitleri?v${app_version}|&sehir=${sehir}&country=${itemCountryCode}`;
+                const url = `https://api.cagrivakti.com.tr/cagri_vakitleri?v=${app_version}|&sehir=${sehir}&country=${itemCountryCode}`;
                 const callback = function(data) {
                     if (data.vakitler) {
                         localStorage.setItem(CACHE_KEY, JSON.stringify({
