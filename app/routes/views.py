@@ -54,7 +54,6 @@ def index():
                            sehir=sehir,
                            country_code=country_code,
                            vakitler=vakitler,
-                           app_version=current_app.config.get('APP_VERSION', '1.0'),
                            daily_content=get_daily_content(),
                            ramadan_info=RamadanService.get_ramadan_info(),
                            guides=get_guides()[:3],
@@ -118,7 +117,6 @@ def sehir_sayfasi(sehir):
                                              sehir=canonical_sehir,
                                              country_code=country_code,
                                              vakitler=vakitler,
-                                             app_version=current_app.config.get('APP_VERSION', '1.0'),
                                              daily_content=get_daily_content(),
                                              ramadan_info=RamadanService.get_ramadan_info(),
                                              seo_title=title,
@@ -155,7 +153,6 @@ def sehir_secimi():
                             cities=city_data,
                             og_image_url=og_image_url,
                             seo_title=title,
-                            app_version=current_app.config.get('APP_VERSION', '1.0'),
                             seo_description=description)
 
 # ======================================================
@@ -217,12 +214,7 @@ def imsakiye_secimi():
     all_cities  = sorted(UserService.get_sehirler('ALL'))
     title       = f"{suanki_yil} Ramazan İmsakiyesi — Çağrı Vakti"
     description = f"Şehrinizi seçin, sahur ve iftar vakitlerini görün."
-    return render_template('imsakiye/imsakiye_selection.html',
-                            cities=all_cities,
-                            og_image_url=og_image_url,
-                            seo_title=title,
-                            app_version=current_app.config.get('APP_VERSION', '1.0'),
-                            seo_description=description)
+    return render_template('imsakiye/imsakiye_selection.html', cities=all_cities, og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 
 @views_bp.route('/imsakiye/<sehir>')
