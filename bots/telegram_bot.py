@@ -651,8 +651,7 @@ class NamazBot:
         with self.app.app_context():
             dini_gunler_list = DiniGunlerService.get_dini_gunler()
         
-        current_year = datetime.now().year
-        message = f"📅 <b>{current_year} Yılı Dini Günler ve Geceler</b>\n\n"
+        message = "📅 <b>Yaklaşan Dini Günler ve Geceler</b>\n\n"
         
         tur_emoji = {
             'kandil': '🌙',
