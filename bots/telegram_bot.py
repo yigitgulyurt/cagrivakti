@@ -657,7 +657,8 @@ class NamazBot:
         tur_emoji = {
             'kandil': '🌙',
             'ramazan': '🌙',
-            'bayram': '🎊'
+            'bayram': '🎊',
+            'ozel': '✨'
         }
         
         for gun in dini_gunler_list:
