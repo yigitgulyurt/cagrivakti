@@ -267,18 +267,19 @@ def sehir_kaydet():
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
 
 from app.config import Config
-@api_bp.route(f'/ezan_vakitleri-V{Config.APP_VERSION}')
+@api_bp.route('/ezan_vakitleri')
 @restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
 def ezan_vakitlerini_al_api():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
     tarih = request.args.get('date')
+    version = request.args.get('v', Config.APP_VERSION)  # opsiyonel, default güncel versiyon
     
     if not sehir:
         return jsonify({'error': 'Sehir bilgisi gerekli'}), 400
         
-    if not is_latin_only(sehir) or not is_latin_only(country_code) or (tarih and not is_latin_only(tarih)):
+    if not is_latin_only(sehir) or not is_latin_only(country_code) or (tarih and not is_latin_only(tarih)) or (version and not is_latin_only(version)):
         return jsonify({'error': 'Gecersiz karakter iceren parametre'}), 400
         
     try:

@@ -551,7 +551,7 @@ async function ezanVakitleriniYukle() {
     }
 
     try {
-        const res  = await fetch(`https://api.cagrivakti.com.tr/ezan_vakitleri-V{{ app_version }}?sehir=${mevcutSehir}&country=${mevcutUlke}`);
+        const res  = await fetch(`https://api.cagrivakti.com.tr/ezan_vakitleri?sehir=${mevcutSehir}&country=${mevcutUlke}&v=${app_version}`);
         const data = await res.json();
 
         if (data.vakitler) {
