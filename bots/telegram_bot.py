@@ -295,12 +295,14 @@ class NamazBot:
             type_emoji = {
                 'ayet': '📖',
                 'hadis': '📜',
-                'soz': '💬'
+                'soz': '💬',
+                'söz': '💬'
             }
             type_label = {
                 'ayet': 'Ayet',
                 'hadis': 'Hadis',
-                'soz': 'Söz'
+                'soz': 'Söz',
+                'söz': 'Söz'
             }
             emoji = type_emoji.get(daily_content.get('type'), '💫')
             label = type_label.get(daily_content.get('type'), 'İçerik')
@@ -485,12 +487,14 @@ class NamazBot:
                 type_emoji = {
                     'ayet': '📖',
                     'hadis': '📜',
-                    'soz': '💬'
+                    'soz': '💬',
+                    'söz': '💬'
                 }
                 type_label = {
                     'ayet': 'Ayet',
                     'hadis': 'Hadis',
-                    'soz': 'Söz'
+                    'soz': 'Söz',
+                    'söz': 'Söz'
                 }
                 emoji = type_emoji.get(daily_content.get('type'), '💫')
                 label = type_label.get(daily_content.get('type'), 'İçerik')
@@ -727,12 +731,14 @@ class NamazBot:
             type_emoji = {
                 'ayet': '📖',
                 'hadis': '📜',
-                'soz': '💬'
+                'soz': '💬',
+                'söz': '💬'
             }
             type_label = {
                 'ayet': 'Ayet',
                 'hadis': 'Hadis',
-                'soz': 'Söz'
+                'soz': 'Söz',
+                'söz': 'Söz'
             }
             
             emoji = type_emoji.get(daily_content.get('type'), '💫')
