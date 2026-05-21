@@ -303,7 +303,7 @@ class NamazBot:
             label = daily_content.get('type', 'İçerik')
             
             welcome_msg += f"\n\n───────────────────\n"
-            welcome_msg += f"{emoji} <b>GÜNÜN {label.upper()}</b> {emoji}\n"
+            welcome_msg += f"{emoji} <b>Günlük {label.capitalize()}</b> {emoji}\n"
             welcome_msg += f"{daily_content.get('text')}"
             if daily_content.get('source'):
                 welcome_msg += f"\n\n<i>📚 Kaynak: {daily_content['source']}</i>"
