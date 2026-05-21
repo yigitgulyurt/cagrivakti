@@ -294,18 +294,13 @@ class NamazBot:
         if daily_content:
             type_emoji = {
                 'ayet': '📖',
-                'hadis': '📜',
+                'hadis': '�',
                 'soz': '💬',
                 'söz': '💬'
             }
-            type_label = {
-                'ayet': 'Ayet',
-                'hadis': 'Hadis',
-                'soz': 'Söz',
-                'söz': 'Söz'
-            }
+
             emoji = type_emoji.get(daily_content.get('type'), '💫')
-            label = type_label.get(daily_content.get('type'), 'İçerik')
+            label = daily_content.get('type', 'İçerik')
             
             welcome_msg += f"\n\n───────────────────\n"
             welcome_msg += f"{emoji} <b>GÜNÜN {label.upper()}</b> {emoji}\n"
@@ -486,7 +481,7 @@ class NamazBot:
             if daily_content:
                 type_emoji = {
                     'ayet': '📖',
-                    'hadis': '📜',
+                    'hadis': '�',
                     'soz': '💬',
                     'söz': '💬'
                 }
@@ -497,7 +492,7 @@ class NamazBot:
                     'söz': 'Söz'
                 }
                 emoji = type_emoji.get(daily_content.get('type'), '💫')
-                label = type_label.get(daily_content.get('type'), 'İçerik')
+                label = daily_content.get('type', 'İçerik')
                 
                 welcome_msg += f"\n\n───────────────────\n"
                 welcome_msg += f"{emoji} <b>GÜNÜN {label.upper()}</b> {emoji}\n"
@@ -734,15 +729,10 @@ class NamazBot:
                 'soz': '💬',
                 'söz': '💬'
             }
-            type_label = {
-                'ayet': 'Ayet',
-                'hadis': 'Hadis',
-                'soz': 'Söz',
-                'söz': 'Söz'
-            }
+
             
             emoji = type_emoji.get(daily_content.get('type'), '💫')
-            label = type_label.get(daily_content.get('type'), 'İçerik')
+            label = daily_content.get('type', 'İçerik')
             
             message = (
                 f"{emoji} <b>GÜNÜN {label.upper()}</b> {emoji}\n\n"
