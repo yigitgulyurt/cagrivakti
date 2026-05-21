@@ -43,6 +43,15 @@ def setup_middleware(app):
         if 'instagram' in user_agent and ('fbav' in user_agent or 'instagram' in user_agent):
             return render_template('open_in_browser.html')
 
+    @app.before_request
+    def restrict_subdomains():
+        host = request.host
+        # Eğer api. subdomainindeysek ve blueprint api değilse 404 dön
+        if host and host.startswith('api.'):
+            if request.blueprint != 'api':
+                from flask import abort
+                abort(404)
+
     @app.after_request
     def set_security_headers(response):
         """Güvenlik başlıklarını (Security Headers) ekle."""
