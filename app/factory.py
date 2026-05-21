@@ -112,9 +112,9 @@ def create_app(config_class=Config):
     from app.routes.api import api_bp
     from app.routes.og import og_bp
     
-    app.register_blueprint(views_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(og_bp)
+    app.register_blueprint(views_bp)
 
     setup_api_logging(app)
     setup_security_logging(app)
