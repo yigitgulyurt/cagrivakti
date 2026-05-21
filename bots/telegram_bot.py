@@ -35,6 +35,26 @@ def format_turkish_date(dt):
     weekday = TURKISH_DAYS[dt.weekday()]
     return f"{day} {month} {year} {weekday}"
 
+def strip_html_tags(text):
+    """HTML etiketlerini temizler ve Telegram uyumlu hale getirir."""
+    import re
+    # <br>, <br /> → yeni satır
+    text = re.sub(r'<br\s*/?>', '\n', text)
+    # <p>, </p> → yeni satır
+    text = re.sub(r'</p>', '\n\n', text)
+    text = re.sub(r'<p>', '', text)
+    # <h1>...</h1> → <b>...</b>
+    text = re.sub(r'<h\d>', '<b>', text)
+    text = re.sub(r'</h\d>', '</b>', text)
+    # <li> → • 
+    text = re.sub(r'<li>', '• ', text)
+    text = re.sub(r'</li>', '\n', text)
+    # <ul>, </ul>, <ol>, </ol> → temizle
+    text = re.sub(r'<ul>|</ul>|<ol>|</ol>', '', text)
+    # Diğer tüm etiketleri temizle
+    text = re.sub(r'<[^>]+>', '', text)
+    return text
+
 # Logging configuration
 log_file = Config.TELEGRAM_LOG_FILE
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
@@ -818,7 +838,7 @@ class NamazBot:
         
         message = (
             f"📚 <b>{guide['title']}</b>\n\n"
-            f"{guide['content']}"
+            f"{strip_html_tags(guide['content'])}"
         )
         
         if len(message) > 4096:
