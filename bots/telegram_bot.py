@@ -459,7 +459,7 @@ class NamazBot:
                 raise e
 
     async def handle_haftalik_takvim(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Haftalık vakit takvimini gösterir."""
+        """Haftalık vakit takvimini gösterir (sadece bu hafta, bugün işaretli)."""
         user_id = update.effective_user.id
         user = self.db.get_user(user_id)
         
@@ -473,6 +473,10 @@ class NamazBot:
         
         sehir = user['sehir']
         now = datetime.now(self.tz)
+        bugun = now.date()
+        
+        # Bu haftanın Pazartesi'sinden başla
+        baslangic = bugun - timedelta(days=bugun.weekday())
         
         with self.app.app_context():
             country = get_country_for_city(sehir)
@@ -488,18 +492,23 @@ class NamazBot:
             'yatsi': 'Yatsı'
         }
         
-        message = f"📍 <b>{sehir.upper()}</b>\n🗓 <b>HAFTALIK VAKİTLER</b>\n───────────────────\n"
+        message = f"📍 <b>{sehir.upper()}</b>\n🗓 <b>BU HAFTANIN VAKİTLERİ</b>\n───────────────────\n"
         
         for i in range(7):
-            gun_tarihi = now.date() + timedelta(days=i)
+            gun_tarihi = baslangic + timedelta(days=i)
             with self.app.app_context():
                 prayer_times = PrayerService.get_vakitler(sehir, country, gun_tarihi.strftime('%Y-%m-%d'))
             
             if prayer_times:
-                message += f"\n📅 <b>{format_turkish_date(gun_tarihi)}</b>\n"
+                bugun_mu = (gun_tarihi == bugun)
+                bugun_isaret = " 📌 BUGÜN!" if bugun_mu else ""
+                message += f"\n📅 <b>{format_turkish_date(gun_tarihi)}</b>{bugun_isaret}\n"
                 for key, label in vakit_labels.items():
                     time_val = prayer_times.get(key, '--:--')
-                    message += f"▫️ {label:<7}: {time_val}\n"
+                    if bugun_mu:
+                        message += f"▶️ <b>{label:<7}: {time_val}</b> ✨\n"
+                    else:
+                        message += f"▫️ {label:<7}: {time_val}\n"
         
         keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
         
@@ -512,8 +521,8 @@ class NamazBot:
         else:
             await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
 
-    async def handle_aylik_takvim(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Aylık vakit takvimini gösterir (son 10 gün gösterilir, çok uzun olmasın diye)."""
+    async def handle_aylik_takvim(self, update: Update, context: ContextTypes.DEFAULT_TYPE, sayfa=0):
+        """Aylık vakit takvimini gösterir (sadece bu ay, sayfalama, bugün işaretli)."""
         user_id = update.effective_user.id
         user = self.db.get_user(user_id)
         
@@ -527,6 +536,30 @@ class NamazBot:
         
         sehir = user['sehir']
         now = datetime.now(self.tz)
+        bugun = now.date()
+        
+        # Bu ayın 1. günü ve son günü
+        ayin_ilk_gunu = bugun.replace(day=1)
+        # Gelecek ayın 1. gününden 1 gün çıkar
+        if ayin_ilk_gunu.month == 12:
+            gelecek_ayin_ilk_gunu = ayin_ilk_gunu.replace(year=ayin_ilk_gunu.year+1, month=1, day=1)
+        else:
+            gelecek_ayin_ilk_gunu = ayin_ilk_gunu.replace(month=ayin_ilk_gunu.month+1, day=1)
+        ayin_son_gunu = gelecek_ayin_ilk_gunu - timedelta(days=1)
+        
+        # Bu aydaki tüm günleri listele
+        gunler = []
+        g = ayin_ilk_gunu
+        while g <= ayin_son_gunu:
+            gunler.append(g)
+            g += timedelta(days=1)
+        
+        # Sayfalama (her sayfada 10 gün)
+        sayfa_basina = 10
+        toplam_sayfa = (len(gunler) + sayfa_basina - 1) // sayfa_basina
+        baslangic_indeks = sayfa * sayfa_basina
+        bitis_indeks = baslangic_indeks + sayfa_basina
+        gosterilecek_gunler = gunler[baslangic_indeks:bitis_indeks]
         
         with self.app.app_context():
             country = get_country_for_city(sehir)
@@ -542,20 +575,31 @@ class NamazBot:
             'yatsi': 'Yatsı'
         }
         
-        message = f"📍 <b>{sehir.upper()}</b>\n🗓 <b>AYLIK VAKİTLER</b>\n───────────────────\n"
+        ay_adi = TURKISH_MONTHS[ayin_ilk_gunu.month]
+        message = f"📍 <b>{sehir.upper()}</b>\n🗓 <b>{ay_adi} {ayin_ilk_gunu.year}</b>\n(Sayfa {sayfa+1}/{toplam_sayfa})\n───────────────────\n"
         
-        for i in range(30):
-            gun_tarihi = now.date() + timedelta(days=i)
+        for gun_tarihi in gosterilecek_gunler:
             with self.app.app_context():
                 prayer_times = PrayerService.get_vakitler(sehir, country, gun_tarihi.strftime('%Y-%m-%d'))
             
             if prayer_times:
-                message += f"\n📅 <b>{format_turkish_date(gun_tarihi)}</b>\n"
+                bugun_mu = (gun_tarihi == bugun)
+                bugun_isaret = " 📌 BUGÜN!" if bugun_mu else ""
+                message += f"\n📅 <b>{format_turkish_date(gun_tarihi)}</b>{bugun_isaret}\n"
                 for key, label in vakit_labels.items():
                     time_val = prayer_times.get(key, '--:--')
-                    message += f"▫️ {label:<7}: {time_val}\n"
+                    if bugun_mu:
+                        message += f"▶️ <b>{label:<7}: {time_val}</b> ✨\n"
+                    else:
+                        message += f"▫️ {label:<7}: {time_val}\n"
         
-        keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
+        # Sayfalama klavyesi
+        keyboard = []
+        if sayfa > 0:
+            keyboard.append([InlineKeyboardButton("⬅️ Önceki Sayfa", callback_data=f"aylik_sayfa_{sayfa-1}")])
+        if sayfa < toplam_sayfa - 1:
+            keyboard.append([InlineKeyboardButton("Sonraki Sayfa ➡️", callback_data=f"aylik_sayfa_{sayfa+1}")])
+        keyboard.append([InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")])
         
         if update.callback_query:
             try:
@@ -605,6 +649,9 @@ class NamazBot:
             await self.handle_haftalik_takvim(update, context)
         elif data == "aylik_takvim":
             await self.handle_aylik_takvim(update, context)
+        elif data.startswith("aylik_sayfa_"):
+            sayfa = int(data.split("_")[2])
+            await self.handle_aylik_takvim(update, context, sayfa)
         elif data == "main_menu":
             welcome_msg = (
                 "✨ <b>Namaz Vakitleri Botuna Hoş Geldiniz!</b>\n\n"

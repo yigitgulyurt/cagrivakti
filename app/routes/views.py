@@ -252,7 +252,7 @@ def imsakiye_detay(sehir):
 
     title       = f"{sehir_adi} {suanki_yil} İmsakiyesi — Çağrı Vakti"
     description = f"{sehir_adi} şehri için {suanki_yil} yılı Ramazan imsakiyesi. İftar ve sahur vakitleri."
-    return render_template('imsakiye/imsakite_detail.html',
+    return render_template('imsakiye/imsakiye_detail.html',
                            sehir=canonical_sehir,
                            country_code=country_code,
                            ramadan_info=RamadanService.get_ramadan_info(),
