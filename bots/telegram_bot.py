@@ -236,7 +236,9 @@ class NamazBot:
         
         keyboard = [
             [InlineKeyboardButton("Namaz Vakitleri 🕒", callback_data="vakitler")],
-            [InlineKeyboardButton("⏳ Kalan Süre", callback_data="kalan_sure")]
+            [InlineKeyboardButton("⏳ Kalan Süre", callback_data="kalan_sure")],
+            [InlineKeyboardButton("📅 Haftalık Takvim", callback_data="haftalik_takvim"),
+             InlineKeyboardButton("📆 Aylık Takvim", callback_data="aylik_takvim")]
         ]
         
         # Ramazan ayındaysa Ramazan butonunu ekle
@@ -456,6 +458,114 @@ class NamazBot:
             else:
                 raise e
 
+    async def handle_haftalik_takvim(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Haftalık vakit takvimini gösterir."""
+        user_id = update.effective_user.id
+        user = self.db.get_user(user_id)
+        
+        if not user or not user['sehir']:
+            msg = "❌ Önce bir şehir seçmelisiniz!"
+            if update.callback_query:
+                await update.callback_query.answer(msg, show_alert=True)
+            else:
+                await update.effective_message.reply_text(msg)
+            return
+        
+        sehir = user['sehir']
+        now = datetime.now(self.tz)
+        
+        with self.app.app_context():
+            country = get_country_for_city(sehir)
+            ramadan_info = RamadanService.get_ramadan_info()
+        is_ramadan = ramadan_info['is_ramadan']
+        
+        vakit_labels = {
+            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
+            'gunes': 'Güneş', 
+            'ogle': 'Öğle', 
+            'ikindi': 'İkindi', 
+            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'yatsi': 'Yatsı'
+        }
+        
+        message = f"📍 <b>{sehir.upper()}</b>\n🗓 <b>HAFTALIK VAKİTLER</b>\n───────────────────\n"
+        
+        for i in range(7):
+            gun_tarihi = now.date() + timedelta(days=i)
+            with self.app.app_context():
+                prayer_times = PrayerService.get_vakitler(sehir, country, gun_tarihi.strftime('%Y-%m-%d'))
+            
+            if prayer_times:
+                message += f"\n📅 <b>{format_turkish_date(gun_tarihi)}</b>\n"
+                for key, label in vakit_labels.items():
+                    time_val = prayer_times.get(key, '--:--')
+                    message += f"▫️ {label:<7}: {time_val}\n"
+        
+        keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
+        
+        if update.callback_query:
+            try:
+                await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+            except BadRequest as e:
+                if "Message is not modified" not in str(e):
+                    raise e
+        else:
+            await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+
+    async def handle_aylik_takvim(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Aylık vakit takvimini gösterir (son 10 gün gösterilir, çok uzun olmasın diye)."""
+        user_id = update.effective_user.id
+        user = self.db.get_user(user_id)
+        
+        if not user or not user['sehir']:
+            msg = "❌ Önce bir şehir seçmelisiniz!"
+            if update.callback_query:
+                await update.callback_query.answer(msg, show_alert=True)
+            else:
+                await update.effective_message.reply_text(msg)
+            return
+        
+        sehir = user['sehir']
+        now = datetime.now(self.tz)
+        
+        with self.app.app_context():
+            country = get_country_for_city(sehir)
+            ramadan_info = RamadanService.get_ramadan_info()
+        is_ramadan = ramadan_info['is_ramadan']
+        
+        vakit_labels = {
+            'imsak': 'Sahur' if is_ramadan else 'İmsak', 
+            'gunes': 'Güneş', 
+            'ogle': 'Öğle', 
+            'ikindi': 'İkindi', 
+            'aksam': 'İftar' if is_ramadan else 'Akşam', 
+            'yatsi': 'Yatsı'
+        }
+        
+        message = f"📍 <b>{sehir.upper()}</b>\n🗓 <b>AYLIK VAKİTLER</b>\n───────────────────\n"
+        
+        for i in range(30):
+            gun_tarihi = now.date() + timedelta(days=i)
+            with self.app.app_context():
+                prayer_times = PrayerService.get_vakitler(sehir, country, gun_tarihi.strftime('%Y-%m-%d'))
+            
+            if prayer_times:
+                message += f"\n📅 <b>{format_turkish_date(gun_tarihi)}</b>\n"
+                for key, label in vakit_labels.items():
+                    time_val = prayer_times.get(key, '--:--')
+                    message += f"▫️ {label:<7}: {time_val}\n"
+        
+        keyboard = [[InlineKeyboardButton("⬅️ Ana Menü", callback_data="main_menu")]]
+        
+        if update.callback_query:
+            try:
+                await update.callback_query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+            except BadRequest as e:
+                if "Message is not modified" not in str(e):
+                    raise e
+        else:
+            await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+
     async def _show_notification_menu(self, query, user_id):
         user = self.db.get_user(user_id)
         status = "Aktif ✅" if user['bildirim_aktif'] else "Kapalı 🔕"
@@ -491,7 +601,11 @@ class NamazBot:
         # Her butona tıklandığında dönen animasyonu durdur
         await query.answer()
 
-        if data == "main_menu":
+        if data == "haftalik_takvim":
+            await self.handle_haftalik_takvim(update, context)
+        elif data == "aylik_takvim":
+            await self.handle_aylik_takvim(update, context)
+        elif data == "main_menu":
             welcome_msg = (
                 "✨ <b>Namaz Vakitleri Botuna Hoş Geldiniz!</b>\n\n"
                 "Aşağıdaki menüden vakitleri görebilir veya ⚙️ <b>Ayarlar</b> kısmından şehrinizi belirleyebilirsiniz."
@@ -576,9 +690,11 @@ class NamazBot:
             await self._show_notification_menu(query, user_id)
         elif data == "bildirim_sure_menu":
             keyboard = [
-                [InlineKeyboardButton("5 Dakika ⏰", callback_data="set_sure_5"),
-                 InlineKeyboardButton("10 Dakika ⏰", callback_data="set_sure_10")],
-                [InlineKeyboardButton("15 Dakika ⏰", callback_data="set_sure_15")],
+                [InlineKeyboardButton("1 Dakika ⏰", callback_data="set_sure_1"),
+                 InlineKeyboardButton("5 Dakika ⏰", callback_data="set_sure_5")],
+                [InlineKeyboardButton("10 Dakika ⏰", callback_data="set_sure_10"),
+                 InlineKeyboardButton("15 Dakika ⏰", callback_data="set_sure_15")],
+                [InlineKeyboardButton("30 Dakika ⏰", callback_data="set_sure_30")],
                 [InlineKeyboardButton("Geri Dön ⬅️", callback_data="bildirim_ayarlari")]
             ]
             try:
@@ -1276,7 +1392,9 @@ class NamazBot:
             ("gunluk", "Günlük içeriği gösterir"),
             ("gundelik", "Günlük içeriği gösterir"),
             ("rehberler", "Bilgi köşesi rehberlerini gösterir"),
-            ("bilgi_kosesi", "Bilgi köşesi rehberlerini gösterir")
+            ("bilgi_kosesi", "Bilgi köşesi rehberlerini gösterir"),
+            ("haftalik", "Haftalık vakit takvimini gösterir"),
+            ("aylik", "Aylık vakit takvimini gösterir")
         ]
         await application.bot.set_my_commands(commands)
         logger.info("Bot komutları başarıyla ayarlandı.")
@@ -1297,6 +1415,8 @@ class NamazBot:
         application.add_handler(CommandHandler("gundelik", self.handle_gunluk))
         application.add_handler(CommandHandler("rehberler", self.handle_rehberler))
         application.add_handler(CommandHandler("bilgi_kosesi", self.handle_rehberler))
+        application.add_handler(CommandHandler("haftalik", self.handle_haftalik_takvim))
+        application.add_handler(CommandHandler("aylik", self.handle_aylik_takvim))
         application.add_handler(CallbackQueryHandler(self.handle_callback))
         application.add_handler(InlineQueryHandler(self.handle_inline_query))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
