@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton, InputTextMessageContent, InlineQueryResultArticle
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, InlineQueryHandler
 from telegram.error import BadRequest
-from app.services import PrayerService, UserService, get_country_for_city, get_daily_content, get_guides, get_guide_by_slug
+from app.services import PrayerService, UserService, get_country_for_city, get_daily_content, get_guides, get_guide_by_slug, DiniGunlerService
 from app.services.ramadan_service import RamadanService
 from app.config import Config
 from app.factory import create_app
@@ -648,27 +648,48 @@ class NamazBot:
 
     async def handle_dini_gunler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Yaklaşan dini günleri listeler."""
-        # Şimdilik statik bir liste, ileride API'den çekilebilir
+        with self.app.app_context():
+            dini_gunler_list = DiniGunlerService.get_dini_gunler()
+        
         current_year = datetime.now().year
-        dini_gunler = (
-            f"📅 <b>{current_year} Yılı Dini Günler ve Geceler</b>\n\n"
-            "🔸 <b>Regaip Kandili:</b> 26 Ocak Pazar\n"
-            "🔸 <b>Miraç Kandili:</b> 17 Şubat Pazartesi\n"
-            "🔸 <b>Berat Kandili:</b> 3 Mart Pazartesi\n"
-            "🔸 <b>Ramazan Başlangıcı:</b> 23 Mart Pazar\n"
-            "🔸 <b>Kadir Gecesi:</b> 17 Nisan Perşembe\n"
-            "🔸 <b>Ramazan Bayramı:</b> 21 Nisan Pazartesi\n"
-            "🔸 <b>Kurban Bayramı:</b> 28 Haziran Cumartesi\n\n"
-            "<i>Not: Tarihler Diyanet İşleri Başkanlığı takvimine göredir.</i>"
-        )
+        message = f"📅 <b>{current_year} Yılı Dini Günler ve Geceler</b>\n\n"
+        
+        tur_emoji = {
+            'kandil': '🌙',
+            'ramazan': '🌙',
+            'bayram': '🎊'
+        }
+        
+        for gun in dini_gunler_list:
+            emoji = tur_emoji.get(gun['tur'], '🔸')
+            tarih_str = format_turkish_date(gun['tarih'])
+            kalan = gun['kalan_gun']
+            
+            if kalan == 0:
+                kalan_str = "� Bugün!"
+            elif kalan > 0:
+                kalan_str = f"⏳ {kalan} gün kaldı"
+            else:
+                kalan_str = "✅ Geçti"
+            
+            message += f"{emoji} <b>{gun['ad']}:</b> {tarih_str} ({kalan_str})\n"
+        
+        message += "\n<i>Not: Tarihler Hicri takvime göre otomatik hesaplanmıştır.</i>"
         
         keyboard = [[InlineKeyboardButton("⬅️ Geri Dön", callback_data="yardim")]]
         
-        await update.callback_query.edit_message_text(
-            dini_gunler, 
-            reply_markup=InlineKeyboardMarkup(keyboard), 
-            parse_mode='HTML'
-        )
+        if update.callback_query:
+            try:
+                await update.callback_query.edit_message_text(
+                    message, 
+                    reply_markup=InlineKeyboardMarkup(keyboard), 
+                    parse_mode='HTML'
+                )
+            except BadRequest as e:
+                if "Message is not modified" not in str(e):
+                    raise e
+        else:
+            await update.effective_message.reply_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
 
     async def handle_kible_yonu(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Kıble yönü hakkında bilgi verir."""
