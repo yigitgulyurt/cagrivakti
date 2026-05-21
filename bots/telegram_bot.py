@@ -207,12 +207,21 @@ class NamazBot:
 
     def get_main_keyboard(self) -> InlineKeyboardMarkup:
         """Ana menü klavyesini döner - Ultra Sadeleştirilmiş Versiyon."""
+        # Ramazan kontrolü
+        with self.app.app_context():
+            ramadan_info = RamadanService.get_ramadan_info()
+        is_ramadan = ramadan_info['is_ramadan']
+        
         keyboard = [
             [InlineKeyboardButton("Namaz Vakitleri 🕒", callback_data="vakitler")],
-            [InlineKeyboardButton("⏳ Kalan Süre", callback_data="kalan_sure")],
-            [InlineKeyboardButton("🌙 Ramazan", callback_data="ramazan")],
-            [InlineKeyboardButton("Ayarlar ve Yardım ⚙️", callback_data="yardim")]
+            [InlineKeyboardButton("⏳ Kalan Süre", callback_data="kalan_sure")]
         ]
+        
+        # Ramazan ayındaysa Ramazan butonunu ekle
+        if is_ramadan:
+            keyboard.append([InlineKeyboardButton("🌙 Ramazan", callback_data="ramazan")])
+        
+        keyboard.append([InlineKeyboardButton("Ayarlar ve Yardım ⚙️", callback_data="yardim")])
         return InlineKeyboardMarkup(keyboard)
 
     def get_notification_keyboard(self, user_id: int) -> InlineKeyboardMarkup:
@@ -541,6 +550,7 @@ class NamazBot:
         keyboard = [
             [InlineKeyboardButton("🔔 Bildirim Ayarları", callback_data="bildirim_ayarlari")],
             [InlineKeyboardButton("🔍 Şehir Seçimi 📍", switch_inline_query_current_chat="")],
+            [InlineKeyboardButton("🌙 Ramazan", callback_data="ramazan")],
             [InlineKeyboardButton("📅 Dini Günler", callback_data="dini_gunler"),
              InlineKeyboardButton("🧭 Kıble Yönü", callback_data="kible_yonu")],
             [InlineKeyboardButton("👥 Grup Ayarı", callback_data="grup_ayarlari"),
