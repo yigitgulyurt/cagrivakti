@@ -66,7 +66,7 @@ def api_anasayfa():
                 'durum': 'Erişime Kapalı'
             },
             {
-                'yol': '/ezan_vakitleri-V<versiyon>',
+                'yol': '/ezan_vakitleri',
                 'aciklama': 'Ezan vakitlerini alır',
                 'durum': 'Erişime Kapalı'
             },
@@ -274,12 +274,11 @@ def ezan_vakitlerini_al_api():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
     tarih = request.args.get('date')
-    version = request.args.get('v', Config.APP_VERSION)  # opsiyonel, default güncel versiyon
     
     if not sehir:
         return jsonify({'error': 'Sehir bilgisi gerekli'}), 400
         
-    if not is_latin_only(sehir) or not is_latin_only(country_code) or (tarih and not is_latin_only(tarih)) or (version and not is_latin_only(version)):
+    if not is_latin_only(sehir) or not is_latin_only(country_code) or (tarih and not is_latin_only(tarih)):
         return jsonify({'error': 'Gecersiz karakter iceren parametre'}), 400
         
     try:
