@@ -10,6 +10,9 @@ import time
 import uuid
 from flask import request, g
 
+# API için iç ağ IP'lerini tek bir kez loglamak için cache
+_api_internal_ip_cache = set()
+
 def compress_rotator(source, dest):
     with open(source, 'rb') as f_in:
         with gzip.open(dest + '.gz', 'wb') as f_out:
@@ -215,6 +218,38 @@ def setup_api_logging(app):
                     ip = request.headers.get('X-Forwarded-For').split(',')[0]
                 else:
                     ip = request.remote_addr
+                
+                # İç ağ IP'si mi kontrol et
+                is_internal_ip = False
+                display_ip = ip
+                if (
+                    ip.startswith('10.') or 
+                    (ip.startswith('172.') and 16 <= int(ip.split('.')[1]) <= 31) or 
+                    ip.startswith('192.168.') or
+                    ip.startswith('127.') or 
+                    ip == '::1'
+                ):
+                    is_internal_ip = True
+                
+                # Health check User-Agent'lerini kontrol et
+                user_agent = request.headers.get('User-Agent', '').lower()
+                health_check_keywords = ['health', 'check', 'kube-probe', 'docker', 'uptime', 'ping']
+                is_health_check = any(keyword in user_agent for keyword in health_check_keywords)
+                
+                if is_health_check:
+                    is_internal_ip = True
+                
+                # İç ağ IP'si ise cache kontrolü
+                if is_internal_ip:
+                    cache_key = f"{ip}-{request.path}"
+                    if cache_key in _api_internal_ip_cache:
+                        return response  # Zaten loglandı, tekrar loglama
+                    else:
+                        _api_internal_ip_cache.add(cache_key)
+                        # Cache temizliği (her 1000 istekte bir)
+                        if len(_api_internal_ip_cache) > 1000:
+                            _api_internal_ip_cache.clear()
+                
                 duration_ms = int((time.time() - getattr(g, '_log_start', time.time())) * 1000)
                 ua = request.headers.get('User-Agent', '')[:200]
                 referer = request.headers.get('Referer', '')[:200]

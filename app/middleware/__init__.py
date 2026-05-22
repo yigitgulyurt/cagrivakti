@@ -1,9 +1,9 @@
-from flask import request, render_template, current_app
+from flask import request, render_template, current_app, g
 import time
 
-# Son loglanan IP ve yolları tutmak için basit bir cache (IP, Path) -> Timestamp
-# _log_cache = {}
-# _CACHE_TIMEOUT = 300  # 5 dakika (saniye cinsinden)
+# İç ağ IP'lerini tek bir kez loglamak için cache
+_internal_ip_cache = set()
+_internal_ip_cache_timeout = 3600  # 1 saat (saniye)
 
 def setup_middleware(app):
     @app.before_request
@@ -29,14 +29,17 @@ def setup_middleware(app):
             
             # IP'yi anlamlı isimle değiştir
             display_ip = ip
+            is_internal_ip = False
             if (
                 ip.startswith('10.') or 
                 (ip.startswith('172.') and 16 <= int(ip.split('.')[1]) <= 31) or 
                 ip.startswith('192.168.')
             ):
                 display_ip = 'Docker-Internal'
+                is_internal_ip = True
             elif ip.startswith('127.') or ip == '::1':
                 display_ip = 'Localhost'
+                is_internal_ip = True
             
             # Health check User-Agent'lerini kontrol et
             user_agent = request.headers.get('User-Agent', '').lower()
@@ -45,6 +48,19 @@ def setup_middleware(app):
             
             if is_health_check:
                 display_ip = 'Health-Check-' + display_ip
+                is_internal_ip = True
+
+            # İç ağ IP'si ise cache kontrolü
+            if is_internal_ip:
+                cache_key = f"{display_ip}-{path}"
+                if cache_key in _internal_ip_cache:
+                    return  # Zaten son 1 saat içinde loglandı, tekrar loglama
+                else:
+                    _internal_ip_cache.add(cache_key)
+                    # 1 saat sonra cache'ten kaldırmak için basit bir zamanlayıcı
+                    # Basit bir şekilde temizleme (her 1000 istekte bir temizle)
+                    if len(_internal_ip_cache) > 1000:
+                        _internal_ip_cache.clear()
 
             # Her isteği kaydet
             try:
