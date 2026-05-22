@@ -474,12 +474,12 @@ def health_check():
         db.session.commit()
         db_time = round((time.time() - db_start) * 1000, 2)
         checks['database'] = {
-            'status': 'ok',
+            'db_status': 'ok',
             'response_time_ms': db_time
         }
     except Exception as e:
         checks['database'] = {
-            'status': 'error',
+            'db_status': 'error',
             'message': str(e)
         }
         critical_failure = True
@@ -492,19 +492,19 @@ def health_check():
         val = cache.get('__healthcheck__')
         cache_time = round((time.time() - cache_start) * 1000, 2)
         checks['cache'] = {
-            'status': 'ok' if val == '1' else 'miss',
+            'cache_status': 'ok' if val == '1' else 'miss',
             'response_time_ms': cache_time
         }
     except Exception as e:
         checks['cache'] = {
-            'status': 'error',
+            'cache_status': 'error',
             'message': str(e)
         }
         # Cache hatası kritik değil, servisi durdurmuyoruz
 
     # 3. Genel uygulama durumu ve metadata
     checks['app'] = {
-        'status': 'ok',
+        'app_status': 'ok',
         'version': current_app.config.get('APP_VERSION', '1.0'),
         'environment': 'production' if not current_app.debug else 'development'
     }
@@ -514,8 +514,8 @@ def health_check():
 
     # Sonuç
     return jsonify({
-        'status': 'ok' if not critical_failure else 'degraded',
+        'app_status': 'ok' if not critical_failure else 'degraded',
         'checks': checks,
         'total_response_time_ms': total_time,
-        'timestamp': datetime.utcnow().isoformat() + 'Z'
+        'timestamp': datetime.now().isoformat() + 'Z'
     }), http_status
