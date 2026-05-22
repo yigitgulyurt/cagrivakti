@@ -1,5 +1,6 @@
 // Service Worker - Ezan Vakitleri
-const CACHE_VERSION = '6.09';
+/* global VERSION */
+const CACHE_VERSION = '${VERSION}';
 const STATIC_CACHE = `cv-static-v${CACHE_VERSION}`;
 const API_CACHE    = `cv-api-v${CACHE_VERSION}`;
 const GAME_CACHE   = `cv-game-v${CACHE_VERSION}`;
