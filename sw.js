@@ -1,12 +1,12 @@
 // Service Worker - Ezan Vakitleri
-/* global VERSION */
-console.log('[SW] Loading, VERSION:', VERSION);
+const CACHE_VERSION = '6.08';
+const STATIC_CACHE = `cv-static-v${CACHE_VERSION}`;
+const API_CACHE    = `cv-api-v${CACHE_VERSION}`;
+const GAME_CACHE   = `cv-game-v${CACHE_VERSION}`;
+const JS_CACHE     = `cv-js-v${CACHE_VERSION}`;
+const CSS_CACHE    = `cv-css-v${CACHE_VERSION}`;
 
-const STATIC_CACHE = `cv-static-v${VERSION}`;
-const API_CACHE    = `cv-api-v${VERSION}`;
-const GAME_CACHE   = `cv-game-v${VERSION}`;
-const JS_CACHE     = `cv-js-v${VERSION}`;
-const CSS_CACHE    = `cv-css-v${VERSION}`;
+console.log('[SW] Loading, CACHE_VERSION:', CACHE_VERSION);
 
 // ── Statik dosyalar (İkonlar) ──────────────────────────────────────────────
 const STATIC_ASSETS = [
