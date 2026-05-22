@@ -110,10 +110,6 @@ server {
     # Security Headers
     include /etc/nginx/snippets/security-headers.conf;
 
-    # /status/cagrivakti -> ana sayfaya yönlendirme
-    location = /status/cagrivakti {
-        return 301 https://status.cagrivakti.com.tr/;
-    }
 
     location / {
         proxy_pass         http://127.0.0.1:3001;
