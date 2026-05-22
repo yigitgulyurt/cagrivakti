@@ -191,18 +191,18 @@
             var today = new Date().toLocaleDateString('en-CA');
 
             // 1. Clear prayer-time cache when the calendar date rolls over
-            var lastVisit = localStorage.getItem('last_visit');
+            var lastVisit = localStorage.getItem('LAST_VISIT_DATE');
             if (lastVisit && lastVisit !== today) {
                 backupAndClear();
             }
-            localStorage.setItem('last_visit', today);
+            localStorage.setItem('LAST_VISIT_DATE', today);
 
             // 2. Clear versioned cache when the app ships a new version
             var storedVersion = localStorage.getItem('APP_VERSION');
             if (!storedVersion || storedVersion !== APP_VERSION) {
                 backupAndClear();
                 localStorage.setItem('APP_VERSION',    APP_VERSION);
-                localStorage.setItem('last_visit', today);
+                localStorage.setItem('LAST_VISIT_DATE', today);
             }
         } catch (e) { /* localStorage not available — silently ignore */ }
     })();

@@ -1,6 +1,5 @@
-from flask import request, render_template, current_app, g
+from flask import request, render_template, current_app
 import time
-from app.logging_config import log_web_visit
 
 # Son loglanan IP ve yolları tutmak için basit bir cache (IP, Path) -> Timestamp
 # _log_cache = {}
@@ -29,10 +28,11 @@ def setup_middleware(app):
 
             # Her isteği kaydet (Deduplication kaldırıldı)
             try:
+                from flask import g
                 uid = getattr(g, 'user_uid', '-')
             except Exception:
                 uid = '-'
-            app.logger.info(log_web_visit(ip, path, uid))
+            app.logger.info(f'{ip} ziyaret: {path} uid={uid}')
 
         except Exception as e:
             app.logger.error(f"Loglama hatası: {str(e)}")

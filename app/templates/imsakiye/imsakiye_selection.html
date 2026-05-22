@@ -297,7 +297,6 @@
 {% block footer_js %}
 <script src="https://js.yigitgulyurt.net.tr/cagrivakti/city-data.cagrivakti.js?v={{ app_version }}" defer></script>
 <script>
-const app_version = "{{ app_version }}";
     $(document).ready(function() {
         const CITY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else '{}' }};
 
@@ -351,11 +350,11 @@ const app_version = "{{ app_version }}";
             // Mevcut kartları temizle ama iskeletleri sadece veri geldikçe değiştir
             grid.empty();
 
-            for (const item of sehirler) {
+            sehirler.forEach((item, index) => {
                 const sehir = typeof item === 'object' ? item.sehir : item;
-                const ulke = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
+                const itemCountryCode = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
                 
-                const CACHE_KEY = `cagri_vakitleri-v=${app_version}|${sehir}_${ulke}`;
+                const CACHE_KEY = `vakitler_${sehir}_${itemCountryCode}`;
                 const TODAY = new Date().toISOString().split('T')[0];
                 const cached = localStorage.getItem(CACHE_KEY);
                 let cachedData = null;
@@ -371,12 +370,13 @@ const app_version = "{{ app_version }}";
                     .click(function() {
                         if ($(this).hasClass('skeleton-card')) return;
                         // İmsakiye detay sayfasına yönlendir
-                        window.location.href = `/imsakiye/${sehir}?country=${ulke}`;
+                        window.location.href = `/imsakiye/${sehir}?country=${itemCountryCode}`;
                     });
 
                 const cityName = $('<div>').addClass('city-name');
                 
                 const IS_RAMADAN = {{ 'true' if ramadan_info.is_ramadan else 'false' }};
+                const aksamLabel = IS_RAMADAN ? 'İftar' : 'Akşam';
 
                 if (cachedData) {
                     card.addClass('content-loaded');
@@ -390,33 +390,36 @@ const app_version = "{{ app_version }}";
                 card.append(cityName);
                 grid.append(card);
                 
-                if (cachedData) continue;
+                function updateUI(vakitler) {
+                    card.removeClass('skeleton-card').addClass('content-loaded');
+                    cityName.empty().text(getDisplayName(sehir));
+                }
 
-                // API isteğini sıraya ekle - IIFE ile closure sorunu çözüldü
-                (function(sehir, ulke, CACHE_KEY, TODAY, card, cityName) {
-                    const url = `https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${sehir}&ulke=${ulke}&v=${app_version}`;
-                    const callback = function(data) {
-                        if (data.durum === 'basarili' && data.data?.vakitler) {
-                            localStorage.setItem(CACHE_KEY, JSON.stringify({
-                                tarih: TODAY,
-                                data: data.data.vakitler
-                            }));
-                            card.removeClass('skeleton-card').addClass('content-loaded');
-                            cityName.empty().text(getDisplayName(sehir));
-                        } else if (!card.hasClass('content-loaded')) {
-                            card.removeClass('skeleton-card').addClass('content-loaded');
-                            cityName.empty().text(getDisplayName(sehir));
-                        }
-                    };
+                if (cachedData) return;
 
-                    if (!isLazy) {
-                        $.get(url).done(callback);
-                    } else {
-                        requestQueue.push({ url, callback });
-                        processQueue();
+                // API isteğini sıraya ekle
+                const url = `https://api.cagrivakti.com.tr/ezan_vakitleri-V{{ app_version }}?sehir=${sehir}&country=${itemCountryCode}`;
+                const callback = function(data) {
+                    if (data.vakitler) {
+                        localStorage.setItem(CACHE_KEY, JSON.stringify({
+                            tarih: TODAY,
+                            data: data.vakitler
+                        }));
+                        updateUI(data.vakitler);
+                    } else if (!card.hasClass('content-loaded')) {
+                        card.removeClass('skeleton-card').addClass('content-loaded');
+                        cityName.empty().text(getDisplayName(sehir));
+                        vakitBilgisi.text('Hata oluştu');
                     }
-                })(sehir, ulke, CACHE_KEY, TODAY, card, cityName);
-            }
+                };
+
+                if (!isLazy) {
+                    $.get(url).done(callback);
+                } else {
+                    requestQueue.push({ url, callback });
+                    processQueue();
+                }
+            });
         }
 
         $('.search-box').on('input', function() {

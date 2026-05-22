@@ -8,7 +8,6 @@ from app.extensions import db, cache
 from app.models import EzanVakti, DailyContent, Guide
 from flask import request, session
 from .ramadan_service import RamadanService
-from .dini_gunler_service import DiniGunlerService
 
 # Varsayılan değerler
 DEFAULT_COUNTRY = 'TR'

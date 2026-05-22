@@ -5,14 +5,12 @@ from app.models import ContactMessage, DailyContent, Guide
 from app.extensions import cache, db, limiter, csrf
 from datetime import datetime, timedelta
 import os
-import sys
 import json
 import bleach
 import requests
 from threading import Thread
 import re
 import hashlib
-from app.services.bot_manager import BotManager
 
 views_bp = Blueprint('views', __name__)
 
@@ -149,11 +147,7 @@ def sehir_secimi():
         [{'name': c, 'country': get_country_for_city(c)} for c in all_cities],
         key=lambda x: x['name'],
     )
-    return render_template('city/city_selection.html',
-                            cities=city_data,
-                            og_image_url=og_image_url,
-                            seo_title=title,
-                            seo_description=description)
+    return render_template('city/city_selection.html', cities=city_data, og_image_url=og_image_url, seo_title=title, seo_description=description)
 
 # ======================================================
 # ==== RAMADAN ====
@@ -252,7 +246,7 @@ def imsakiye_detay(sehir):
 
     title       = f"{sehir_adi} {suanki_yil} İmsakiyesi — Çağrı Vakti"
     description = f"{sehir_adi} şehri için {suanki_yil} yılı Ramazan imsakiyesi. İftar ve sahur vakitleri."
-    return render_template('imsakiye/imsakiye_detail.html',
+    return render_template('imsakiye/imsakite_detail.html',
                            sehir=canonical_sehir,
                            country_code=country_code,
                            ramadan_info=RamadanService.get_ramadan_info(),
@@ -700,7 +694,7 @@ def admin_message_delete(message_id):
 @views_bp.route('/admin/logs')
 @admin_required
 def admin_logs():
-    log_file          = current_app.config.get('WEB_LOG_FILE')
+    log_file          = current_app.config.get('LOG_FILE')
     api_log_file      = current_app.config.get('API_LOG_FILE')
     bot_log_file      = current_app.config.get('TELEGRAM_LOG_FILE')
     security_log_file = current_app.config.get('SECURITY_LOG_FILE')
@@ -731,25 +725,6 @@ def admin_logs():
                         page_counts[path.strip()] += 1
                     except Exception as e:
                         current_app.logger.error(f"Log satır hatası: {e} - Satır: {line}")
-                else:
-                    try:
-                        log_entry = json.loads(line.strip())
-                        if 'message' in log_entry and 'ziyaret:' in log_entry['message']:
-                            msg = log_entry['message']
-                            path_match = _re.search(r'ziyaret: (.*)', msg)
-                            if path_match:
-                                path = path_match.group(1).split(' ')[0].strip()
-                                timestamp_str = log_entry.get('timestamp', '')
-                                try:
-                                    hour = (timestamp_str.split(' ')[1][:2] + ":00"
-                                            if ' ' in timestamp_str
-                                            else (timestamp_str[11:13] + ":00" if len(timestamp_str) > 13 else "00:00"))
-                                    hourly_counts[hour] += 1
-                                    page_counts[path] += 1
-                                except Exception as e:
-                                    current_app.logger.error(f"JSON log satır hatası: {e} - Satır: {line}")
-                    except json.JSONDecodeError:
-                        continue
             stats['hourly'] = dict(sorted(hourly_counts.items()))
             stats['pages']  = dict(page_counts.most_common())
         except Exception as e:
@@ -782,100 +757,6 @@ def admin_logs():
                            bot_logs=bot_logs,
                            security_logs=security_logs,
                            stats=stats)
-
-
-import subprocess
-
-def get_systemd_service_status(service_name):
-    """Systemd servis durumunu döner (active/inactive)."""
-    try:
-        current_app.logger.info(f'[DEBUG] /bin/systemctl is-active {service_name} çalıştırılıyor...')
-        result = subprocess.run(
-            ['/bin/systemctl', 'is-active', service_name],
-            capture_output=True,
-            text=True,
-            timeout=5
-        )
-        status = result.stdout.strip()
-        current_app.logger.info(f'[DEBUG] systemctl is-active çıktısı: stdout={repr(status)}, stderr={repr(result.stderr)}, returncode={result.returncode}')
-        return status
-    except Exception as e:
-        current_app.logger.error(f'[DEBUG] get_systemd_service_status hatası: {str(e)}')
-        return 'inactive'
-
-def run_systemctl_command(command):
-    """Systemctl komutu çalıştırır ve (success, message) döner."""
-    try:
-        cmd = ['/usr/bin/sudo', '/bin/systemctl'] + command
-        current_app.logger.info(f'[DEBUG] Komut çalıştırılıyor: {" ".join(cmd)}')
-        result = subprocess.run(
-            cmd,
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-        current_app.logger.info(f'[DEBUG] Komut başarıyla tamamlandı: stdout={repr(result.stdout)}, stderr={repr(result.stderr)}')
-        return True, 'İşlem başarıyla tamamlandı.'
-    except subprocess.CalledProcessError as e:
-        current_app.logger.error(f'[DEBUG] CalledProcessError: returncode={e.returncode}, stdout={repr(e.stdout)}, stderr={repr(e.stderr)}')
-        return False, f'Hata: {e.stderr or e.stdout}'
-    except Exception as e:
-        current_app.logger.error(f'[DEBUG] run_systemctl_command hatası: {str(e)}')
-        return False, f'Hata: {str(e)}'
-
-
-@views_bp.route('/admin/botlar')
-@admin_required
-def admin_bots():
-    bot_status = get_systemd_service_status('cagrivakti-bot.service')
-    return render_template('admin/bots.html', bot_status=bot_status)
-
-
-@views_bp.route('/admin/bot/<bot_name>/baslat')
-@admin_required
-def admin_start_bot(bot_name):
-    if bot_name != 'telegram':
-        flash('Geçersiz bot adı.', 'danger')
-        return redirect(url_for('views.admin_bots'))
-    
-    success, message = run_systemctl_command(['start', 'cagrivakti-bot.service'])
-    if success:
-        flash('Telegram botu başarıyla başlatıldı.', 'success')
-    else:
-        flash(message, 'danger')
-    return redirect(url_for('views.admin_bots'))
-
-
-@views_bp.route('/admin/bot/<bot_name>/durdur')
-@admin_required
-def admin_stop_bot(bot_name):
-    if bot_name != 'telegram':
-        flash('Geçersiz bot adı.', 'danger')
-        return redirect(url_for('views.admin_bots'))
-    
-    success, message = run_systemctl_command(['stop', 'cagrivakti-bot.service'])
-    if success:
-        flash('Telegram botu başarıyla durduruldu.', 'success')
-    else:
-        flash(message, 'danger')
-    return redirect(url_for('views.admin_bots'))
-
-
-@views_bp.route('/admin/bot/<bot_name>/yeniden-baslat')
-@admin_required
-def admin_restart_bot(bot_name):
-    if bot_name != 'telegram':
-        flash('Geçersiz bot adı.', 'danger')
-        return redirect(url_for('views.admin_bots'))
-    
-    success, message = run_systemctl_command(['restart', 'cagrivakti-bot.service'])
-    if success:
-        flash('Telegram botu başarıyla yeniden başlatıldı.', 'success')
-    else:
-        flash(message, 'danger')
-    return redirect(url_for('views.admin_bots'))
-
 
 # ======================================================
 # ==== EXTRA ====
@@ -1243,5 +1124,4 @@ def iletisim():
 @views_bp.route('/<sehir>')
 def root_sehir_redirect(sehir):
     """Kök dizinden şehir adına yönlendirme (örn: /ankara → /sehir/ankara)"""
-    query_params = {k: v for k, v in request.args.items() if k != 'sehir'}
-    return redirect(url_for('views.sehir_sayfasi', sehir=sehir, **query_params), code=301)
+    return redirect(url_for('views.sehir_sayfasi', sehir=sehir, **request.args), code=301)

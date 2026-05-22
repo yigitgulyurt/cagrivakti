@@ -47,22 +47,6 @@
       "category": "Dini Günler",
       "content": "<h3>İtikaf Nedir?</h3><p>İtikaf, bir Müslümanın ibadet niyetiyle beş vakit namaz kılınan bir camide veya kadınlar için evlerinin bir odasında dış dünyadan koparak belirli bir süre kalmasıdır.</p><h3>Ramazan İtikafı</h3><p>Hz. Peygamber'in sünneti olan itikaf, genellikle Ramazan'ın son on gününde yapılır. Bu sürede kişi vaktini namaz, Kur'an okuma, zikir ve tefekkürle geçirir.</p><h3>Şartları</h3><p>İtikaf yapan kişinin niyet etmesi, oruçlu olması (vacip olan itikaf için) ve camide bulunması gerekir. Temel ihtiyaçlar dışında camiden çıkılmaz.</p>",
       "last_updated": "2026-02-10"
-    },
-    {
-      "slug": "abdest-nasil-alinir-rehber",
-      "title": "Abdest Nasıl Alınır? (Resimli Anlatım)",
-      "description": "Namazın anahtarı olan abdestin farzları, sünnetleri ve sırasıyla alınış şekli.",
-      "category": "Namaz Kılavuzu",
-      "content": "<h3>Abdestin Farzları</h3><p>Abdestin dört farzı vardır: Yüzü yıkamak, kolları dirseklerle beraber yıkamak, başın dörtte birini meshetmek ve ayakları topuklarla beraber yıkamak.</p><h3>Abdestin Alınışı</h3><ol><li>Niyet edilir ve 'Euzü Besmele' çekilir.</li><li>Eller bileklere kadar 3 defa yıkanır.</li><li>Ağza ve burna 3'er defa su verilir.</li><li>Yüz 3 defa yıkanır.</li><li>Önce sağ, sonra sol kol dirseklerle beraber yıkanır.</li><li>Baş meshedilir, kulaklar ve boyun temizlenir.</li><li>Önce sağ, sonra sol ayak topuklarla beraber yıkanır.</li></ol>",
-      "last_updated": "2026-02-15"
-    },
-    {
-      "slug": "zekat-hesaplama-ve-nisap",
-      "title": "Zekat Kimlere Verilir? Nisap Miktarı Nedir?",
-      "description": "İslam'ın beş şartından biri olan zekatın hesaplanması, nisap miktarı ve verileceği yerler hakkında detaylı rehber.",
-      "category": "Mali İbadetler",
-      "content": "<h3>Zekat Nedir?</h3><p>Zekat, dinen zengin sayılan Müslümanların yılda bir kez mallarının belli bir kısmını fakirlere vermesidir.</p><h3>Nisap Miktarı</h3><p>Nisap, zekatın vacip olması için gereken zenginlik ölçüsüdür. Güncel olarak 80.18 gram altın veya bu değerde para ve ticaret malına sahip olanlar zengin sayılır.</p><h3>Zekat Kimlere Verilmez?</h3><p>Ana, baba, büyükanne, büyükbaba, çocuklar, torunlar ve eşe zekat verilmez. Zekat, ihtiyaç sahibi kardeşlere, akrabalara ve diğer fakirlere verilir.</p>",
-      "last_updated": "2026-02-15"
     }
   ]
 }

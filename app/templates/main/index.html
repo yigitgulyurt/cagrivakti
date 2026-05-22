@@ -880,9 +880,9 @@ document.addEventListener('DOMContentLoaded', function () {
        -------------------------------------------------------- */
     async function initHomeCountdown(city, country) {
         try {
-            const app_version = "{{ app_version }}";
-            const CACHE_KEY   = `cagri_vakitleri-v=${app_version}|${city}_${country}`;
-            const DATE_TRACK_KEY = `date_track_${city}_${country}`;
+            const CACHE_VERSION  = 'V{{ app_version }}';
+            const CACHE_KEY      = `vakitler_${city}_${country}_${CACHE_VERSION}`;
+            const DATE_TRACK_KEY = `home_date_track_${city}_${country}`;
 
             // Remove stale (un-versioned) cache entry if present
             try {
@@ -903,34 +903,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     : new Date().toLocaleDateString('en-CA');
 
                 if (parsed.tarih === correctDate) {
-                    data = { 
-                        vakitler: parsed.data, 
-                        timezone: parsed.data.timezone, 
-                        yarin: parsed.yarin 
-                    };
+                    data = { vakitler: parsed.data };
                 }
             }
 
             /* --- Fetch from API if cache miss --- */
             if (!data) {
-                const response     = await fetch(`https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${city}&ulke=${country}&v=${app_version}`);
+                const response     = await fetch(`https://api.cagrivakti.com.tr/ezan_vakitleri-V{{ app_version }}?sehir=${city}&country=${country}`);
                 const responseData = await response.json();
 
-                if (responseData.durum === 'basarili' && responseData.data?.vakitler) {
-                    const tz    = responseData.data.timezone || 'Europe/Istanbul';
+                if (responseData.vakitler) {
+                    const tz    = responseData.timezone
+                               || responseData.vakitler?.timezone
+                               || 'Europe/Istanbul';
                     const today = getCityDateStr(tz);
 
                     localStorage.setItem(CACHE_KEY, JSON.stringify({
                         tarih: today,
-                        data: responseData.data.vakitler,
-                        yarin: responseData.data.yarin
+                        data: responseData.vakitler,
                     }));
 
-                    data = { 
-                        vakitler: responseData.data.vakitler, 
-                        timezone: tz, 
-                        yarin: responseData.data.yarin 
-                    };
+                    data = responseData;
                 }
             }
 

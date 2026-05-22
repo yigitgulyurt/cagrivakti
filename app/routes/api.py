@@ -7,7 +7,7 @@ from datetime import datetime, date, timedelta
 from functools import wraps
 import re
 
-api_bp = Blueprint('api', __name__)
+api_bp = Blueprint('api', __name__, subdomain='api')
 
 @api_bp.route('/')
 def api_anasayfa():
@@ -17,74 +17,64 @@ def api_anasayfa():
         'uygun_uc_noktalar': [
             {
                 'yol': '/',
-                'aciklama': 'API ana sayfası',
-                'durum': 'Erişime Açık'
+                'aciklama': 'API ana sayfası'
             },
             {
                 'yol': '/sehirler',
-                'aciklama': 'Belirli bir ülkenin şehirlerini listeler (varsayılan: TR)',
-                'durum': 'Erişime Açık'
+                'aciklama': 'Belirli bir ülkenin şehirlerini listeler (varsayılan: TR)'
             },
             {
                 'yol': '/sehirler/uluslararasi',
-                'aciklama': 'Tüm ulusuz uluslararası şehirleri listeler',
-                'durum': 'Erişime Açık'
+                'aciklama': 'Tüm uluslararası şehirleri listeler'
             },
             {
                 'yol': '/sehirler/tumu',
-                'aciklama': 'Tüm şehirleri (Türkiye ve 160+ + uluslararası) listeler',
-                'durum': 'Erişime Açık'
+                'aciklama': 'Tüm şehirleri (Türkiye + uluslararası) listeler'
             },
             {
                 'yol': '/sehirler/ara',
-                'aciklama': 'Şehir adı ile arama yapar (parametre: q)',
-                'durum': 'Erişime Kapalı'
+                'aciklama': 'Şehir adı ile arama yapar (parametre: q)'
             },
             {
                 'yol': '/sehir/detay',
-                'aciklama': 'Belirli bir şehrin detaylarını verir (parametre: sehir)',
-                'durum': 'Erişime Kapalı'
+                'aciklama': 'Belirli bir şehrin detaylarını verir (parametre: sehir)'
             },
             {
                 'yol': '/sehir/suanki_zaman',
-                'aciklama': 'Belirli bir şehrin o anki zamanını verir (parametre: sehir)',
-                'durum': 'Erişime Kapalı'
+                'aciklama': 'Belirli bir şehrin o anki zamanını verir (parametre: sehir)'
             },
             {
                 'yol': '/sehir_kaydet',
-                'aciklama': 'Şehir tercihini kaydeder (POST, parametreler: sehir, country_code)',
-                'durum': 'Erişime Kapalı'
+                'aciklama': 'Şehir tercihini kaydeder (POST, parametreler: sehir, country_code)'
             },
             {
                 'yol': '/ulkeler',
-                'aciklama': 'Tüm ülkeleri listeler',
-                'durum': 'Erişime Kapalı'
+                'aciklama': 'Tüm ülkeleri listeler'
             },
             {
                 'yol': '/ulke/detay',
-                'aciklama': 'Belirli bir ülkenin detaylarını verir (parametre: kod)',
-                'durum': 'Erişime Kapalı'
+                'aciklama': 'Belirli bir ülkenin detaylarını verir (parametre: kod)'
             },
             {
-                'yol': '/cagri_vakitleri',
-                'aciklama': 'Genel API v1 uç noktası',
-                'durum': 'Erişime Kapalı'
+                'yol': '/ezan_vakitleri-V<versiyon>',
+                'aciklama': 'Ezan vakitlerini alır'
+            },
+            {
+                'yol': '/vakitler',
+                'aciklama': 'Genel API v1 uç noktası'
             },
             {
                 'yol': '/sonraki_vakit',
-                'aciklama': 'Bir sonraki ezan vaktini verir',
-                'durum': 'Erişime Kapalı'
+                'aciklama': 'Bir sonraki ezan vaktini verir'
             },
             {
                 'yol': '/daily_content',
-                'aciklama': 'Günlük içeriği verir',
-                'durum': 'Erişime Kapalı'
+                'aciklama': 'Günlük içeriği verir'
             },
 
             {
                 'yol': '/status',
-                'aciklama': 'Sağlık kontrolü',
-                'durum': 'Erişime Açık'
+                'aciklama': 'Sağlık kontrolü'
             }
         ]
     })
@@ -154,7 +144,7 @@ def tum_sehirleri_getir():
     return jsonify(UserService.get_sehirler('ALL'))
 
 @api_bp.route('/sehirler/ara')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=3600, query_string=True)
 def sehirleri_ara():
     arama = request.args.get('q', '').strip().lower()
@@ -170,7 +160,7 @@ def sehirleri_ara():
     return jsonify(sonuclar)
 
 @api_bp.route('/sehir/suanki_zaman')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=60, query_string=True)
 def sehir_suanki_zaman():
     sehir = request.args.get('sehir')
@@ -193,7 +183,7 @@ def sehir_suanki_zaman():
     })
 
 @api_bp.route('/ulkeler')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=86400)
 def ulkeleri_getir():
     tum_sehirler = UserService.get_sehirler('ALL')
@@ -209,7 +199,7 @@ def ulkeleri_getir():
     return jsonify(ulkeler)
 
 @api_bp.route('/ulke/detay')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=86400, query_string=True)
 def ulke_detay():
     ulke_kodu = request.args.get('kod')
@@ -224,7 +214,7 @@ def ulke_detay():
     })
 
 @api_bp.route('/sehir/detay')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=86400, query_string=True)
 def sehir_detay():
     sehir = request.args.get('sehir')
@@ -243,7 +233,7 @@ def sehir_detay():
     })
 
 @api_bp.route('/sehir_kaydet', methods=['POST'])
-@restrict_to_main_domain
+#@restrict_to_main_domain
 def sehir_kaydet():
     data = request.get_json()
     sehir = data.get('sehir')
@@ -261,10 +251,56 @@ def sehir_kaydet():
     UserService.save_user_preferences(sehir, country_code)
     return jsonify({'redirect': f'/sehir/{sehir}?country={country_code}'})
 
+from app.config import Config
+@api_bp.route(f'/ezan_vakitleri-V{Config.APP_VERSION}')
+#@restrict_to_main_domain
+@cache.cached(timeout=3600, query_string=True)
+def ezan_vakitlerini_al_api():
+    sehir = request.args.get('sehir')
+    country_code = request.args.get('country', 'TR')
+    tarih = request.args.get('date')
+    
+    if not sehir:
+        return jsonify({'error': 'Sehir bilgisi gerekli'}), 400
+        
+    if not is_latin_only(sehir) or not is_latin_only(country_code) or (tarih and not is_latin_only(tarih)):
+        return jsonify({'error': 'Gecersiz karakter iceren parametre'}), 400
+        
+    try:
+        vakitler = PrayerService.get_vakitler(sehir, country_code, tarih)
+        if vakitler:
+            # Timezone'u ayır ve vakitleri sırala
+            tz_info = vakitler.pop('timezone', 'Europe/Istanbul')
+            sirali_vakitler = {}
+            for v in ["imsak", "gunes", "ogle", "ikindi", "aksam", "yatsi"]:
+                if v in vakitler:
+                    sirali_vakitler[v] = vakitler[v]
+            
+            # Yarının imsak vaktini de al
+            yarin_tarih = None
+            if tarih:
+                try:
+                    tarih_obj = datetime.strptime(tarih, '%Y-%m-%d')
+                    yarin_tarih = (tarih_obj + timedelta(days=1)).strftime('%Y-%m-%d')
+                except:
+                    pass
+            else:
+                yarin_tarih = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+            
+            yarin_vakitler = PrayerService.get_vakitler(sehir, country_code, yarin_tarih)
+            yarin_imsak = yarin_vakitler.get('imsak') if yarin_vakitler else None
 
+            return jsonify({
+                'vakitler': sirali_vakitler,
+                'timezone': tz_info,
+                'yarin': {'imsak': yarin_imsak} if yarin_imsak else None
+            })
+        return jsonify({'error': 'Vakit bulunamadı'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/sonraki_vakit')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 def sonraki_vakti_getir():
     sehir = request.args.get('sehir')
     country_code = request.args.get('country', 'TR')
@@ -276,14 +312,14 @@ def sonraki_vakti_getir():
     return jsonify(result)
 
 @api_bp.route('/daily_content')
-@restrict_to_main_domain
+#@restrict_to_main_domain
 @cache.cached(timeout=86400)
 def daily_content():
     return jsonify(get_daily_content())
 
 # Public API v1
-@api_bp.route('/cagri_vakitleri')
-@restrict_to_main_domain
+@api_bp.route('/vakitler')
+#@restrict_to_main_domain
 def public_api_vakitler():
     sehir = request.args.get('sehir')
     country_code = request.args.get('ulke', 'TR').upper()
@@ -423,20 +459,6 @@ def public_api_vakitler():
                 if v in vakitler:
                     sirali_vakitler[v] = vakitler[v]
             
-            # Yarının imsak vaktini de al
-            yarin_tarih = None
-            if tarih:
-                try:
-                    tarih_obj = datetime.strptime(tarih, '%Y-%m-%d')
-                    yarin_tarih = (tarih_obj + timedelta(days=1)).strftime('%Y-%m-%d')
-                except:
-                    pass
-            else:
-                yarin_tarih = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
-            
-            yarin_vakitler = PrayerService.get_vakitler(sehir, country_code, yarin_tarih)
-            yarin_imsak = yarin_vakitler.get('imsak') if yarin_vakitler else None
-
             return jsonify({
                 'durum': 'basarili', 
                 'tip': 'gunluk', 
@@ -445,8 +467,7 @@ def public_api_vakitler():
                     'ulke': country_code, 
                     'tarih': tarih or datetime.now().strftime('%Y-%m-%d'), 
                     'vakitler': sirali_vakitler,
-                    'timezone': tz_info,
-                    'yarin': {'imsak': yarin_imsak} if yarin_imsak else None
+                    'timezone': tz_info
                 }
             })
         return jsonify({'durum': 'hata', 'mesaj': 'Vakit bulunamadı.'}), 404

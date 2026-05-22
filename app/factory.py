@@ -2,15 +2,23 @@ from flask import Flask, request, g, current_app
 from flask_cors import CORS
 # from flask_compress import Compress
 from flask_minify import Minify
+import logging
+from logging.handlers import RotatingFileHandler, TimedRotatingFileHandler
 import os
-from dotenv import load_dotenv
+import gzip
+import shutil
+import pytz
 from datetime import datetime
+from dotenv import load_dotenv
+
+import json
+import time
+import uuid
 
 from app.extensions import db, migrate, cache, csrf, limiter, assets
 from app.config import Config
 from app.error_handlers import register_error_handlers
 from app.middleware import setup_middleware
-from app.logging_config import setup_logging, setup_api_logging, setup_security_logging
 
 def create_app(config_class=Config):
     # .env dosyasını yükle
@@ -44,7 +52,7 @@ def create_app(config_class=Config):
                 "http://127.0.0.1:*"
             ]
         },
-        r"/cagri_vakitleri": {
+        r"/ezan_vakitleri-V2*": {
             "origins": [
                 "https://cagrivakti.com.tr",
                 "https://www.cagrivakti.com.tr",
@@ -112,12 +120,9 @@ def create_app(config_class=Config):
     from app.routes.api import api_bp
     from app.routes.og import og_bp
     
-    # API'yi sadece /api yolundan erişilebilir yap
-    app.register_blueprint(api_bp, url_prefix='/api')  # cagrivakti.com.tr/api/...
-    
-    # Diğer blueprint'leri kaydet
-    app.register_blueprint(og_bp)
     app.register_blueprint(views_bp)
+    app.register_blueprint(api_bp)
+    app.register_blueprint(og_bp)
 
     setup_api_logging(app)
     setup_security_logging(app)
@@ -206,3 +211,192 @@ def _clear_cache_on_version_change(app):
         app.logger.warning(f'[version] Cache temizleme kontrolü başarısız: {e}')
 
 
+class IstanbulFormatter(logging.Formatter):
+    def converter(self, timestamp):
+        dt = datetime.fromtimestamp(timestamp, pytz.utc)
+        return dt.astimezone(pytz.timezone('Europe/Istanbul'))
+
+    def formatTime(self, record, datefmt=None):
+        dt = self.converter(record.created)
+        if datefmt:
+            s = dt.strftime(datefmt)
+        else:
+            try:
+                s = dt.isoformat(timespec='milliseconds')
+            except TypeError:
+                s = dt.isoformat()
+        return s
+
+def compress_rotator(source, dest):
+    with open(source, 'rb') as f_in:
+        with gzip.open(dest + '.gz', 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+    os.remove(source)
+
+def setup_logging(app):
+    log_file = app.config['LOG_FILE']
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+    app.logger.handlers = []
+    level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
+    app.logger.setLevel(getattr(logging, level_name, logging.INFO))
+    default_formatter = IstanbulFormatter(
+        '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    clean_formatter = IstanbulFormatter(
+        '[%(asctime)s] %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    file_handler = TimedRotatingFileHandler(
+        log_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
+    )
+    file_handler.setFormatter(clean_formatter)
+    file_handler.setLevel(logging.INFO)
+
+    class RequestContextFilter(logging.Filter):
+        def filter(self, record):
+            try:
+                record.request_id = getattr(g, 'request_id', '-')
+            except Exception:
+                record.request_id = '-'
+            return True
+
+    ctx_filter = RequestContextFilter()
+    file_handler.addFilter(ctx_filter)
+    app.logger.addHandler(file_handler)
+    error_log_file = os.path.join(os.path.dirname(log_file), 'error.log')
+    error_handler = RotatingFileHandler(
+        error_log_file, maxBytes=10*1024*1024, backupCount=10, encoding='utf-8'
+    )
+    error_handler.setFormatter(default_formatter)
+    error_handler.addFilter(ctx_filter)
+    error_handler.setLevel(logging.ERROR)
+    app.logger.addHandler(error_handler)
+    werkzeug_logger = logging.getLogger('werkzeug')
+    werkzeug_logger.setLevel(logging.ERROR)
+    werkzeug_logger.addHandler(error_handler)
+
+def setup_api_logging(app):
+    api_log_file = app.config['API_LOG_FILE']
+    os.makedirs(os.path.dirname(api_log_file), exist_ok=True)
+    api_logger = logging.getLogger('api_logger')
+    level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
+    api_logger.setLevel(getattr(logging, level_name, logging.INFO))
+    api_logger.propagate = False
+    formatter = IstanbulFormatter(
+        '[%(asctime)s] %(remote_addr)s - %(method)s %(path)s %(status)s %(duration_ms)sms rid=%(request_id)s uid=%(user_id)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    handler = TimedRotatingFileHandler(
+        api_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
+    )
+    handler.setFormatter(formatter)
+
+    class RequestContextFilter(logging.Filter):
+        def filter(self, record):
+            try:
+                record.request_id = getattr(g, 'request_id', '-')
+            except Exception:
+                record.request_id = '-'
+                record.user_id = '-'
+            if not hasattr(record, 'status'):
+                record.status = '-'
+            if not hasattr(record, 'duration_ms'):
+                record.duration_ms = 0
+            return True
+
+    handler.addFilter(RequestContextFilter())
+    api_logger.addHandler(handler)
+    if app.config.get('API_LOG_JSON', True):
+        json_file = api_log_file.replace('.log', '.jsonl')
+        json_handler = TimedRotatingFileHandler(
+            json_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
+        )
+        json_handler.setLevel(getattr(logging, level_name, logging.INFO))
+        json_logger = logging.getLogger('api_logger.json')
+        json_logger.setLevel(getattr(logging, level_name, logging.INFO))
+        json_logger.propagate = False
+        json_logger.addHandler(json_handler)
+        json_handler.addFilter(RequestContextFilter())
+        json_handler.setFormatter(logging.Formatter('%(message)s'))
+
+    @app.before_request
+    def _api_log_start():
+        g._log_start = time.time()
+        g.request_id = uuid.uuid4().hex[:12]
+
+    @app.after_request
+    def _api_log_end(response):
+        try:
+            if request.blueprint == 'api' or (request.host and request.host.startswith('api.')):
+                if request.headers.get('X-Forwarded-For'):
+                    ip = request.headers.get('X-Forwarded-For').split(',')[0]
+                else:
+                    ip = request.remote_addr
+                duration_ms = int((time.time() - getattr(g, '_log_start', time.time())) * 1000)
+                ua = request.headers.get('User-Agent', '')[:200]
+                referer = request.headers.get('Referer', '')[:200]
+                path = request.full_path
+                status = response.status_code
+                extra = {
+                    'remote_addr': ip,
+                    'method': request.method,
+                    'path': path,
+                    'status': status,
+                    'duration_ms': duration_ms,
+                    'user_id': getattr(g, 'user_uid', '-')
+                }
+                api_logger.info('', extra=extra)
+                if app.config.get('API_LOG_JSON', True):
+                    payload = {
+                        'ts': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                        'rid': getattr(g, 'request_id', '-'),
+                        'uid': getattr(g, 'user_uid', '-'),
+                        'ip': ip,
+                        'method': request.method,
+                        'path': path,
+                        'status': status,
+                        'duration_ms': duration_ms,
+                        'ua': ua,
+                        'referer': referer
+                    }
+                    logging.getLogger('api_logger.json').info(json.dumps(payload, ensure_ascii=False))
+        except Exception:
+            pass
+        return response
+
+def setup_security_logging(app):
+    sec_log_file = app.config.get('SECURITY_LOG_FILE')
+    os.makedirs(os.path.dirname(sec_log_file), exist_ok=True)
+    logger = logging.getLogger('security_logger')
+    level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
+    logger.setLevel(getattr(logging, level_name, logging.INFO))
+    logger.propagate = False
+    handler = TimedRotatingFileHandler(
+        sec_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
+    )
+    handler.setFormatter(IstanbulFormatter('[%(asctime)s] %(levelname)s | ip=%(remote_addr)s | method=%(method)s | path=%(path)s | %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+    
+    class SecurityContextFilter(logging.Filter):
+        def filter(self, record):
+            try:
+                record.remote_addr = getattr(g, 'remote_addr', '-')
+                record.method = getattr(g, 'request_method', '-')
+                record.path = getattr(g, 'request_path', '-')
+            except Exception:
+                record.remote_addr = '-'
+                record.method = '-'
+                record.path = '-'
+            return True
+    
+    handler.addFilter(SecurityContextFilter())
+    logger.addHandler(handler)
+    
+    @app.before_request
+    def capture_security_context():
+        try:
+            g.remote_addr = request.remote_addr
+            g.request_method = request.method
+            g.request_path = request.full_path
+        except Exception:
+            pass
