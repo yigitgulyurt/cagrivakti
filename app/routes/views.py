@@ -16,13 +16,6 @@ from app.services.bot_manager import BotManager
 
 views_bp = Blueprint('views', __name__)
 
-@views_bp.before_request
-def before_views_request():
-    """Views blueprint'ini sadece ana domain ve www'de çalıştır"""
-    if request.host.startswith('api.'):
-        from flask import abort
-        abort(404)
-
 # Mevcut yıl bilgisini global olarak tanımlayalım
 suanki_yil = datetime.now().year
 

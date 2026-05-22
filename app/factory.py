@@ -112,14 +112,11 @@ def create_app(config_class=Config):
     from app.routes.api import api_bp
     from app.routes.og import og_bp
     
-    # 1. API'yi ÖNCE KAYDET (Bu ÇOK ÖNEMLİ!)
-    app.register_blueprint(api_bp, name='api_subdomain', subdomain='api')  # api.cagrivakti.com.tr/...
-    app.register_blueprint(api_bp, name='api_path', url_prefix='/api')  # cagrivakti.com.tr/api/...
+    # API'yi sadece /api yolundan erişilebilir yap
+    app.register_blueprint(api_bp, url_prefix='/api')  # cagrivakti.com.tr/api/...
     
-    # 2. Diğer blueprint'leri kaydet
+    # Diğer blueprint'leri kaydet
     app.register_blueprint(og_bp)
-    
-    # 3. Views blueprint'ini SON kaydet (normal şekilde, isim değiştirme!)
     app.register_blueprint(views_bp)
 
     setup_api_logging(app)
