@@ -514,7 +514,7 @@ def health_check():
 
     # Sonuç
     return jsonify({
-        'app_status': 'ok' if not critical_failure else 'degraded',
+        'status': 'ok' if not critical_failure else 'degraded',
         'checks': checks,
         'total_response_time_ms': total_time,
         'timestamp': datetime.now().isoformat() + 'Z'

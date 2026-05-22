@@ -19,7 +19,7 @@ def setup_middleware(app):
         if request.blueprint == 'api' or (request.host and request.host.startswith('api.')) or '/static/' in path or path.endswith(('.ico', '.json', '.txt')):
             return
 
-        # Health check ve iç ağ IP'lerini filtrele
+        # Health check ve iç ağ IP'lerini kontrol et ve logla
         try:
             # IP adresini al
             if request.headers.get('X-Forwarded-For'):
@@ -27,30 +27,32 @@ def setup_middleware(app):
             else:
                 ip = request.remote_addr
             
-            # İç ağ IP'lerini filtrele (Docker, localhost, vs.)
-            # 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8
+            # IP'yi anlamlı isimle değiştir
+            display_ip = ip
             if (
                 ip.startswith('10.') or 
                 (ip.startswith('172.') and 16 <= int(ip.split('.')[1]) <= 31) or 
-                ip.startswith('192.168.') or 
-                ip.startswith('127.') or
-                ip == '::1'
+                ip.startswith('192.168.')
             ):
-                return
+                display_ip = 'Docker-Internal'
+            elif ip.startswith('127.') or ip == '::1':
+                display_ip = 'Localhost'
             
-            # Health check User-Agent'lerini filtrele
+            # Health check User-Agent'lerini kontrol et
             user_agent = request.headers.get('User-Agent', '').lower()
             health_check_keywords = ['health', 'check', 'kube-probe', 'docker', 'uptime', 'ping']
-            if any(keyword in user_agent for keyword in health_check_keywords):
-                return
+            is_health_check = any(keyword in user_agent for keyword in health_check_keywords)
+            
+            if is_health_check:
+                display_ip = 'Health-Check-' + display_ip
 
-            # Her isteği kaydet (Deduplication kaldırıldı)
+            # Her isteği kaydet
             try:
                 from flask import g
                 uid = getattr(g, 'user_uid', '-')
             except Exception:
                 uid = '-'
-            app.logger.info(f'{ip} ziyaret: {path} uid={uid}')
+            app.logger.info(f'{display_ip} ziyaret: {path} uid={uid}')
 
         except Exception as e:
             app.logger.error(f"Loglama hatası: {str(e)}")
