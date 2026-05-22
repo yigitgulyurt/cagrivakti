@@ -1,5 +1,7 @@
 // Service Worker - Ezan Vakitleri
 /* global VERSION */
+console.log('[SW] Loading, VERSION:', VERSION);
+
 const STATIC_CACHE = `cv-static-v${VERSION}`;
 const API_CACHE    = `cv-api-v${VERSION}`;
 const GAME_CACHE   = `cv-game-v${VERSION}`;
@@ -33,21 +35,17 @@ const PAGE_ASSETS = [
 ];
 
 // ── Cross-origin subdomain dosyaları (js. ve css.yigitgulyurt.net.tr) ────────
-// Buraya çektiğin JS dosyalarının tam URL'lerini ekle.
-// Örnek: 'https://js.yigitgulyurt.net.tr/jquery.min.js'
 const JS_ASSETS = [
     'https://js.yigitgulyurt.net.tr/cagrivakti/jquery.cagrivakti.js',
     'https://js.yigitgulyurt.net.tr/cagrivakti/inappredirect.cagrivakti.js',
     'https://js.yigitgulyurt.net.tr/cagrivakti/city-data.cagrivakti.js'
 ];
 
-// Buraya çektiğin CSS dosyalarının tam URL'lerini ekle.
-// Örnek: 'https://css.yigitgulyurt.net.tr/main.css'
 const CSS_ASSETS = [
     'https://css.yigitgulyurt.net.tr/cagrivakti/main.cagrivakti.css',
 ];
 
-// JS_ASSETS ve CSS_ASSETS'i Request objelerine çevir (cross-origin için zorunlu)
+// JS_ASSETS ve CSS_ASSETS'i Request objelerine çevir
 const JS_REQUESTS = JS_ASSETS.map(
     (url) => new Request(url, { mode: 'cors', credentials: 'omit' })
 );
@@ -55,7 +53,7 @@ const CSS_REQUESTS = CSS_ASSETS.map(
     (url) => new Request(url, { mode: 'cors', credentials: 'omit' })
 );
 
-// ── Hiç önbelleğe alınmayacak URL'ler (tam eşleşme veya prefix) ─────────────
+// ── Hiç önbelleğe alınmayacak URL'ler ─────────────
 const NO_CACHE_URLS = [
     '/kaynak/under-the-red-sky/jsons/saveState.json',
     '/stream/viewers',
@@ -63,31 +61,45 @@ const NO_CACHE_URLS = [
     '/paylas/vakit',
 ];
 
-// Yükleme (Install) - Kritik dosyaları önbelleğe al
+// Yükleme (Install)
 self.addEventListener('install', (event) => {
+    console.log('[SW] Installing...');
     event.waitUntil(
         Promise.all([
             caches.open(STATIC_CACHE).then((cache) => {
                 console.log('[SW] Pre-caching static assets');
-                return cache.addAll([...STATIC_ASSETS, ...PAGE_ASSETS]);
+                return cache.addAll([...STATIC_ASSETS, ...PAGE_ASSETS]).catch(err => {
+                    console.warn('[SW] Some static assets failed to cache:', err);
+                });
             }),
             caches.open(JS_CACHE).then((cache) => {
                 console.log('[SW] Pre-caching JS assets');
-                return cache.addAll(JS_REQUESTS);
+                return cache.addAll(JS_REQUESTS).catch(err => {
+                    console.warn('[SW] Some JS assets failed to cache:', err);
+                });
             }),
             caches.open(CSS_CACHE).then((cache) => {
                 console.log('[SW] Pre-caching CSS assets');
-                return cache.addAll(CSS_REQUESTS);
+                return cache.addAll(CSS_REQUESTS).catch(err => {
+                    console.warn('[SW] Some CSS assets failed to cache:', err);
+                });
             })
-        ]).then(() => self.skipWaiting())
+        ]).then(() => {
+            console.log('[SW] Install completed, skipping waiting');
+            return self.skipWaiting();
+        })
     );
 });
 
 // Aktifleştirme (Activate) - Eski önbellekleri temizle
 self.addEventListener('activate', (event) => {
+    console.log('[SW] Activating...');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             const allowedCaches = [STATIC_CACHE, API_CACHE, GAME_CACHE, JS_CACHE, CSS_CACHE];
+            console.log('[SW] Allowed caches:', allowedCaches);
+            console.log('[SW] Found caches:', cacheNames);
+            
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (!allowedCaches.includes(cacheName)) {
@@ -96,7 +108,10 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
-        }).then(() => self.clients.claim())
+        }).then(() => {
+            console.log('[SW] Activate completed, claiming clients');
+            return self.clients.claim();
+        })
     );
 });
 
@@ -106,7 +121,7 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(event.request.url);
 
-    // Font ve stream bypass (CORS hatalarını önlemek için fontlar yakalanmaz)
+    // Font ve stream bypass
     if (
         url.hostname === 'fonts.googleapis.com' ||
         url.hostname === 'fonts.gstatic.com' ||
@@ -128,13 +143,13 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Hiç cache'lenmeyecek URL'ler — her zaman ağdan getir
+    // Hiç cache'lenmeyecek URL'ler
     if (NO_CACHE_URLS.some(p => url.pathname === p)) {
         event.respondWith(fetch(event.request));
         return;
     }
 
-    // Oyun dosyaları — ayrı GAME_CACHE, Stale-While-Revalidate
+    // Oyun dosyaları
     if (url.pathname.startsWith('/kaynak/under-the-red-sky/')) {
         event.respondWith(
             caches.open(GAME_CACHE).then((cache) => {
@@ -146,7 +161,6 @@ self.addEventListener('fetch', (event) => {
                         return networkResponse;
                     }).catch((err) => {
                         if (cachedResponse) {
-                            console.warn('[SW] Game fetch failed, using cache:', event.request.url);
                             return;
                         }
                         throw err;
@@ -158,7 +172,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // API istekleri - Network-First, hata durumunda Cache
+    // API istekleri - Network-First
     if (url.hostname === 'api.cagrivakti.com.tr' && (url.pathname.startsWith('/cagri_vakitleri') || url.pathname.startsWith('/vakitler/'))) {
         event.respondWith(
             fetch(event.request)
@@ -186,7 +200,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // ── js. ve css.yigitgulyurt.net.tr — Stale-While-Revalidate ─────────────
+    // js. ve css.yigitgulyurt.net.tr
     if (
         url.hostname === 'js.yigitgulyurt.net.tr' ||
         url.hostname === 'css.yigitgulyurt.net.tr'
@@ -206,7 +220,6 @@ self.addEventListener('fetch', (event) => {
                     })
                     .catch(() => {
                         if (cachedResponse) {
-                            console.warn(`[SW] ${url.hostname} fetch failed, serving from cache:`, event.request.url);
                             return cachedResponse;
                         }
                     });
@@ -217,7 +230,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // HTML sayfaları - Network-First, hata durumunda Cache, yoksa Offline
+    // HTML sayfaları - Network-First
     if (event.request.mode === 'navigate') {
         event.respondWith(
             fetch(event.request)
@@ -272,7 +285,6 @@ self.addEventListener('fetch', (event) => {
                 })
                 .catch((err) => {
                     if (cachedResponse) {
-                        console.warn('[SW] Background fetch failed for ' + event.request.url);
                         return;
                     }
                     throw err;
