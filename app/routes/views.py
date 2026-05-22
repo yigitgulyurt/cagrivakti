@@ -16,6 +16,13 @@ from app.services.bot_manager import BotManager
 
 views_bp = Blueprint('views', __name__)
 
+@views_bp.before_request
+def before_views_request():
+    """Views blueprint'ini sadece ana domain ve www'de çalıştır"""
+    if request.host.startswith('api.'):
+        from flask import abort
+        abort(404)
+
 # Mevcut yıl bilgisini global olarak tanımlayalım
 suanki_yil = datetime.now().year
 
@@ -1243,9 +1250,5 @@ def iletisim():
 @views_bp.route('/<sehir>')
 def root_sehir_redirect(sehir):
     """Kök dizinden şehir adına yönlendirme (örn: /ankara → /sehir/ankara)"""
-    # API subdomain'inde bu rotanın çalışmasını engelle
-    if request.host.startswith('api.'):
-        from flask import jsonify
-        return jsonify({'error': 'Not found'}), 404
     query_params = {k: v for k, v in request.args.items() if k != 'sehir'}
     return redirect(url_for('views.sehir_sayfasi', sehir=sehir, **query_params), code=301)
