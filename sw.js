@@ -7,7 +7,7 @@ const GAME_CACHE   = `cv-game-v${CACHE_VERSION}`;
 const JS_CACHE     = `cv-js-v${CACHE_VERSION}`;
 const CSS_CACHE    = `cv-css-v${CACHE_VERSION}`;
 
-console.log('[SW] Loading, CACHE_VERSION:', CACHE_VERSION);
+// // console.log('[SW] Loading, CACHE_VERSION:', CACHE_VERSION);
 
 // ── Statik dosyalar (İkonlar) ──────────────────────────────────────────────
 const STATIC_ASSETS = [
@@ -63,29 +63,29 @@ const NO_CACHE_URLS = [
 
 // Yükleme (Install)
 self.addEventListener('install', (event) => {
-    console.log('[SW] Installing...');
+    // console.log('[SW] Installing...');
     event.waitUntil(
         Promise.all([
             caches.open(STATIC_CACHE).then((cache) => {
-                console.log('[SW] Pre-caching static assets');
+                // console.log('[SW] Pre-caching static assets');
                 return cache.addAll([...STATIC_ASSETS, ...PAGE_ASSETS]).catch(err => {
                     console.warn('[SW] Some static assets failed to cache:', err);
                 });
             }),
             caches.open(JS_CACHE).then((cache) => {
-                console.log('[SW] Pre-caching JS assets');
+                // console.log('[SW] Pre-caching JS assets');
                 return cache.addAll(JS_REQUESTS).catch(err => {
                     console.warn('[SW] Some JS assets failed to cache:', err);
                 });
             }),
             caches.open(CSS_CACHE).then((cache) => {
-                console.log('[SW] Pre-caching CSS assets');
+                // console.log('[SW] Pre-caching CSS assets');
                 return cache.addAll(CSS_REQUESTS).catch(err => {
                     console.warn('[SW] Some CSS assets failed to cache:', err);
                 });
             })
         ]).then(() => {
-            console.log('[SW] Install completed, skipping waiting');
+            // console.log('[SW] Install completed, skipping waiting');
             return self.skipWaiting();
         })
     );
@@ -93,23 +93,23 @@ self.addEventListener('install', (event) => {
 
 // Aktifleştirme (Activate) - Eski önbellekleri temizle
 self.addEventListener('activate', (event) => {
-    console.log('[SW] Activating...');
+    // console.log('[SW] Activating...');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             const allowedCaches = [STATIC_CACHE, API_CACHE, GAME_CACHE, JS_CACHE, CSS_CACHE];
-            console.log('[SW] Allowed caches:', allowedCaches);
-            console.log('[SW] Found caches:', cacheNames);
+            // console.log('[SW] Allowed caches:', allowedCaches);
+            // console.log('[SW] Found caches:', cacheNames);
             
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (!allowedCaches.includes(cacheName)) {
-                        console.log('[SW] Removing old cache:', cacheName);
+                        // console.log('[SW] Removing old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
         }).then(() => {
-            console.log('[SW] Activate completed, claiming clients');
+            // console.log('[SW] Activate completed, claiming clients');
             return self.clients.claim();
         })
     );
