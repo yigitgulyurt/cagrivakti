@@ -7,7 +7,7 @@ from datetime import datetime, date, timedelta
 from functools import wraps
 import re
 
-api_bp = Blueprint('api', __name__, subdomain='api')
+api_bp = Blueprint('api', __name__)
 
 @api_bp.route('/')
 def api_anasayfa():

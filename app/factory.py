@@ -112,7 +112,9 @@ def create_app(config_class=Config):
     from app.routes.api import api_bp
     from app.routes.og import og_bp
     
-    app.register_blueprint(api_bp)
+    # API'yi hem /api yolundan hem de api. subdomain'inden erişilebilir yap
+    app.register_blueprint(api_bp, name='api_path', url_prefix='/api')  # cagrivakti.com.tr/api/...
+    app.register_blueprint(api_bp, name='api_subdomain', subdomain='api')  # api.cagrivakti.com.tr/...
     app.register_blueprint(og_bp)
     app.register_blueprint(views_bp)
 
