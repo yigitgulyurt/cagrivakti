@@ -47,7 +47,12 @@ class APIRequestContextFilter(logging.Filter):
     def filter(self, record):
         try:
             record.request_id = getattr(g, 'request_id', '-')
-            record.user_id = getattr(g, 'user_uid', '-')
+            # User_id'yi temiz al, üzerinde ekstra bir şey olmasın
+            user_id = getattr(g, 'user_uid', '-')
+            # Eğer user_id içinde 'uid=' varsa, temizle
+            if 'uid=' in str(user_id):
+                user_id = '-'
+            record.user_id = user_id
         except Exception:
             record.request_id = '-'
             record.user_id = '-'

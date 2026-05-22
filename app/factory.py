@@ -3,6 +3,7 @@ from flask_cors import CORS
 # from flask_compress import Compress
 from flask_minify import Minify
 import os
+import uuid
 from dotenv import load_dotenv
 from datetime import datetime
 
@@ -97,11 +98,13 @@ def create_app(config_class=Config):
     @app.before_request
     def ensure_uid():
         try:
+            g.user_uid = '-'
             uid = request.cookies.get('cv_uid')
-            if not uid:
-                uid = uuid.uuid4().hex[:16]
-                g._set_uid_cookie = uid
-            g.user_uid = uid
+            if uid and all(c in '0123456789abcdefABCDEF' for c in uid):
+                g.user_uid = uid
+            else:
+                # Yeni uid oluştur ama çerezi after_request'te ayarlayacağız
+                g.user_uid = uuid.uuid4().hex[:16]
         except Exception:
             g.user_uid = '-'
 
@@ -125,14 +128,27 @@ def create_app(config_class=Config):
     @app.after_request
     def add_header(response):
         try:
-            if getattr(g, '_set_uid_cookie', None):
+            # Çerezi her zaman kontrol et ve yenile/güncelle
+            current_uid_in_cookie = request.cookies.get('cv_uid')
+            current_uid_in_g = getattr(g, 'user_uid', '-')
+            
+            # Eğer cookie yoksa veya geçersizse, yenisini ayarla
+            if (not current_uid_in_cookie or 
+                current_uid_in_cookie != current_uid_in_g or
+                not all(c in '0123456789abcdefABCDEF' for c in current_uid_in_g)):
+                
+                if current_uid_in_g and current_uid_in_g != '-':
+                    uid_to_set = current_uid_in_g
+                else:
+                    uid_to_set = uuid.uuid4().hex[:16]
+                
                 response.set_cookie(
                     'cv_uid',
-                    g._set_uid_cookie,
-                    max_age=60*60*24*365,
+                    uid_to_set,
+                    max_age=60*60*24*365*2,  # 2 yıl
                     samesite='Lax',
                     path='/',
-                    secure=True,
+                    secure=not current_app.debug,  # Debug modunda secure=False
                     httponly=True
                 )
         except Exception:
