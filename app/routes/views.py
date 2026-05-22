@@ -1067,20 +1067,22 @@ def favicon():
 
 @views_bp.route('/sw.js')
 def serve_sw():
-    version = current_app.config.get('APP_VERSION', '1.0')
     sw_path = os.path.join(current_app.root_path, '..', 'sw.js')
     try:
         with open(sw_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        content = content.replace('${VERSION}', version)
         resp    = make_response(content)
         resp.headers['Content-Type']  = 'application/javascript; charset=utf-8'
-        resp.headers['Cache-Control'] = 'no-cache'
+        resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        resp.headers['Pragma'] = 'no-cache'
+        resp.headers['Expires'] = '0'
         return resp
     except Exception:
         response = make_response(send_from_directory(
             os.path.join(current_app.root_path, 'static', 'js'), 'sw.js'))
-        response.headers['Cache-Control'] = 'no-cache'
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
         return response
 
 

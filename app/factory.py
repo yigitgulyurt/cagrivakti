@@ -90,7 +90,7 @@ def create_app(config_class=Config):
     cache.init_app(app)
     csrf.init_app(app)
     limiter.init_app(app)
-    Minify(app=app, html=False, js=True, cssless=True)
+    Minify(app=app, html=False, js=False, cssless=True)
 
     setup_logging(app)
 
