@@ -119,9 +119,8 @@ def create_app(config_class=Config):
     # 2. Diğer blueprint'leri kaydet
     app.register_blueprint(og_bp)
     
-    # 3. Views blueprint'ini SON kaydet ve SADECE ana domain + www'de çalıştır!
-    app.register_blueprint(views_bp, name='views_main', subdomain=None)  # Ana domain (sadece ana domain!)
-    app.register_blueprint(views_bp, name='views_www', subdomain='www')   # www.cagrivakti.com.tr
+    # 3. Views blueprint'ini SON kaydet (normal şekilde, isim değiştirme!)
+    app.register_blueprint(views_bp)
 
     setup_api_logging(app)
     setup_security_logging(app)
