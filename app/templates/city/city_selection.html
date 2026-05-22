@@ -352,7 +352,19 @@
 {% block footer_js %}
 <script src="https://js.yigitgulyurt.net.tr/cagrivakti/city-data.cagrivakti.js?v={{ app_version }}" defer></script>
 <script>
+const app_version = "{{ app_version }}";
     $(document).ready(function() {
+        // Eski ve hatalı localStorage önbelleklerini temizle
+        const CACHE_KEY_PREFIX = "cagri_vakitleri";
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(CACHE_KEY_PREFIX)) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
         const CITY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }};
 
         function getDisplayName(city) {
@@ -410,9 +422,9 @@
 
             sehirler.forEach((item, index) => {
                 const sehir = typeof item === 'object' ? item.sehir : item;
-                const itemCountryCode = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
+                const ulke = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
                 
-                const CACHE_KEY = `vakitler-V{{ app_version }}-${sehir}_${itemCountryCode}`;
+                const CACHE_KEY = `cagri_vakitleri-v=${app_version}|${sehir}_${ulke}`;
                 const TODAY = new Date().toISOString().split('T')[0];
                 const cached = localStorage.getItem(CACHE_KEY);
                 let cachedData = null;
@@ -425,7 +437,7 @@
 
                 const card = $('<a>')
                     .addClass('city-card')
-                    .attr('href', `/sehir/${sehir}?country=${itemCountryCode}`)
+                    .attr('href', `/sehir/${sehir}?country=${ulke}`)
                     .click(function(e) {
                         if ($(this).hasClass('skeleton-card')) {
                             e.preventDefault();
@@ -489,34 +501,34 @@
                 if (cachedData) return;
 
                 // API isteğini sıraya ekle
-                const url = `https://api.cagrivakti.com.tr/ezan_vakitleri-V{{ app_version }}?sehir=${sehir}&country=${itemCountryCode}`;
+                const url = `https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${sehir}&ulke=${ulke}&v=${app_version}`;
                 const callback = function(data) {
-                    if (data.vakitler) {
+                    if (data.durum === 'basarili' && data.data?.vakitler) {
                         // Yarın verisini de ekle
-                        if (data.yarin) {
-                            data.vakitler.yarin = data.yarin;
+                        if (data.data.yarin) {
+                            data.data.vakitler.yarin = data.data.yarin;
                         }
 
                         localStorage.setItem(CACHE_KEY, JSON.stringify({
                             tarih: TODAY,
-                            data: data.vakitler
+                            data: data.data.vakitler
                         }));
-                        updateUI(data.vakitler);
-                    } else if (!card.hasClass('content-loaded')) {
-                        card.removeClass('skeleton-card').addClass('content-loaded');
-                        cityName.empty().text(getDisplayName(sehir));
-                        vakitBilgisi.text('Vakit bulunamadı');
-                    }
-                };
-
-                if (!isLazy) {
-                    $.get(url).done(callback);
-                } else {
-                    requestQueue.push({ url, callback });
-                    processQueue();
+                        updateUI(data.data.vakitler);
+                } else if (!card.hasClass('content-loaded')) {
+                    card.removeClass('skeleton-card').addClass('content-loaded');
+                    cityName.empty().text(getDisplayName(sehir));
+                    vakitBilgisi.text('Vakit bulunamadı');
                 }
-            });
-        }
+            };
+
+            if (!isLazy) {
+                $.get(url).done(callback);
+            } else {
+                requestQueue.push({ url, callback });
+                processQueue();
+            }
+        });
+    }
 
         $('.search-box').on('input', function() {
             const searchText = $(this).val().toLowerCase();

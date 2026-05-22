@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    APP_VERSION = "5.00"
+    APP_VERSION = "6.07"
     # Tek versiyon kaynağı: APP_VERSION
     SEND_FILE_MAX_AGE_DEFAULT = 31536000 # Flask static dosya cache süresi (1 Yıl)
     SERVER_NAME = os.environ.get('SERVER_NAME')
@@ -18,13 +18,15 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_SORT_KEYS = False
     LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs')
-    LOG_FILE = os.path.join(LOG_DIR, 'cagrivakti-web.log')
-    API_LOG_FILE = os.path.join(LOG_DIR, 'cagrivakti-api.log')
-    TELEGRAM_LOG_FILE = os.path.join(LOG_DIR, 'cagrivakti-bot.log')
-    SECURITY_LOG_FILE = os.path.join(LOG_DIR, 'security.log')
+    WEB_LOG_FILE = os.environ.get('WEB_LOG_FILE', os.path.join(LOG_DIR, 'web.log'))
+    API_LOG_FILE = os.environ.get('API_LOG_FILE', os.path.join(LOG_DIR, 'api.log'))
+    TELEGRAM_LOG_FILE = os.environ.get('TELEGRAM_LOG_FILE', os.path.join(LOG_DIR, 'telegram.log'))
+    SECURITY_LOG_FILE = os.environ.get('SECURITY_LOG_FILE', os.path.join(LOG_DIR, 'security.log'))
+    ERROR_LOG_FILE = os.environ.get('ERROR_LOG_FILE', os.path.join(LOG_DIR, 'error.log'))
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     API_LOG_JSON = os.environ.get('API_LOG_JSON', 'true').lower() in ('1', 'true', 'yes')
-    LOG_RETENTION_DAYS = int(os.environ.get('LOG_RETENTION_DAYS', '30'))
+    APP_LOG_JSON = os.environ.get('APP_LOG_JSON', 'false').lower() in ('1', 'true', 'yes')
+    LOG_RETENTION_DAYS = int(os.environ.get('LOG_RETENTION_DAYS', '7'))
     
     LOGGED_PAGES = {
         '/sehir',

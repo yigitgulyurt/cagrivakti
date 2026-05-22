@@ -20,8 +20,8 @@
         },
         {
             "type": "xxxx",
-            "text": "Ramazan ayı için örnek ayet metni.",
-            "category": "ramadan",
+            "text": "type'a uygun metin",
+            "category": "daily",
             "source": "xxxx"
         }
     ]

@@ -36,7 +36,7 @@ class RamadanService:
 
         jd = RamadanService._int_part(365.25 * (y + 4716)) + \
              RamadanService._int_part(30.6001 * (m + 1)) + \
-             d + b - 1524 - 1
+             d + b - 1524
 
         z = jd - 1948440 + 10632
         n = RamadanService._int_part((z - 1) / 10631.0)
@@ -103,6 +103,9 @@ class RamadanService:
 
         # Otomatik Hesaplama
         h_year, h_month, h_day = cls.gregorian_to_hijri(current_date)
+
+        # TEST MODU: Ramazan ayında gibi göster (geçici olarak)
+        # h_year, h_month, h_day = 1447, 9, 15  # 15. Ramazan günü olarak test ediy
         
         res = {"is_ramadan": False, "status": "none"}
 
