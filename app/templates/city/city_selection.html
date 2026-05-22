@@ -490,7 +490,7 @@ const app_version = "{{ app_version }}";
                 if (cachedData) return;
 
                 // API isteğini sıraya ekle
-                const url = `https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${sehir}&ulke=${ulke}&v=${app_version}`;
+                const url = `https://cagrivakti.com.tr/api/cagri_vakitleri?v=${app_version}&sehir=${sehir}&ulke=${ulke}`;
                 const callback = function(data) {
                     if (data.durum === 'basarili' && data.data?.vakitler) {
                         // Yarın verisini de ekle

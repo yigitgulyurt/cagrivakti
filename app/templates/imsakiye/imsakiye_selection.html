@@ -394,7 +394,7 @@ const app_version = "{{ app_version }}";
 
                 // API isteğini sıraya ekle - IIFE ile closure sorunu çözüldü
                 (function(sehir, ulke, CACHE_KEY, TODAY, card, cityName) {
-                    const url = `https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${sehir}&ulke=${ulke}&v=${app_version}`;
+                    const url = `https://cagrivakti.com.tr/api/cagri_vakitleri?v=${app_version}&sehir=${sehir}&ulke=${ulke}`;
                     const callback = function(data) {
                         if (data.durum === 'basarili' && data.data?.vakitler) {
                             localStorage.setItem(CACHE_KEY, JSON.stringify({
