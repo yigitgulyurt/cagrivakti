@@ -145,12 +145,31 @@
             navigator.serviceWorker.register('/sw.js')
                 .then(reg => {
                     console.log('[SW] Registration successful, scope:', reg.scope);
+                    
+                    // Periodic Background Sync (where supported)
+                    if ('periodicSync' in reg) {
+                        reg.periodicSync.register('refresh-vakitler', {
+                            minInterval: 24 * 60 * 60 * 1000 // 24 hours
+                        }).catch(err => console.log('Periodic Sync failed', err));
+                    }
+                    
+                    // Update found - log it
+                    reg.addEventListener('updatefound', () => {
+                        console.log('[SW] New service worker found, installing...');
+                        const newWorker = reg.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            console.log('[SW] Service worker state changed:', newWorker.state);
+                            if (newWorker.state === 'installed') {
+                                if (navigator.serviceWorker.controller) {
+                                    console.log('[SW] New SW installed');
+                                } else {
+                                    console.log('[SW] First time SW installed');
+                                }
+                            }
+                        });
+                    });
                 })
-                .catch(err => {
-                    console.error('[SW] Registration failed:', err);
-                    console.error('[SW] Error name:', err.name);
-                    console.error('[SW] Error message:', err.message);
-                });
+                .catch(err => console.error('[SW] Registration failed:', err));
         });
     }
     </script>
