@@ -116,7 +116,9 @@ def create_app(config_class=Config):
     app.register_blueprint(api_bp, name='api_subdomain', subdomain='api')  # api.cagrivakti.com.tr/... (ÖNCE!)
     app.register_blueprint(api_bp, name='api_path', url_prefix='/api')  # cagrivakti.com.tr/api/...
     app.register_blueprint(og_bp)
-    app.register_blueprint(views_bp)  # En SONA!
+    # Views blueprint'ini SADECE ana domain ve www'de çalışacak şekilde kaydet!
+    app.register_blueprint(views_bp, name='views_main')  # Ana domain
+    app.register_blueprint(views_bp, name='views_www', subdomain='www')  # www subdomain
 
     setup_api_logging(app)
     setup_security_logging(app)
