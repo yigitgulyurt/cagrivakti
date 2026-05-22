@@ -354,6 +354,17 @@
 <script>
 const app_version = "{{ app_version }}";
     $(document).ready(function() {
+        // Eski ve hatalı localStorage önbelleklerini temizle
+        const CACHE_KEY_PREFIX = "cagri_vakitleri";
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(CACHE_KEY_PREFIX)) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
         const CITY_MAPPING = {{ CITY_DISPLAY_NAME_MAPPING | tojson | safe if CITY_DISPLAY_NAME_MAPPING else "{}" }};
 
         function getDisplayName(city) {
