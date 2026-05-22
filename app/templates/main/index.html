@@ -913,7 +913,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             /* --- Fetch from API if cache miss --- */
             if (!data) {
-                const response     = await fetch(`https://api.cagrivakti.com.tr/cagri_vakitleri?sehir=${city}&ulke=${country}&v=${app_version}`);
+                const response     = await fetch(`https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${city}&ulke=${country}&v=${app_version}`);
                 const responseData = await response.json();
 
                 if (responseData.durum === 'basarili' && responseData.data?.vakitler) {

@@ -413,7 +413,7 @@
         tableContainer.style.opacity = '0.3';
 
         try {
-            let url = `https://api.cagrivakti.com.tr/cagri_vakitleri?sehir=${sehir}&ulke=${countryCode}&v={{ app_version }}`;
+            let url = `https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${sehir}&ulke=${countryCode}&v={{ app_version }}`;
             
             if (currentTab === 'aylik') {
                 const now = new Date();

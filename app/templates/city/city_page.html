@@ -552,7 +552,7 @@ async function ezanVakitleriniYukle() {
     }
 
     try {
-        const res  = await fetch(`https://api.cagrivakti.com.tr/cagri_vakitleri?sehir=${mevcutSehir}&ulke=${mevcutUlke}&v=${app_version}`);
+        const res  = await fetch(`https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${mevcutSehir}&ulke=${mevcutUlke}&v=${app_version}`);
         const data = await res.json();
 
         if (data.durum === 'basarili' && data.data?.vakitler) {
@@ -576,7 +576,7 @@ async function dailyContentYukle() {
     if (cached) { renderDailyContent(cached); return; }
 
     try {
-        const res  = await fetch('https://api.cagrivakti.com.tr/daily_content');
+        const res  = await fetch('https://cagrivakti.com.tr/api/daily_content');
         const data = await res.json();
         if (data?.text) {
             setCachedDailyContent(data);
