@@ -142,7 +142,7 @@
             const APP_VERSION = "{{ app_version }}";
             console.log('[SW] Registering service worker, app version:', APP_VERSION);
             
-            navigator.serviceWorker.register('/sw.js')
+            navigator.serviceWorker.register('/sw.js?v=' + APP_VERSION)
                 .then(reg => {
                     console.log('[SW] Registration successful, scope:', reg.scope);
                     
@@ -161,7 +161,9 @@
                             console.log('[SW] Service worker state changed:', newWorker.state);
                             if (newWorker.state === 'installed') {
                                 if (navigator.serviceWorker.controller) {
-                                    console.log('[SW] New SW installed');
+                                    console.log('[SW] New SW installed, will prompt for refresh');
+                                    // Instead of auto-refresh, we could show a prompt
+                                    // But let's just log it for now to avoid loops
                                 } else {
                                     console.log('[SW] First time SW installed');
                                 }
