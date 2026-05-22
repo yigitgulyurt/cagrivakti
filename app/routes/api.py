@@ -461,11 +461,16 @@ def health_check():
     Referer/Origin başlığı göndermediği için 403 alırlardı.
     """
     import time
+    import os
+    import sys
+    from datetime import datetime
+    
     start_time = time.time()
     
     checks = {}
     http_status = 200
     critical_failure = False
+    warnings = []
 
     # 1. Veritabanı bağlantısı
     try:
@@ -475,7 +480,8 @@ def health_check():
         db_time = round((time.time() - db_start) * 1000, 2)
         checks['database'] = {
             'db_status': 'ok',
-            'response_time_ms': db_time
+            'response_time_ms': db_time,
+            'db_type': current_app.config.get('SQLALCHEMY_DATABASE_URI', '').split(':')[0] if current_app.config.get('SQLALCHEMY_DATABASE_URI') else 'unknown'
         }
     except Exception as e:
         checks['database'] = {
@@ -491,9 +497,11 @@ def health_check():
         cache.set('__healthcheck__', '1', timeout=5)
         val = cache.get('__healthcheck__')
         cache_time = round((time.time() - cache_start) * 1000, 2)
+        cache_type = current_app.config.get('CACHE_TYPE', 'unknown')
         checks['cache'] = {
             'cache_status': 'ok' if val == '1' else 'miss',
-            'response_time_ms': cache_time
+            'response_time_ms': cache_time,
+            'cache_type': cache_type
         }
     except Exception as e:
         checks['cache'] = {
@@ -501,21 +509,158 @@ def health_check():
             'message': str(e)
         }
         # Cache hatası kritik değil, servisi durdurmuyoruz
+        warnings.append('Cache is not available')
 
-    # 3. Genel uygulama durumu ve metadata
+    # 3. Disk alanı kontrolü
+    try:
+        disk_start = time.time()
+        if sys.platform.startswith('win'):
+            # Windows için disk alanı kontrolü
+            import ctypes
+            free_bytes = ctypes.c_ulonglong(0)
+            total_bytes = ctypes.c_ulonglong(0)
+            ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(os.path.abspath('/')), None, ctypes.pointer(total_bytes), ctypes.pointer(free_bytes))
+            free_gb = round(free_bytes.value / (1024**3), 2)
+            total_gb = round(total_bytes.value / (1024**3), 2)
+        else:
+            # Linux/macOS için disk alanı kontrolü
+            statvfs = os.statvfs('/')
+            free_gb = round((statvfs.f_frsize * statvfs.f_bfree) / (1024**3), 2)
+            total_gb = round((statvfs.f_frsize * statvfs.f_blocks) / (1024**3), 2)
+        
+        used_percent = round(((total_gb - free_gb) / total_gb) * 100, 2)
+        disk_time = round((time.time() - disk_start) * 1000, 2)
+        
+        checks['disk'] = {
+            'disk_status': 'ok',
+            'free_gb': free_gb,
+            'total_gb': total_gb,
+            'used_percent': used_percent,
+            'response_time_ms': disk_time
+        }
+        
+        # Disk alanı %90'dan fazlaysa uyarı
+        if used_percent > 90:
+            warnings.append(f'Disk usage is high: {used_percent}%')
+        elif used_percent > 80:
+            warnings.append(f'Disk usage is warning: {used_percent}%')
+            
+    except Exception as e:
+        checks['disk'] = {
+            'disk_status': 'error',
+            'message': str(e)
+        }
+        warnings.append('Disk check failed')
+
+    # 4. Sistem kaynakları (CPU ve RAM)
+    try:
+        sys_start = time.time()
+        
+        # RAM kullanımı
+        ram_info = {}
+        if sys.platform.startswith('win'):
+            # Windows için RAM kontrolü
+            import ctypes
+            class MEMORYSTATUSEX(ctypes.Structure):
+                _fields_ = [("dwLength", ctypes.c_ulong),
+                           ("dwMemoryLoad", ctypes.c_ulong),
+                           ("ullTotalPhys", ctypes.c_ulonglong),
+                           ("ullAvailPhys", ctypes.c_ulonglong),
+                           ("ullTotalPageFile", ctypes.c_ulonglong),
+                           ("ullAvailPageFile", ctypes.c_ulonglong),
+                           ("ullTotalVirtual", ctypes.c_ulonglong),
+                           ("ullAvailVirtual", ctypes.c_ulonglong)]
+            
+            stat = MEMORYSTATUSEX()
+            stat.dwLength = ctypes.sizeof(stat)
+            ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat))
+            ram_info = {
+                'used_percent': stat.dwMemoryLoad,
+                'total_gb': round(stat.ullTotalPhys / (1024**3), 2),
+                'available_gb': round(stat.ullAvailPhys / (1024**3), 2)
+            }
+        else:
+            # Linux/macOS için RAM kontrolü
+            try:
+                with open('/proc/meminfo', 'r') as f:
+                    meminfo = f.read()
+                mem_total = int([line for line in meminfo.split('\n') if 'MemTotal' in line][0].split()[1])
+                mem_available = int([line for line in meminfo.split('\n') if 'MemAvailable' in line][0].split()[1])
+                mem_used = mem_total - mem_available
+                ram_info = {
+                    'used_percent': round((mem_used / mem_total) * 100, 2),
+                    'total_gb': round(mem_total / (1024**2), 2),
+                    'available_gb': round(mem_available / (1024**2), 2)
+                }
+            except:
+                ram_info = {'status': 'unavailable'}
+        
+        sys_time = round((time.time() - sys_start) * 1000, 2)
+        checks['system'] = {
+            'sys_status': 'ok',
+            'ram': ram_info,
+            'platform': sys.platform,
+            'python_version': sys.version,
+            'response_time_ms': sys_time
+        }
+        
+        # RAM kullanımı %90'dan fazlaysa uyarı
+        if ram_info and 'used_percent' in ram_info and ram_info['used_percent'] > 90:
+            warnings.append(f'RAM usage is high: {ram_info["used_percent"]}%')
+            
+    except Exception as e:
+        checks['system'] = {
+            'sys_status': 'error',
+            'message': str(e)
+        }
+        warnings.append('System resources check failed')
+
+    # 5. Genel uygulama durumu ve metadata
     checks['app'] = {
         'app_status': 'ok',
         'version': current_app.config.get('APP_VERSION', '1.0'),
-        'environment': 'production' if not current_app.debug else 'development'
+        'environment': 'production' if not current_app.debug else 'development',
+        'server_time': datetime.now().isoformat() + 'Z'
     }
 
-    # 4. Toplam yanıt süresi
+    # 6. Log dizini kontrolü
+    try:
+        log_dir = current_app.config.get('LOG_DIR', 'logs')
+        log_dir_exists = os.path.exists(log_dir)
+        log_dir_writable = os.access(log_dir, os.W_OK) if log_dir_exists else False
+        
+        checks['logging'] = {
+            'log_status': 'ok' if log_dir_exists and log_dir_writable else 'error',
+            'log_dir_exists': log_dir_exists,
+            'log_dir_writable': log_dir_writable,
+            'log_dir': log_dir
+        }
+        
+        if not log_dir_exists or not log_dir_writable:
+            warnings.append('Logging directory not available')
+            
+    except Exception as e:
+        checks['logging'] = {
+            'log_status': 'error',
+            'message': str(e)
+        }
+        warnings.append('Logging check failed')
+
+    # 7. Toplam yanıt süresi
     total_time = round((time.time() - start_time) * 1000, 2)
+
+    # 8. Genel durum belirleme
+    overall_status = 'ok'
+    if critical_failure:
+        overall_status = 'critical'
+    elif warnings:
+        overall_status = 'degraded'
 
     # Sonuç
     return jsonify({
-        'status': 'ok' if not critical_failure else 'degraded',
+        'status': overall_status,
         'checks': checks,
+        'warnings': warnings,
         'total_response_time_ms': total_time,
         'timestamp': datetime.now().isoformat() + 'Z'
     }), http_status
