@@ -1,4 +1,4 @@
-// Service Worker - Ezan Vakti
+// Service Worker - Ezan Vakitleri
 const CACHE_VERSION = '6.08';
 const STATIC_CACHE = `cv-static-v${CACHE_VERSION}`;
 const API_CACHE    = `cv-api-v${CACHE_VERSION}`;
@@ -8,6 +8,51 @@ const CSS_CACHE    = `cv-css-v${CACHE_VERSION}`;
 
 console.log('[SW] Loading, CACHE_VERSION:', CACHE_VERSION);
 
+// ── Statik dosyalar (İkonlar) ──────────────────────────────────────────────
+const STATIC_ASSETS = [
+    '/static/icons/favicon.ico',
+    '/static/icons/ios/180.png',
+    '/static/icons/android/android-launchericon-192-192.png',
+    '/static/icons/android/android-launchericon-512-512.png',
+    '/static/icons/windows11/Square150x150Logo.scale-100.png',
+];
+
+// ── Sayfa URL'leri ───────────────────────────────────────────────────────────
+const PAGE_ASSETS = [
+    '/',
+    '/offline',
+    '/sehir',
+    '/imsakiye',
+    '/ramazan',
+    '/neden-biz',
+    '/indir',
+    '/konum-bul',
+    '/iletisim',
+    '/ilkelerimiz',
+    '/bilgi-kosesi',
+    '/asal-sayi',
+    '/Mustafa-Kemal-Ataturk',
+];
+
+// ── Cross-origin subdomain dosyaları (js. ve css.yigitgulyurt.net.tr) ────────
+const JS_ASSETS = [
+    'https://js.yigitgulyurt.net.tr/cagrivakti/jquery.cagrivakti.js',
+    'https://js.yigitgulyurt.net.tr/cagrivakti/inappredirect.cagrivakti.js',
+    'https://js.yigitgulyurt.net.tr/cagrivakti/city-data.cagrivakti.js'
+];
+
+const CSS_ASSETS = [
+    'https://css.yigitgulyurt.net.tr/cagrivakti/main.cagrivakti.css',
+];
+
+// JS_ASSETS ve CSS_ASSETS'i Request objelerine çevir
+const JS_REQUESTS = JS_ASSETS.map(
+    (url) => new Request(url, { mode: 'cors', credentials: 'omit' })
+);
+const CSS_REQUESTS = CSS_ASSETS.map(
+    (url) => new Request(url, { mode: 'cors', credentials: 'omit' })
+);
+
 // ── Hiç önbelleğe alınmayacak URL'ler ─────────────
 const NO_CACHE_URLS = [
     '/kaynak/under-the-red-sky/jsons/saveState.json',
@@ -16,19 +61,33 @@ const NO_CACHE_URLS = [
     '/paylas/vakit',
 ];
 
-// Yükleme (Install) - Basit versiyon, sadece gerekli dosyalar
+// Yükleme (Install)
 self.addEventListener('install', (event) => {
     console.log('[SW] Installing...');
     event.waitUntil(
-        caches.open(STATIC_CACHE)
-            .then(() => {
-                console.log('[SW] Cache opened successfully');
-                return self.skipWaiting();
+        Promise.all([
+            caches.open(STATIC_CACHE).then((cache) => {
+                console.log('[SW] Pre-caching static assets');
+                return cache.addAll([...STATIC_ASSETS, ...PAGE_ASSETS]).catch(err => {
+                    console.warn('[SW] Some static assets failed to cache:', err);
+                });
+            }),
+            caches.open(JS_CACHE).then((cache) => {
+                console.log('[SW] Pre-caching JS assets');
+                return cache.addAll(JS_REQUESTS).catch(err => {
+                    console.warn('[SW] Some JS assets failed to cache:', err);
+                });
+            }),
+            caches.open(CSS_CACHE).then((cache) => {
+                console.log('[SW] Pre-caching CSS assets');
+                return cache.addAll(CSS_REQUESTS).catch(err => {
+                    console.warn('[SW] Some CSS assets failed to cache:', err);
+                });
             })
-            .catch(err => {
-                console.error('[SW] Install error:', err);
-                return self.skipWaiting();
-            })
+        ]).then(() => {
+            console.log('[SW] Install completed, skipping waiting');
+            return self.skipWaiting();
+        })
     );
 });
 
@@ -90,8 +149,31 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Oyun dosyaları
+    if (url.pathname.startsWith('/kaynak/under-the-red-sky/')) {
+        event.respondWith(
+            caches.open(GAME_CACHE).then((cache) => {
+                return cache.match(event.request).then((cachedResponse) => {
+                    const fetchPromise = fetch(event.request).then((networkResponse) => {
+                        if (networkResponse && networkResponse.status === 200) {
+                            cache.put(event.request, networkResponse.clone());
+                        }
+                        return networkResponse;
+                    }).catch((err) => {
+                        if (cachedResponse) {
+                            return;
+                        }
+                        throw err;
+                    });
+                    return cachedResponse || fetchPromise;
+                });
+            })
+        );
+        return;
+    }
+
     // API istekleri - Network-First
-    if (url.hostname === 'api.cagrivakti.com.tr' && (url.pathname.startsWith('/cagri_vakitleri') || url.pathname.startsWith('/vakitler/'))) {
+    if ((url.hostname === 'cagrivakti.com.tr' || url.hostname === 'www.cagrivakti.com.tr') && (url.pathname.startsWith('/api/cagri_vakitleri'))) {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
@@ -118,7 +200,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // js. ve css.yigitgulyurt.net.tr - Stale-While-Revalidate
+    // js. ve css.yigitgulyurt.net.tr
     if (
         url.hostname === 'js.yigitgulyurt.net.tr' ||
         url.hostname === 'css.yigitgulyurt.net.tr'
@@ -148,6 +230,46 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // HTML sayfaları - Network-First
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    if (response.ok && response.status === 200 &&
+                        !response.url.includes('/offline') &&
+                        !response.url.includes('/kaynak/') &&
+                        !response.url.includes('/canli-kaynak/')) {
+                        const responseClone = response.clone();
+                        caches.open(STATIC_CACHE).then((cache) => {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
+                    return response;
+                })
+                .catch(async () => {
+                    const cachedResponse = await caches.match(event.request);
+                    if (cachedResponse) return cachedResponse;
+
+                    const url = new URL(event.request.url);
+                    const cleanResponse = await caches.match(url.pathname, { ignoreSearch: true });
+                    if (cleanResponse) return cleanResponse;
+
+                    if (url.pathname.startsWith('/sehir/')) {
+                        const sehirResponse = await caches.match('/sehir');
+                        if (sehirResponse) return sehirResponse;
+                    }
+
+                    if (url.pathname.startsWith('/imsakiye/')) {
+                        const imsakiyeResponse = await caches.match('/imsakiye');
+                        if (imsakiyeResponse) return imsakiyeResponse;
+                    }
+
+                    return caches.match('/offline');
+                })
+        );
+        return;
+    }
+
     // Statik dosyalar - Stale-While-Revalidate
     event.respondWith(
         caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
@@ -165,6 +287,7 @@ self.addEventListener('fetch', (event) => {
                     if (cachedResponse) {
                         return;
                     }
+                    throw err;
                 });
 
             return cachedResponse || fetchPromise;
