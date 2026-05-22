@@ -409,7 +409,7 @@ const app_version = "{{ app_version }}";
             // Mevcut kartları temizle ama iskeletleri sadece veri geldikçe değiştir
             grid.empty();
 
-            for (const item of sehirler) {
+            sehirler.forEach((item, index) => {
                 const sehir = typeof item === 'object' ? item.sehir : item;
                 const ulke = countryCode === 'AUTO' ? (item.code || 'TR') : countryCode;
                 
@@ -487,38 +487,36 @@ const app_version = "{{ app_version }}";
                 card.append(cityName).append(vakitBilgisi);
                 grid.append(card);
 
-                if (cachedData) continue;
+                if (cachedData) return;
 
                 // API isteğini sıraya ekle
-                (function(sehir, ulke, CACHE_KEY, TODAY, updateUI, card, cityName, vakitBilgisi) {
-                    const url = `https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${sehir}&ulke=${ulke}&v=${app_version}`;
-                    const callback = function(data) {
-                        if (data.durum === 'basarili' && data.data?.vakitler) {
-                            // Yarın verisini de ekle
-                            if (data.data.yarin) {
-                                data.data.vakitler.yarin = data.data.yarin;
-                            }
+                const url = `https://cagrivakti.com.tr/api/cagri_vakitleri?sehir=${sehir}&ulke=${ulke}&v=${app_version}`;
+                const callback = function(data) {
+                    if (data.durum === 'basarili' && data.data?.vakitler) {
+                        // Yarın verisini de ekle
+                        if (data.data.yarin) {
+                            data.data.vakitler.yarin = data.data.yarin;
+                        }
 
-                            localStorage.setItem(CACHE_KEY, JSON.stringify({
-                                tarih: TODAY,
-                                data: data.data.vakitler
-                            }));
-                            updateUI(data.data.vakitler);
-                    } else if (!card.hasClass('content-loaded')) {
-                        card.removeClass('skeleton-card').addClass('content-loaded');
-                        cityName.empty().text(getDisplayName(sehir));
-                        vakitBilgisi.text('Vakit bulunamadı');
-                    }
-                };
-
-                if (!isLazy) {
-                    $.get(url).done(callback);
-                } else {
-                    requestQueue.push({ url, callback });
-                    processQueue();
+                        localStorage.setItem(CACHE_KEY, JSON.stringify({
+                            tarih: TODAY,
+                            data: data.data.vakitler
+                        }));
+                        updateUI(data.data.vakitler);
+                } else if (!card.hasClass('content-loaded')) {
+                    card.removeClass('skeleton-card').addClass('content-loaded');
+                    cityName.empty().text(getDisplayName(sehir));
+                    vakitBilgisi.text('Vakit bulunamadı');
                 }
-            })(sehir, ulke, CACHE_KEY, TODAY, updateUI, card, cityName, vakitBilgisi);
-        }
+            };
+
+            if (!isLazy) {
+                $.get(url).done(callback);
+            } else {
+                requestQueue.push({ url, callback });
+                processQueue();
+            }
+        });
     }
 
         $('.search-box').on('input', function() {
