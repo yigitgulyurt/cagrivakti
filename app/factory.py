@@ -112,7 +112,7 @@ def create_app(config_class=Config):
     from app.routes.api import api_bp
     from app.routes.og import og_bp
     
-    # 1. API'yi ÖNCE kaydet (ÖNCE KAYDET ÇOK ÖNEMLİ!)
+    # 1. API'yi ÖNCE KAYDET (Bu ÇOK ÖNEMLİ!)
     app.register_blueprint(api_bp, name='api_subdomain', subdomain='api')  # api.cagrivakti.com.tr/...
     app.register_blueprint(api_bp, name='api_path', url_prefix='/api')  # cagrivakti.com.tr/api/...
     
@@ -120,8 +120,8 @@ def create_app(config_class=Config):
     app.register_blueprint(og_bp)
     
     # 3. Views blueprint'ini SON kaydet ve SADECE ana domain + www'de çalıştır!
-    app.register_blueprint(views_bp, name='views_main')  # Ana domain (varsayılan, tüm subdomain'lerde değil!)
-    app.register_blueprint(views_bp, name='views_www', subdomain='www')  # www.cagrivakti.com.tr
+    app.register_blueprint(views_bp, name='views_main', subdomain=None)  # Ana domain (sadece ana domain!)
+    app.register_blueprint(views_bp, name='views_www', subdomain='www')   # www.cagrivakti.com.tr
 
     setup_api_logging(app)
     setup_security_logging(app)
