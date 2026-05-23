@@ -117,7 +117,7 @@ server {
     include /etc/nginx/snippets/security-headers.conf;
 
     location /kuma-lang.js {
-        alias /etc/nginx/custom/kuma-lang.js;
+        alias /var/www/cagrivakti/kuma/kuma-lang.js;
     }
 
     location / {
