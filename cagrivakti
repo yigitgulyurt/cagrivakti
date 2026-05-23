@@ -68,8 +68,8 @@ server {
 server {
     listen 443 ssl;
     server_name status.cagrivakti.com.tr;
-    ssl_certificate /etc/letsencrypt/live/status.cagrivakti.com.tr/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/status.cagrivakti.com.tr/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -105,6 +105,8 @@ server {
 server {
     listen 443 ssl;
     server_name kuma.cagrivakti.com.tr;
+    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -124,4 +126,4 @@ server {
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
         proxy_set_header   X-Forwarded-Proto $scheme;
     }
-}
+} 
