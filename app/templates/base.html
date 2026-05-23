@@ -323,6 +323,7 @@
                 <a href="{{ url_for('views.rainmeter_guide') }}">Masaüstü Widget</a>
                 <a href="{{ url_for('views.prime_number') }}">Asal Sayı (20000 Basamak)</a>
                 <a href="{{ url_for('views.under_the_red_sky') }}">Oyun</a>
+                <a href="#" id="status-link">Durum</a>
             </div>
 
             <div class="footer-creator">
@@ -424,6 +425,18 @@
        GLOBAL SCRIPTS
        ================================================================ #}
     <script>
+    /* ----------------------------------------------------------------
+       Durum linki: tarayıcı diline göre yönlendirme
+       ---------------------------------------------------------------- */
+    document.addEventListener('DOMContentLoaded', () => {
+        const statusLink = document.getElementById('status-link');
+        if (statusLink) {
+            const lang = navigator.language || navigator.userLanguage;
+            const isTurkish = lang && (lang.startsWith('tr') || lang.startsWith('TR'));
+            statusLink.href = isTurkish ? 'https://durum.cagrivakti.com.tr' : 'https://status.cagrivakti.com.tr';
+        }
+    });
+
     /* ----------------------------------------------------------------
        Online / offline status logging
        ---------------------------------------------------------------- */
