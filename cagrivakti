@@ -5,17 +5,14 @@ server {
     listen 80;
     server_name cagrivakti.com.tr www.cagrivakti.com.tr status.cagrivakti.com.tr kuma.cagrivakti.com.tr;
 
-    # Certbot challenge
     location /.well-known/acme-challenge/ {
         root /var/www/html;
     }
 
-    # WWW ise ana domaine yönlendir
     if ($host = www.cagrivakti.com.tr) {
         return 301 https://cagrivakti.com.tr$request_uri;
     }
 
-    # Diğer tüm istekleri HTTPS'e yönlendir
     return 301 https://$host$request_uri;
 }
 
@@ -25,7 +22,8 @@ server {
 server {
     listen 443 ssl;
     server_name www.cagrivakti.com.tr;
-
+    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -38,7 +36,8 @@ server {
 server {
     listen 443 ssl;
     server_name cagrivakti.com.tr;
-
+    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -61,12 +60,12 @@ server {
 
 # --------------------------------------------------
 # Status Subdomain (status.cagrivakti.com.tr) - HTTPS
-# Kuma'nın /status/cagrivakti path'ini kullanıcıdan gizler
 # --------------------------------------------------
 server {
     listen 443 ssl;
     server_name status.cagrivakti.com.tr;
-
+    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -97,20 +96,16 @@ server {
 
 # --------------------------------------------------
 # Kuma Admin Subdomain (kuma.cagrivakti.com.tr) - HTTPS
-# Uptime Kuma dashboard + base URL buraya set edilecek
 # --------------------------------------------------
 server {
     listen 443 ssl;
     server_name kuma.cagrivakti.com.tr;
-
+    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     include /etc/nginx/snippets/security-headers.conf;
-
-    # İsteğe bağlı: dışarıya kapatmak istersen
-    # allow <senin-IP'n>;
-    # deny all;
 
     location / {
         proxy_pass         http://127.0.0.1:3001;
