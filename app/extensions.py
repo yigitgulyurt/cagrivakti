@@ -23,14 +23,9 @@ limiter = Limiter(
 @limiter.request_filter
 def vip_request_filter():
     """
-    VIP API anahtarına sahip, yerel geliştirme, kendi domainimizden gelen,
-    statik dosyalar, sağlık kontrolü veya iç ağdan gelen istekleri rate limit'ten muaf tutar.
+    SADECE sağlık kontrolü endpoint'leri ve iç ağ IP'leri rate limit'ten muaf tutar.
     """
-    # Statik dosyaları muaf tut
-    if request.path.startswith('/static/') or request.path.endswith(('.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot')):
-        return True
-    
-    # Sağlık kontrolü endpoint'lerini muaf tut
+    # SADECE sağlık kontrolü endpoint'lerini muaf tut
     if '/status' in request.path or request.path == '/api/status':
         return True
     
