@@ -84,25 +84,25 @@ server {
 # --------------------------------------------------
 # Durum Subdomain (durum.cagrivakti.com.tr) - HTTPS
 # --------------------------------------------------
-server {
-    listen 443 ssl;
-    server_name durum.cagrivakti.com.tr;
-    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+# server {
+#     listen 443 ssl;
+#     server_name durum.cagrivakti.com.tr;
+#     ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
+#     include /etc/letsencrypt/options-ssl-nginx.conf;
+#     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-    include /etc/nginx/snippets/security-headers.conf;
+#     include /etc/nginx/snippets/security-headers.conf;
 
-    location = / {
-        return 200 '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Çağrı Vakti — Durum</title><link rel="icon" type="image/png" href="https://image.yigitgulyurt.net.tr/file/cagrivakti/favicon.ico"><style>body,html{margin:0;padding:0;height:100%;}iframe{width:100%;height:100vh;border:none;}</style></head><body><iframe src="https://kuma.cagrivakti.com.tr/status/cagrivakti"></iframe></body></html>';
-        add_header Content-Type "text/html; charset=utf-8";
-    }
+#     location = / {
+#         return 200 '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Çağrı Vakti — Durum</title><link rel="icon" type="image/png" href="https://image.yigitgulyurt.net.tr/file/cagrivakti/favicon.ico"><style>body,html{margin:0;padding:0;height:100%;}iframe{width:100%;height:100vh;border:none;}</style></head><body><iframe src="https://kuma.cagrivakti.com.tr/status/cagrivakti"></iframe></body></html>';
+#         add_header Content-Type "text/html; charset=utf-8";
+#     }
 
-    # location / {
-    #     return 301 https://durum.cagrivakti.com.tr/;
-    # }
-}
+#     location / {
+#         return 301 https://durum.cagrivakti.com.tr/;
+#     }
+# }
 
 # --------------------------------------------------
 # Kuma Admin Subdomain (kuma.cagrivakti.com.tr) - HTTPS
