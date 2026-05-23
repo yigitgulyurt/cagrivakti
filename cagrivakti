@@ -105,8 +105,6 @@ server {
 server {
     listen 443 ssl;
     server_name kuma.cagrivakti.com.tr;
-    ssl_certificate /etc/letsencrypt/live/kuma.cagrivakti.com.tr/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/kuma.cagrivakti.com.tr/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
