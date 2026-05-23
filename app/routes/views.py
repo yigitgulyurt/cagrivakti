@@ -1235,7 +1235,10 @@ def iletisim():
                            seo_description=description,
                            og_image_url=og_image_url)
 
-
+@views_bp.route('/status')
+def status():
+    return redirect(url_for('https://status.cagrivakti.com.tr'))
+    
 # ======================================================
 # ==== ROOT CITY ROUTE (son olmalı!) ====
 # ======================================================
