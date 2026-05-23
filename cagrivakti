@@ -99,9 +99,9 @@ server {
         add_header Content-Type "text/html; charset=utf-8";
     }
 
-    location / {
-        return 301 https://durum.cagrivakti.com.tr/;
-    }
+    # location / {
+    #     return 301 https://durum.cagrivakti.com.tr/;
+    # }
 }
 
 # --------------------------------------------------
