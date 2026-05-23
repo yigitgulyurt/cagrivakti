@@ -72,25 +72,8 @@ server {
     include /etc/nginx/snippets/security-headers.conf;
 
     location / {
-        proxy_pass         http://127.0.0.1:3001/status/cagrivakti;
-        proxy_http_version 1.1;
-        proxy_set_header   Upgrade    $http_upgrade;
-        proxy_set_header   Connection "upgrade";
-        proxy_set_header   Host              kuma.cagrivakti.com.tr;
-        proxy_set_header   X-Real-IP         $remote_addr;
-        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto $scheme;
-    }
-
-    location /assets/ {
-        proxy_pass http://127.0.0.1:3001/assets/;
-    }
-
-    location /socket.io/ {
-        proxy_pass         http://127.0.0.1:3001/socket.io/;
-        proxy_http_version 1.1;
-        proxy_set_header   Upgrade    $http_upgrade;
-        proxy_set_header   Connection "upgrade";
+        return 200 '<!DOCTYPE html><html><head><style>body,html{margin:0;padding:0;height:100%;}iframe{width:100%;height:100vh;border:none;}</style></head><body><iframe src="https://kuma.cagrivakti.com.tr/status/cagrivakti"></iframe></body></html>';
+        add_header Content-Type text/html;
     }
 }
 
@@ -116,5 +99,8 @@ server {
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
         proxy_set_header   X-Forwarded-Proto $scheme;
+
+        # Kuma'nın SAMEORIGIN header'ını kaldır
+        proxy_hide_header  X-Frame-Options;
     }
 }
