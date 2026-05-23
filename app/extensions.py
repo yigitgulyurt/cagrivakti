@@ -23,10 +23,25 @@ limiter = Limiter(
 @limiter.request_filter
 def vip_request_filter():
     """
-    VIP API anahtarına sahip, yerel geliştirme veya kendi domainimizden gelen istekleri rate limit'ten muaf tutar.
+    VIP API anahtarına sahip, yerel geliştirme, kendi domainimizden gelen,
+    statik dosyalar, sağlık kontrolü veya iç ağdan gelen istekleri rate limit'ten muaf tutar.
     """
-    # Yerel geliştirme muafiyeti
-    if request.remote_addr in ['127.0.0.1', '::1']:
+    # Statik dosyaları muaf tut
+    if request.path.startswith('/static/') or request.path.endswith(('.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot')):
+        return True
+    
+    # Sağlık kontrolü endpoint'lerini muaf tut
+    if '/status' in request.path or request.path == '/api/status':
+        return True
+    
+    # Yerel geliştirme ve iç ağ IP'lerini muaf tut
+    ip = request.remote_addr
+    if (
+        ip in ['127.0.0.1', '::1'] or
+        ip.startswith('10.') or 
+        (ip.startswith('172.') and 16 <= int(ip.split('.')[1]) <= 31) or 
+        ip.startswith('192.168.')
+    ):
         return True
 
     # VIP API Key muafiyeti
@@ -45,7 +60,7 @@ def vip_request_filter():
         'http://www.cagrivakti.com.tr',
         'http://localhost',
         'http://127.0.0.1'
-    ]
+        ]
     
     def is_allowed_domain(url):
         if not url:
