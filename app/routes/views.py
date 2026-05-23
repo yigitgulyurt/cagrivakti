@@ -1237,8 +1237,8 @@ def iletisim():
 
 @views_bp.route('/status')
 def status():
-    return redirect(url_for('https://status.cagrivakti.com.tr'))
-    
+    return redirect(url_for('https://status.cagrivakti.com.tr'), code=301)
+
 # ======================================================
 # ==== ROOT CITY ROUTE (son olmalı!) ====
 # ======================================================
