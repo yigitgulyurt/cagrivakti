@@ -3,7 +3,7 @@
 # --------------------------------------------------
 server {
     listen 80;
-    server_name cagrivakti.com.tr www.cagrivakti.com.tr api.cagrivakti.com.tr status.cagrivakti.com.tr;
+    server_name cagrivakti.com.tr www.cagrivakti.com.tr status.cagrivakti.com.tr kuma.cagrivakti.com.tr;
 
     # Certbot challenge
     location /.well-known/acme-challenge/ {
@@ -25,13 +25,12 @@ server {
 server {
     listen 443 ssl;
     server_name www.cagrivakti.com.tr;
-    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     return 301 https://cagrivakti.com.tr$request_uri;
-
 }
 
 # --------------------------------------------------
@@ -40,64 +39,31 @@ server {
 server {
     listen 443 ssl;
     server_name cagrivakti.com.tr;
-    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-    # Security Headers
-    include /etc/nginx/snippets/security-headers.conf;  # <-- bunu ekle
 
-    # Proxy (Flask socket)
+    include /etc/nginx/snippets/security-headers.conf;
+
     location / {
         include proxy_params;
         proxy_pass http://unix:/var/www/cagrivakti/cagrivakti.sock;
     }
 
-    # Statik Dosyalar
     location /static {
         alias /var/www/cagrivakti/app/static;
         more_clear_headers ETag;
         add_header Cache-Control "public, max-age=31536000, immutable";
         add_header Vary "Accept-Encoding";
-        add_header X-Content-Type-Options "nosniff" always;  # static için ayrıca
-        access_log off;
-    }
-
-}
-
-# --------------------------------------------------
-# API Subdomain (api.cagrivakti.com.tr) - HTTPS
-# --------------------------------------------------
-server {
-    listen 443 ssl;
-    server_name api.cagrivakti.com.tr;
-    ssl_certificate /etc/letsencrypt/live/api.cagrivakti.com.tr/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/api.cagrivakti.com.tr/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-
-    # Security Headers
-    include /etc/nginx/snippets/security-headers.conf;  # <-- bunu ekle
-
-    # Proxy (Flask socket)
-    location / {
-        include proxy_params;
-        proxy_pass http://unix:/var/www/cagrivakti/cagrivakti.sock;
-    }
-
-    # Statik Dosyalar
-    location /static {
-        alias /var/www/cagrivakti/app/static;
-        more_clear_headers ETag;
-        add_header Cache-Control "public, max-age=31536000, immutable";
-        add_header Vary "Accept-Encoding";
-        add_header X-Content-Type-Options "nosniff" always;  # static için ayrıca
+        add_header X-Content-Type-Options "nosniff" always;
         access_log off;
     }
 }
 
 # --------------------------------------------------
 # Status Subdomain (status.cagrivakti.com.tr) - HTTPS
+# Kuma'nın /status/cagrivakti path'ini kullanıcıdan gizler
 # --------------------------------------------------
 server {
     listen 443 ssl;
@@ -107,17 +73,54 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-    # Security Headers
     include /etc/nginx/snippets/security-headers.conf;
+
+    location / {
+        proxy_pass         http://127.0.0.1:3001/status/cagrivakti;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    $http_upgrade;
+        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+
+    location /assets/ {
+        proxy_pass http://127.0.0.1:3001/assets/;
+    }
+
+    location /socket.io/ {
+        proxy_pass         http://127.0.0.1:3001/socket.io/;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    $http_upgrade;
+        proxy_set_header   Connection "upgrade";
+    }
+}
+
+# --------------------------------------------------
+# Kuma Admin Subdomain (kuma.cagrivakti.com.tr) - HTTPS
+# Uptime Kuma dashboard + base URL buraya set edilecek
+# --------------------------------------------------
+server {
+    listen 443 ssl;
+    server_name kuma.cagrivakti.com.tr;
+    ssl_certificate /etc/letsencrypt/live/kuma.cagrivakti.com.tr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/kuma.cagrivakti.com.tr/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    include /etc/nginx/snippets/security-headers.conf;
+
+    # İsteğe bağlı: dışarıya kapatmak istersen
+    # allow <senin-IP'n>;
+    # deny all;
 
     location / {
         proxy_pass         http://127.0.0.1:3001;
         proxy_http_version 1.1;
-
-        # WebSocket — Kuma canlı güncelleme için WS kullanır
         proxy_set_header   Upgrade    $http_upgrade;
         proxy_set_header   Connection "upgrade";
-
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
