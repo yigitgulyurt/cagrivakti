@@ -1,148 +1,335 @@
-{% extends "base.html" %}
-
-{% block extra_css %}
-<style>
-    .error-wrapper {
-        min-height: calc(100vh - 200px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-    }
-    .error-container {
-        background: var(--card-bg);
-        padding: 60px 40px;
-        border-radius: 32px;
-        max-width: 600px;
-        width: 100%;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        text-align: center;
-        border: 1px solid rgba(255, 193, 7, 0.1);
-        position: relative;
-        overflow: hidden;
-    }
-    .error-container::before {
-        content: attr(data-error-code);
-        position: absolute;
-        top: -20px;
-        right: -20px;
-        font-size: 150px;
-        font-weight: 900;
-        color: rgba(255, 193, 7, 0.03);
-        z-index: 0;
-    }
-    .error-icon {
-        font-size: 5rem;
-        margin-bottom: 24px;
-        position: relative;
-        z-index: 1;
-    }
-    .error-icon.float {
-        animation: float 3s ease-in-out infinite;
-    }
-    .error-icon.glitch {
-        animation: glitch 1s linear infinite;
-    }
-    .error-icon.pulse {
-        animation: pulse-error 2s ease-in-out infinite;
-    }
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
-    @keyframes glitch {
-        0% { transform: translate(0); }
-        20% { transform: translate(-2px, 2px); }
-        40% { transform: translate(-2px, -2px); }
-        60% { transform: translate(2px, 2px); }
-        80% { transform: translate(2px, -2px); }
-        100% { transform: translate(0); }
-    }
-    @keyframes pulse-error {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-    }
-    h1 {
-        font-size: 2.5rem;
-        color: var(--text);
-        margin-bottom: 16px;
-        font-weight: 800;
-        position: relative;
-        z-index: 1;
-    }
-    p {
-        font-size: 1.1rem;
-        color: var(--gray);
-        margin-bottom: 32px;
-        line-height: 1.6;
-        position: relative;
-        z-index: 1;
-    }
-    .arabic-quote {
-        background: rgba(255, 193, 7, 0.05);
-        padding: 24px;
-        border-radius: 20px;
-        margin-bottom: 32px;
-        position: relative;
-        z-index: 1;
-        border-left: 4px solid var(--primary);
-    }
-    .arabic-text {
-        font-size: 1.5rem;
-        margin-bottom: 8px;
-        color: var(--primary);
-        font-weight: 600;
-    }
-    .arabic-meaning {
-        font-size: 0.95rem;
-        color: var(--gray);
-        font-style: italic;
-    }
-    .error-actions {
-        display: flex;
-        gap: 16px;
-        justify-content: center;
-        flex-wrap: wrap;
-        position: relative;
-        z-index: 1;
-    }
-    @media (max-width: 480px) {
-        .error-container {
-            padding: 40px 20px;
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hata - Çağrı Vakti{% endblock %}</title>
+    
+    <link rel="icon" type="image/x-icon" href="https://image.yigitgulyurt.net.tr/file/cagrivakti/favicon.ico">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        h1 { font-size: 2rem; }
-        .error-actions .btn { width: 100%; justify-content: center; }
-    }
-</style>
-{% endblock %}
 
-{% block content %}
-<main class="error-wrapper fade-in">
-    <section class="error-container" data-error-code="{% block error_code %}{% endblock %}">
-        
-        {% block error_icon %}{% endblock %}
-        
-        <h1>{% block error_title %}{% endblock %}</h1>
-        
-        <p>{% block error_message %}{% endblock %}</p>
-        
-        {% block arabic_quote %}
-        <div class="arabic-quote">
-            <div class="arabic-text">"İnnallâhe me’as-sâbirîn"</div>
-            <div class="arabic-meaning">(Şüphesiz Allah sabredenlerle birliktedir)</div>
-        </div>
-        {% endblock %}
-        
-        <div class="error-actions">
-            {% block error_actions %}
-            <a href="{{ url_for('views.index') }}" class="btn btn-primary">
-                <svg class="icon"><use xlink:href="#fa-home"></use></svg> Ana Sayfaya Dön
-            </a>
-            <a href="javascript:history.back()" class="btn btn-secondary">
-                <svg class="icon"><use xlink:href="#fa-arrow-left"></use></svg> Geri Git
-            </a>
+        :root {
+            --primary: #ffc107;
+            --primary-hover: #ffd54f;
+            --dark: #121212;
+            --card-bg: #1e1e1e;
+            --text: #ffffff;
+            --gray: #94a3b8;
+            --hover-color: #2d2d2d;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .error-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .error-bg-code {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: min(40vw, 400px);
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            color: rgba(255, 193, 7, 0.03);
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .error-bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle at 20% 80%, rgba(255, 193, 7, 0.05) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(255, 193, 7, 0.05) 0%, transparent 50%);
+        }
+
+        .error-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .error-container {
+            background: var(--card-bg);
+            padding: 56px 48px;
+            border-radius: 28px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            border: 1px solid rgba(255, 193, 7, 0.12);
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .error-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent 0%, var(--primary) 50%, transparent 100%);
+            border-radius: 28px 28px 0 0;
+        }
+
+        .error-icon {
+            font-size: 4.5rem;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .error-icon.float {
+            animation: float 3.5s ease-in-out infinite;
+        }
+
+        .error-icon.glitch {
+            animation: glitch 1.2s linear infinite;
+        }
+
+        .error-icon.pulse {
+            animation: pulse-error 2s ease-in-out infinite;
+        }
+
+        .error-icon.shake {
+            animation: shake 0.5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-14px); }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes pulse-error {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            color: var(--text);
+            margin-bottom: 14px;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: var(--gray);
+            margin-bottom: 32px;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        .arabic-quote {
+            background: rgba(255, 193, 7, 0.06);
+            padding: 24px 20px;
+            border-radius: 18px;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 1;
+            border-left: 4px solid var(--primary);
+        }
+
+        .arabic-text {
+            font-family: 'Amiri', serif;
+            font-size: 1.45rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .arabic-meaning {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-style: italic;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--dark);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            stroke-width: 0;
+            stroke: currentColor;
+            fill: currentColor;
+            vertical-align: middle;
+            margin-top: -2px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 16px;
+            }
+
+            .error-container {
+                padding: 44px 28px;
+                border-radius: 22px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            .error-icon {
+                font-size: 3.75rem;
+            }
+
+            .error-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-bg">
+        <div class="error-bg-code">{% block error_code %}{% endblock %}</div>
+        <div class="error-bg-pattern"></div>
+    </div>
+
+    <div class="error-wrapper fade-in">
+        <div class="error-container">
+            
+            {% block error_icon %}{% endblock %}
+            
+            <h1>{% block error_title %}{% endblock %}</h1>
+            
+            <p>{% block error_message %}{% endblock %}</p>
+            
+            {% block arabic_quote %}
+            <div class="arabic-quote">
+                <div class="arabic-text">"İnnallâhe me’as-sâbirîn"</div>
+                <div class="arabic-meaning">(Şüphesiz Allah sabredenlerle birliktedir)</div>
+            </div>
             {% endblock %}
+            
+            <div class="error-actions">
+                {% block error_actions %}
+                <a href="{{ url_for('views.index') }}" class="btn btn-primary">
+                    <svg class="icon"><use xlink:href="#fa-home"></use></svg> Ana Sayfaya Dön
+                </a>
+                <a href="javascript:history.back()" class="btn btn-secondary">
+                    <svg class="icon"><use xlink:href="#fa-arrow-left"></use></svg> Geri Git
+                </a>
+                {% endblock %}
+            </div>
         </div>
-    </section>
-</main>
-{% endblock %}
+    </div>
+
+    <div style="display: none;">
+        {% include 'img/icons.svg' %}
+    </div>
+</body>
+</html>
