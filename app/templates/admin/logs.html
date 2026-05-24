@@ -205,6 +205,12 @@
         <input id="sec_filter" type="text" placeholder="Metin/UID filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
         <div id="security_logs" class="log-viewer"></div>
     </div>
+
+    <div class="log-section">
+        <h2><svg class="icon"><use xlink:href="#fa-list"></use></svg> Tüm İstekler</h2>
+        <input id="all_requests_filter" type="text" placeholder="Metin/UID/Status filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
+        <div id="all_requests_logs" class="log-viewer"></div>
+    </div>
 </div>
 
 <script>
@@ -216,14 +222,16 @@ const logData = {
     web: { raw: '', filtered: '' },
     api: { raw: '', filtered: '' },
     bot: { raw: '', filtered: '' },
-    security: { raw: '', filtered: '' }
+    security: { raw: '', filtered: '' },
+    all_requests: { raw: '', filtered: '' }
 };
 
 const logScrollStates = {
     web: true,
     api: true,
     bot: true,
-    security: true
+    security: true,
+    all_requests: true
 };
 
 function normalizeRaw(raw) {
@@ -296,10 +304,11 @@ async function updateAllLogs() {
         web: document.getElementById('web_filter').value,
         api: document.getElementById('api_filter').value,
         bot: document.getElementById('bot_filter').value,
-        security: document.getElementById('sec_filter').value
+        security: document.getElementById('sec_filter').value,
+        all_requests: document.getElementById('all_requests_filter').value
     };
     
-    ['web', 'api', 'bot', 'security'].forEach(key => {
+    ['web', 'api', 'bot', 'security', 'all_requests'].forEach(key => {
         updateLogViewer(key, data[`${key}_logs`] || '', filters[key]);
     });
 }
@@ -366,7 +375,7 @@ function setupFilter(key, inputId) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-    ['web', 'api', 'bot', 'security'].forEach(key => {
+    ['web', 'api', 'bot', 'security', 'all_requests'].forEach(key => {
         setupScrollTracking(key);
     });
     
@@ -374,6 +383,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     setupFilter('api', 'api_filter');
     setupFilter('bot', 'bot_filter');
     setupFilter('security', 'sec_filter');
+    setupFilter('all_requests', 'all_requests_filter');
     
     document.getElementById('toggleAutoUpdate').addEventListener('click', () => {
         if (autoUpdateActive) {

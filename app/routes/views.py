@@ -702,12 +702,13 @@ def admin_message_delete(message_id):
 @views_bp.route('/admin/logs')
 @admin_required
 def admin_logs():
-    log_file          = current_app.config.get('WEB_LOG_FILE')
-    api_log_file      = current_app.config.get('API_LOG_FILE')
-    bot_log_file      = current_app.config.get('TELEGRAM_LOG_FILE')
-    security_log_file = current_app.config.get('SECURITY_LOG_FILE')
+    log_file              = current_app.config.get('WEB_LOG_FILE')
+    api_log_file          = current_app.config.get('API_LOG_FILE')
+    bot_log_file          = current_app.config.get('TELEGRAM_LOG_FILE')
+    security_log_file     = current_app.config.get('SECURITY_LOG_FILE')
+    all_requests_log_file = current_app.config.get('ALL_REQUESTS_LOG_FILE')
 
-    web_logs = api_logs = bot_logs = security_logs = ""
+    web_logs = api_logs = bot_logs = security_logs = all_requests_logs = ""
     stats    = {'hourly': {}, 'pages': {}}
 
     import re as _re
@@ -757,25 +758,27 @@ def admin_logs():
         except Exception as e:
             current_app.logger.error(f"Log analiz hatası: {e}")
 
-    for attr, path in [('api_logs', api_log_file), ('bot_logs', bot_log_file), ('security_logs', security_log_file)]:
+    for attr, path in [('api_logs', api_log_file), ('bot_logs', bot_log_file), ('security_logs', security_log_file), ('all_requests_logs', all_requests_log_file)]:
         if path and os.path.exists(path):
             try:
                 with open(path, 'r', encoding='utf-8') as f:
                     locals()[attr]  # noqa — just referencing; assignment below
                     val = "".join(f.readlines()[-200:])
-                if attr == 'api_logs':      api_logs      = val
-                elif attr == 'bot_logs':    bot_logs      = val
-                elif attr == 'security_logs': security_logs = val
+                if attr == 'api_logs':           api_logs           = val
+                elif attr == 'bot_logs':         bot_logs           = val
+                elif attr == 'security_logs':    security_logs      = val
+                elif attr == 'all_requests_logs': all_requests_logs = val
             except Exception as e:
                 current_app.logger.error(f"{attr} okuma hatası: {e}")
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return jsonify({
-            'web_logs':      web_logs      or 'Log verisi bulunamadı.',
-            'api_logs':      api_logs      or 'API log verisi bulunamadı.',
-            'bot_logs':      bot_logs      or 'Bot log verisi bulunamadı.',
-            'security_logs': security_logs or 'Güvenlik log verisi bulunamadı.',
-            'stats':         stats,
+            'web_logs':           web_logs           or 'Log verisi bulunamadı.',
+            'api_logs':           api_logs           or 'API log verisi bulunamadı.',
+            'bot_logs':           bot_logs           or 'Bot log verisi bulunamadı.',
+            'security_logs':      security_logs      or 'Güvenlik log verisi bulunamadı.',
+            'all_requests_logs':  all_requests_logs  or 'Tüm istekler log verisi bulunamadı.',
+            'stats':              stats,
         })
 
     return render_template('admin/logs.html',
@@ -783,6 +786,7 @@ def admin_logs():
                            api_logs=api_logs,
                            bot_logs=bot_logs,
                            security_logs=security_logs,
+                           all_requests_logs=all_requests_logs,
                            stats=stats)
 
 
