@@ -39,6 +39,93 @@
         align-items: center;
         gap: 10px;
     }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: #0d1117;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #30363d;
+        text-align: center;
+    }
+    .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f0b726;
+        margin-bottom: 5px;
+    }
+    .stat-card .stat-label {
+        font-size: 0.875rem;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .filter-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+    .mode-toggle {
+        display: inline-flex;
+        background: #0d1117;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #30363d;
+    }
+    .mode-btn {
+        padding: 10px 20px;
+        background: transparent;
+        border: none;
+        color: #8b949e;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .mode-btn:hover {
+        background: rgba(255, 193, 7, 0.1);
+    }
+    .mode-btn.active {
+        background: #f0b726;
+        color: #0d1117;
+    }
+    .top-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    .top-list {
+        background: #0d1117;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #30363d;
+    }
+    .top-list h3 {
+        font-size: 1rem;
+        color: #f0b726;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .top-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #30363d;
+        font-size: 0.875rem;
+    }
+    .top-item:last-child {
+        border-bottom: none;
+    }
+    .top-item .count {
+        color: #3fb950;
+        font-weight: 700;
+    }
     .log-viewer {
         background: #0d1117;
         color: #e6edf3;
@@ -203,14 +290,70 @@
     </div>
 
     <div class="log-section">
-        <h2><svg class="icon"><use xlink:href="#fa-list"></use></svg> Tüm İstekler</h2>
-        <input id="all_requests_filter" type="text" placeholder="Metin/UID/Status filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
-        <div id="all_requests_logs" class="log-viewer"></div>
+        <h2><svg class="icon"><use xlink:href="#fa-chart-bar"></use></svg> Toplu İstatistikler</h2>
+        <div class="stats-grid" id="stats_panel">
+            <div class="stat-card">
+                <div class="stat-value" id="stat_total_requests">0</div>
+                <div class="stat-label">Toplam İstek</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat_top_method">-</div>
+                <div class="stat-label">En Çok Kullanılan Method</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat_error_count">0</div>
+                <div class="stat-label">Hata Sayısı (4xx/5xx)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat_unique_ips">0</div>
+                <div class="stat-label">Farklı IP</div>
+            </div>
+        </div>
+        
+        <div class="top-section">
+            <div class="top-list">
+                <h3><svg class="icon"><use xlink:href="#fa-file-alt"></use></svg> En Aktif Sayfalar</h3>
+                <div id="top_pages"></div>
+            </div>
+            <div class="top-list">
+                <h3><svg class="icon"><use xlink:href="#fa-user"></use></svg> En Aktif IP'ler</h3>
+                <div id="top_ips"></div>
+            </div>
+        </div>
     </div>
 
     <div class="log-section">
-        <h2><svg class="icon"><use xlink:href="#fa-compress"></use></svg> Tüm İstekler (Compact Mod)</h2>
-        <div id="all_requests_compact" class="log-viewer"></div>
+        <h2><svg class="icon"><use xlink:href="#fa-list"></use></svg> Tüm İstekler</h2>
+        <div class="filter-row">
+            <div class="mode-toggle">
+                <button class="mode-btn active" data-mode="normal" id="mode_normal">Normal</button>
+                <button class="mode-btn" data-mode="compact" id="mode_compact">Compact</button>
+            </div>
+            <select id="filter_method" class="admin-select">
+                <option value="">Tüm Methodlar</option>
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="OPTIONS">OPTIONS</option>
+                <option value="HEAD">HEAD</option>
+                <option value="PATCH">PATCH</option>
+            </select>
+            <select id="filter_status" class="admin-select">
+                <option value="">Tüm Durumlar</option>
+                <option value="2xx">2xx (Başarılı)</option>
+                <option value="3xx">3xx (Yönlendirme)</option>
+                <option value="4xx">4xx (İstemci Hatası)</option>
+                <option value="5xx">5xx (Sunucu Hatası)</option>
+            </select>
+            <select id="filter_type" class="admin-select">
+                <option value="">Tüm İstekler</option>
+                <option value="api">Sadece API</option>
+                <option value="web">Sadece Web</option>
+            </select>
+            <input id="all_requests_filter" type="text" placeholder="Metin/UID/Status filtrele..." class="admin-select" style="flex: 1; min-width: 200px;">
+        </div>
+        <div id="all_requests_logs" class="log-viewer"></div>
     </div>
 </div>
 
@@ -218,6 +361,7 @@
 let autoUpdateActive = true;
 let updateIntervalId = null;
 let currentInterval = 5000;
+let currentMode = 'normal';
 
 const logData = {
     app: { raw: '', filtered: '' },
@@ -317,42 +461,124 @@ function updateLogViewer(key, content, filterQuery) {
     }
 }
 
-function renderCompactLogs(raw) {
-    if (!raw) return '<div class="log-line">Log verisi bulunamadı.</div>';
+function parseAllRequests(raw) {
+    if (!raw) return [];
     const normalized = normalizeRaw(raw);
     const lines = normalized.split('\n');
     
-    const grouped = {};
-    lines.forEach(line => {
-        if (!line.trim()) return;
-        
+    return lines.filter(line => line.trim()).map(line => {
         const ipMatch = line.match(/^\[.*?\]\s+([\d.]+|Docker-Internal|Localhost|Health-Check-.*?)\s+/);
         const methodMatch = line.match(/\s+(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)\s+/);
         const pathMatch = line.match(/\s+(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)\s+(\S+)\s+/);
+        const statusMatch = line.match(/\s+(\d{3})\s+/);
         
         const ip = ipMatch ? ipMatch[1] : 'unknown';
         const method = methodMatch ? methodMatch[1] : 'unknown';
         const path = pathMatch ? pathMatch[2].split('?')[0] : 'unknown';
+        const status = statusMatch ? statusMatch[1] : 'unknown';
+        const isApi = path.startsWith('/api/');
         
-        const key = `${ip}||${method}||${path}`;
+        return { line, ip, method, path, status, isApi };
+    });
+}
+
+function calculateStats(parsed) {
+    const stats = {
+        totalRequests: parsed.length,
+        methodCounts: {},
+        errorCount: 0,
+        uniqueIps: new Set(),
+        pageCounts: {},
+        ipCounts: {}
+    };
+    
+    parsed.forEach(req => {
+        stats.uniqueIps.add(req.ip);
+        
+        stats.methodCounts[req.method] = (stats.methodCounts[req.method] || 0) + 1;
+        
+        if (req.status.startsWith('4') || req.status.startsWith('5')) {
+            stats.errorCount++;
+        }
+        
+        stats.pageCounts[req.path] = (stats.pageCounts[req.path] || 0) + 1;
+        stats.ipCounts[req.ip] = (stats.ipCounts[req.ip] || 0) + 1;
+    });
+    
+    return stats;
+}
+
+function updateStatsPanel(stats) {
+    document.getElementById('stat_total_requests').textContent = stats.totalRequests;
+    
+    const topMethod = Object.entries(stats.methodCounts)
+        .sort((a, b) => b[1] - a[1])[0];
+    document.getElementById('stat_top_method').textContent = topMethod ? topMethod[0] : '-';
+    
+    document.getElementById('stat_error_count').textContent = stats.errorCount;
+    document.getElementById('stat_unique_ips').textContent = stats.uniqueIps.size;
+    
+    const topPages = Object.entries(stats.pageCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+    
+    const topIps = Object.entries(stats.ipCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+    
+    document.getElementById('top_pages').innerHTML = topPages.map(([path, count]) => 
+        `<div class="top-item"><span>${path}</span><span class="count">${count}x</span></div>`
+    ).join('') || '<div class="top-item">Veri yok</div>';
+    
+    document.getElementById('top_ips').innerHTML = topIps.map(([ip, count]) => 
+        `<div class="top-item"><span>${ip}</span><span class="count">${count}x</span></div>`
+    ).join('') || '<div class="top-item">Veri yok</div>';
+}
+
+function applyFilters(parsed) {
+    const methodFilter = document.getElementById('filter_method').value;
+    const statusFilter = document.getElementById('filter_status').value;
+    const typeFilter = document.getElementById('filter_type').value;
+    const textFilter = document.getElementById('all_requests_filter').value.toLowerCase();
+    
+    return parsed.filter(req => {
+        if (methodFilter && req.method !== methodFilter) return false;
+        
+        if (statusFilter) {
+            const statusPrefix = statusFilter.replace('xx', '');
+            if (!req.status.startsWith(statusPrefix)) return false;
+        }
+        
+        if (typeFilter === 'api' && !req.isApi) return false;
+        if (typeFilter === 'web' && req.isApi) return false;
+        
+        if (textFilter && !req.line.toLowerCase().includes(textFilter)) return false;
+        
+        return true;
+    });
+}
+
+function renderCompactLogs(raw) {
+    const parsed = parseAllRequests(raw);
+    const filtered = applyFilters(parsed);
+    
+    const grouped = {};
+    filtered.forEach(req => {
+        const key = `${req.ip}||${req.method}||${req.path}`;
         
         if (!grouped[key]) {
             grouped[key] = {
-                ip,
-                method,
-                path,
+                ip: req.ip,
+                method: req.method,
+                path: req.path,
                 count: 0,
-                firstSeen: null,
-                lastSeen: null,
                 statusCodes: new Set()
             };
         }
         
         grouped[key].count++;
-        
-        const statusMatch = line.match(/\s+(\d{3})\s+/);
-        if (statusMatch) {
-            grouped[key].statusCodes.add(statusMatch[1]);
+        if (req.status !== 'unknown') {
+            grouped[key].statusCodes.add(req.status);
         }
     });
     
@@ -360,14 +586,15 @@ function renderCompactLogs(raw) {
     
     return sortedGroups.map(group => {
         const statusList = Array.from(group.statusCodes).join(', ');
-        return `<div class="log-line" style="border-left: 3px solid #f0b726; padding-left: 10px; margin-bottom: 5px;">
+        const isApi = group.path.startsWith('/api/');
+        return `<div class="log-line" style="border-left: 3px solid ${isApi ? '#a78bfa' : '#f0b726'}; padding-left: 10px; margin-bottom: 5px;">
             <span style="color: #79c0ff;">${group.count}x</span> | 
             <span style="color: #d29922;">${group.ip}</span> | 
             <span style="color: #3fb950;">${group.method}</span> | 
             <span style="color: #e6edf3;">${group.path}</span>
             ${statusList ? ` | <span style="color: #ff7b72;">Status: ${statusList}</span>` : ''}
         </div>`;
-    }).join('');
+    }).join('') || '<div class="log-line">Filtrelere uygun veri bulunamadı.</div>';
 }
 
 async function updateAllLogs() {
@@ -377,19 +604,52 @@ async function updateAllLogs() {
     const filters = {
         app: document.getElementById('app_filter').value,
         bot: document.getElementById('bot_filter').value,
-        security: document.getElementById('sec_filter').value,
-        all_requests: document.getElementById('all_requests_filter').value
+        security: document.getElementById('sec_filter').value
     };
     
-    ['app', 'bot', 'security', 'all_requests'].forEach(key => {
+    ['app', 'bot', 'security'].forEach(key => {
         updateLogViewer(key, data[`${key}_logs`] || '', filters[key]);
     });
     
-    const compactViewer = document.getElementById('all_requests_compact');
-    if (compactViewer) {
-        compactViewer.innerHTML = renderCompactLogs(data['all_requests_logs'] || '');
-        compactViewer.scrollTop = compactViewer.scrollHeight;
+    const parsed = parseAllRequests(data['all_requests_logs'] || '');
+    const filtered = applyFilters(parsed);
+    const stats = calculateStats(parsed);
+    updateStatsPanel(stats);
+    
+    const viewer = document.getElementById('all_requests_logs');
+    const scrollToBottom = logScrollStates['all_requests'] && shouldScrollToBottom(viewer);
+    
+    if (currentMode === 'compact') {
+        viewer.innerHTML = renderCompactLogs(data['all_requests_logs'] || '');
+    } else {
+        const raw = filtered.map(req => req.line).join('\n');
+        viewer.innerHTML = renderLog(raw, '', true);
     }
+    
+    if (scrollToBottom) {
+        viewer.scrollTop = viewer.scrollHeight;
+    }
+}
+
+function setupModeToggle() {
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentMode = btn.dataset.mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateAllLogs();
+        });
+    });
+}
+
+function setupFilterListeners() {
+    ['filter_method', 'filter_status', 'filter_type', 'all_requests_filter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', updateAllLogs);
+            el.addEventListener('input', updateAllLogs);
+        }
+    });
 }
 
 function startAutoUpdate() {
@@ -454,14 +714,16 @@ function setupFilter(key, inputId) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-    ['app', 'bot', 'security', 'all_requests'].forEach(key => {
+    ['app', 'bot', 'security'].forEach(key => {
         setupScrollTracking(key);
     });
     
     setupFilter('app', 'app_filter');
     setupFilter('bot', 'bot_filter');
     setupFilter('security', 'sec_filter');
-    setupFilter('all_requests', 'all_requests_filter');
+    
+    setupModeToggle();
+    setupFilterListeners();
     
     document.getElementById('toggleAutoUpdate').addEventListener('click', () => {
         if (autoUpdateActive) {
