@@ -90,6 +90,18 @@
             backdrop-filter: blur(10px);
         }
 
+        .error-container-code {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 120px;
+            font-weight: 900;
+            color: rgba(255, 193, 7, 0.03);
+            user-select: none;
+            z-index: 0;
+            line-height: 1;
+        }
+
         .error-container::before {
             content: '';
             position: absolute;
@@ -249,6 +261,45 @@
             margin-top: -2px;
         }
 
+        .error-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 18px 20px;
+            border-radius: 14px;
+            margin-top: 32px;
+            text-align: left;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .error-info-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .error-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 14px;
+        }
+        .error-info-item {
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+        .error-info-item span {
+            display: block;
+            color: var(--gray);
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+        }
+        @media (max-width: 400px) {
+            .error-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .fade-in {
             animation: fadeIn 0.6s ease-out;
         }
@@ -294,13 +345,9 @@
     </style>
 </head>
 <body>
-    <div class="error-bg">
-        <div class="error-bg-code">{% block error_code %}{% endblock %}</div>
-        <div class="error-bg-pattern"></div>
-    </div>
-
     <div class="error-wrapper fade-in">
         <div class="error-container">
+            <div class="error-container-code">{% block error_code %}{% endblock %}</div>
             
             {% block error_icon %}{% endblock %}
             
@@ -325,6 +372,34 @@
                 </a>
                 {% endblock %}
             </div>
+            
+            {% block error_info %}
+            <div class="error-info">
+                <div class="error-info-label">Hata Bilgileri</div>
+                <div class="error-info-grid">
+                    {% if g.request_id %}
+                    <div class="error-info-item">
+                        <span>RID</span>
+                        {{ g.request_id }}
+                    </div>
+                    {% endif %}
+                    {% if g.user_uid %}
+                    <div class="error-info-item">
+                        <span>UID</span>
+                        {{ g.user_uid }}
+                    </div>
+                    {% endif %}
+                    <div class="error-info-item">
+                        <span>IP</span>
+                        {{ request.remote_addr }}
+                    </div>
+                    <div class="error-info-item">
+                        <span>Tarih</span>
+                        {{ now().strftime('%d.%m.%Y %H:%M:%S') }}
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
         </div>
     </div>
 
