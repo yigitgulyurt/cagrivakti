@@ -1,11 +1,16 @@
 from flask import request, render_template, current_app, g
 import time
+import uuid
 
 # İç ağ IP'lerini tek bir kez loglamak için cache
 _internal_ip_cache = set()
 _internal_ip_cache_timeout = 3600  # 1 saat (saniye)
 
 def setup_middleware(app):
+    @app.before_request
+    def set_request_context():
+        g.request_id = uuid.uuid4().hex[:12]
+
     @app.before_request
     def log_request_info():
         path = request.path
@@ -64,11 +69,12 @@ def setup_middleware(app):
 
             # Her isteği kaydet
             try:
-                from flask import g
                 uid = getattr(g, 'user_uid', '-')
+                rid = getattr(g, 'request_id', '-')
             except Exception:
                 uid = '-'
-            app.logger.info(f'{display_ip} ziyaret: {path} uid={uid}')
+                rid = '-'
+            app.logger.info(f'{display_ip:<18} ziyaret: {path:<32} rid={rid} uid={uid}')
 
         except Exception as e:
             app.logger.error(f"Loglama hatası: {str(e)}")
