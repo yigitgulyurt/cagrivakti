@@ -191,7 +191,8 @@ def create_app(config_class=Config):
             current_year=datetime.now().year,
             app_version=app.config.get('APP_VERSION', '1.0'),
             get_display_name=get_display_name,
-            CITY_DISPLAY_NAME_MAPPING=CITY_DISPLAY_NAME_MAPPING
+            CITY_DISPLAY_NAME_MAPPING=CITY_DISPLAY_NAME_MAPPING,
+            now=datetime.now
         )
 
     # ── Versiyon değişince Flask cache'ini otomatik temizle ──
