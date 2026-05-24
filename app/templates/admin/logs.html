@@ -189,12 +189,6 @@
     </div>
 
     <div class="log-section">
-        <h2><svg class="icon"><use xlink:href="#fa-code"></use></svg> API Kullanım Raporu</h2>
-        <input id="api_filter" type="text" placeholder="Metin/UID/Status filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
-        <div id="api_logs" class="log-viewer"></div>
-    </div>
-
-    <div class="log-section">
         <h2><svg class="icon"><use xlink:href="#fa-robot"></use></svg> Bot Aktivite Raporu</h2>
         <input id="bot_filter" type="text" placeholder="Metin filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
         <div id="bot_logs" class="log-viewer"></div>
@@ -220,7 +214,6 @@ let currentInterval = 5000;
 
 const logData = {
     web: { raw: '', filtered: '' },
-    api: { raw: '', filtered: '' },
     bot: { raw: '', filtered: '' },
     security: { raw: '', filtered: '' },
     all_requests: { raw: '', filtered: '' }
@@ -228,7 +221,6 @@ const logData = {
 
 const logScrollStates = {
     web: true,
-    api: true,
     bot: true,
     security: true,
     all_requests: true
@@ -243,25 +235,35 @@ function normalizeRaw(raw) {
     return txt.trim();
 }
 
-function formatLogLine(line) {
+function formatLogLine(line, isAllRequests = false) {
     const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     let l = esc(line);
+    
+    // API isteklerini kontrol et
+    const isApiRequest = l.includes(' /api/');
+    
     l = l.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:,\d{3})?)/, '<span class="log-timestamp">$1</span>');
     l = l.replace(/\b(ERROR|CRITICAL)\b/g, '<span class="log-level-error">$1</span>');
     l = l.replace(/\b(WARNING|WARN)\b/g, '<span class="log-level-warn">$1</span>');
     l = l.replace(/\b(INFO)\b/g, '<span class="log-level-info">$1</span>');
     l = l.replace(/\b(DEBUG)\b/g, '<span class="log-level-debug">$1</span>');
+    
+    // API isteği ise arka plan rengi değiştir
+    if (isAllRequests && isApiRequest) {
+        l = '<div style="background: rgba(167, 139, 250, 0.1); border-left: 3px solid #a78bfa; margin-left: -20px; padding-left: 17px;">' + l + '</div>';
+    }
+    
     return l;
 }
 
-function renderLog(raw, filterQuery = '') {
+function renderLog(raw, filterQuery = '', isAllRequests = false) {
     if (!raw) return '<div class="log-line">Log verisi bulunamadı.</div>';
     const normalized = normalizeRaw(raw);
     const lines = normalized.split('\n');
     const filteredLines = filterQuery 
         ? lines.filter(line => line.toLowerCase().includes(filterQuery.toLowerCase()))
         : lines;
-    return filteredLines.map(line => `<div class="log-line">${formatLogLine(line)}</div>`).join('');
+    return filteredLines.map(line => `<div class="log-line">${formatLogLine(line, isAllRequests)}</div>`).join('');
 }
 
 function shouldScrollToBottom(viewer) {
@@ -289,7 +291,7 @@ function updateLogViewer(key, content, filterQuery) {
     
     const scrollToBottom = logScrollStates[key] && shouldScrollToBottom(viewer);
     
-    viewer.innerHTML = renderLog(content, filterQuery);
+    viewer.innerHTML = renderLog(content, filterQuery, key === 'all_requests');
     
     if (scrollToBottom) {
         viewer.scrollTop = viewer.scrollHeight;
@@ -302,13 +304,12 @@ async function updateAllLogs() {
     
     const filters = {
         web: document.getElementById('web_filter').value,
-        api: document.getElementById('api_filter').value,
         bot: document.getElementById('bot_filter').value,
         security: document.getElementById('sec_filter').value,
         all_requests: document.getElementById('all_requests_filter').value
     };
     
-    ['web', 'api', 'bot', 'security', 'all_requests'].forEach(key => {
+    ['web', 'bot', 'security', 'all_requests'].forEach(key => {
         updateLogViewer(key, data[`${key}_logs`] || '', filters[key]);
     });
 }
@@ -375,12 +376,11 @@ function setupFilter(key, inputId) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-    ['web', 'api', 'bot', 'security', 'all_requests'].forEach(key => {
+    ['web', 'bot', 'security', 'all_requests'].forEach(key => {
         setupScrollTracking(key);
     });
     
     setupFilter('web', 'web_filter');
-    setupFilter('api', 'api_filter');
     setupFilter('bot', 'bot_filter');
     setupFilter('security', 'sec_filter');
     setupFilter('all_requests', 'all_requests_filter');
