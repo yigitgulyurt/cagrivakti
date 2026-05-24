@@ -18,7 +18,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_SORT_KEYS = False
     LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs')
-    WEB_LOG_FILE = os.environ.get('WEB_LOG_FILE', os.path.join(LOG_DIR, 'web.log'))
+    APP_LOG_FILE = os.environ.get('APP_LOG_FILE', os.path.join(LOG_DIR, 'app.log'))
     API_LOG_FILE = os.environ.get('API_LOG_FILE', os.path.join(LOG_DIR, 'api.log'))
     ALL_REQUESTS_LOG_FILE = os.environ.get('ALL_REQUESTS_LOG_FILE', os.path.join(LOG_DIR, 'all_requests.log'))
     TELEGRAM_LOG_FILE = os.environ.get('TELEGRAM_LOG_FILE', os.path.join(LOG_DIR, 'telegram.log'))

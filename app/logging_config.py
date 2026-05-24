@@ -110,7 +110,7 @@ class APILogFormatter(IstanbulFormatter):
 
 
 def setup_logging(app):
-    log_file = app.config['WEB_LOG_FILE']
+    log_file = app.config['APP_LOG_FILE']
     error_log_file = app.config['ERROR_LOG_FILE']
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
     app.logger.handlers = []
@@ -136,7 +136,7 @@ def setup_logging(app):
     )
     file_handler.rotator = compress_rotator
     file_handler.setFormatter(json_formatter if app.config.get('APP_LOG_JSON') else clean_formatter)
-    file_handler.setLevel(logging.INFO)
+    file_handler.setLevel(logging.ERROR)
     file_handler.addFilter(ctx_filter)
     app.logger.addHandler(file_handler)
     
@@ -147,7 +147,7 @@ def setup_logging(app):
         )
         json_file_handler.rotator = compress_rotator
         json_file_handler.setFormatter(json_formatter)
-        json_file_handler.setLevel(logging.INFO)
+        json_file_handler.setLevel(logging.ERROR)
         json_file_handler.addFilter(ctx_filter)
         app.logger.addHandler(json_file_handler)
     

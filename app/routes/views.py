@@ -702,69 +702,29 @@ def admin_message_delete(message_id):
 @views_bp.route('/admin/logs')
 @admin_required
 def admin_logs():
-    log_file              = current_app.config.get('WEB_LOG_FILE')
-    api_log_file          = current_app.config.get('API_LOG_FILE')
+    log_file              = current_app.config.get('APP_LOG_FILE')
     bot_log_file          = current_app.config.get('TELEGRAM_LOG_FILE')
     security_log_file     = current_app.config.get('SECURITY_LOG_FILE')
     all_requests_log_file = current_app.config.get('ALL_REQUESTS_LOG_FILE')
 
-    web_logs = api_logs = bot_logs = security_logs = all_requests_logs = ""
+    app_logs = bot_logs = security_logs = all_requests_logs = ""
     stats    = {'hourly': {}, 'pages': {}}
-
-    import re as _re
-    from collections import Counter
 
     if os.path.exists(log_file):
         try:
             with open(log_file, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
-            web_logs      = "".join(lines[-200:])
-            log_pattern   = _re.compile(r'\[(.*?)\] (?:INFO in .*: )?.*? ziyaret: (.*)')
-            hourly_counts = Counter()
-            page_counts   = Counter()
-            for line in lines:
-                match = log_pattern.search(line)
-                if match:
-                    timestamp_str, path = match.groups()
-                    try:
-                        hour = (timestamp_str.split(' ')[1][:2] + ":00"
-                                if ' ' in timestamp_str
-                                else (timestamp_str[11:13] + ":00" if len(timestamp_str) > 13 else "00:00"))
-                        hourly_counts[hour] += 1
-                        page_counts[path.strip()] += 1
-                    except Exception as e:
-                        current_app.logger.error(f"Log satır hatası: {e} - Satır: {line}")
-                else:
-                    try:
-                        log_entry = json.loads(line.strip())
-                        if 'message' in log_entry and 'ziyaret:' in log_entry['message']:
-                            msg = log_entry['message']
-                            path_match = _re.search(r'ziyaret: (.*)', msg)
-                            if path_match:
-                                path = path_match.group(1).split(' ')[0].strip()
-                                timestamp_str = log_entry.get('timestamp', '')
-                                try:
-                                    hour = (timestamp_str.split(' ')[1][:2] + ":00"
-                                            if ' ' in timestamp_str
-                                            else (timestamp_str[11:13] + ":00" if len(timestamp_str) > 13 else "00:00"))
-                                    hourly_counts[hour] += 1
-                                    page_counts[path] += 1
-                                except Exception as e:
-                                    current_app.logger.error(f"JSON log satır hatası: {e} - Satır: {line}")
-                    except json.JSONDecodeError:
-                        continue
-            stats['hourly'] = dict(sorted(hourly_counts.items()))
-            stats['pages']  = dict(page_counts.most_common())
+            app_logs      = "".join(lines[-200:])
         except Exception as e:
-            current_app.logger.error(f"Log analiz hatası: {e}")
+            current_app.logger.error(f"Log okuma hatası: {e}")
 
-    for attr, path in [('api_logs', api_log_file), ('bot_logs', bot_log_file), ('security_logs', security_log_file), ('all_requests_logs', all_requests_log_file)]:
+    for attr, path in [('app_logs', log_file), ('bot_logs', bot_log_file), ('security_logs', security_log_file), ('all_requests_logs', all_requests_log_file)]:
         if path and os.path.exists(path):
             try:
                 with open(path, 'r', encoding='utf-8') as f:
                     locals()[attr]  # noqa — just referencing; assignment below
                     val = "".join(f.readlines()[-200:])
-                if attr == 'api_logs':           api_logs           = val
+                if attr == 'app_logs':         app_logs           = val
                 elif attr == 'bot_logs':         bot_logs           = val
                 elif attr == 'security_logs':    security_logs      = val
                 elif attr == 'all_requests_logs': all_requests_logs = val
@@ -773,8 +733,7 @@ def admin_logs():
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return jsonify({
-            'web_logs':           web_logs           or 'Log verisi bulunamadı.',
-            'api_logs':           api_logs           or 'API log verisi bulunamadı.',
+            'app_logs':           app_logs           or 'Log verisi bulunamadı.',
             'bot_logs':           bot_logs           or 'Bot log verisi bulunamadı.',
             'security_logs':      security_logs      or 'Güvenlik log verisi bulunamadı.',
             'all_requests_logs':  all_requests_logs  or 'Tüm istekler log verisi bulunamadı.',
@@ -782,8 +741,7 @@ def admin_logs():
         })
 
     return render_template('admin/logs.html',
-                           web_logs=web_logs,
-                           api_logs=api_logs,
+                           app_logs=app_logs,
                            bot_logs=bot_logs,
                            security_logs=security_logs,
                            all_requests_logs=all_requests_logs,

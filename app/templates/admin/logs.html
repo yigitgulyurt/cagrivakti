@@ -183,9 +183,9 @@
     </div>
 
     <div class="log-section">
-        <h2><svg class="icon"><use xlink:href="#fa-globe"></use></svg> Web Uygulama Raporu</h2>
-        <input id="web_filter" type="text" placeholder="Metin/UID filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
-        <div id="web_logs" class="log-viewer"></div>
+        <h2><svg class="icon"><use xlink:href="#fa-exclamation-triangle"></use></svg> App Hataları</h2>
+        <input id="app_filter" type="text" placeholder="Metin/UID filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
+        <div id="app_logs" class="log-viewer"></div>
     </div>
 
     <div class="log-section">
@@ -213,14 +213,14 @@ let updateIntervalId = null;
 let currentInterval = 5000;
 
 const logData = {
-    web: { raw: '', filtered: '' },
+    app: { raw: '', filtered: '' },
     bot: { raw: '', filtered: '' },
     security: { raw: '', filtered: '' },
     all_requests: { raw: '', filtered: '' }
 };
 
 const logScrollStates = {
-    web: true,
+    app: true,
     bot: true,
     security: true,
     all_requests: true
@@ -303,13 +303,13 @@ async function updateAllLogs() {
     if (!data) return;
     
     const filters = {
-        web: document.getElementById('web_filter').value,
+        app: document.getElementById('app_filter').value,
         bot: document.getElementById('bot_filter').value,
         security: document.getElementById('sec_filter').value,
         all_requests: document.getElementById('all_requests_filter').value
     };
     
-    ['web', 'bot', 'security', 'all_requests'].forEach(key => {
+    ['app', 'bot', 'security', 'all_requests'].forEach(key => {
         updateLogViewer(key, data[`${key}_logs`] || '', filters[key]);
     });
 }
@@ -376,11 +376,11 @@ function setupFilter(key, inputId) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-    ['web', 'bot', 'security', 'all_requests'].forEach(key => {
+    ['app', 'bot', 'security', 'all_requests'].forEach(key => {
         setupScrollTracking(key);
     });
     
-    setupFilter('web', 'web_filter');
+    setupFilter('app', 'app_filter');
     setupFilter('bot', 'bot_filter');
     setupFilter('security', 'sec_filter');
     setupFilter('all_requests', 'all_requests_filter');
