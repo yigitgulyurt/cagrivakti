@@ -47,7 +47,9 @@
         border-radius: 12px;
         height: 500px;
         overflow-y: auto;
-        white-space: pre;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-width: 100%;
         font-size: 0.9rem;
         line-height: 1.7;
         border: 1px solid #30363d;
@@ -241,6 +243,18 @@ function formatLogLine(line, isAllRequests = false) {
     
     // API isteklerini kontrol et
     const isApiRequest = l.includes(' /api/');
+    
+    // 145 karakterden sonra alt satıra kır
+    let wrapped = '';
+    let currentPos = 0;
+    while (currentPos < l.length) {
+        if (currentPos > 0) {
+            wrapped += '<br>';
+        }
+        wrapped += l.substring(currentPos, currentPos + 145);
+        currentPos += 145;
+    }
+    l = wrapped;
     
     l = l.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:,\d{3})?)/, '<span class="log-timestamp">$1</span>');
     l = l.replace(/\b(ERROR|CRITICAL)\b/g, '<span class="log-level-error">$1</span>');
