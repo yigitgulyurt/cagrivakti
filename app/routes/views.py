@@ -531,7 +531,9 @@ def admin_required(f):
         admin_user = current_app.config.get('ADMIN_USER')
         admin_pass = current_app.config.get('ADMIN_PASS')
         if not auth or not (auth.username == admin_user and auth.password == admin_pass):
-            return make_response('Yetkisiz Erişim', 401, {'WWW-Authenticate': 'Basic realm="Admin Panel"'})
+            response = make_response(render_template('errors/401.html'), 401)
+            response.headers['WWW-Authenticate'] = 'Basic realm="Admin Panel"'
+            return response
         return f(*args, **kwargs)
     return decorated_function
 
