@@ -97,6 +97,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 20px;
+        margin-bottom: 30px;
     }
     .top-list {
         background: #0d1117;
@@ -242,6 +243,93 @@
         0%, 100% { opacity: 1; }
         50% { opacity: 0.5; }
     }
+    
+    .compact-card {
+        background: #0d1117;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        border: 1px solid #30363d;
+    }
+    
+    .compact-card.api {
+        border-left: 3px solid #a78bfa;
+    }
+    
+    .compact-card.web {
+        border-left: 3px solid #f0b726;
+    }
+    
+    .compact-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .compact-count {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #79c0ff;
+    }
+    
+    .compact-ip {
+        color: #d29922;
+        font-weight: 500;
+    }
+    
+    .compact-method {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    
+    .compact-method.GET { background: rgba(63, 185, 80, 0.2); color: #3fb950; }
+    .compact-method.POST { background: rgba(240, 183, 38, 0.2); color: #f0b726; }
+    .compact-method.PUT { background: rgba(121, 192, 255, 0.2); color: #79c0ff; }
+    .compact-method.DELETE { background: rgba(248, 81, 73, 0.2); color: #f85149; }
+    .compact-method.PATCH { background: rgba(163, 113, 247, 0.2); color: #a371f7; }
+    .compact-method.OPTIONS { background: rgba(139, 148, 158, 0.2); color: #8b949e; }
+    .compact-method.HEAD { background: rgba(139, 148, 158, 0.2); color: #8b949e; }
+    
+    .compact-path {
+        font-family: 'JetBrainsMonoNerdFont', monospace;
+        color: #e6edf3;
+        font-size: 0.875rem;
+        word-break: break-all;
+    }
+    
+    .compact-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .compact-statuses {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .status-pill {
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-pill.success { background: rgba(63, 185, 80, 0.2); color: #3fb950; }
+    .status-pill.redirect { background: rgba(240, 183, 38, 0.2); color: #f0b726; }
+    .status-pill.client-error { background: rgba(248, 81, 73, 0.2); color: #f85149; }
+    .status-pill.server-error { background: rgba(248, 81, 73, 0.3); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.3); }
 </style>
 {% endblock %}
 
@@ -271,54 +359,33 @@
         </div>
     </div>
 
-    <div class="log-section">
-        <h2><svg class="icon"><use xlink:href="#fa-exclamation-triangle"></use></svg> App Hataları</h2>
-        <input id="app_filter" type="text" placeholder="Metin/UID filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
-        <div id="app_logs" class="log-viewer"></div>
-    </div>
-
-    <div class="log-section">
-        <h2><svg class="icon"><use xlink:href="#fa-robot"></use></svg> Bot Aktivite Raporu</h2>
-        <input id="bot_filter" type="text" placeholder="Metin filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
-        <div id="bot_logs" class="log-viewer"></div>
-    </div>
-
-    <div class="log-section">
-        <h2><svg class="icon"><use xlink:href="#fa-shield-alt"></use></svg> Güvenlik Olayları</h2>
-        <input id="sec_filter" type="text" placeholder="Metin/UID filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
-        <div id="security_logs" class="log-viewer"></div>
-    </div>
-
-    <div class="log-section">
-        <h2><svg class="icon"><use xlink:href="#fa-chart-bar"></use></svg> Toplu İstatistikler</h2>
-        <div class="stats-grid" id="stats_panel">
-            <div class="stat-card">
-                <div class="stat-value" id="stat_total_requests">0</div>
-                <div class="stat-label">Toplam İstek</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="stat_top_method">-</div>
-                <div class="stat-label">En Çok Kullanılan Method</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="stat_error_count">0</div>
-                <div class="stat-label">Hata Sayısı (4xx/5xx)</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="stat_unique_ips">0</div>
-                <div class="stat-label">Farklı IP</div>
-            </div>
+    <div class="stats-grid" id="stats_panel">
+        <div class="stat-card">
+            <div class="stat-value" id="stat_total_requests">0</div>
+            <div class="stat-label">Toplam İstek</div>
         </div>
-        
-        <div class="top-section">
-            <div class="top-list">
-                <h3><svg class="icon"><use xlink:href="#fa-file-alt"></use></svg> En Aktif Sayfalar</h3>
-                <div id="top_pages"></div>
-            </div>
-            <div class="top-list">
-                <h3><svg class="icon"><use xlink:href="#fa-user"></use></svg> En Aktif IP'ler</h3>
-                <div id="top_ips"></div>
-            </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat_top_method">-</div>
+            <div class="stat-label">En Çok Kullanılan Method</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat_error_count">0</div>
+            <div class="stat-label">Hata Sayısı (4xx/5xx)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat_unique_ips">0</div>
+            <div class="stat-label">Farklı IP</div>
+        </div>
+    </div>
+    
+    <div class="top-section">
+        <div class="top-list">
+            <h3><svg class="icon"><use xlink:href="#fa-file-alt"></use></svg> En Aktif Sayfalar</h3>
+            <div id="top_pages"></div>
+        </div>
+        <div class="top-list">
+            <h3><svg class="icon"><use xlink:href="#fa-user"></use></svg> En Aktif IP'ler</h3>
+            <div id="top_ips"></div>
         </div>
     </div>
 
@@ -355,6 +422,24 @@
         </div>
         <div id="all_requests_logs" class="log-viewer"></div>
     </div>
+
+    <div class="log-section">
+        <h2><svg class="icon"><use xlink:href="#fa-exclamation-triangle"></use></svg> App Hataları</h2>
+        <input id="app_filter" type="text" placeholder="Metin/UID filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
+        <div id="app_logs" class="log-viewer"></div>
+    </div>
+
+    <div class="log-section">
+        <h2><svg class="icon"><use xlink:href="#fa-robot"></use></svg> Bot Aktivite Raporu</h2>
+        <input id="bot_filter" type="text" placeholder="Metin filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
+        <div id="bot_logs" class="log-viewer"></div>
+    </div>
+
+    <div class="log-section">
+        <h2><svg class="icon"><use xlink:href="#fa-shield-alt"></use></svg> Güvenlik Olayları</h2>
+        <input id="sec_filter" type="text" placeholder="Metin/UID filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
+        <div id="security_logs" class="log-viewer"></div>
+    </div>
 </div>
 
 <script>
@@ -390,10 +475,8 @@ function formatLogLine(line, isAllRequests = false) {
     const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     let l = esc(line);
     
-    // API isteklerini kontrol et
     const isApiRequest = l.includes(' /api/');
     
-    // 145 karakterden sonra alt satıra kır
     let wrapped = '';
     let currentPos = 0;
     while (currentPos < l.length) {
@@ -411,7 +494,6 @@ function formatLogLine(line, isAllRequests = false) {
     l = l.replace(/\b(INFO)\b/g, '<span class="log-level-info">$1</span>');
     l = l.replace(/\b(DEBUG)\b/g, '<span class="log-level-debug">$1</span>');
     
-    // API isteği ise arka plan rengi değiştir
     if (isAllRequests && isApiRequest) {
         l = '<div style="background: rgba(167, 139, 250, 0.1); border-left: 3px solid #a78bfa; margin-left: -20px; padding-left: 17px;">' + l + '</div>';
     }
@@ -558,6 +640,15 @@ function applyFilters(parsed) {
     });
 }
 
+function getStatusClass(status) {
+    if (!status || status === 'unknown') return '';
+    if (status.startsWith('2')) return 'success';
+    if (status.startsWith('3')) return 'redirect';
+    if (status.startsWith('4')) return 'client-error';
+    if (status.startsWith('5')) return 'server-error';
+    return '';
+}
+
 function renderCompactLogs(raw) {
     const parsed = parseAllRequests(raw);
     const filtered = applyFilters(parsed);
@@ -572,7 +663,8 @@ function renderCompactLogs(raw) {
                 method: req.method,
                 path: req.path,
                 count: 0,
-                statusCodes: new Set()
+                statusCodes: new Set(),
+                isApi: req.isApi
             };
         }
         
@@ -585,14 +677,24 @@ function renderCompactLogs(raw) {
     const sortedGroups = Object.values(grouped).sort((a, b) => b.count - a.count);
     
     return sortedGroups.map(group => {
-        const statusList = Array.from(group.statusCodes).join(', ');
-        const isApi = group.path.startsWith('/api/');
-        return `<div class="log-line" style="border-left: 3px solid ${isApi ? '#a78bfa' : '#f0b726'}; padding-left: 10px; margin-bottom: 5px;">
-            <span style="color: #79c0ff;">${group.count}x</span> | 
-            <span style="color: #d29922;">${group.ip}</span> | 
-            <span style="color: #3fb950;">${group.method}</span> | 
-            <span style="color: #e6edf3;">${group.path}</span>
-            ${statusList ? ` | <span style="color: #ff7b72;">Status: ${statusList}</span>` : ''}
+        const statusList = Array.from(group.statusCodes);
+        const typeClass = group.isApi ? 'api' : 'web';
+        
+        let statusPills = '';
+        if (statusList.length > 0) {
+            statusPills = statusList.map(status => 
+                `<span class="status-pill ${getStatusClass(status)}">${status}</span>`
+            ).join('');
+        }
+        
+        return `<div class="compact-card ${typeClass}">
+            <div class="compact-header">
+                <span class="compact-count">${group.count}x</span>
+                <span class="compact-ip">${group.ip}</span>
+                <span class="compact-method ${group.method}">${group.method}</span>
+            </div>
+            <div class="compact-path">${group.path}</div>
+            ${statusPills ? `<div class="compact-footer"><div class="compact-statuses">${statusPills}</div></div>` : ''}
         </div>`;
     }).join('') || '<div class="log-line">Filtrelere uygun veri bulunamadı.</div>';
 }
