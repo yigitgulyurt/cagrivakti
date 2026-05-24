@@ -246,7 +246,7 @@ CITY_DISPLAY_NAME_MAPPING = {
     # Uluslararası
     "Washington": "Washington", "New-York": "New York", "Los-Angeles": "Los Angeles",
     "Ottawa": "Ottawa", "Toronto": "Toronto", "Mexico-City": "Mexico City",
-    "Havana": "Havana", "Guatemala-City": "Guatemala City", "San-Salvador": "San Salvador",
+    "Havana": "Havana", "Guatemala-City": "Guatemala City",
     "Tegucigalpa": "Tegucigalpa", "Managua": "Managua", "San-Jose": "San José",
     "Panama-City": "Panama City", "Kingston": "Kingston", "Santo-Domingo": "Santo Domingo",
     "Port-au-Prince": "Port-au-Prince", "Nassau": "Nassau", "Belmopan": "Belmopan",
@@ -335,7 +335,7 @@ ALL_CANONICAL_CITIES += [
 # Uluslararası şehirler
 ALL_CANONICAL_CITIES += [
     "Washington", "New-York", "Los-Angeles", "Ottawa", "Toronto", "Mexico-City", "Havana",
-    "Guatemala-City", "San-Salvador", "Tegucigalpa", "Managua", "San-Jose", "Panama-City",
+    "Guatemala-City", "Tegucigalpa", "Managua", "San-Jose", "Panama-City",
     "Kingston", "Santo-Domingo", "Port-au-Prince", "Nassau", "Belmopan", "Saint-Johns",
     "Bridgetown", "Roseau", "Saint-Georges", "Basseterre", "Castries", "Kingstown",
     "Port-of-Spain", "Oranjestad", "Willemstad",
@@ -538,7 +538,6 @@ def get_timezone_for_city(sehir, country_code='TR'):
             ('mexico-city', 'mx'): 'America/Mexico_City',
             ('havana', 'cu'): 'America/Havana',
             ('guatemala-city', 'gt'): 'America/Guatemala',
-            ('san-salvador', 'sv'): 'America/El_Salvador',
             ('tegucigalpa', 'hn'): 'America/Tegucigalpa',
             ('managua', 'ni'): 'America/Managua',
             ('san-jose', 'cr'): 'America/Costa_Rica',
@@ -767,7 +766,7 @@ def get_country_for_city(sehir):
         # North America & Caribbean
         'Washington': 'US', 'New-York': 'US', 'Los-Angeles': 'US',
         'Ottawa': 'CA', 'Toronto': 'CA', 'Mexico-City': 'MX', 'Havana': 'CU',
-        'Guatemala-City': 'GT', 'San-Salvador': 'SV', 'Tegucigalpa': 'HN',
+        'Guatemala-City': 'GT', 'Tegucigalpa': 'HN',
         'Managua': 'NI', 'San-Jose': 'CR', 'Panama-City': 'PA',
         'Kingston': 'JM', 'Santo-Domingo': 'DO', 'Port-au-Prince': 'HT',
         'Nassau': 'BS', 'Belmopan': 'BZ', 'Saint-Johns': 'AG',
@@ -886,7 +885,7 @@ class UserService:
         elif country_code == 'INT':
             return [
                 "Washington", "New-York", "Los-Angeles", "Ottawa", "Toronto", "Mexico-City", "Havana",
-                "Guatemala-City", "San-Salvador", "Tegucigalpa", "Managua", "San-Jose", "Panama-City",
+                "Guatemala-City", "Tegucigalpa", "Managua", "San-Jose", "Panama-City",
                 "Kingston", "Santo-Domingo", "Port-au-Prince", "Nassau", "Belmopan", "Saint-Johns",
                 "Bridgetown", "Roseau", "Saint-Georges", "Basseterre", "Castries", "Kingstown",
                 "Port-of-Spain", "Oranjestad", "Willemstad",
