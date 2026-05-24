@@ -456,120 +456,23 @@ def public_api_vakitler():
 @api_bp.route('/status')
 def health_check():
     """
-    Uptime Kuma için HIZLI ama detaylı health check endpoint'i.
+    Basit health check endpoint'i.
     """
-    import time
-    import os
-    import sys
-    from datetime import datetime
-    
-    start_time = time.time()
-    
-    http_status = 200
     overall = "ok"
-    details = {}
+    http_status = 200
     
-    # 1. Veritabanı (hızlı kontrol)
     try:
-        db_start = time.time()
         db.session.execute(db.text('SELECT 1'))
         db.session.commit()
-        db_time = round((time.time() - db_start) * 1000, 2)
-        details["database"] = {"status": "ok", "response_ms": db_time}
-    except Exception as e:
-        details["database"] = {"status": "critical", "error": str(e)}
+    except Exception:
         overall = "critical"
         http_status = 503
-
-    # 2. Cache (hızlı kontrol)
-    try:
-        cache_start = time.time()
-        cache.set('__healthcheck__', '1', timeout=5)
-        val = cache.get('__healthcheck__')
-        cache_time = round((time.time() - cache_start) * 1000, 2)
-        details["cache"] = {"status": "ok", "response_ms": cache_time}
-    except Exception as e:
-        details["cache"] = {"status": "warning", "error": str(e)}
-        if overall != "critical":
-            overall = "warning"
-
-    # 3. Disk Alanı (hızlı kontrol)
-    try:
-        disk_status = "ok"
-        disk_msg = ""
-        used_pct = 0
-        if sys.platform.startswith('win'):
-            import ctypes
-            free_bytes = ctypes.c_ulonglong(0)
-            total_bytes = ctypes.c_ulonglong(0)
-            ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(os.path.abspath('/')), None, ctypes.pointer(total_bytes), ctypes.pointer(free_bytes))
-            used_pct = round(((total_bytes.value - free_bytes.value) / total_bytes.value) * 100, 1)
-        else:
-            statvfs = os.statvfs('/')
-            used_pct = round(((statvfs.f_blocks - statvfs.f_bfree) / statvfs.f_blocks) * 100, 1)
-        
-        if used_pct > 95:
-            disk_status = "critical"
-            overall = "critical"
-            disk_msg = f"Disk almost full: {used_pct}%"
-        elif used_pct > 90:
-            disk_status = "warning"
-            disk_msg = f"Disk warning: {used_pct}%"
-            if overall == "ok":
-                overall = "warning"
-        
-        details["disk"] = {"status": disk_status, "used_percent": used_pct, "message": disk_msg}
-    except Exception as e:
-        details["disk"] = {"status": "unknown", "error": str(e)}
-
-    # 4. RAM Kullanımı (hızlı kontrol)
-    try:
-        ram_status = "ok"
-        ram_msg = ""
-        used_pct = 0
-        if sys.platform.startswith('win'):
-            import ctypes
-            class MEMORYSTATUSEX(ctypes.Structure):
-                _fields_ = [("dwLength", ctypes.c_ulong), ("dwMemoryLoad", ctypes.c_ulong)]
-            stat = MEMORYSTATUSEX()
-            stat.dwLength = ctypes.sizeof(stat)
-            ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat))
-            used_pct = stat.dwMemoryLoad
-        else:
-            try:
-                with open('/proc/meminfo', 'r') as f:
-                    meminfo = f.read()
-                mem_total = int([line for line in meminfo.split('\n') if 'MemTotal' in line][0].split()[1])
-                mem_available = int([line for line in meminfo.split('\n') if 'MemAvailable' in line][0].split()[1])
-                used_pct = round(((mem_total - mem_available) / mem_total) * 100, 1)
-            except:
-                pass
-        
-        if used_pct > 95:
-            ram_status = "critical"
-            overall = "critical"
-            ram_msg = f"RAM almost full: {used_pct}%"
-        elif used_pct > 90:
-            ram_status = "warning"
-            ram_msg = f"RAM warning: {used_pct}%"
-            if overall == "ok":
-                overall = "warning"
-        
-        details["ram"] = {"status": ram_status, "used_percent": used_pct, "message": ram_msg}
-    except Exception as e:
-        details["ram"] = {"status": "unknown", "error": str(e)}
-
-    # Sonuç
-    total_time = round((time.time() - start_time) * 1000, 2)
     
-    return jsonify({
-        "status": overall,
-        "database_status": details.get("database", {}).get("status", "unknown"),
-        "cache_status": details.get("cache", {}).get("status", "unknown"),
-        "disk_status": details.get("disk", {}).get("status", "unknown"),
-        "ram_status": details.get("ram", {}).get("status", "unknown"),
-        "version": current_app.config.get('APP_VERSION', '1.0'),
-        "response_time_ms": total_time,
-        "timestamp": datetime.now().isoformat() + 'Z',
-        "details": details
-    }), http_status
+    try:
+        cache.set('__healthcheck__', '1', timeout=5)
+        cache.get('__healthcheck__')
+    except Exception:
+        if overall == "ok":
+            overall = "warning"
+    
+    return jsonify({"status": overall}), http_status
