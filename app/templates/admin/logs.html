@@ -131,17 +131,24 @@
         background: #0d1117;
         color: #e6edf3;
         font-family: 'JetBrainsMonoNerdFont', monospace;
-        padding: 10px;
+        padding: 20px;
         border-radius: 12px;
-        height: 350px;
+        height: 500px;
         overflow-y: auto;
         white-space: pre-wrap;
         word-wrap: break-word;
         max-width: 100%;
         font-size: 0.9rem;
-        line-height: 1.5;
+        line-height: 1.7;
         border: 1px solid #30363d;
         box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .log-viewer.compact-mode {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 8px;
+        padding: 12px;
     }
     .log-viewer::-webkit-scrollbar {
         width: 12px;
@@ -246,9 +253,9 @@
     
     .compact-card {
         background: #0d1117;
-        border-radius: 4px;
-        padding: 3px 8px;
-        margin-bottom: 2px;
+        border-radius: 6px;
+        padding: 6px 10px;
+        margin-bottom: 4px;
         border: 1px solid #30363d;
     }
     
@@ -264,13 +271,13 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2px;
+        margin-bottom: 4px;
         flex-wrap: wrap;
-        gap: 4px;
+        gap: 6px;
     }
     
     .compact-count {
-        font-size: 0.75rem;
+        font-size: 0.9rem;
         font-weight: 700;
         color: #79c0ff;
     }
@@ -278,15 +285,15 @@
     .compact-ip {
         color: #d29922;
         font-weight: 500;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
     }
     
     .compact-method {
         display: inline-block;
-        padding: 1px 4px;
-        border-radius: 2px;
+        padding: 1px 6px;
+        border-radius: 3px;
         font-weight: 600;
-        font-size: 0.6rem;
+        font-size: 0.65rem;
         text-transform: uppercase;
     }
     
@@ -301,30 +308,29 @@
     .compact-path {
         font-family: 'JetBrainsMonoNerdFont', monospace;
         color: #e6edf3;
-        font-size: 0.65rem;
+        font-size: 0.75rem;
         word-break: break-all;
-        line-height: 1.2;
     }
     
     .compact-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 2px;
+        margin-top: 4px;
         flex-wrap: wrap;
-        gap: 3px;
+        gap: 4px;
     }
     
     .compact-statuses {
         display: flex;
-        gap: 3px;
+        gap: 4px;
         flex-wrap: wrap;
     }
     
     .status-pill {
-        padding: 0px 4px;
-        border-radius: 4px;
-        font-size: 0.6rem;
+        padding: 1px 5px;
+        border-radius: 6px;
+        font-size: 0.65rem;
         font-weight: 600;
     }
     
@@ -724,8 +730,10 @@ async function updateAllLogs() {
     const scrollToBottom = logScrollStates['all_requests'] && shouldScrollToBottom(viewer);
     
     if (currentMode === 'compact') {
+        viewer.classList.add('compact-mode');
         viewer.innerHTML = renderCompactLogs(data['all_requests_logs'] || '');
     } else {
+        viewer.classList.remove('compact-mode');
         const raw = filtered.map(req => req.line).join('\n');
         viewer.innerHTML = renderLog(raw, '', true);
     }
