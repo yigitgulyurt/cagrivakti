@@ -207,6 +207,11 @@
         <input id="all_requests_filter" type="text" placeholder="Metin/UID/Status filtrele..." class="admin-select" style="margin-bottom:12px; width: 100%; max-width: 400px;">
         <div id="all_requests_logs" class="log-viewer"></div>
     </div>
+
+    <div class="log-section">
+        <h2><svg class="icon"><use xlink:href="#fa-compress"></use></svg> Tüm İstekler (Compact Mod)</h2>
+        <div id="all_requests_compact" class="log-viewer"></div>
+    </div>
 </div>
 
 <script>
@@ -312,6 +317,59 @@ function updateLogViewer(key, content, filterQuery) {
     }
 }
 
+function renderCompactLogs(raw) {
+    if (!raw) return '<div class="log-line">Log verisi bulunamadı.</div>';
+    const normalized = normalizeRaw(raw);
+    const lines = normalized.split('\n');
+    
+    const grouped = {};
+    lines.forEach(line => {
+        if (!line.trim()) return;
+        
+        const ipMatch = line.match(/^\[.*?\]\s+([\d.]+|Docker-Internal|Localhost|Health-Check-.*?)\s+/);
+        const methodMatch = line.match(/\s+(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)\s+/);
+        const pathMatch = line.match(/\s+(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)\s+(\S+)\s+/);
+        
+        const ip = ipMatch ? ipMatch[1] : 'unknown';
+        const method = methodMatch ? methodMatch[1] : 'unknown';
+        const path = pathMatch ? pathMatch[2].split('?')[0] : 'unknown';
+        
+        const key = `${ip}||${method}||${path}`;
+        
+        if (!grouped[key]) {
+            grouped[key] = {
+                ip,
+                method,
+                path,
+                count: 0,
+                firstSeen: null,
+                lastSeen: null,
+                statusCodes: new Set()
+            };
+        }
+        
+        grouped[key].count++;
+        
+        const statusMatch = line.match(/\s+(\d{3})\s+/);
+        if (statusMatch) {
+            grouped[key].statusCodes.add(statusMatch[1]);
+        }
+    });
+    
+    const sortedGroups = Object.values(grouped).sort((a, b) => b.count - a.count);
+    
+    return sortedGroups.map(group => {
+        const statusList = Array.from(group.statusCodes).join(', ');
+        return `<div class="log-line" style="border-left: 3px solid #f0b726; padding-left: 10px; margin-bottom: 5px;">
+            <span style="color: #79c0ff;">${group.count}x</span> | 
+            <span style="color: #d29922;">${group.ip}</span> | 
+            <span style="color: #3fb950;">${group.method}</span> | 
+            <span style="color: #e6edf3;">${group.path}</span>
+            ${statusList ? ` | <span style="color: #ff7b72;">Status: ${statusList}</span>` : ''}
+        </div>`;
+    }).join('');
+}
+
 async function updateAllLogs() {
     const data = await fetchLogs();
     if (!data) return;
@@ -326,6 +384,12 @@ async function updateAllLogs() {
     ['app', 'bot', 'security', 'all_requests'].forEach(key => {
         updateLogViewer(key, data[`${key}_logs`] || '', filters[key]);
     });
+    
+    const compactViewer = document.getElementById('all_requests_compact');
+    if (compactViewer) {
+        compactViewer.innerHTML = renderCompactLogs(data['all_requests_logs'] || '');
+        compactViewer.scrollTop = compactViewer.scrollHeight;
+    }
 }
 
 function startAutoUpdate() {
