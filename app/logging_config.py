@@ -352,6 +352,10 @@ def setup_all_requests_logging(app):
     @app.after_request
     def _all_requests_log_end(response):
         try:
+            # Admin log sayfası isteklerini kaydetme
+            if request.path.startswith('/admin/logs'):
+                return response
+                
             if request.headers.get('X-Forwarded-For'):
                 ip = request.headers.get('X-Forwarded-For').split(',')[0]
             else:
