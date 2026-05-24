@@ -456,7 +456,7 @@ def public_api_vakitler():
 @api_bp.route('/status')
 def health_check():
     """
-    Uptime Kuma için basit ve anlaşılır health check endpoint'i.
+    Uptime Kuma için HIZLI ama detaylı health check endpoint'i.
     """
     import time
     import os
@@ -469,7 +469,7 @@ def health_check():
     overall = "ok"
     details = {}
     
-    # 1. Veritabanı
+    # 1. Veritabanı (hızlı kontrol)
     try:
         db_start = time.time()
         db.session.execute(db.text('SELECT 1'))
@@ -481,7 +481,7 @@ def health_check():
         overall = "critical"
         http_status = 503
 
-    # 2. Cache
+    # 2. Cache (hızlı kontrol)
     try:
         cache_start = time.time()
         cache.set('__healthcheck__', '1', timeout=5)
@@ -493,7 +493,7 @@ def health_check():
         if overall != "critical":
             overall = "warning"
 
-    # 3. Disk Alanı
+    # 3. Disk Alanı (hızlı kontrol)
     try:
         disk_status = "ok"
         disk_msg = ""
@@ -522,7 +522,7 @@ def health_check():
     except Exception as e:
         details["disk"] = {"status": "unknown", "error": str(e)}
 
-    # 4. RAM Kullanımı
+    # 4. RAM Kullanımı (hızlı kontrol)
     try:
         ram_status = "ok"
         ram_msg = ""
@@ -564,10 +564,10 @@ def health_check():
     
     return jsonify({
         "status": overall,
-        "database_status": details["database"]["status"],
-        "cache_status": details["cache"]["status"],
-        "disk_status": details["disk"]["status"],
-        "ram_status": details["ram"]["status"],
+        "database_status": details.get("database", {}).get("status", "unknown"),
+        "cache_status": details.get("cache", {}).get("status", "unknown"),
+        "disk_status": details.get("disk", {}).get("status", "unknown"),
+        "ram_status": details.get("ram", {}).get("status", "unknown"),
         "version": current_app.config.get('APP_VERSION', '1.0'),
         "response_time_ms": total_time,
         "timestamp": datetime.now().isoformat() + 'Z',

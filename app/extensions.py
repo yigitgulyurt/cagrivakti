@@ -25,8 +25,8 @@ def vip_request_filter():
     """
     SADECE sağlık kontrolü endpoint'leri ve iç ağ IP'leri rate limit'ten muaf tutar.
     """
-    # SADECE sağlık kontrolü endpoint'lerini muaf tut
-    if '/status' in request.path or request.path == '/api/status':
+    # SADECE sağlık kontrolü endpoint'lerini muaf tut (EN BAŞTA)
+    if request.path.endswith('/status') or '/status' in request.path:
         return True
     
     # Yerel geliştirme ve iç ağ IP'lerini muaf tut
