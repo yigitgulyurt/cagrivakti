@@ -311,5 +311,84 @@ def setup_security_logging(app):
             pass
 
 
+def setup_all_requests_logging(app):
+    all_requests_log_file = app.config['ALL_REQUESTS_LOG_FILE']
+    os.makedirs(os.path.dirname(all_requests_log_file), exist_ok=True)
+    all_requests_logger = logging.getLogger('all_requests_logger')
+    level_name = app.config.get('LOG_LEVEL', 'INFO').upper()
+    all_requests_logger.setLevel(getattr(logging, level_name, logging.INFO))
+    all_requests_logger.propagate = False
+    formatter = APILogFormatter(
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    handler = TimedRotatingFileHandler(
+        all_requests_log_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
+    )
+    handler.rotator = compress_rotator
+    handler.setFormatter(formatter)
+
+    api_ctx_filter = APIRequestContextFilter()
+
+    handler.addFilter(api_ctx_filter)
+    all_requests_logger.addHandler(handler)
+    if app.config.get('API_LOG_JSON', True):
+        json_file = all_requests_log_file.replace('.log', '.jsonl')
+        json_handler = TimedRotatingFileHandler(
+            json_file, when='midnight', interval=1, backupCount=app.config.get('LOG_RETENTION_DAYS', 30), encoding='utf-8'
+        )
+        json_handler.rotator = compress_rotator
+        json_handler.setLevel(getattr(logging, level_name, logging.INFO))
+        json_logger = logging.getLogger('all_requests_logger.json')
+        json_logger.setLevel(getattr(logging, level_name, logging.INFO))
+        json_logger.propagate = False
+        json_logger.addHandler(json_handler)
+        json_handler.addFilter(api_ctx_filter)
+        json_handler.setFormatter(logging.Formatter('%(message)s'))
+
+    @app.before_request
+    def _all_requests_log_start():
+        g._all_requests_log_start = time.time()
+
+    @app.after_request
+    def _all_requests_log_end(response):
+        try:
+            if request.headers.get('X-Forwarded-For'):
+                ip = request.headers.get('X-Forwarded-For').split(',')[0]
+            else:
+                ip = request.remote_addr
+            
+            duration_ms = int((time.time() - getattr(g, '_all_requests_log_start', time.time())) * 1000)
+            ua = request.headers.get('User-Agent', '')[:200]
+            referer = request.headers.get('Referer', '')[:200]
+            path = request.full_path
+            status = response.status_code
+            extra = {
+                'remote_addr': ip,
+                'method': request.method,
+                'path': path,
+                'status': status,
+                'duration_ms': duration_ms,
+                'user_id': getattr(g, 'user_uid', '-')
+            }
+            all_requests_logger.info('', extra=extra)
+            if app.config.get('API_LOG_JSON', True):
+                payload = {
+                    'ts': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                    'rid': getattr(g, 'request_id', '-'),
+                    'uid': getattr(g, 'user_uid', '-'),
+                    'ip': ip,
+                    'method': request.method,
+                    'path': path,
+                    'status': status,
+                    'duration_ms': duration_ms,
+                    'ua': ua,
+                    'referer': referer
+                }
+                logging.getLogger('all_requests_logger.json').info(json.dumps(payload, ensure_ascii=False))
+        except Exception:
+            pass
+        return response
+
+
 def log_web_visit(ip, path, uid):
     return f'{ip:<18} ziyaret: {path} uid={uid}'

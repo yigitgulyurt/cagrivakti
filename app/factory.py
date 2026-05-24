@@ -11,7 +11,7 @@ from app.extensions import db, migrate, cache, csrf, limiter, assets
 from app.config import Config
 from app.error_handlers import register_error_handlers
 from app.middleware import setup_middleware
-from app.logging_config import setup_logging, setup_api_logging, setup_security_logging
+from app.logging_config import setup_logging, setup_api_logging, setup_security_logging, setup_all_requests_logging
 
 def create_app(config_class=Config):
     # .env dosyasını yükle
@@ -124,6 +124,7 @@ def create_app(config_class=Config):
 
     setup_api_logging(app)
     setup_security_logging(app)
+    setup_all_requests_logging(app)
     
     @app.after_request
     def add_header(response):

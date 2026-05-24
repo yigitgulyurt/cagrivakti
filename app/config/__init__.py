@@ -20,6 +20,7 @@ class Config:
     LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs')
     WEB_LOG_FILE = os.environ.get('WEB_LOG_FILE', os.path.join(LOG_DIR, 'web.log'))
     API_LOG_FILE = os.environ.get('API_LOG_FILE', os.path.join(LOG_DIR, 'api.log'))
+    ALL_REQUESTS_LOG_FILE = os.environ.get('ALL_REQUESTS_LOG_FILE', os.path.join(LOG_DIR, 'all_requests.log'))
     TELEGRAM_LOG_FILE = os.environ.get('TELEGRAM_LOG_FILE', os.path.join(LOG_DIR, 'telegram.log'))
     SECURITY_LOG_FILE = os.environ.get('SECURITY_LOG_FILE', os.path.join(LOG_DIR, 'security.log'))
     ERROR_LOG_FILE = os.environ.get('ERROR_LOG_FILE', os.path.join(LOG_DIR, 'error.log'))
