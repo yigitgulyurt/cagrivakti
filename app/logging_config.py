@@ -105,7 +105,8 @@ class APILogFormatter(IstanbulFormatter):
         request_id = getattr(record, 'request_id', '-')
         user_id = getattr(record, 'user_id', '-')
         
-        return (f'[{asctime}] {remote_addr:<15} - {method:<7} {path:<45} '
+        path_padding = 52 - len(method)
+        return (f'[{asctime}] {remote_addr:<15} - {method} {path:<{path_padding}} '
                 f'{status:3} {duration_ms:4}ms rid={request_id} uid={user_id}')
 
 
