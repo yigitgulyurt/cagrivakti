@@ -43,6 +43,11 @@ server {
 
     include /etc/nginx/snippets/security-headers.conf;
 
+    # WordPress scanner ve xmlrpc tarama trafiğini sessizce kes
+    location ~* (wp-includes|wp-admin|xmlrpc\.php) {
+        return 444;
+    }
+
     location / {
         include proxy_params;
         proxy_pass http://unix:/var/www/cagrivakti/cagrivakti.sock;
