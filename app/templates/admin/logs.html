@@ -146,9 +146,11 @@
     
     .log-viewer.compact-mode {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 450px));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 8px;
         padding: 12px;
+        align-items: start;
+        align-content: start;
     }
     
     .log-viewer::-webkit-scrollbar {
@@ -260,8 +262,8 @@
         border: 1px solid #30363d;
         white-space: normal;
         line-height: 1.3;
-        min-width: 320px;
-        max-width: 450px;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .compact-card.api {
