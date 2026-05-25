@@ -255,26 +255,34 @@
     .compact-card {
         background: #0d1117;
         border-radius: 6px;
-        padding: 5px 8px;
+        padding: 6px 10px;
         margin-bottom: 0;
         border: 1px solid #30363d;
+        white-space: normal;
+        line-height: 1.3;
     }
     
     .compact-card.api {
-        border-left: 2px solid #a78bfa;
+        border-left: 3px solid #a78bfa;
     }
     
     .compact-card.web {
-        border-left: 2px solid #f0b726;
+        border-left: 3px solid #f0b726;
     }
     
     .compact-header {
         display: flex;
         justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 4px;
+        gap: 8px;
+    }
+    
+    .compact-left {
+        display: flex;
         align-items: center;
-        margin-bottom: 3px;
+        gap: 6px;
         flex-wrap: wrap;
-        gap: 5px;
     }
     
     .compact-count {
@@ -284,9 +292,10 @@
     }
     
     .compact-ip {
-        color: #d29922;
+        color: #8b949e;
         font-weight: 500;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
+        text-align: right;
     }
     
     .compact-method {
@@ -298,28 +307,19 @@
         text-transform: uppercase;
     }
     
-    .compact-method.GET { background: rgba(63, 185, 80, 0.2); color: #3fb950; }
-    .compact-method.POST { background: rgba(240, 183, 38, 0.2); color: #f0b726; }
-    .compact-method.PUT { background: rgba(121, 192, 255, 0.2); color: #79c0ff; }
-    .compact-method.DELETE { background: rgba(248, 81, 73, 0.2); color: #f85149; }
-    .compact-method.PATCH { background: rgba(163, 113, 247, 0.2); color: #a371f7; }
+    .compact-method.GET     { background: rgba(63, 185, 80, 0.2);   color: #3fb950; }
+    .compact-method.POST    { background: rgba(240, 183, 38, 0.2);  color: #f0b726; }
+    .compact-method.PUT     { background: rgba(121, 192, 255, 0.2); color: #79c0ff; }
+    .compact-method.DELETE  { background: rgba(248, 81, 73, 0.2);   color: #f85149; }
+    .compact-method.PATCH   { background: rgba(163, 113, 247, 0.2); color: #a371f7; }
     .compact-method.OPTIONS { background: rgba(139, 148, 158, 0.2); color: #8b949e; }
-    .compact-method.HEAD { background: rgba(139, 148, 158, 0.2); color: #8b949e; }
+    .compact-method.HEAD    { background: rgba(139, 148, 158, 0.2); color: #8b949e; }
     
     .compact-path {
         font-family: 'JetBrainsMonoNerdFont', monospace;
         color: #e6edf3;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         word-break: break-all;
-    }
-    
-    .compact-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 3px;
-        flex-wrap: wrap;
-        gap: 4px;
     }
     
     .compact-statuses {
@@ -698,12 +698,14 @@ function renderCompactLogs(raw) {
         
         return `<div class="compact-card ${typeClass}">
             <div class="compact-header">
-                <span class="compact-count">${group.count}x</span>
+                <div class="compact-left">
+                    <span class="compact-count">${group.count}x</span>
+                    <span class="compact-method ${group.method}">${group.method}</span>
+                    ${statusPills ? `<div class="compact-statuses">${statusPills}</div>` : ''}
+                </div>
                 <span class="compact-ip">${group.ip}</span>
-                <span class="compact-method ${group.method}">${group.method}</span>
             </div>
             <div class="compact-path">${group.path}</div>
-            ${statusPills ? `<div class="compact-footer"><div class="compact-statuses">${statusPills}</div></div>` : ''}
         </div>`;
     }).join('') || '<div class="log-line">Filtrelere uygun veri bulunamadı.</div>';
 }
