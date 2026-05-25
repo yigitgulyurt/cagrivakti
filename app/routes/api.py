@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app, abort
+from flask import Blueprint, jsonify, request, current_app, abort, render_template
 import logging
 
 from app.services import UserService, PrayerService, get_daily_content, get_country_for_city, get_timezone_for_city, CITY_DISPLAY_NAME_MAPPING, COUNTRY_NAME_MAPPING
@@ -477,6 +477,9 @@ def health_check():
     
     return jsonify({"status": overall}), http_status
 
-@api_bp.route('/404')
-def not_found():
-    abort(404)
+@api_bp.route('/error/<int:code>')
+def error_page(code):
+    valid_codes = [400, 401, 403, 404, 405, 429, 500, 502, 503]
+    if code not in valid_codes:
+        code = 404
+    return render_template(f'errors/{code}.html'), code
