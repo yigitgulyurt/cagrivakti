@@ -4,8 +4,8 @@ from flask_limiter.errors import RateLimitExceeded
 import logging
 
 def is_api_subdomain():
-    """API subdomain'inde olup olmadığımızı kontrol eder"""
-    return request.host.startswith('api.')
+    """API subdomain'inde veya /api yolunda olup olmadığımızı kontrol eder"""
+    return request.path.startswith('/api/')
 
 def get_log_prefix():
     try:

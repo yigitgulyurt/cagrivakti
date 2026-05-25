@@ -476,3 +476,7 @@ def health_check():
             overall = "warning"
     
     return jsonify({"status": overall}), http_status
+
+@api_bp.route('/404')
+def not_found():
+    abort(404)
