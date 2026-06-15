@@ -980,7 +980,7 @@ def serve_sitemap():
         'views.index', 'views.sehir_secimi', 'views.imsakiye_secimi',
         'views.ramazan_nedir', 'views.orucu_bozan_durumlar',
         'views.neden_biz', 'views.indir', 'views.konum_bul',
-        'views.iletisim', 'views.ilkelerimiz',
+        'views.iletisim', 'views.ilkelerimiz', 'views.lisans',
         'views.bilgi_kosesi_liste', 'views.prime_number',
         'views.under_the_red_sky',
     ]
@@ -1141,6 +1141,37 @@ def send_admin_notification(name, email, subject, message):
         except Exception as e:
             current_app.logger.error(f"Telegram notification error: {e}")
 
+
+@views_bp.route('/lisans')
+@cache.cached(timeout=86400)
+def lisans():
+    title       = "Lisans — Çağrı Vakti"
+    description = "Çağrı Vakti yazılımının lisans bilgileri."
+
+    og_image_url = url_for(
+        'og.og_image',
+        title     = 'Lisans',
+        subtitle  = description,
+        theme     = 'license-page',
+        icon      = r'\uf0c0',
+        prompt    = 'Lisans',
+        domain    = 'cagrivakti.com.tr',
+        _external = True,
+    )
+
+    license_path = os.path.join(os.path.dirname(current_app.root_path), 'LICENSE')
+    try:
+        with open(license_path, 'r', encoding='utf-8') as f:
+            license_content = f.read()
+    except Exception as e:
+        current_app.logger.error(f"Lisans dosyası okunamadı: {e}")
+        license_content = "Lisans dosyası bulunamadı."
+
+    return render_template('info/license.html',
+                           seo_title=title,
+                           seo_description=description,
+                           og_image_url=og_image_url,
+                           license_content=license_content)
 
 @views_bp.route('/iletisim', methods=['GET', 'POST'])
 @limiter.limit("5 per hour", methods=['POST'])

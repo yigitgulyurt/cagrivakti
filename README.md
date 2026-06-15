@@ -69,3 +69,15 @@ The project is built on a modern technology stack focused on high performance an
 - **Advanced Notifications:** Customizable prayer time reminders via browsers and social bots.
 - **Mobile Experience:** Further enhancing the PWA experience to add new features with the smoothness of a native application.
 - **Community Tools:** Developing interactive sections where users can participate in events and sharing.
+
+---
+
+## 📜 Lisans / License
+
+Tüm Hakları Saklıdır © 2026 Yiğit Gülyurt
+
+Bu proje özel lisans ile korunmaktadır. Detaylı bilgi için [LICENSE](/LICENSE) dosyasına veya [web sitesindeki lisans sayfasına](https://cagrivakti.com.tr/lisans) bakınız.
+
+All Rights Reserved © 2026 Yiğit Gülyurt
+
+This project is protected under a proprietary license. See the [LICENSE](/LICENSE) file or the [license page on the website](https://cagrivakti.com.tr/lisans) for details.

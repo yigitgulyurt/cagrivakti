@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Lisans | Çağrı Vakti{% endblock %}
+
+{% block brand_text %}LİSANS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .license-container {
+        max-width: 1000px;
+        margin: 60px auto;
+        padding: 0 24px;
+    }
+    .license-card {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 60px;
+        border-radius: 32px;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+    }
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--gray);
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 32px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+    .back-link:hover {
+        color: var(--primary);
+        transform: translateX(-6px);
+    }
+    h1 {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        margin-bottom: 40px;
+        background: linear-gradient(to right, #fff, var(--primary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .license-content {
+        white-space: pre-wrap;
+        color: var(--gray);
+        line-height: 1.8;
+        font-size: 1rem;
+        font-family: 'Courier New', Courier, monospace;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 32px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .license-footer {
+        margin-top: 60px;
+        padding-top: 32px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--gray);
+        font-size: 0.9rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    @media (max-width: 768px) {
+        .license-container { margin: 30px auto; }
+        .license-card { padding: 32px 24px; border-radius: 24px; }
+        h1 { font-size: 2.2rem; }
+        .license-footer { flex-direction: column; text-align: center; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="license-container fade-in">
+    <a href="{{ url_for('views.index') }}" class="back-link">
+        <svg class="icon"><use xlink:href="#fa-arrow-left"></use></svg> Platforma Dön
+    </a>
+    
+    <article class="license-card">
+        <h1>Lisans Bilgileri</h1>
+        
+        <div class="license-content">{{ license_content }}</div>
+
+        <div class="license-footer">
+            <span>&copy; {{ current_year }} Çağrı Vakti | Tüm Hakları Saklıdır</span>
+        </div>
+    </article>
+</main>
+{% endblock %}
