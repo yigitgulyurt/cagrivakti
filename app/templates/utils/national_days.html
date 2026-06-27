@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}{{ seo_title }}{% endblock %}
+
+{% block brand_text %}MİLLİ GÜNLER{% endblock %}
+
+{% block extra_css %}
+<style>
+    .national-days-page {
+        min-height: 100vh;
+        padding: 20px;
+        background: var(--dark);
+        color: var(--text);
+    }
+
+    .content-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 0 10px;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(to right, #fff, var(--primary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.9rem;
+    }
+
+    /* Days Grid */
+    .days-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .day-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid rgba(255,255,255,0.05);
+        box-shadow: var(--card-shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .day-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255,255,255,0.1);
+    }
+
+    .day-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .day-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .day-type {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .day-type.bayram {
+        background: rgba(76,175,80,0.1);
+        color: #4caf50;
+    }
+
+    .day-type.milli {
+        background: rgba(33,150,243,0.1);
+        color: #2196f3;
+    }
+
+    .day-date {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.7);
+    }
+
+    .day-countdown {
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .day-countdown.today {
+        color: var(--primary);
+    }
+
+    .day-countdown.passed {
+        color: rgba(255,255,255,0.4);
+        text-decoration: line-through;
+    }
+
+    .day-description {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="national-days-page">
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h1>Milli Günler</h1>
+            <p>Türkiye Cumhuriyeti’nin milli ve özel günleri için güncel bilgiler ve kalan gün hesaplaması</p>
+        </div>
+
+        <!-- Milli Günler Listesi -->
+        <div class="days-grid">
+            {% for gun in milli_gunler %}
+                <div class="day-card">
+                    <div class="day-header">
+                        <span class="day-name">
+                            <span class="day-type {{ gun.tur }}">{{ gun.tur }}</span>
+                            {{ gun.ad }}
+                        </span>
+                        <span class="day-date">
+                            {% set turkish_months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'] %}
+                            {% set turkish_days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'] %}
+                            {{ gun.tarih.day }} {{ turkish_months[gun.tarih.month -1] }} {{ gun.tarih.year }} {{ turkish_days[gun.tarih.weekday()] }}
+                        </span>
+                    </div>
+                    {% if gun.kalan_gun == 0 %}
+                        <div class="day-countdown today">📌 Bugün</div>
+                    {% elif gun.kalan_gun == 1 %}
+                        <div class="day-countdown">⏳ Yarın</div>
+                    {% elif gun.kalan_gun > 0 %}
+                        <div class="day-countdown">⏳ {{ gun.kalan_gun }} gün kaldı</div>
+                    {% else %}
+                        <div class="day-countdown passed">✅ Geçti</div>
+                    {% endif %}
+                    {% if gun.aciklama %}
+                        <div class="day-description">{{ gun.aciklama }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
