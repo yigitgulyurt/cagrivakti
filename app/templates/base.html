@@ -97,6 +97,18 @@
           "position": 6,
           "name": "İmsakiye",
           "url": "https://cagrivakti.com.tr/imsakiye"
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "position": 7,
+          "name": "Dini Günler",
+          "url": "https://cagrivakti.com.tr/dini-gunler"
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "position": 8,
+          "name": "Milli Günler",
+          "url": "https://cagrivakti.com.tr/milli-gunler"
         }
       ]
     }
@@ -268,6 +280,8 @@
             <a href="{{ url_for('views.ramazan_nedir') }}"          class="nav-link" title="Ramazan Ayı Hakkında Merak Edilenler">Ramazan?</a>
             <a href="{{ url_for('views.orucu_bozan_durumlar') }}"   class="nav-link" title="Orucu Bozan ve Bozmayan Durumlar Rehberi">Oruç Bozan Durumlar?</a>
             <a href="{{ url_for('views.bilgi_kosesi_liste') }}"     class="nav-link" title="İslam ve Dini Konularda Yararlı Bilgiler">Bilgi Köşesi</a>
+            <a href="{{ url_for('views.dini_gunler') }}"             class="nav-link" title="Dini Günler ve Kandiller">Dini Günler</a>
+            <a href="{{ url_for('views.milli_gunler') }}"            class="nav-link" title="Türkiye'nin Milli ve Özel Günleri">Milli Günler</a>
             <a href="{{ url_for('views.neden_biz') }}"              class="nav-link" title="Neden Çağrı Vakti'ni Tercih Etmelisiniz?">Neden Biz?</a>
             <a href="{{ url_for('views.indir') }}"                  class="nav-link" title="Çağrı Vakti Mobil Uygulamasını Ücretsiz İndirin">Uygulamayı İndir</a>
             <a href="{{ url_for('views.ilkelerimiz') }}"            class="nav-link" title="Yayın İlkelerimiz ve Değerlerimiz">İlkelerimiz</a>
@@ -315,6 +329,8 @@
                 <a href="{{ url_for('views.sehir_secimi') }}">Vakitler</a>
                 <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye {{ current_year }}</a>
                 <a href="{{ url_for('views.kible_pusulasi') }}">Kıble</a>
+                <a href="{{ url_for('views.dini_gunler') }}">Dini Günler</a>
+                <a href="{{ url_for('views.milli_gunler') }}">Milli Günler</a>
                 <a href="{{ url_for('views.indir') }}">Uygulamayı İndir</a>
                 <a href="{{ url_for('views.iletisim') }}">İletişim</a>
                 <a href="{{ url_for('views.neden_biz') }}">Neden Biz?</a>
@@ -323,15 +339,7 @@
                 <a href="{{ url_for('views.rainmeter_guide') }}">Masaüstü Widget</a>
                 <a href="{{ url_for('views.prime_number') }}">Asal Sayı (20000 Basamak)</a>
                 <a href="{{ url_for('views.under_the_red_sky') }}">Oyun</a>
-            </div>
-
-            {# Sistem Durumu Bölümü #}
-            <div class="footer-status-section">
-                <div class="footer-status-label">Sistem Durumu</div>
-                <a href="#" id="status-link" class="footer-status-link">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-signal"></use></svg>
-                    <span>Canlı İzle</span>
-                </a>
+                <a href="https://durum.cagrivakti.com.tr" target="_blank" rel="noopener noreferrer" id="status-link">Sistem Durumu</a>
             </div>
 
             <div class="footer-creator">
