@@ -1,8 +1,6 @@
-from flask import request, render_template, current_app, g, session
+from flask import request, render_template, current_app, g
 import time
 import uuid
-from app.models import UtmVisit
-from app.extensions import db
 
 # İç ağ IP'lerini tek bir kez loglamak için cache
 _internal_ip_cache = set()
@@ -18,62 +16,6 @@ def setup_middleware(app):
         user_agent = request.headers.get('User-Agent', '').lower()
         if 'instagram' in user_agent and ('fbav' in user_agent or 'instagram' in user_agent):
             return render_template('utils/open_in_browser.html')
-
-    @app.before_request
-    def capture_utm_params():
-        # UTM parametrelerini kontrol et
-        utm_params = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
-        has_utm = any(request.args.get(param) for param in utm_params)
-        
-        # Eğer UTM parametreleri varsa ve zaten session'da saklanmamışsa
-        if has_utm and 'utm_data' not in session:
-            session['utm_data'] = {
-                'utm_source': request.args.get('utm_source'),
-                'utm_medium': request.args.get('utm_medium'),
-                'utm_campaign': request.args.get('utm_campaign'),
-                'utm_term': request.args.get('utm_term'),
-                'utm_content': request.args.get('utm_content'),
-                'initial_path': request.path,
-                'initial_referrer': request.headers.get('Referer')
-            }
-            # Session'ı kalıcı yap
-            session.permanent = True
-        
-        # Eğer session'da UTM verisi varsa veya şu anda UTM parametreleri varsa, kaydet
-        if has_utm or 'utm_data' in session:
-            try:
-                # Kullanıcı verilerini al
-                user_uid = getattr(g, 'user_uid', '-')
-                ip_address = request.remote_addr
-                user_agent = request.headers.get('User-Agent', '')[:500]
-                referrer = request.headers.get('Referer', '')[:255]
-                
-                # UTM verilerini al (ya yeni ya session'dan)
-                utm_data = session.get('utm_data', {}) if not has_utm else {
-                    'utm_source': request.args.get('utm_source'),
-                    'utm_medium': request.args.get('utm_medium'),
-                    'utm_campaign': request.args.get('utm_campaign'),
-                    'utm_term': request.args.get('utm_term'),
-                    'utm_content': request.args.get('utm_content')
-                }
-                
-                # Veritabanına kaydet
-                visit = UtmVisit(
-                    user_uid=user_uid,
-                    ip_address=ip_address,
-                    path=request.path,
-                    referrer=referrer,
-                    user_agent=user_agent,
-                    utm_source=utm_data.get('utm_source'),
-                    utm_medium=utm_data.get('utm_medium'),
-                    utm_campaign=utm_data.get('utm_campaign'),
-                    utm_term=utm_data.get('utm_term'),
-                    utm_content=utm_data.get('utm_content')
-                )
-                db.session.add(visit)
-                db.session.commit()
-            except Exception as e:
-                current_app.logger.error(f"UTM kaydetme hatası: {e}")
 
     @app.after_request
     def set_security_headers(response):

@@ -105,25 +105,3 @@ class StreamState(db.Model):
             db.session.add(state)
             db.session.commit()
         return state
-
-
-class UtmVisit(db.Model):
-    __tablename__ = 'utm_visits'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_uid = db.Column(db.String(32), nullable=False, index=True)
-    ip_address = db.Column(db.String(45), nullable=True, index=True)
-    path = db.Column(db.String(255), nullable=False, index=True)
-    referrer = db.Column(db.String(255), nullable=True)
-    user_agent = db.Column(db.String(500), nullable=True)
-    
-    utm_source = db.Column(db.String(100), nullable=True, index=True)
-    utm_medium = db.Column(db.String(100), nullable=True, index=True)
-    utm_campaign = db.Column(db.String(100), nullable=True, index=True)
-    utm_term = db.Column(db.String(100), nullable=True)
-    utm_content = db.Column(db.String(100), nullable=True)
-    
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-
-    def __repr__(self):
-        return f'<UtmVisit {self.utm_source} {self.utm_campaign}>'
