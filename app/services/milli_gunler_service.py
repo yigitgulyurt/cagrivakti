@@ -30,6 +30,13 @@ class MilliGunlerService:
                 "aciklama": "Yeni yılın ilk günü"
             },
             {
+                "ad": "8 Mart Dünya Kadınlar Günü",
+                "gun": 8,
+                "ay": 3,
+                "tur": "milli",
+                "aciklama": "Dünya Kadınlar Günü"
+            },
+            {
                 "ad": "23 Nisan Ulusal Egemenlik ve Çocuk Bayramı",
                 "gun": 23,
                 "ay": 4,
@@ -44,6 +51,13 @@ class MilliGunlerService:
                 "aciklama": "Dünya Emek ve Dayanışma Günü"
             },
             {
+                "ad": "3 Mayıs Basın Bayramı",
+                "gun": 3,
+                "ay": 5,
+                "tur": "milli",
+                "aciklama": "Türkiye Basın Bayramı"
+            },
+            {
                 "ad": "19 Mayıs Atatürk'ü Anma, Gençlik ve Spor Bayramı",
                 "gun": 19,
                 "ay": 5,
@@ -51,11 +65,32 @@ class MilliGunlerService:
                 "aciklama": "Samsun'a çıkış yıldönümü ve gençlik bayramı"
             },
             {
+                "ad": "15 Temmuz Demokrasi ve Milli Birlik Günü",
+                "gun": 15,
+                "ay": 7,
+                "tur": "milli",
+                "aciklama": "15 Temmuz Demokrasi ve Milli Birlik Günü"
+            },
+            {
                 "ad": "30 Ağustos Zafer Bayramı",
                 "gun": 30,
                 "ay": 8,
                 "tur": "bayram",
                 "aciklama": "Büyük Zafer'in yıldönümü"
+            },
+            {
+                "ad": "9 Eylül İzmir'in Kurtuluşu",
+                "gun": 9,
+                "ay": 9,
+                "tur": "milli",
+                "aciklama": "İzmir'in Kurtuluş Yıldönümü"
+            },
+            {
+                "ad": "5 Ekim Dünya Öğretmenler Günü",
+                "gun": 5,
+                "ay": 10,
+                "tur": "milli",
+                "aciklama": "Dünya Öğretmenler Günü"
             },
             {
                 "ad": "29 Ekim Cumhuriyet Bayramı",
@@ -70,6 +105,13 @@ class MilliGunlerService:
                 "ay": 11,
                 "tur": "milli",
                 "aciklama": "Gazi Mustafa Kemal Atatürk'ün ölüm yıldönümü"
+            },
+            {
+                "ad": "10 Aralık İnsan Hakları Günü",
+                "gun": 10,
+                "ay": 12,
+                "tur": "milli",
+                "aciklama": "Dünya İnsan Hakları Günü"
             },
         ]
 
