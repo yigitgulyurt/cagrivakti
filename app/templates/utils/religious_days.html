@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}{{ seo_title }}{% endblock %}
+
+{% block brand_text %}DİNİ GÜNLER{% endblock %}
+
+{% block extra_css %}
+<style>
+    .religious-days-page {
+        min-height: 100vh;
+        padding: 20px;
+        background: var(--dark);
+        color: var(--text);
+    }
+
+    .content-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 0 10px;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(to right, #fff, var(--primary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.9rem;
+    }
+
+    /* Ramazan Section */
+    .ramadan-section {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        border: 1px solid rgba(255,255,255,0.05);
+        box-shadow: var(--card-shadow);
+    }
+
+    .ramadan-section h2 {
+        font-size: 1.25rem;
+        color: var(--primary);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .ramadan-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+        gap: 16px;
+    }
+
+    .info-card {
+        background: rgba(0,0,0,0.15);
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .info-card .label {
+        font-size: 0.75rem;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .info-card .value {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .info-card .value.primary {
+        color: var(--primary);
+    }
+
+    /* Dini Günler Grid */
+    .days-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .day-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid rgba(255,255,255,0.05);
+        box-shadow: var(--card-shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .day-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255,255,255,0.1);
+    }
+
+    .day-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .day-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .day-type {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .day-type.kandil {
+        background: rgba(255,193,7,0.1);
+        color: #ffc107;
+    }
+
+    .day-type.bayram {
+        background: rgba(76,175,80,0.1);
+        color: #4caf50;
+    }
+
+    .day-type.ozel {
+        background: rgba(33,150,243,0.1);
+        color: #2196f3;
+    }
+
+    .day-date {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.7);
+    }
+
+    .day-countdown {
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .day-countdown.today {
+        color: var(--primary);
+    }
+
+    .day-countdown.passed {
+        color: rgba(255,255,255,0.4);
+        text-decoration: line-through;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="religious-days-page">
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h1>Dini Günler ve Kandiller</h1>
+            <p>Ramazan, bayramlar ve özel günler için anlık bilgiler ve kalan gün hesaplaması</p>
+        </div>
+
+        <!-- Ramazan Bölümü -->
+        <div class="ramadan-section">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)">
+                    <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.28-.38-.64-.38-1.03 0-.83.67-1.5 1.5-1.5h3.5c3.04 0 5.5-2.46 5.5-5.5S15.04 3 12 3zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6c.34 0 .67.03 1 .08.34.05.66.12 1 .21v.01c.32.09.64.19.94.3.31.11.6.23.89.36.29.13.57.28.84.44.27.16.53.34.79.53.26.19.51.39.76.6.25.21.49.44.72.68.24.24.47.49.7.75.24.26.46.53.68.81.22.28.42.56.62.85.2.29.39.59.57.89.18.3.35.61.5.92.16.31.3.63.44.95.14.32.27.65.38.98.11.33.21.66.29 1 .08.34.15.68.2 1.02.05.34.09.68.1 1.02 0 .01 0 .01 0 .02H12z"/>
+                </svg>
+                Ramazan
+            </h2>
+            <div class="ramadan-info">
+                {% if ramadan_info.is_ramadan %}
+                    <div class="info-card">
+                        <span class="label">Gün</span>
+                        <span class="value primary">{{ ramadan_info.current_day }} / 30</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="label">Kalan Gün</span>
+                        <span class="value">{{ ramadan_info.days_remaining }} gün</span>
+                    </div>
+                    {% if ramadan_info.is_laylat_al_qadr_day %}
+                        <div class="info-card">
+                            <span class="label">Özel</span>
+                            <span class="value primary">Kadir Gecesi!</span>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {% if ramadan_info.status == 'upcoming' %}
+                        <div class="info-card">
+                            <span class="label">Başlama Tarihi</span>
+                            <span class="value primary">{{ ramadan_info.start_date.strftime('%d/%m/%Y') if ramadan_info.start_date else '--' }}</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="label">Kalan Gün</span>
+                            <span class="value">{{ ramadan_info.days_to_start }} gün</span>
+                        </div>
+                    {% elif ramadan_info.status == 'finished' %}
+                        <div class="info-card">
+                            <span class="label">Durum</span>
+                            <span class="value">Bu yılki Ramazan bitti</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="label">Gelecek Yıl</span>
+                            <span class="value primary">{{ ramadan_info.next_ramadan_date.strftime('%d/%m/%Y') if ramadan_info.next_ramadan_date else '--' }}</span>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Dini Günler Listesi -->
+        <div class="days-grid">
+            {% for gun in dini_gunler %}
+                <div class="day-card">
+                    <div class="day-header">
+                        <span class="day-name">
+                            <span class="day-type {{ gun.tur }}">{{ gun.tur }}</span>
+                            {{ gun.ad }}
+                        </span>
+                        <span class="day-date">
+                            {% set turkish_months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'] %}
+                            {% set turkish_days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'] %}
+                            {{ gun.tarih.day }} {{ turkish_months[gun.tarih.month -1] }} {{ gun.tarih.year }} {{ turkish_days[gun.tarih.weekday()] }}
+                        </span>
+                    </div>
+                    {% if gun.kalan_gun == 0 %}
+                        <div class="day-countdown today">📌 Bugün</div>
+                    {% elif gun.kalan_gun == 1 %}
+                        <div class="day-countdown">⏳ Yarın</div>
+                    {% elif gun.kalan_gun > 0 %}
+                        <div class="day-countdown">⏳ {{ gun.kalan_gun }} gün kaldı</div>
+                    {% else %}
+                        <div class="day-countdown passed">✅ Geçti</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

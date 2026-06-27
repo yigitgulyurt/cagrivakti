@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, make_response, send_from_directory, current_app, abort, flash, jsonify
 from functools import wraps
 from app.services import UserService, PrayerService, RamadanService, get_timezone_for_city, get_daily_content, get_guides, get_guide_by_slug, get_country_for_city, CITY_DISPLAY_NAME_MAPPING, normalize_city_name
+from app.services.dini_gunler_service import DiniGunlerService
 from app.models import ContactMessage, DailyContent, Guide
 from app.extensions import cache, db, limiter, csrf
 from datetime import datetime, timedelta
@@ -256,6 +257,30 @@ def imsakiye_detay(sehir):
                            sehir=canonical_sehir,
                            country_code=country_code,
                            ramadan_info=RamadanService.get_ramadan_info(),
+                           og_image_url=og_image_url,
+                           seo_title=title,
+                           seo_description=description)
+
+
+@views_bp.route('/dini-gunler')
+@cache.cached(timeout=3600)
+def dini_gunler():
+    og_image_url = url_for(
+        'og.og_image',
+        title     = 'Dini Günler ve Kandiller',
+        subtitle  = 'Ramazan, bayramlar ve diğer önemli İslami günler hakkında bilgi.',
+        theme     = 'religious-days',
+        icon      = r'\udb82\udd79',
+        prompt    = 'Dini Günler',
+        domain    = 'cagrivakti.com.tr',
+        _external = True,
+    )
+
+    title       = f"Dini Günler ve Kandiller {suanki_yil} — Çağrı Vakti"
+    description = f"Ramazan ayı, bayramlar, kandiller ve diğer önemli İslami günler hakkında güncel bilgiler ve kalan günler."
+    return render_template('utils/religious_days.html',
+                           ramadan_info=RamadanService.get_ramadan_info(),
+                           dini_gunler=DiniGunlerService.get_dini_gunler(),
                            og_image_url=og_image_url,
                            seo_title=title,
                            seo_description=description)
@@ -982,7 +1007,7 @@ def serve_sitemap():
         'views.neden_biz', 'views.indir', 'views.konum_bul',
         'views.iletisim', 'views.ilkelerimiz', 'views.lisans',
         'views.bilgi_kosesi_liste', 'views.prime_number',
-        'views.under_the_red_sky',
+        'views.under_the_red_sky', 'views.dini_gunler',
     ]
     for rule in static_urls:
         pages.append({
