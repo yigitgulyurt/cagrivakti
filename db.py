@@ -19,7 +19,7 @@ Namaz Vakitleri DB Kontrol Aracı - Kullanım Kılavuzu:
 Komutlar:
   init     : Veritabanı tablolarını oluşturur ve migrations klasörünü hazırlar.
   migrate  : Modellerdeki değişiklikleri algılar ve yeni bir migrasyon dosyası oluşturur.
-             Kullanım: python db.py migrate -m "mesaj"
+             Kullanım: "python db.py migrate" -m "mesaj"
   update   : Bekleyen migrasyonları veritabanına uygular (upgrade).
   drop     : Veritabanındaki TÜM tabloları siler (Onay ister).
   reset    : Tüm tabloları siler ve her şeyi yeniden oluşturur (Onay ister).

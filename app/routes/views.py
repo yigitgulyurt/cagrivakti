@@ -748,6 +748,44 @@ def admin_logs():
                            stats=stats)
 
 
+@views_bp.route('/admin/utm')
+@admin_required
+def admin_utm():
+    from app.models import UtmVisit
+    from sqlalchemy import func
+    
+    # Toplam ziyaret sayısı
+    total_visits = UtmVisit.query.count()
+    
+    # Kaynak bazında istatistikler
+    source_stats = db.session.query(
+        UtmVisit.utm_source,
+        func.count(UtmVisit.id).label('count')
+    ).filter(UtmVisit.utm_source.isnot(None)).group_by(UtmVisit.utm_source).order_by(func.count(UtmVisit.id).desc()).all()
+    
+    # Kampanya bazında istatistikler
+    campaign_stats = db.session.query(
+        UtmVisit.utm_campaign,
+        func.count(UtmVisit.id).label('count')
+    ).filter(UtmVisit.utm_campaign.isnot(None)).group_by(UtmVisit.utm_campaign).order_by(func.count(UtmVisit.id).desc()).all()
+    
+    # Orta bazında istatistikler
+    medium_stats = db.session.query(
+        UtmVisit.utm_medium,
+        func.count(UtmVisit.id).label('count')
+    ).filter(UtmVisit.utm_medium.isnot(None)).group_by(UtmVisit.utm_medium).order_by(func.count(UtmVisit.id).desc()).all()
+    
+    # Son 50 ziyaret
+    recent_visits = UtmVisit.query.order_by(UtmVisit.created_at.desc()).limit(50).all()
+    
+    return render_template('admin/utm.html',
+                           total_visits=total_visits,
+                           source_stats=source_stats,
+                           campaign_stats=campaign_stats,
+                           medium_stats=medium_stats,
+                           recent_visits=recent_visits)
+
+
 import subprocess
 
 def get_systemd_service_status(service_name):

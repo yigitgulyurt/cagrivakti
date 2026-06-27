@@ -10,7 +10,6 @@ Flask_Migrate==4.0.5
 Flask_Minify==0.50
 flask_sqlalchemy==3.1.1
 flask_wtf==1.2.2
-nextcord==3.1.1
 pandas==3.0.1
 python-dotenv==1.2.2
 python-telegram-bot==22.6
