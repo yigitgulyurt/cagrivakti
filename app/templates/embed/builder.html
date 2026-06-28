@@ -628,6 +628,12 @@
                 <div class="form-group">
                     <label class="form-label">Hazır Boyutlar</label>
                     <div class="preset-grid">
+                        <button type="button" class="preset-btn" data-w="150" data-h="220">
+                            <i class="fas fa-square preset-icon"></i>
+                            Basit
+                            <span class="preset-dim">150x220</span>
+                        </button>
+
                         <button type="button" class="preset-btn active" data-w="300" data-h="250">
                             <i class="fas fa-square preset-icon"></i>
                             Kare
@@ -691,7 +697,7 @@
                             <button type="button" class="number-btn minus" data-target="height-input">
                                 <svg class="icon" viewBox="0 0 640 640"><use xlink:href="#fa-minus"></use></svg>
                             </button>
-                            <input type="number" id="height-input" value="250" min="50" max="1200" class="form-control">
+                            <input type="number" id="height-input" value="250" min="220" max="1200" class="form-control">
                             <button type="button" class="number-btn plus" data-target="height-input">
                                 <svg class="icon" viewBox="0 0 640 640"><use xlink:href="#fa-plus"></use></svg>
                             </button>
@@ -737,6 +743,15 @@
         <div class="showroom-grid">
             <!-- Top Row: Square, Vertical Detail, Full Feature, Skyscraper -->
             <div class="showroom-row top-row">
+
+                <!-- Basit -->
+                <div class="showroom-item">
+                    <span class="showroom-label">Basit (150x220)</span>
+                    <div class="showroom-frame-wrapper">
+                        <iframe class="showroom-frame" data-w="150" data-h="220" frameborder="0" scrolling="no"></iframe>
+                    </div>
+
+
                 <!-- Square -->
                 <div class="showroom-item">
                     <span class="showroom-label">Kare (300x250)</span>
