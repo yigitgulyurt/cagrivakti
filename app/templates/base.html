@@ -314,32 +314,117 @@
 
             {# Popular city shortcuts #}
             <div class="footer-popular-cities">
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Istanbul',   country='TR') }}">İstanbul</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Ankara',     country='TR') }}">Ankara</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Izmir',      country='TR') }}">İzmir</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Antalya',    country='TR') }}">Antalya</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Trabzon',    country='TR') }}">Trabzon</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Erzurum',    country='TR') }}">Erzurum</a>
-                <a href="{{ url_for('views.sehir_sayfasi', sehir='Diyarbakir', country='TR') }}">Diyarbakır</a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Istanbul',   country='TR') }}">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
+                    İstanbul
+                </a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Ankara',     country='TR') }}">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
+                    Ankara
+                </a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Izmir',      country='TR') }}">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
+                    İzmir
+                </a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Antalya',    country='TR') }}">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
+                    Antalya
+                </a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Trabzon',    country='TR') }}">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
+                    Trabzon
+                </a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Erzurum',    country='TR') }}">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
+                    Erzurum
+                </a>
+                <a href="{{ url_for('views.sehir_sayfasi', sehir='Diyarbakir', country='TR') }}">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#fa-city"></use></svg>
+                    Diyarbakır
+                </a>
             </div>
 
-            {# Site-wide links #}
-            <div class="footer-links">
-                <a href="{{ url_for('views.ataturk') }}"          class="footer-link-ataturk">Atatürk</a>
-                <a href="{{ url_for('views.sehir_secimi') }}">Vakitler</a>
-                <a href="{{ url_for('views.imsakiye_secimi') }}">İmsakiye {{ current_year }}</a>
-                <a href="{{ url_for('views.kible_pusulasi') }}">Kıble</a>
-                <a href="{{ url_for('views.dini_gunler') }}">Dini Günler</a>
-                <a href="{{ url_for('views.milli_gunler') }}">Milli Günler</a>
-                <a href="{{ url_for('views.indir') }}">Uygulamayı İndir</a>
-                <a href="{{ url_for('views.iletisim') }}">İletişim</a>
-                <a href="{{ url_for('views.neden_biz') }}">Neden Biz?</a>
-                <a href="{{ url_for('views.ilkelerimiz') }}">İlkelerimiz</a>
-                <a href="{{ url_for('views.sitene_ekle') }}">Sitene Ekle</a>
-                <a href="{{ url_for('views.rainmeter_guide') }}">Masaüstü Widget</a>
-                <a href="{{ url_for('views.prime_number') }}">Asal Sayı (20000 Basamak)</a>
-                <a href="{{ url_for('views.under_the_red_sky') }}">Oyun</a>
-                <a href="https://durum.cagrivakti.com.tr" target="_blank" rel="noopener noreferrer" id="status-link">Sistem Durumu</a>
+            {# Site-wide links - organized into sections #}
+            <div class="footer-links-grid">
+                <div class="footer-column">
+                    <h4>Vakit Araçları</h4>
+                    <a href="{{ url_for('views.sehir_secimi') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-clock-solid"></use></svg>
+                        Namaz Vakitleri
+                    </a>
+                    <a href="{{ url_for('views.imsakiye_secimi') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-calendar-days-solid"></use></svg>
+                        İmsakiye {{ current_year }}
+                    </a>
+                    <a href="{{ url_for('views.kible_pusulasi') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-compass-solid"></use></svg>
+                        Kıble Pusulası
+                    </a>
+                    <a href="{{ url_for('views.dini_gunler') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-calendar-days-solid"></use></svg>
+                        Dini Günler
+                    </a>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Diğer Araçlar</h4>
+                    <a href="{{ url_for('views.indir') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-download-solid-full"></use></svg>
+                        Uygulamayı İndir
+                    </a>
+                    <a href="{{ url_for('views.rainmeter_guide') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-file-edit-solid-full"></use></svg>
+                        Masaüstü Widget
+                    </a>
+                    <a href="{{ url_for('views.prime_number') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-code"></use></svg>
+                        Asal Sayı (20000 Basamak)
+                    </a>
+                    <a href="{{ url_for('views.under_the_red_sky') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-star"></use></svg>
+                        Oyun
+                    </a>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Hakkımızda</h4>
+                    <a href="{{ url_for('views.ataturk') }}" class="footer-link-ataturk">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-star"></use></svg>
+                        Atatürk
+                    </a>
+                    <a href="{{ url_for('views.milli_gunler') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-calendar-days-solid"></use></svg>
+                        Milli Günler
+                    </a>
+                    <a href="{{ url_for('views.neden_biz') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-circle-info-solid-full"></use></svg>
+                        Neden Biz?
+                    </a>
+                    <a href="{{ url_for('views.ilkelerimiz') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-shield-alt"></use></svg>
+                        İlkelerimiz
+                    </a>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>İletişim</h4>
+                    <a href="{{ url_for('views.iletisim') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-envelope-solid-full"></use></svg>
+                        İletişim
+                    </a>
+                    <a href="{{ url_for('views.sitene_ekle') }}">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-code"></use></svg>
+                        Sitene Ekle
+                    </a>
+                    <a href="https://github.com/yigitgulyurt/cagrivakti" target="_blank" rel="noopener noreferrer">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-code"></use></svg>
+                        GitHub
+                    </a>
+                    <a href="https://durum.cagrivakti.com.tr" target="_blank" rel="noopener noreferrer" id="status-link">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#fa-circle-check-solid"></use></svg>
+                        Sistem Durumu
+                    </a>
+                </div>
             </div>
 
             <div class="footer-creator">
