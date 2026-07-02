@@ -125,8 +125,8 @@ self.addEventListener('fetch', (event) => {
     if (
         url.hostname === 'fonts.googleapis.com' ||
         url.hostname === 'fonts.gstatic.com' ||
-        url.hostname === 'font.yigitgulyurt.net.tr' ||
-        url.hostname === 'image.yigitgulyurt.net.tr' ||
+        (url.hostname === 'yigitgulyurt.net.tr' &&
+        (url.pathname.startsWith('/font') || url.pathname.startsWith('/image'))) ||
         url.pathname.startsWith('/canli-kaynak/') ||
         url.pathname === '/stream/status' ||
         url.pathname.startsWith('/paylas/')

@@ -1075,7 +1075,7 @@ def serve_robots():
 
 @views_bp.route('/favicon.ico')
 def favicon():
-    return redirect('https://image.yigitgulyurt.net.tr/file/cagrivakti/favicon.ico', code=301)
+    return redirect('https://yigitgulyurt.net.tr/image/file/cagrivakti/favicon.ico', code=301)
 
 
 @views_bp.route('/sw.js')
