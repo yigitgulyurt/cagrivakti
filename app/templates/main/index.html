@@ -952,10 +952,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const vakitler = data.vakitler;
             const tz       = data.timezone || 'Europe/Istanbul';
 
+            const isFriday = (() => {
+                const now = new Date();
+                const cityNow = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+                return cityNow.getDay() === 5; // Sunday=0, Friday=5
+            })();
             const VAKIT_SIRASI = [
                 { id: 'imsak',  label: 'İmsak'  },
                 { id: 'gunes',  label: 'Güneş'  },
-                { id: 'ogle',   label: 'Öğle'   },
+                { id: 'ogle',   label: isFriday ? 'Cuma' : 'Öğle'   },
                 { id: 'ikindi', label: 'İkindi' },
                 { id: 'aksam',  label: 'Akşam'  },
                 { id: 'yatsi',  label: 'Yatsı'  },

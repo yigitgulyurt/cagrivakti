@@ -126,10 +126,11 @@
         <div class="vakitler-grid">
 
             {# Build vakit list — Ramadan swaps Akşam→İftar and Yatsı→Teravih #}
+            {% set is_friday = is_friday_in_timezone(vakitler.timezone) %}
             {% set vakit_list = [
                 ('imsak',  'İmsak'),
                 ('gunes',  'Güneş'),
-                ('ogle',   'Öğle'),
+                ('ogle',   'Cuma'   if is_friday else 'Öğle'),
                 ('ikindi', 'İkindi'),
                 ('aksam',  'İftar'   if ramadan_info.is_ramadan else 'Akşam'),
                 ('yatsi',  'Teravih' if ramadan_info.is_ramadan else 'Yatsı'),
@@ -591,10 +592,16 @@ async function dailyContentYukle() {
 /* ================================================================
    Countdown engine  (called every second via setInterval)
    ================================================================ */
-const VAKIT_NAME_MAP = {
-    imsak: 'İmsak', gunes: 'Güneş', ogle: 'Öğle',
-    ikindi: 'İkindi', aksam: 'Akşam', yatsi: 'Yatsı',
-};
+const isFriday = (() => {
+            const tz = ezanVakitleri.timezone || 'Europe/Istanbul';
+            const now = new Date();
+            const cityNow = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+            return cityNow.getDay() === 5; // Sunday=0, Friday=5
+        })();
+        const VAKIT_NAME_MAP = {
+            imsak: 'İmsak', gunes: 'Güneş', ogle: isFriday ? 'Cuma' : 'Öğle',
+            ikindi: 'İkindi', aksam: 'Akşam', yatsi: 'Yatsı',
+        };
 
 function updateCountdowns() {
     if (!ezanVakitleri) return;

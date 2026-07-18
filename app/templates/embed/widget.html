@@ -337,7 +337,8 @@
             <a href="https://cagrivakti.com.tr" target="_blank" class="logo-link">Çağrı Vakti</a>
         </div>
         <div class="times-grid">
-            {% for vakit_key, vakit_label in [('imsak', 'İmsak'), ('gunes', 'Güneş'), ('ogle', 'Öğle'), ('ikindi', 'İkindi'), ('aksam', 'Akşam'), ('yatsi', 'Yatsı')] %}
+            {% set is_friday = is_friday_in_timezone(vakitler.timezone) %}
+            {% for vakit_key, vakit_label in [('imsak', 'İmsak'), ('gunes', 'Güneş'), ('ogle', 'Cuma' if is_friday else 'Öğle'), ('ikindi', 'İkindi'), ('aksam', 'Akşam'), ('yatsi', 'Yatsı')] %}
             <div class="time-item" id="card-{{ vakit_key }}">
                 <span class="time-label">{{ vakit_label }}</span>
                 <span class="time-value">{{ vakitler[vakit_key] }}</span>
@@ -485,7 +486,13 @@
                 }
 
                 // Render matching city page design
-                const map = {'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': 'Öğle', 'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'};
+        const isFriday = (() => {
+            const tz = ezanVakitleri.timezone || 'Europe/Istanbul';
+            const now = new Date();
+            const cityNow = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+            return cityNow.getDay() === 5; // Sunday=0, Friday=5
+        })();
+            const map = {'imsak': 'İmsak', 'gunes': 'Güneş', 'ogle': isFriday ? 'Cuma' : 'Öğle', 'ikindi': 'İkindi', 'aksam': 'Akşam', 'yatsi': 'Yatsı'};
                 let displayName = map[nextVakitName] || nextVakitName;
 
                 if (nextVakitName === 'imsak' && ezanVakitleri.yarin && ezanVakitleri.yarin.imsak) {

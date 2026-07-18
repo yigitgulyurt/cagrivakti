@@ -474,11 +474,19 @@
         // Bugünün tarihini al (YYYY-MM-DD formatında)
         const today = new Date().toISOString().split('T')[0];
 
-        // Header'ları güncelle (İftar/Sahur için)
+        // Header'ları güncelle (İftar/Sahur ve Cuma için)
         const isRamadanTab = currentTab === 'ramazan';
+        // Check if today is Friday (local timezone or city timezone? Let's use city's timezone if available)
+        const isTodayFriday = (() => {
+            const tz = '{{ sehir_verisi.timezone or "Europe/Istanbul" }}';
+            const now = new Date();
+            const cityNow = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+            return cityNow.getDay() === 5; // Sunday=0, Friday=5
+        })();
         const headers = document.querySelectorAll('.imsakiye-table th');
         if (headers.length >= 6) {
             headers[1].textContent = isRamadanTab ? 'Sahur' : 'İmsak';
+            headers[3].textContent = isTodayFriday ? 'Cuma' : 'Öğle';
             headers[5].textContent = isRamadanTab ? 'İftar' : 'Akşam';
         }
 

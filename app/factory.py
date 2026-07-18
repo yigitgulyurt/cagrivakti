@@ -180,6 +180,7 @@ def create_app(config_class=Config):
 
     from app.services.ramadan_service import RamadanService
     from app.services import CITY_DISPLAY_NAME_MAPPING
+    import pytz
     
     @app.context_processor
     def inject_global_data():
@@ -187,13 +188,32 @@ def create_app(config_class=Config):
             if not city_name: return ""
             return CITY_DISPLAY_NAME_MAPPING.get(city_name, city_name)
 
+        def is_friday_in_timezone(timezone_str):
+            """Check if today is Friday in the given timezone."""
+            try:
+                tz = pytz.timezone(timezone_str)
+                now_in_tz = datetime.now(tz)
+                return now_in_tz.weekday() == 4  # Monday=0, Friday=4
+            except Exception:
+                return False
+
+        def is_date_friday(date_str):
+            """Check if a YYYY-MM-DD date string is Friday."""
+            try:
+                d = datetime.strptime(date_str, "%Y-%m-%d").date()
+                return d.weekday() == 4  # Monday=0, Friday=4
+            except Exception:
+                return False
+
         return dict(
             ramadan_info=RamadanService.get_ramadan_info(),
             current_year=datetime.now().year,
             app_version=app.config.get('APP_VERSION', '1.0'),
             get_display_name=get_display_name,
             CITY_DISPLAY_NAME_MAPPING=CITY_DISPLAY_NAME_MAPPING,
-            now=datetime.now
+            now=datetime.now,
+            is_friday_in_timezone=is_friday_in_timezone,
+            is_date_friday=is_date_friday
         )
 
     # ── Versiyon değişince Flask cache'ini otomatik temizle ──
