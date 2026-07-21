@@ -240,16 +240,19 @@ def imsakiye_detay(sehir):
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
 
     sehir_adi = CITY_DISPLAY_NAME_MAPPING.get(canonical_sehir, canonical_sehir.replace('-', ' ').title())
+    sehir_verisi = {
+        'timezone': get_timezone_for_city(canonical_sehir, country_code)
+    }
 
     og_image_url = url_for(
         'og.og_image',
-        title     = f"{sehir_adi} {suanki_yil} İmsakiyesi",
-        subtitle  = f"{suanki_yil} Yılı Sahur ve İftar Vakitleri",
+        title     =f"{sehir_adi} {suanki_yil} İmsakiyesi",
+        subtitle  =f"{suanki_yil} Yılı Sahur ve İftar Vakitleri",
         theme     = 'imsakiye-page',
         icon      = r'\udb82\udd79',
-        prompt    = f"{sehir_adi} İmsakiyesi",
-        domain    = 'cagrivakti.com.tr',
-        _external = True,
+        prompt    =f"{sehir_adi} İmsakiyesi",
+        domain    ='cagrivakti.com.tr',
+        _external =True,
     )
 
     title       = f"{sehir_adi} {suanki_yil} İmsakiyesi — Çağrı Vakti"
@@ -258,6 +261,7 @@ def imsakiye_detay(sehir):
                            sehir=canonical_sehir,
                            country_code=country_code,
                            ramadan_info=RamadanService.get_ramadan_info(),
+                           sehir_verisi=sehir_verisi,
                            og_image_url=og_image_url,
                            seo_title=title,
                            seo_description=description)
