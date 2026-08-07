@@ -20,7 +20,7 @@ server {
 # WWW -> Ana Domain Yönlendirme (HTTPS)
 # --------------------------------------------------
 server {
-    listen 443 ssl;
+    listen 127.0.0.1:8443 ssl;
     server_name www.cagrivakti.com.tr;
     ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
@@ -34,7 +34,7 @@ server {
 # Ana Domain (cagrivakti.com.tr) - HTTPS
 # --------------------------------------------------
 server {
-    listen 443 ssl;
+    listen 127.0.0.1:8443 ssl;
     server_name cagrivakti.com.tr;
     ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
@@ -67,7 +67,7 @@ server {
 # Status Subdomain (status.cagrivakti.com.tr) - HTTPS
 # --------------------------------------------------
 server {
-    listen 443 ssl;
+    listen 127.0.0.1:8443 ssl;
     server_name status.cagrivakti.com.tr;
     ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
@@ -90,7 +90,7 @@ server {
 # Durum Subdomain (durum.cagrivakti.com.tr) - HTTPS
 # --------------------------------------------------
 server {
-    listen 443 ssl;
+    listen 127.0.0.1:8443 ssl;
     server_name durum.cagrivakti.com.tr;
     ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
@@ -112,7 +112,7 @@ server {
 # Kuma Admin Subdomain (kuma.cagrivakti.com.tr) - HTTPS
 # --------------------------------------------------
 server {
-    listen 443 ssl;
+    listen 127.0.0.1:8443 ssl;
     server_name kuma.cagrivakti.com.tr;
     ssl_certificate /etc/letsencrypt/live/cagrivakti.com.tr/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/cagrivakti.com.tr/privkey.pem;
