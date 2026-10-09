@@ -390,6 +390,7 @@
 <script>
     const sehir = "{{ sehir }}";
     const countryCode = "{{ country_code }}";
+    const currentYear = "{{ current_year }}";
     let currentTab = 'haftalik';
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -420,7 +421,7 @@
                 const now = new Date();
                 url += `&ay=${now.getMonth() + 1}&yil=${now.getFullYear()}`;
             } else if (currentTab === 'yillik') {
-                url += `&tam_yil=true&yil=${(currentYear)}`;
+                url += `&tam_yil=true&yil=${(current_year)}`;
 
             } else if (currentTab === 'ramazan') {
                 url += `&ramazan=true`;
