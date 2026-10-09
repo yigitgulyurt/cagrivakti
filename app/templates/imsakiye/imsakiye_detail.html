@@ -74,6 +74,20 @@
                 </a>
             </div>
         </div>
+
+        <div class="arsiv-section fade-in">
+            <div class="arsiv-header">
+                <span class="arsiv-label">Yıllık Arşiv</span>
+            </div>
+            <div class="arsiv-years" id="arsiv-years">
+                {% for yil in arsiv_yillari %}
+                    <button class="arsiv-year-btn {% if yil == current_year %}active{% endif %}"
+                            data-yil="{{ yil }}">
+                        {{ yil }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -372,12 +386,85 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
+
+    .arsiv-years {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .arsiv-year-btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+
+/* Arsiv Section - Minimal, soluk görünüm */
+.arsiv-section {
+    margin-top: 60px;
+    padding: 20px 24px;
+    border: 0.5px solid var(--imsakiye-border);
+    border-radius: 20px;
+    background: transparent;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    user-select: none;
+}
+
+.arsiv-section:hover {
+    opacity: 1;
+}
+
+.arsiv-header {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.arsiv-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.arsiv-years {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.arsiv-year-btn {
+    background: transparent;
+    border: 0.5px solid rgba(255, 255, 255, 0.06);
+    color: #555;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+}
+
+.arsiv-year-btn:hover {
+    border-color: rgba(255, 193, 7, 0.3);
+    color: #888;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.arsiv-year-btn.active {
+    border-color: rgba(255, 193, 7, 0.4);
+    color: var(--imsakiye-primary);
+    background: rgba(255, 193, 7, 0.04);
+    font-weight: 600;
 }
 
 @media print {
     body { background: #fff !important; color: #000 !important; }
     .imsakiye-wrapper { padding: 0; }
-    .navbar, .imsakiye-tabs, .imsakiye-footer, .back-btn { display: none !important; }
+    .navbar, .imsakiye-tabs, .imsakiye-footer, .back-btn, .arsiv-section { display: none !important; }
     .imsakiye-content { border: 1px solid #000; border-radius: 0; box-shadow: none; }
     .imsakiye-table th { background: #f0f0f0 !important; color: #000 !important; border-bottom: 2px solid #000; }
     .imsakiye-table td { color: #000 !important; border-bottom: 1px solid #ccc; }
@@ -390,14 +477,65 @@
 <script>
     const sehir = "{{ sehir }}";
     const countryCode = "{{ country_code }}";
-    const current_year = "{{ current_year }}";
+    let current_year = parseInt("{{ current_year }}", 10);
     let currentTab = 'haftalik';
+
+    function getUrlParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+    }
+
+    function updateUrlParams() {
+        const params = new URLSearchParams();
+        if (countryCode && countryCode !== 'TR') {
+            params.set('country', countryCode);
+        }
+        const urlYil = getUrlParam('yil');
+        const serverYil = parseInt("{{ current_year }}", 10);
+        if (current_year !== serverYil || urlYil) {
+            params.set('yil', current_year.toString());
+        }
+        const qs = params.toString();
+        const newUrl = window.location.pathname + (qs ? '?' + qs : '');
+        window.history.replaceState({}, '', newUrl);
+    }
+
+    function initYearFromUrl() {
+        const urlYil = getUrlParam('yil');
+        if (urlYil && !isNaN(parseInt(urlYil, 10))) {
+            current_year = parseInt(urlYil, 10);
+            document.querySelectorAll('.arsiv-year-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.yil, 10) === current_year);
+            });
+            updateYearBadge();
+        }
+    }
+
+    function updateYearBadge() {
+        const badge = document.querySelector('.year-badge');
+        if (badge) badge.textContent = current_year;
+        document.title = document.title.replace(/\d{4}/, current_year);
+    }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentTab = btn.dataset.tab;
+            fetchVakitler();
+        });
+    });
+
+    document.querySelectorAll('.arsiv-year-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const yil = parseInt(btn.dataset.yil, 10);
+            if (yil === current_year) return;
+
+            document.querySelectorAll('.arsiv-year-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            current_year = yil;
+            updateYearBadge();
+            updateUrlParams();
             fetchVakitler();
         });
     });
@@ -417,20 +555,19 @@
         try {
             let url = `https://cagrivakti.com.tr/api/cagri_vakitleri?v=${app_version}&sehir=${sehir}&ulke=${countryCode}`;
             
-            if (currentTab === 'aylik') {
-                const now = new Date();
-                url += `&ay=${now.getMonth() + 1}&yil=${now.getFullYear()}`;
-            } else if (currentTab === 'yillik') {
-                url += `&tam_yil=true&yil=${(current_year)}`;
+            const now = new Date();
+            const useTodayYear = current_year === now.getFullYear();
+            const refMonth = useTodayYear ? now.getMonth() + 1 : 1;
+            const refYear = current_year;
 
+            if (currentTab === 'aylik') {
+                url += `&ay=${refMonth}&yil=${refYear}`;
+            } else if (currentTab === 'yillik') {
+                url += `&tam_yil=true&yil=${refYear}`;
             } else if (currentTab === 'ramazan') {
-                url += `&ramazan=true`;
+                url += `&ramazan=true&yil=${refYear}`;
             } else {
-                // Haftalık için özel bir parametre yok ama API'den bugünden itibaren 7 günü alabiliriz
-        // Mevcut API v1 tam yılı destekliyor, biz oradan ilk 7 günü filtreleyebiliriz
-        // Ya da API'ye haftalık desteği eklenebilir. Şimdilik aylık veriden ilk 7 günü alalım.
-        const now = new Date();
-                url += `&ay=${now.getMonth() + 1}&yil=${now.getFullYear()}`;
+                url += `&ay=${refMonth}&yil=${refYear}`;
             }
 
             const response = await fetch(url);
@@ -440,11 +577,14 @@
                 let vakitler = result.data.vakitler || [];
                 
                 if (currentTab === 'haftalik') {
-                    // Sadece bugünden itibaren 7 günü al
-                    const today = new Date().toISOString().split('T')[0];
-                    const todayIndex = vakitler.findIndex(v => v.tarih >= today);
-                    if (todayIndex !== -1) {
-                        vakitler = vakitler.slice(todayIndex, todayIndex + 7);
+                    if (useTodayYear) {
+                        const today = new Date().toISOString().split('T')[0];
+                        const todayIndex = vakitler.findIndex(v => v.tarih >= today);
+                        if (todayIndex !== -1) {
+                            vakitler = vakitler.slice(todayIndex, todayIndex + 7);
+                        } else {
+                            vakitler = vakitler.slice(0, 7);
+                        }
                     } else {
                         vakitler = vakitler.slice(0, 7);
                     }
@@ -473,17 +613,14 @@
         const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
         const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
 
-        // Bugünün tarihini al (YYYY-MM-DD formatında)
         const today = new Date().toISOString().split('T')[0];
 
-        // Header'ları güncelle (İftar/Sahur ve Cuma için)
         const isRamadanTab = currentTab === 'ramazan';
-        // Check if today is Friday (local timezone or city timezone? Let's use city's timezone if available)
         const isTodayFriday = (() => {
             const tz = '{{ sehir_verisi.timezone or "Europe/Istanbul" }}';
             const now = new Date();
             const cityNow = new Date(now.toLocaleString('en-US', { timeZone: tz }));
-            return cityNow.getDay() === 5; // Sunday=0, Friday=5
+            return cityNow.getDay() === 5;
         })();
         const headers = document.querySelectorAll('.imsakiye-table th');
         if (headers.length >= 6) {
@@ -503,7 +640,6 @@
                 tr.classList.add('today-row');
             }
             
-            // Ramazan günü bilgisi (Eğer ramazan tabındaysak)
             let tarihHtml = `
                 <span class="tarih-cell">${dateStr}</span>
                 <span class="tarih-sub">${dayStr}</span>
@@ -530,7 +666,6 @@
             `;
             body.appendChild(tr);
 
-            // Eğer bugünse ve tablo içindeyse oraya kaydır (opsiyonel ama kullanışlı)
             if (isToday && currentTab !== 'haftalik') {
                 setTimeout(() => {
                     tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -539,7 +674,9 @@
         });
     }
 
-    // İlk yükleme
-    document.addEventListener('DOMContentLoaded', fetchVakitler);
+    document.addEventListener('DOMContentLoaded', () => {
+        initYearFromUrl();
+        fetchVakitler();
+    });
 </script>
 {% endblock %}

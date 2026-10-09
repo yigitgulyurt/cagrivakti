@@ -239,6 +239,11 @@ def imsakiye_detay(sehir):
     if not is_latin_only(country_code):
         abort(400, description="Gecersiz karakter iceren ulke kodu.")
 
+    yil_param = request.args.get('yil', type=int)
+    secilen_yil = yil_param if yil_param else suanki_yil
+
+    arsiv_yillari = list(range(suanki_yil - 5, suanki_yil + 2))
+
     sehir_adi = CITY_DISPLAY_NAME_MAPPING.get(canonical_sehir, canonical_sehir.replace('-', ' ').title())
     sehir_verisi = {
         'timezone': get_timezone_for_city(canonical_sehir, country_code)
@@ -246,8 +251,8 @@ def imsakiye_detay(sehir):
 
     og_image_url = url_for(
         'og.og_image',
-        title     =f"{sehir_adi} {suanki_yil} İmsakiyesi",
-        subtitle  =f"{suanki_yil} Yılı Sahur ve İftar Vakitleri",
+        title     =f"{sehir_adi} {secilen_yil} İmsakiyesi",
+        subtitle  =f"{secilen_yil} Yılı Sahur ve İftar Vakitleri",
         theme     = 'imsakiye-page',
         icon      = r'\udb82\udd79',
         prompt    =f"{sehir_adi} İmsakiyesi",
@@ -255,8 +260,8 @@ def imsakiye_detay(sehir):
         _external =True,
     )
 
-    title       = f"{sehir_adi} {suanki_yil} İmsakiyesi — Çağrı Vakti"
-    description = f"{sehir_adi} şehri için {suanki_yil} yılı Ramazan imsakiyesi. İftar ve sahur vakitleri."
+    title       = f"{sehir_adi} {secilen_yil} İmsakiyesi — Çağrı Vakti"
+    description = f"{sehir_adi} şehri için {secilen_yil} yılı Ramazan imsakiyesi. İftar ve sahur vakitleri."
     return render_template('imsakiye/imsakiye_detail.html',
                            sehir=canonical_sehir,
                            country_code=country_code,
@@ -264,7 +269,9 @@ def imsakiye_detay(sehir):
                            sehir_verisi=sehir_verisi,
                            og_image_url=og_image_url,
                            seo_title=title,
-                           seo_description=description)
+                           seo_description=description,
+                           current_year=secilen_yil,
+                           arsiv_yillari=arsiv_yillari)
 
 
 @views_bp.route('/dini-gunler')
