@@ -420,8 +420,8 @@
                 const now = new Date();
                 url += `&ay=${now.getMonth() + 1}&yil=${now.getFullYear()}`;
             } else if (currentTab === 'yillik') {
-                url += `&tam_yil=true`;
-                url += `&yil=${currentYear}`;
+                url += `&tam_yil=true&yil=${now.getFullYear()}`;
+
             } else if (currentTab === 'ramazan') {
                 url += `&ramazan=true`;
             } else {
