@@ -421,6 +421,7 @@
                 url += `&ay=${now.getMonth() + 1}&yil=${now.getFullYear()}`;
             } else if (currentTab === 'yillik') {
                 url += `&tam_yil=true`;
+                url += `&yil=${currentYear}`;
             } else if (currentTab === 'ramazan') {
                 url += `&ramazan=true`;
             } else {

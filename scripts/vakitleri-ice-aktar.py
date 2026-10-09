@@ -45,7 +45,7 @@ def normalize_sehir_name(name):
     return normalized
 
 def import_excel_files():
-    folder_path = os.path.join(os.path.dirname(__file__), '2026')
+    folder_path = os.path.join(os.path.dirname(__file__), '2027')
     if not os.path.exists(folder_path):
         print(f"Klasör bulunamadı: {folder_path}")
         return
